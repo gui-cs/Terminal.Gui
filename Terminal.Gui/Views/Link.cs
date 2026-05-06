@@ -108,6 +108,38 @@ public class Link : View, IDesignable
     ///     <c>mailto</c> are allowed by default. Callers that explicitly require additional schemes may modify this set,
     ///     but doing so widens the attack surface when <see cref="Url"/> is populated from untrusted input.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <c>file://</c> URIs are intentionally excluded from the default set because they allow local filesystem
+    ///         access and can be used to invoke registered shell handlers on Windows. Applications that display
+    ///         user-controlled content (Markdown, RSS, log output, etc.) are therefore protected by default.
+    ///     </para>
+    ///     <para>
+    ///         <b>Migration path for applications that need <c>file://</c> or other non-default schemes:</b>
+    ///     </para>
+    ///     <para>
+    ///         <b>Option 1 — Per-link handling via <see cref="Markdown.LinkClicked"/>.</b> Handle the URL in the event
+    ///         and set <c>e.Handled = true</c> to prevent <see cref="OpenUrl"/> from being called:
+    ///         <code>
+    /// markdownView.LinkClicked += (_, e) =>
+    /// {
+    ///     if (e.Url.StartsWith("file://", StringComparison.OrdinalIgnoreCase))
+    ///     {
+    ///         // Handle the file link yourself.
+    ///         e.Handled = true;
+    ///     }
+    /// };
+    ///         </code>
+    ///     </para>
+    ///     <para>
+    ///         <b>Option 2 — Global opt-in at application startup.</b> To allow <c>file://</c> links across the entire
+    ///         application, add the scheme to this set before any links are activated:
+    ///         <code>
+    /// Link.SafeSchemes.Add("file");
+    ///         </code>
+    ///         Only do this in applications where <c>file://</c> URIs originate from trusted content.
+    ///     </para>
+    /// </remarks>
     public static readonly HashSet<string> SafeSchemes = new (StringComparer.OrdinalIgnoreCase)
     {
         "http", "https", "mailto"
