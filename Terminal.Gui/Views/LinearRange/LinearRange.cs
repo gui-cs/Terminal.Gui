@@ -141,9 +141,7 @@ public class LinearRange<T> : LinearRangeViewBase<T, LinearRangeSpan<T>>
                                            default,
                                            default,
                                            -1,
-                                           -1)
-                   with
-                   { };
+                                           -1);
         }
 
         // Sort to get logical [low, high]
