@@ -167,11 +167,10 @@ public class DimAutoDemo : Scenario
 
         List<object> options = ["One", "Two", "Three", "Four"];
 
-        LinearRange linearRange = new (options)
+        LinearMultiSelector<object> linearRange = new (options)
         {
             X = 0,
             Y = 0,
-            Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
             Title = "_LinearRange"
