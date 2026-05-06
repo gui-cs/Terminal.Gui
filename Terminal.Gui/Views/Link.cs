@@ -104,28 +104,50 @@ public class Link : View, IDesignable
     }
 
     /// <summary>
+    ///     The set of URI schemes that <see cref="OpenUrl"/> is permitted to open. Only <c>http</c>, <c>https</c>, and
+    ///     <c>mailto</c> are allowed by default. Callers that explicitly require additional schemes may modify this set,
+    ///     but doing so widens the attack surface when <see cref="Url"/> is populated from untrusted input.
+    /// </summary>
+    public static readonly HashSet<string> SafeSchemes = new (StringComparer.OrdinalIgnoreCase)
+    {
+        "http", "https", "mailto"
+    };
+
+    /// <summary>
     ///     Opens the specified URL in the default web browser using a platform-specific mechanism.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         On Windows, uses <c>cmd /c start</c>. On macOS, uses <c>open</c>. On Linux, uses <c>xdg-open</c>.
+    ///         Only URLs whose scheme is listed in <see cref="SafeSchemes"/> (<c>http</c>, <c>https</c>, <c>mailto</c> by
+    ///         default) are opened. URLs with any other scheme (e.g. <c>file</c>, <c>ftp</c>, or Windows protocol
+    ///         handlers such as <c>ms-msdt</c>) are silently ignored.
     ///     </para>
     ///     <para>
-    ///         Ampersands in the URL are escaped on Windows to prevent shell interpretation.
+    ///         On Windows, uses <see cref="ProcessStartInfo.UseShellExecute"/> so the URL is dispatched directly by the
+    ///         OS shell without passing through <c>cmd.exe</c>. On macOS, uses <c>open</c>. On Linux, uses
+    ///         <c>xdg-open</c>.
+    ///     </para>
+    ///     <para>
+    ///         Callers that populate <see cref="Url"/> from untrusted input (markdown, RSS feeds, network data, etc.)
+    ///         must ensure the value is validated before it reaches this method.
     ///     </para>
     /// </remarks>
-    /// <param name="url">The URL to open. Should be a well-formed absolute URI.</param>
+    /// <param name="url">The URL to open. Must be a well-formed absolute URI with an allowed scheme.</param>
     public static void OpenUrl (string url)
     {
-        if (!Uri.IsWellFormedUriString (url, UriKind.Absolute) || Environment.GetEnvironmentVariable ("DisableRealDriverIO") == "1")
+        if (!Uri.TryCreate (url, UriKind.Absolute, out Uri? parsed) || parsed is null || !SafeSchemes.Contains (parsed.Scheme))
+        {
+            return;
+        }
+
+        if (Environment.GetEnvironmentVariable ("DisableRealDriverIO") == "1")
         {
             return;
         }
 
         if (PlatformDetection.IsWindows ())
         {
-            url = url.Replace ("&", "^&");
-            Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
+            Process.Start (new ProcessStartInfo (url) { UseShellExecute = true });
         }
         else if (PlatformDetection.IsMac ())
         {
