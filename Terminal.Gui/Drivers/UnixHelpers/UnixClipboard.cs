@@ -204,7 +204,7 @@ internal class WSLClipboard : ClipboardBase
             return;
         }
 
-        (int exitCode, string output) = ClipboardProcessRunner.Process (_powershellPath, $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
+        (int exitCode, string output) = ClipboardProcessRunner.Process (_powershellPath, "-noprofile -command \"$input | Set-Clipboard\"", input: text);
     }
 
     private bool CheckSupport ()
