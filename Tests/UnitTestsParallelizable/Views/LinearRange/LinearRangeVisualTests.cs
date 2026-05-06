@@ -121,7 +121,7 @@ public class LinearRangeVisualTests (ITestOutputHelper output)
         app.LayoutAndDraw ();
 
         // First, force focus on the right end so _lastFocusedOption=4 when we press the left.
-        Assert.True (r.OnOptionFocused (4, new LinearRangeEventArgs<int> (new (), 4)) || true);
+        r.OnOptionFocused (4, new LinearRangeEventArgs<int> (new (), 4));
 
         Assert.True (r.TryGetPositionByOption (0, out (int x, int y) pLeft));
         Point sLeft = r.ViewportToScreen (new Point (pLeft.x, pLeft.y));
