@@ -928,13 +928,13 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
             Enable (ConfigLocations.HardCoded);
             ResetToHardCodedDefaults ();
 
-            string? json = ConfigurationManager.SourcesManager?.ToJson (Settings);
+            string json = ConfigurationManager.SourcesManager?.ToJson (Settings);
 
             Assert.NotNull (json);
             Assert.DoesNotContain ("\"MessageBox.DefaultBorderStyle\": null", json);
             Assert.DoesNotContain ("\"Button.DefaultShadow\": null", json);
 
-            SettingsScope? roundTripped = JsonSerializer.Deserialize (json, SerializerContext.SettingsScope);
+            SettingsScope roundTripped = JsonSerializer.Deserialize (json, SerializerContext.SettingsScope);
 
             Assert.NotNull (roundTripped);
             Assert.NotNull (roundTripped! ["Themes"].PropertyValue);
@@ -969,7 +969,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
 
             Assert.True (CustomConvertedBoolean);
 
-            string? json = ConfigurationManager.SourcesManager?.ToJson (Settings);
+            string json = ConfigurationManager.SourcesManager?.ToJson (Settings);
 
             Assert.NotNull (json);
             Assert.Contains ("\"ConfigurationMangerTests.CustomConvertedBoolean\": \"yes\"", json);
@@ -1757,7 +1757,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
     {
         public override bool? Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            string? value = reader.GetString ();
+            string value = reader.GetString ();
 
             return value?.ToLowerInvariant () switch
             {
