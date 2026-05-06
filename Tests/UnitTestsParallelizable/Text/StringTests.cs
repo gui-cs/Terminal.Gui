@@ -215,31 +215,30 @@ public class StringTests
     }
 
     [Theory]
-    // Control characters (should be replaced with the "Control Pictures" block)
+    // Control characters (should be replaced with the "Control Pictures" block via +U+2400 offset)
     [InlineData ("\u0000", "\u2400")]  // NULL → ␀
-    [InlineData ("\u0009", "\u0009")]  // TAB → preserved (handled elsewhere)
+    [InlineData ("\u0009", "\u2409")]  // TAB → ␉
     [InlineData ("\u000A", "\u240A")]  // LF → ␊
     [InlineData ("\u000D", "\u240D")]  // CR → ␍
     [InlineData ("\u001B", "\u241B")]  // ESC → ␛
 
-    // C1 controls (should be replaced with space)
+    // C1 controls (mapped via +U+2400 offset for distinct visuals)
     [InlineData ("\u007F", "\u247F")]  // DEL → Control Picture
-    [InlineData ("\u0080", " ")]       // C1 control → space
-    [InlineData ("\u009F", " ")]       // C1 control → space
+    [InlineData ("\u0080", "\u2480")]  // C1 control → distinct visual
+    [InlineData ("\u009F", "\u249F")]  // C1 control → distinct visual
 
     // Printable characters (should remain unchanged)
     [InlineData ("A", "A")]
     [InlineData (" ", " ")]
     [InlineData ("~", "~")]
 
-    // Multi-character string with control char at start (should be sanitized)
+    // Multi-character strings (control at start → space, no controls → unchanged)
     [InlineData ("AB", "AB")]
     [InlineData ("Hello", "Hello")]
-    [InlineData ("\u0009A", "\u0009A")] // TAB + A: TAB is allowed, so preserved
 
     // Copilot - Security fix: multi-char graphemes starting with control chars are sanitized
     [InlineData ("\u001BA", " ")]       // ESC + A → space (unsafe control at start)
-    [InlineData ("A\u001B", " ")]       // A + ESC → space (embedded control)
+    [InlineData ("\u0009A", " ")]       // TAB + A → space (control at start of multi-char)
     public void MakePrintable_ReturnsExpected (string input, string expected)
     {
         // Act

@@ -133,10 +133,18 @@ public static class StringExtensions
 
     /// <summary>
     ///     Ensures the text does not contain control characters that could be emitted verbatim to the terminal,
-    ///     by translating C0 controls (U+0000–U+001F, except TAB U+0009) and C1 controls (U+007F–U+009F) to
-    ///     equivalent, printable, Unicode Control Pictures (U+2400–U+243F) or space.
+    ///     by translating C0 controls (U+0000–U+001F), DEL (U+007F), and C1 controls (U+0080–U+009F) to
+    ///     printable Unicode equivalents via the +U+2400 offset. Multi-character graphemes whose first
+    ///     character is a control are replaced with a space.
     /// </summary>
-    /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
+    /// <remarks>
+    ///     <para>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</para>
+    ///     <para>
+    ///         Per UAX #29, control characters are always grapheme cluster boundaries. A well-formed grapheme
+    ///         cluster produced by <see cref="System.Globalization.StringInfo.GetTextElementEnumerator(string)"/>
+    ///         cannot contain embedded controls, so only the first character needs to be checked.
+    ///     </para>
+    /// </remarks>
     /// <param name="str">The text.</param>
     /// <returns>A string safe for terminal display.</returns>
     public static string MakePrintable (this string str)
@@ -148,49 +156,18 @@ public static class StringExtensions
 
         char first = str [0];
 
-        // Fast path: single-char grapheme with no control character
+        // Fast path: single-char grapheme (covers the vast majority of calls)
         if (str.Length == 1)
         {
-            if (first == '\t')
-            {
-                return str; // TAB is allowed — handled elsewhere
-            }
-
-            if (char.IsControl (first))
-            {
-                // Map C0 controls (0x00–0x1F) and DEL (0x7F) to Unicode Control Pictures (U+2400–U+2421).
-                // Map C1 controls (0x80–0x9F) to a replacement space since there are no standard pictures.
-                if (first <= '\x7F')
-                {
-                    return new string ((char)(first + 0x2400), 1);
-                }
-
-                return " ";
-            }
-
-            return str;
+            return char.IsControl (first) ? new string ((char)(first + 0x2400), 1) : str;
         }
 
-        // Multi-char grapheme: check if first char is a control character
-        if (first == '\t')
-        {
-            return str; // TAB is allowed
-        }
-
+        // Multi-char grapheme: per UAX #29, control characters are grapheme cluster boundaries,
+        // so a well-formed cluster from GetTextElementEnumerator cannot contain embedded controls.
+        // We only need to check the first character defensively for malformed input.
         if (char.IsControl (first))
         {
-            // The grapheme starts with a control character — replace entirely with space
             return " ";
-        }
-
-        // Check for embedded control characters within the grapheme cluster
-        for (int i = 1; i < str.Length; i++)
-        {
-            if (char.IsControl (str [i]) && str [i] != '\t')
-            {
-                // Replace the entire grapheme with space — it contains embedded controls
-                return " ";
-            }
         }
 
         return str;

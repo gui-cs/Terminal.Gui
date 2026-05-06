@@ -198,31 +198,11 @@ public static class RuneExtensions
     }
 
     /// <summary>
-    ///     Ensures the rune is not a control character and can be displayed by translating C0 controls (U+0000–U+001F,
-    ///     except TAB U+0009) and C1 controls (U+007F–U+009F) to equivalent printable Unicode chars or space.
+    ///     Ensures the rune is not a control character and can be displayed by translating C0 controls (U+0000–U+001F),
+    ///     DEL (U+007F), and C1 controls (U+0080–U+009F) to printable Unicode equivalents via the +U+2400 offset.
     /// </summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
     /// <param name="rune">The rune to make printable.</param>
     /// <returns>A printable rune safe for terminal display.</returns>
-    public static Rune MakePrintable (this Rune rune)
-    {
-        if (rune.Value == '\t')
-        {
-            return rune; // TAB is allowed — handled elsewhere
-        }
-
-        if (!Rune.IsControl (rune))
-        {
-            return rune;
-        }
-
-        // Map C0 controls (0x00–0x1F) and DEL (0x7F) to Unicode Control Pictures (U+2400–U+2421).
-        // Map C1 controls (0x80–0x9F) to space since there are no standard pictures.
-        if (rune.Value <= 0x7F)
-        {
-            return new (rune.Value + 0x2400);
-        }
-
-        return new (' ');
-    }
+    public static Rune MakePrintable (this Rune rune) { return Rune.IsControl (rune) ? new (rune.Value + 0x2400) : rune; }
 }
