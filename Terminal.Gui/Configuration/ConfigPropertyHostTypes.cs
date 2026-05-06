@@ -58,7 +58,7 @@ internal static class ConfigPropertyHostTypes
         typeof (FileDialogStyle),
         typeof (FrameView),
         typeof (HexView),
-        typeof (LinearRange),
+        typeof (LinearRangeDefaults),
         typeof (Menu),
         typeof (MenuBar),
         typeof (MessageBox),
@@ -89,7 +89,7 @@ internal static class ConfigPropertyHostTypes
     [DynamicDependency (PreservedMembers, typeof (FileDialogStyle))]
     [DynamicDependency (PreservedMembers, typeof (FrameView))]
     [DynamicDependency (PreservedMembers, typeof (HexView))]
-    [DynamicDependency (PreservedMembers, typeof (LinearRange))]
+    [DynamicDependency (PreservedMembers, typeof (LinearRangeDefaults))]
     [DynamicDependency (PreservedMembers, typeof (Menu))]
     [DynamicDependency (PreservedMembers, typeof (MenuBar))]
     [DynamicDependency (PreservedMembers, typeof (MessageBox))]
