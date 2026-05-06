@@ -159,6 +159,13 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
     }
 
+    /// <summary>
+    ///     Gets whether the Accept command (Enter key) should also invoke Activate (toggle/select) before accepting.
+    ///     The default is <see langword="true"/> (OptionSelector behavior). Override to return <see langword="false"/>
+    ///     to accept without activating (FlagSelector behavior).
+    /// </summary>
+    protected virtual bool ActivateOnAccept => true;
+
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
@@ -167,7 +174,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return true;
         }
 
-        // Per spec: Enter key should Activate AND Accept for both OptionSelector and FlagSelector.
+        // Per spec: Enter key should Activate AND Accept for OptionSelector.
         // Enter only triggers Command.Accept (View's default key binding), so invoke Activate here
         // before continuing with Accept processing. Also handle direct programmatic Accept invocations
         // (Binding is null) by activating the currently focused checkbox.
@@ -178,7 +185,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
 
         bool directAccept = args.Context?.Binding is null && Focused is CheckBox;
 
-        if (!enterFromCheckBox && !directAccept)
+        if ((!enterFromCheckBox && !directAccept) || !ActivateOnAccept)
         {
             return args.Context?.Binding switch
             {
