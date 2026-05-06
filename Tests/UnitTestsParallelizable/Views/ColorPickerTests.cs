@@ -494,13 +494,16 @@ public class ColorPickerTests
         Assert.Same (hex, cp.Focused);
 
         hex.Text = "";
-        name.Text = "";
 
         Assert.Empty (hex.Text);
-        Assert.Empty (name.Text);
+
+        // Name field shows "Black" initially (from SelectedColor = Color.Black)
+        Assert.Equal ("Black", name.Text);
 
         cp.App!.Keyboard.RaiseKeyDownEvent ('#');
-        Assert.Empty (name.Text);
+
+        // Name stays at "Black" while typing hex (no update until leave/accept)
+        Assert.Equal ("Black", name.Text);
 
         //7FFFD4
 
@@ -510,7 +513,7 @@ public class ColorPickerTests
         cp.App!.Keyboard.RaiseKeyDownEvent ('F');
         cp.App!.Keyboard.RaiseKeyDownEvent ('F');
         cp.App!.Keyboard.RaiseKeyDownEvent ('D');
-        Assert.Empty (name.Text);
+        Assert.Equal ("Black", name.Text);
 
         cp.App!.Keyboard.RaiseKeyDownEvent ('4');
 
@@ -548,13 +551,16 @@ public class ColorPickerTests
         Assert.Same (hex, cp.Focused);
 
         hex.Text = "";
-        name.Text = "";
 
         Assert.Empty (hex.Text);
-        Assert.Empty (name.Text);
+
+        // Name field shows "Black" initially (from SelectedColor = Color.Black)
+        Assert.Equal ("Black", name.Text);
 
         cp.App!.Keyboard.RaiseKeyDownEvent ('#');
-        Assert.Empty (name.Text);
+
+        // Name stays at "Black" while typing hex (no update until leave/accept)
+        Assert.Equal ("Black", name.Text);
 
         //7FFFD4
 
@@ -564,7 +570,7 @@ public class ColorPickerTests
         cp.App!.Keyboard.RaiseKeyDownEvent ('F');
         cp.App!.Keyboard.RaiseKeyDownEvent ('F');
         cp.App!.Keyboard.RaiseKeyDownEvent ('D');
-        Assert.Empty (name.Text);
+        Assert.Equal ("Black", name.Text);
 
         cp.App!.Keyboard.RaiseKeyDownEvent ('4');
 
@@ -868,8 +874,9 @@ public class ColorPickerTests
     }
 
     [Fact]
-    public void TabCompleteColorName ()
+    public void DropDownListColorName_SelectsColor ()
     {
+        // Copilot
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
 
         cp.Draw (); // Draw is needed to update TrianglePosition
@@ -880,38 +887,16 @@ public class ColorPickerTests
         TextField name = GetTextField (cp, ColorPickerPart.ColorName);
         TextField hex = GetTextField (cp, ColorPickerPart.Hex);
 
-        name.SetFocus ();
+        // Verify the name field is a DropDownList
+        Assert.IsType<DropDownList> (name);
 
-        Assert.True (name.HasFocus);
-        Assert.Same (name, cp.Focused);
+        // Initial color is Black
+        Assert.Equal ("Black", name.Text);
 
-        name.Text = "";
-        Assert.Empty (name.Text);
+        // Directly set the text on the DropDownList to simulate selecting "Aqua"
+        name.Text = "Aqua";
 
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.A);
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.Q);
-
-        Assert.Equal ("aq", name.Text);
-
-        // Auto complete the color name
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.Tab);
-
-        // Match cyan alternative name
-        Assert.Equal ("Aqua", name.Text);
-
-        Assert.True (name.HasFocus);
-
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.Tab);
-
-        // Resolves to cyan color
-        Assert.Equal ("Aqua", name.Text);
-
-        // Tab out of the text field
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.Tab);
-
-        Assert.False (name.HasFocus);
-        Assert.NotSame (name, cp.Focused);
-
+        // The color should now be Aqua (#00FFFF)
         Assert.Equal ("#00FFFF", hex.Text);
 
         cp.App?.Dispose ();

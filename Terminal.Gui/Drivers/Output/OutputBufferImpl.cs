@@ -58,6 +58,12 @@ public class OutputBufferImpl : IOutputBuffer
     /// <returns>The URL if one exists, otherwise null.</returns>
     public string? GetCellUrl (int col, int row)
     {
+        // Fast-path: skip locking when no URLs have been set
+        if (_urlMap is null)
+        {
+            return null;
+        }
+
         lock (_contentsLock)
         {
             return _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
