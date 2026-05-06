@@ -117,7 +117,17 @@ public class MarkdownTester : Scenario
 
         Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };
 
-        statusBar.Add (themeShortcut, themeBgShortcut, quitShortcut);
+        Link linkView = new () { Text = "" };
+        Shortcut linkShortcut = new () { CommandView = linkView, Title = "", MouseHighlightStates = MouseState.None };
+
+        preview.LinkClicked += (_, e) =>
+                                {
+                                    linkView.Text = e.Url;
+                                    linkShortcut.MouseHighlightStates = MouseState.In;
+                                    e.Handled = true;
+                                };
+
+        statusBar.Add (themeShortcut, themeBgShortcut, linkShortcut, quitShortcut);
         window.Add (statusBar);
 
         preview.Text = editor.Text;

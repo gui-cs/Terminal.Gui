@@ -88,6 +88,15 @@ public partial class Markdown
                 };
                 tableView.Recalculate (tableLayoutWidth);
 
+                // Forward link clicks from the table to this Markdown view's LinkClicked event.
+                tableView.LinkClicked += (_, e) =>
+                                         {
+                                             if (RaiseLinkClicked (e.Url))
+                                             {
+                                                 e.Handled = true;
+                                             }
+                                         };
+
                 _tableViews.Add (tableView);
                 Add (tableView);
 

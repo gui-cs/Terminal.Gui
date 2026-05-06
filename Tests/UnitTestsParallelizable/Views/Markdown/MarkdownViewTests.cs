@@ -201,6 +201,60 @@ public class MarkdownViewTests (ITestOutputHelper output)
         window.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void Mouse_Click_On_Link_In_Table_Cell_Raises_LinkClicked ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [select](https://example.com) | Pick one item |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        window.Add (markdownView);
+
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // The table is a SubView of the Markdown view. Find it.
+        MarkdownTable? tableView = null;
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable t)
+            {
+                tableView = t;
+
+                break;
+            }
+        }
+
+        Assert.NotNull (tableView);
+
+        // Click on the link text in the first body row, first column.
+        // Table layout: row 0 = top border, row 1 = header, row 2 = separator, row 3 = body row.
+        // Column layout: col 0 starts after left border (x=1), with 1 char padding = x=2.
+        tableView.NewMouseEvent (new Mouse { Position = new Point (2, 3), Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.Equal ("https://example.com", clickedUrl);
+
+        window.Dispose ();
+    }
+
     [Fact]
     public void Image_Fallback_Text_Renders ()
     {

@@ -53,7 +53,15 @@ public sealed class MarkdownTable : View, IDesignable
         Border.Thickness = new Thickness (0);
         Padding.Thickness = new Thickness (0);
         Margin.Thickness = new Thickness (0);
+
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
     }
+
+    /// <summary>
+    ///     Raised when a hyperlink inside a table cell is clicked.
+    ///     Set <see cref="MarkdownLinkEventArgs.Handled"/> to prevent default navigation.
+    /// </summary>
+    public event EventHandler<MarkdownLinkEventArgs>? LinkClicked;
 
     /// <summary>
     ///     Gets or sets an optional syntax highlighter used to resolve theme-based attributes for
@@ -200,6 +208,165 @@ public sealed class MarkdownTable : View, IDesignable
         base.OnSubViewLayout (args);
 
         Recalculate (Frame.Width);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse, MouseEvent.Position: { } pos })
+        {
+            return;
+        }
+
+        if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
+        {
+            return;
+        }
+
+        string? url = HitTestLink (pos.X, pos.Y);
+
+        if (url is null)
+        {
+            return;
+        }
+
+        MarkdownLinkEventArgs args = new (url);
+        LinkClicked?.Invoke (this, args);
+
+        if (args.Handled)
+        {
+            return;
+        }
+
+        Link.OpenUrl (url);
+    }
+
+    /// <summary>
+    ///     Returns the URL of the link at the given viewport position, or <see langword="null"/>
+    ///     if no link segment occupies that position.
+    /// </summary>
+    internal string? HitTestLink (int viewportX, int viewportY)
+    {
+        if (_columnWidths.Length == 0)
+        {
+            return null;
+        }
+
+        // Determine which row the click is in.
+        // Layout: row 0 = top border, rows 1..headerRowHeight = header,
+        //         headerRowHeight+1 = separator, then body rows, last row = bottom border.
+        int y = viewportY;
+        y--; // skip top border
+
+        if (y < 0)
+        {
+            return null;
+        }
+
+        List<StyledSegment> []? cellSegments = null;
+
+        if (y < _headerRowHeight)
+        {
+            // Click in the header row
+            cellSegments = _headerSegments;
+        }
+        else
+        {
+            y -= _headerRowHeight;
+            y--; // skip separator line
+
+            if (y < 0)
+            {
+                return null;
+            }
+
+            // Walk body rows
+            for (var r = 0; r < _bodyRowHeights.Length; r++)
+            {
+                if (y < _bodyRowHeights [r])
+                {
+                    cellSegments = _rowSegments [r];
+
+                    break;
+                }
+
+                y -= _bodyRowHeights [r];
+            }
+        }
+
+        if (cellSegments is null)
+        {
+            return null;
+        }
+
+        // Determine which column the click is in.
+        int x = viewportX;
+        x--; // skip left border
+        var col = -1;
+
+        for (var c = 0; c < _columnWidths.Length; c++)
+        {
+            if (x < _columnWidths [c])
+            {
+                col = c;
+
+                break;
+            }
+
+            x -= _columnWidths [c] + 1; // column width + separator
+        }
+
+        if (col < 0 || col >= cellSegments.Length)
+        {
+            return null;
+        }
+
+        // Word-wrap the cell and find the segment at the click position within the line.
+        int innerWidth = _columnWidths [col] - 2;
+        List<List<StyledSegment>> wrappedLines = WrapSegments (cellSegments [col], innerWidth);
+
+        // 'y' is now the line-in-row offset (already computed above for multi-line rows)
+        if (y < 0 || y >= wrappedLines.Count)
+        {
+            return null;
+        }
+
+        List<StyledSegment> lineSegs = wrappedLines [y];
+
+        // Compute text width for alignment padding
+        var textWidth = 0;
+
+        foreach (StyledSegment seg in lineSegs)
+        {
+            textWidth += seg.Text.GetColumns ();
+        }
+
+        Alignment alignment = col < _data.ColumnAlignments.Length ? _data.ColumnAlignments [col] : Alignment.Start;
+        int padLeft = CalculateLeftPadding (_columnWidths [col], Math.Min (textWidth, innerWidth), alignment);
+
+        // x is relative to column start; subtract padding to get text-relative position.
+        int textX = x - padLeft;
+
+        if (textX < 0)
+        {
+            return null;
+        }
+
+        var runX = 0;
+
+        foreach (StyledSegment seg in lineSegs)
+        {
+            int segWidth = seg.Text.GetColumns ();
+
+            if (textX >= runX && textX < runX + segWidth && !string.IsNullOrWhiteSpace (seg.Url))
+            {
+                return seg.Url;
+            }
+
+            runX += segWidth;
+        }
+
+        return null;
     }
 
     /// <inheritdoc/>
