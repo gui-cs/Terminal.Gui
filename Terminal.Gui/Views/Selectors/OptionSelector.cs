@@ -175,6 +175,22 @@ public class OptionSelector : SelectorBase, IDesignable
         Debug.Assert (SubViews.OfType<CheckBox> ().Count (cb => cb.Value == CheckState.Checked) <= 1);
     }
 
+    /// <inheritdoc/>
+    protected override void OnValueChanged (int? value, int? previousValue)
+    {
+        if (value is null || Values is null)
+        {
+            return;
+        }
+
+        int index = Values.IndexOf (v => v == value);
+
+        if (index >= 0 && index < SubViews.OfType<CheckBox> ().Count ())
+        {
+            FocusedItem = index;
+        }
+    }
+
     /// <summary>
     ///     Gets or sets the <see cref="SelectorBase.Labels"/> index for the focused item. The active item may or may not be
     ///     the selected

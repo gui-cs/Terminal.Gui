@@ -157,6 +157,23 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
 
     object? IValue.GetValue () => Value;
 
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Resolves the diamond between <see cref="TextValidateField"/>'s <c>IValue&lt;string&gt;</c>
+    ///     and this view's <c>IValue&lt;TimeSpan&gt;</c> by parsing into <see cref="TimeSpan"/>.
+    /// </remarks>
+    bool IValue.TrySetValueFromString (string input)
+    {
+        if (!IValueParser.TryParseValue (input, out TimeSpan parsed))
+        {
+            return false;
+        }
+
+        Value = parsed;
+
+        return true;
+    }
+
     /// <summary>
     ///     Synchronizes the <see cref="TimeSpan"/> backing field when the base class
     ///     <see cref="TextValidateField.Text"/> property changes programmatically.
