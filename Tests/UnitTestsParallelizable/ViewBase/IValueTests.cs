@@ -415,4 +415,244 @@ public class IValueTests
         Assert.Equal (view, changingSender);
         Assert.Equal (view, changedSender);
     }
+
+    #region TrySetValueFromString
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_Int_ParsesValid ()
+    {
+        TestIntValueView view = new ();
+
+        bool result = ((IValue)view).TrySetValueFromString ("42");
+
+        Assert.True (result);
+        Assert.Equal (42, view.Value);
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_Int_ReturnsFalse_ForInvalid ()
+    {
+        TestIntValueView view = new () { Value = 7 };
+
+        bool result = ((IValue)view).TrySetValueFromString ("not a number");
+
+        Assert.False (result);
+        Assert.Equal (7, view.Value);
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_String_AssignsDirectly ()
+    {
+        TestStringValueView view = new ();
+
+        bool result = ((IValue)view).TrySetValueFromString ("hello");
+
+        Assert.True (result);
+        Assert.Equal ("hello", view.Value);
+    }
+
+    // Copilot - test view exposing IValue<DateTime> for IParsable verification.
+    private sealed class TestDateValueView : View, IValue<DateTime>
+    {
+        private DateTime _value;
+
+        public DateTime Value
+        {
+            get => _value;
+            set =>
+                CWPPropertyHelper.ChangeProperty (this,
+                                                  ref _value,
+                                                  value,
+                                                  args => false,
+                                                  ValueChanging,
+                                                  _ => { },
+                                                  args => ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue)),
+                                                  ValueChanged,
+                                                  out _);
+        }
+
+        public event EventHandler<ValueChangingEventArgs<DateTime>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<DateTime>>? ValueChanged;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_DateTime_ParsesViaIParsable ()
+    {
+        TestDateValueView view = new ();
+
+        bool result = ((IValue)view).TrySetValueFromString ("2024-06-15");
+
+        Assert.True (result);
+        Assert.Equal (new DateTime (2024, 6, 15), view.Value);
+    }
+
+    // Copilot - test view exposing IValue<DayOfWeek?> for enum + nullable verification.
+    private sealed class TestEnumValueView : View, IValue<DayOfWeek?>
+    {
+        private DayOfWeek? _value;
+
+        public DayOfWeek? Value
+        {
+            get => _value;
+            set =>
+                CWPPropertyHelper.ChangeProperty (this,
+                                                  ref _value,
+                                                  value,
+                                                  args => false,
+                                                  ValueChanging,
+                                                  _ => { },
+                                                  args => ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue)),
+                                                  ValueChanged,
+                                                  out _);
+        }
+
+        public event EventHandler<ValueChangingEventArgs<DayOfWeek?>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<DayOfWeek?>>? ValueChanged;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+    }
+
+    // Copilot
+    [Theory]
+    [InlineData ("Monday", DayOfWeek.Monday)]
+    [InlineData ("friday", DayOfWeek.Friday)] // case-insensitive
+    public void TrySetValueFromString_NullableEnum_Parses (string input, DayOfWeek expected)
+    {
+        TestEnumValueView view = new ();
+
+        bool result = ((IValue)view).TrySetValueFromString (input);
+
+        Assert.True (result);
+        Assert.Equal (expected, view.Value);
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_Enum_ReturnsFalse_ForInvalid ()
+    {
+        TestEnumValueView view = new () { Value = DayOfWeek.Sunday };
+
+        bool result = ((IValue)view).TrySetValueFromString ("NotADay");
+
+        Assert.False (result);
+        Assert.Equal (DayOfWeek.Sunday, view.Value);
+    }
+
+    // Copilot - test view exposing IValue<object> for unsupported-type verification.
+    private sealed class TestObjectValueView : View, IValue<object?>
+    {
+        private object? _value;
+
+        public object? Value
+        {
+            get => _value;
+            set =>
+                CWPPropertyHelper.ChangeProperty (this,
+                                                  ref _value,
+                                                  value,
+                                                  args => false,
+                                                  ValueChanging,
+                                                  _ => { },
+                                                  args => ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue)),
+                                                  ValueChanged,
+                                                  out _);
+        }
+
+        public event EventHandler<ValueChangingEventArgs<object?>>? ValueChanging;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChanged;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_UnsupportedType_ReturnsFalse ()
+    {
+        TestObjectValueView view = new ();
+
+        bool result = ((IValue)view).TrySetValueFromString ("anything");
+
+        Assert.False (result);
+        Assert.Null (view.Value);
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_RaisesValueChanged ()
+    {
+        TestIntValueView view = new ();
+        var raised = 0;
+        view.ValueChanged += (_, _) => raised++;
+
+        bool result = ((IValue)view).TrySetValueFromString ("99");
+
+        Assert.True (result);
+        Assert.Equal (1, raised);
+        Assert.Equal (99, view.Value);
+    }
+
+    // Copilot - integration with real Views
+    [Fact]
+    public void TrySetValueFromString_NumericUpDown_Int_Parses ()
+    {
+        NumericUpDown<int> upDown = new ();
+
+        bool result = ((IValue)upDown).TrySetValueFromString ("123");
+
+        Assert.True (result);
+        Assert.Equal (123, upDown.Value);
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_ColorPicker_ParsesHexColor ()
+    {
+        ColorPicker picker = new ();
+
+        bool result = ((IValue)picker).TrySetValueFromString ("#FF0000");
+
+        Assert.True (result);
+        Assert.Equal (Color.Red, picker.SelectedColor);
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_ColorPicker_ReturnsFalse_ForInvalid ()
+    {
+        ColorPicker picker = new ();
+
+        bool result = ((IValue)picker).TrySetValueFromString ("not-a-color");
+
+        Assert.False (result);
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_DatePicker_ParsesIsoDate ()
+    {
+        DatePicker picker = new ();
+
+        bool result = ((IValue)picker).TrySetValueFromString ("2024-12-25");
+
+        Assert.True (result);
+        Assert.Equal (new DateTime (2024, 12, 25), picker.Value);
+    }
+
+    // Copilot
+    [Fact]
+    public void TrySetValueFromString_MenuItem_SetsTitle ()
+    {
+        MenuItem item = new () { Title = "Old" };
+
+        bool result = ((IValue)item).TrySetValueFromString ("New");
+
+        Assert.True (result);
+        Assert.Equal ("New", item.Title);
+        Assert.Equal ("New", item.GetValue ());
+    }
+
+    #endregion TrySetValueFromString
 }
