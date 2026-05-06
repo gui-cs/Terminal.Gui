@@ -102,10 +102,17 @@ public class DefaultFileOperations : IFileOperations
         {
             if (toRename is IFileInfo f)
             {
+                if (ContainsInvalidNameCharacters (newName))
+                {
+                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, Strings.fdPathTraversalError, Strings.btnOk);
+
+                    return null;
+                }
+
                 string parentDir = f.Directory?.FullName ?? throw new InvalidOperationException ();
                 string combined = Path.Combine (parentDir, newName);
 
-                if (ContainsInvalidNameCharacters (newName) || !IsContainedIn (parentDir, combined))
+                if (!IsContainedIn (parentDir, combined))
                 {
                     MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, Strings.fdPathTraversalError, Strings.btnOk);
 
@@ -120,10 +127,18 @@ public class DefaultFileOperations : IFileOperations
             else
             {
                 var d = (IDirectoryInfo)toRename;
+
+                if (ContainsInvalidNameCharacters (newName))
+                {
+                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, Strings.fdPathTraversalError, Strings.btnOk);
+
+                    return null;
+                }
+
                 string parentDir = d.Parent?.FullName ?? throw new InvalidOperationException ();
                 string combined = Path.Combine (parentDir, newName);
 
-                if (ContainsInvalidNameCharacters (newName) || !IsContainedIn (parentDir, combined))
+                if (!IsContainedIn (parentDir, combined))
                 {
                     MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, Strings.fdPathTraversalError, Strings.btnOk);
 
@@ -161,9 +176,16 @@ public class DefaultFileOperations : IFileOperations
 
         try
         {
+            if (ContainsInvalidNameCharacters (result))
+            {
+                MessageBox.ErrorQuery (app, Strings.fdNewFailed, Strings.fdPathTraversalError, Strings.btnOk);
+
+                return null;
+            }
+
             string combined = Path.Combine (inDirectory.FullName, result);
 
-            if (ContainsInvalidNameCharacters (result) || !IsContainedIn (inDirectory.FullName, combined))
+            if (!IsContainedIn (inDirectory.FullName, combined))
             {
                 MessageBox.ErrorQuery (app, Strings.fdNewFailed, Strings.fdPathTraversalError, Strings.btnOk);
 
