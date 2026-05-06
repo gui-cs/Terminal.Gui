@@ -128,6 +128,11 @@ public class Link : View, IDesignable
     ///         <c>xdg-open</c>.
     ///     </para>
     ///     <para>
+    ///         Any exception thrown by the underlying process launch (e.g. no default browser registered,
+    ///         permission denied) is caught and logged via <see cref="Logging.Warning"/>; the method never
+    ///         propagates such exceptions to the caller.
+    ///     </para>
+    ///     <para>
     ///         Callers that populate <see cref="Url"/> from untrusted input (markdown, RSS feeds, network data, etc.)
     ///         must ensure the value is validated before it reaches this method.
     ///     </para>
@@ -145,28 +150,35 @@ public class Link : View, IDesignable
             return;
         }
 
-        if (PlatformDetection.IsWindows ())
+        try
         {
-            Process.Start (new ProcessStartInfo (url) { UseShellExecute = true });
-        }
-        else if (PlatformDetection.IsMac ())
-        {
-            Process.Start ("open", url);
-        }
-        else if (PlatformDetection.IsLinux ())
-        {
-            using Process process = new ();
-
-            process.StartInfo = new ProcessStartInfo
+            if (PlatformDetection.IsWindows ())
             {
-                FileName = "xdg-open",
-                Arguments = url,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            process.Start ();
+                Process.Start (new ProcessStartInfo (url) { UseShellExecute = true });
+            }
+            else if (PlatformDetection.IsMac ())
+            {
+                Process.Start ("open", url);
+            }
+            else if (PlatformDetection.IsLinux ())
+            {
+                using Process process = new ();
+
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = "xdg-open",
+                    Arguments = url,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                process.Start ();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"OpenUrl failed for '{url}': {ex.Message}");
         }
     }
 
