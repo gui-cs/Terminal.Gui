@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 //  Item HotKey - Focus item. Activate (Toggle) item. Do NOT Accept.
 // Focused:
 //  Space key - Activate (Toggle) focused item. Do NOT Accept.
-//  Enter key - Activate (Toggle) and Accept the focused item.
+//  Enter key - Accept. Do NOT Toggle.
 //  HotKey - No-op.
 //  Item HotKey - Focus item, Activate (Toggle), and do NOT Accept.
 
@@ -59,6 +59,11 @@ public class FlagSelector : SelectorBase, IDesignable
     ///     Consumes: FlagSelector owns toggle semantics.
     /// </summary>
     protected override bool ConsumeDispatch => true;
+
+    /// <summary>
+    ///     FlagSelector does not toggle on Enter — Enter only accepts.
+    /// </summary>
+    protected override bool ActivateOnAccept => false;
 
     // Set by OnHandlingHotKey to suppress the Activate that DefaultHotKeyHandler
     // fires after RaiseHandlingHotKey. Checked and cleared in GetDispatchTarget.

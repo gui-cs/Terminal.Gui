@@ -8,36 +8,34 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
-    public void LinearRange_CanCreateAndRender (string d)
+    public void LinearSelector_CanCreateAndRender (string d)
     {
         using AppTestHelper c = With.A<Window> (30, 10, d, _out)
                                         .Add (
-                                              new LinearRange<int> ([0, 10, 20, 30, 40, 50])
+                                              new LinearSelector<int> ([0, 10, 20, 30, 40, 50])
                                               {
                                                   X = 2,
-                                                  Y = 2,
-                                                  Type = LinearRangeType.Single
+                                                  Y = 2
                                               })
-                                        .Focus<LinearRange<int>> ()
+                                        .Focus<LinearSelector<int>> ()
                                         .WaitIteration ()
-                                        .ScreenShot ("LinearRange initial render", _out)
+                                        .ScreenShot ("LinearSelector initial render", _out)
                                         .Stop ();
     }
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
-    public void LinearRange_CanNavigateWithArrowKeys (string d)
+    public void LinearSelector_CanNavigateWithArrowKeys (string d)
     {
         using AppTestHelper c = With.A<Window> (30, 10, d, _out)
                                         .Add (
-                                              new LinearRange<int> ([0, 10, 20, 30])
+                                              new LinearSelector<int> ([0, 10, 20, 30])
                                               {
                                                   X = 2,
                                                   Y = 2,
-                                                  Type = LinearRangeType.Single,
                                                   AllowEmpty = false
                                               })
-                                        .Focus<LinearRange<int>> ()
+                                        .Focus<LinearSelector<int>> ()
                                         .WaitIteration ()
                                         .ScreenShot ("Initial state", _out)
                                         .KeyDown (Key.CursorRight)
@@ -51,50 +49,41 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
-    public void LinearRange_TypeChange_TriggersEvents (string d)
+    public void LinearRange_RangeKindChange_TriggersValueChange (string d)
     {
         LinearRange<int> linearRange = new ([0, 10, 20, 30])
         {
             X = 2,
             Y = 2,
-            Type = LinearRangeType.Single
+            RangeKind = LinearRangeSpanKind.Closed
         };
+        linearRange.Value = new LinearRangeSpan<int> (LinearRangeSpanKind.Closed, 0, 30, 0, 3);
 
-        var changingEventRaised = false;
-        var changedEventRaised = false;
+        var changedRaised = false;
 
-        linearRange.TypeChanging += (_, args) =>
+        linearRange.ValueChanged += (_, args) =>
                                     {
-                                        changingEventRaised = true;
-                                        Assert.Equal (LinearRangeType.Single, args.CurrentValue);
-                                        Assert.Equal (LinearRangeType.Range, args.NewValue);
+                                        changedRaised = true;
+                                        Assert.Equal (LinearRangeSpanKind.LeftBounded, args.NewValue.Kind);
                                     };
 
-        linearRange.TypeChanged += (_, args) =>
-                                   {
-                                       changedEventRaised = true;
-                                       Assert.Equal (LinearRangeType.Single, args.OldValue);
-                                       Assert.Equal (LinearRangeType.Range, args.NewValue);
-                                   };
-
-        // Change the type before adding to window
-        linearRange.Type = LinearRangeType.Range;
+        // Migrate from Closed -> LeftBounded; the End is preserved.
+        linearRange.RangeKind = LinearRangeSpanKind.LeftBounded;
 
         using AppTestHelper c = With.A<Window> (30, 10, d, _out)
                                         .Add (linearRange)
                                         .Focus<LinearRange<int>> ()
                                         .WaitIteration ()
-                                        .ScreenShot ("After type change to Range", _out)
+                                        .ScreenShot ("After RangeKind change to LeftBounded", _out)
                                         .Stop ();
 
-        Assert.True (changingEventRaised);
-        Assert.True (changedEventRaised);
-        Assert.Equal (LinearRangeType.Range, linearRange.Type);
+        Assert.True (changedRaised);
+        Assert.Equal (LinearRangeSpanKind.LeftBounded, linearRange.RangeKind);
     }
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
-    public void LinearRange_RangeType_CanSelectRange (string d)
+    public void LinearRange_Closed_CanSelectRange (string d)
     {
         using AppTestHelper c = With.A<Window> (30, 10, d, _out)
                                         .Add (
@@ -102,7 +91,7 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
                                               {
                                                   X = 2,
                                                   Y = 2,
-                                                  Type = LinearRangeType.Range,
+                                                  RangeKind = LinearRangeSpanKind.Closed,
                                                   AllowEmpty = false
                                               })
                                         .Focus<LinearRange<int>> ()
@@ -121,18 +110,17 @@ public class LinearRangeFluentTests (ITestOutputHelper outputHelper) : TestsAllD
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
-    public void LinearRange_VerticalOrientation_Renders (string d)
+    public void LinearSelector_VerticalOrientation_Renders (string d)
     {
         using AppTestHelper c = With.A<Window> (10, 15, d, _out)
                                         .Add (
-                                              new LinearRange<int> ([0, 10, 20, 30])
+                                              new LinearSelector<int> ([0, 10, 20, 30])
                                               {
                                                   X = 2,
                                                   Y = 2,
-                                                  Orientation = Orientation.Vertical,
-                                                  Type = LinearRangeType.Single
+                                                  Orientation = Orientation.Vertical
                                               })
-                                        .Focus<LinearRange<int>> ()
+                                        .Focus<LinearSelector<int>> ()
                                         .WaitIteration ()
                                         .ScreenShot ("Vertical orientation", _out)
                                         .KeyDown (Key.CursorDown)
