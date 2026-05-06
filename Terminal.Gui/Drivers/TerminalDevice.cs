@@ -252,8 +252,11 @@ internal static class TerminalDevice
                 return;
             }
 
+            // At this point we know at least one of (_inputFd, _outputFd) is -1 (otherwise the
+            // early return above already fired), so ttyFd is guaranteed to be adopted below.
             if (_inputFd == -1)
             {
+                // stdin was redirected: claim the /dev/tty fd we just opened for input.
                 _inputFd = ttyFd;
                 _ownedInputFd = ttyFd;
                 _inputAttached = true;
@@ -261,26 +264,20 @@ internal static class TerminalDevice
 
             if (_outputFd == -1)
             {
-                if (_inputFd == ttyFd)
+                if (_ownedInputFd == ttyFd)
                 {
-                    // Reuse the same fd for read and write — /dev/tty was opened O_RDWR.
+                    // We opened /dev/tty for input above; reuse the same fd for write — it was
+                    // opened O_RDWR and we avoid burning a second fd on the same device.
                     _outputFd = ttyFd;
                     _outputAttached = true;
                 }
                 else
                 {
-                    int outFd = open ("/dev/tty", O_RDWR | O_NOCTTY);
-
-                    if (outFd >= 0 && UnixIOHelper.IsTerminal (outFd))
-                    {
-                        _outputFd = outFd;
-                        _ownedOutputFd = outFd;
-                        _outputAttached = true;
-                    }
-                    else if (outFd >= 0)
-                    {
-                        _ = close (outFd);
-                    }
+                    // stdin was already a real terminal, so ttyFd was not claimed for input.
+                    // Claim it for output now (this is the `myapp | jq` case).
+                    _outputFd = ttyFd;
+                    _ownedOutputFd = ttyFd;
+                    _outputAttached = true;
                 }
             }
         }

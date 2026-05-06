@@ -20,10 +20,6 @@ internal sealed class WindowsVTOutputHelper : IDisposable
 
     private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
     private const uint ENABLE_PROCESSED_OUTPUT = 1;
-    private const int STD_OUTPUT_HANDLE = -11;
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
 
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
@@ -180,16 +176,12 @@ internal sealed class WindowsVTOutputHelper : IDisposable
     }
 
     /// <summary>
-    ///     Flushes the stdout (or controlling console) handle via <c>FlushFileBuffers</c>.
+    ///     Flushes the controlling console output handle via <c>FlushFileBuffers</c>.
+    ///     No-op when no terminal output device is available.
     /// </summary>
     public static void FlushStdout ()
     {
         nint h = TerminalDevice.OutputHandle;
-
-        if (h == nint.Zero || h == new nint (-1))
-        {
-            h = GetStdHandle (STD_OUTPUT_HANDLE);
-        }
 
         if (h != nint.Zero && h != new nint (-1))
         {
