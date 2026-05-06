@@ -151,6 +151,36 @@ public class FlagSelectorTests
         Assert.Equal (valueBefore, flagSelector.Value);
     }
 
+    // Copilot - Sonnet 4
+    // Per issue: Enter should just accept, not toggle, in FlagSelector
+    [Fact]
+    public void FlagSelector_Enter_Does_Not_Toggle_Value ()
+    {
+        using FlagSelector<SelectorStyles> flagSelector = new ();
+
+        CheckBox firstCheckBox = flagSelector.SubViews.OfType<CheckBox> ().ElementAt (0);
+        flagSelector.SetFocus ();
+        Assert.True (flagSelector.HasFocus);
+
+        SelectorStyles? valueBefore = flagSelector.Value;
+
+        int selectorValueChanged = 0;
+        flagSelector.ValueChanged += (_, _) => selectorValueChanged++;
+
+        int acceptingFired = 0;
+        flagSelector.Accepting += (_, _) => acceptingFired++;
+
+        // Press Enter on the focused checkbox
+        firstCheckBox.NewKeyDownEvent (Key.Enter);
+
+        // Value should NOT change (Enter does not toggle in FlagSelector)
+        Assert.Equal (0, selectorValueChanged);
+        Assert.Equal (valueBefore, flagSelector.Value);
+
+        // But Accepting should fire
+        Assert.Equal (1, acceptingFired);
+    }
+
     // Tests for FlagSelector<TEnum>
     [Fact]
     public void GenericInitialization_ShouldSetDefaults ()
