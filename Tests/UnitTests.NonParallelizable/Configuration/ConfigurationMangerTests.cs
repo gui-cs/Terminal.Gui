@@ -98,8 +98,9 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
                    || binding.Macos is { Length: > 0 };
         }
 
-#nullable enable
+#pragma warning disable CS8632 // Nullable annotations document the nullable PlatformKeyBinding properties in this non-nullable test file.
         static void AssertKeyArraysAreDeepCopies (Key []? currentKeys, Key []? cachedKeys)
+#pragma warning restore CS8632
         {
             if (currentKeys is null)
             {
@@ -118,7 +119,6 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
                 Assert.Equal (currentKeys [i], cachedKeys [i]);
             }
         }
-#nullable restore
     }
 
     [Fact]
