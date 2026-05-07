@@ -1,6 +1,6 @@
 # Terminal.Gui UI Catalog
 
-UI Catalog is a comprehensive sample library for Terminal.Gui. It provides:
+UI Catalog is a comprehensive sample library for [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui). It provides:
 
 1. An easy-to-use, interactive, showcase for Terminal.Gui concepts and features.
 2. Sample code that illustrates how to properly implement said concepts & features.

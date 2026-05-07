@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 ///     Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be
 ///     oriented either vertically or horizontally.
 /// </summary>
-public sealed class ScrollSlider : View, IOrientation, IDesignable
+public sealed class ScrollSlider : View, IOrientation, IDesignable, IValue<int>
 {
     /// <summary>
     ///     Initializes a new instance.
@@ -208,6 +208,23 @@ public sealed class ScrollSlider : View, IOrientation, IDesignable
 
     private void RaisePositionChangeEvents (int newPosition)
     {
+        int oldPosition = _position;
+
+        // Raise IValue<int> ValueChanging event
+        ValueChangingEventArgs<int> valueChangingArgs = new (oldPosition, newPosition);
+
+        if (OnValueChanging (valueChangingArgs) || valueChangingArgs.Handled)
+        {
+            return;
+        }
+
+        ValueChanging?.Invoke (this, valueChangingArgs);
+
+        if (valueChangingArgs.Handled)
+        {
+            return;
+        }
+
         CancelEventArgs<int> args = new (ref _position, ref newPosition);
         PositionChanging?.Invoke (this, args);
 
@@ -222,6 +239,12 @@ public sealed class ScrollSlider : View, IOrientation, IDesignable
         MoveToPosition (_position);
 
         PositionChanged?.Invoke (this, new (in _position));
+
+        // Raise IValue<int> ValueChanged and ValueChangedUntyped events
+        ValueChangedEventArgs<int> valueChangedArgs = new (oldPosition, _position);
+        OnValueChanged (valueChangedArgs);
+        ValueChanged?.Invoke (this, valueChangedArgs);
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldPosition, _position));
 
         Scrolled?.Invoke (this, new (in distance));
 
@@ -239,6 +262,42 @@ public sealed class ScrollSlider : View, IOrientation, IDesignable
 
     /// <summary>Raised when the <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
     public event EventHandler<EventArgs<int>>? Scrolled;
+
+    #region IValue<int> Implementation
+
+    /// <summary>
+    ///     Gets or sets the position of the ScrollSlider. This is an alias for <see cref="Position"/>
+    ///     provided to satisfy the <see cref="IValue{TValue}"/> interface.
+    /// </summary>
+    public int Value
+    {
+        get => Position;
+        set => Position = value;
+    }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<int>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> is changing. Return <see langword="true"/> to cancel the change.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    private bool OnValueChanging (ValueChangingEventArgs<int> args) => false;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    private void OnValueChanged (ValueChangedEventArgs<int> args) { }
+
+    #endregion
 
     /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
