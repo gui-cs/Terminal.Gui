@@ -287,17 +287,14 @@ public partial class Markdown
     /// <summary>Converts rendered list marker text back to Markdown source marker text for selection and clipboard operations.</summary>
     private static string TranslateListMarkerText (string text)
     {
-        if (string.IsNullOrEmpty (text))
+        const string BulletPrefix = "• ";
+
+        if (!text.StartsWith (BulletPrefix, StringComparison.Ordinal))
         {
             return text;
         }
 
-        if (!text.StartsWith ("• ", StringComparison.Ordinal))
-        {
-            return text;
-        }
-
-        string markerText = text [2..];
+        string markerText = text [BulletPrefix.Length..];
 
         if (markerText == $"{Glyphs.CheckStateChecked} ")
         {
