@@ -369,6 +369,7 @@ public static class DeepCloner
     [UnconditionalSuppressMessage ("Trimming", "IL2067", Justification = "Dictionary cloning only instantiates supported dictionary runtime types and falls back safely when comparer constructors are unavailable.")]
     private static IDictionary CreateDictionaryInstance (Type dictType, object? comparer)
     {
+        // Typed paths for dictionary types that require custom comparers.
         if (dictType == typeof (ConcurrentDictionary<string, ThemeScope>))
         {
             if (comparer is IEqualityComparer<string> stringComparer)
@@ -387,6 +388,32 @@ public static class DeepCloner
             }
 
             return new Dictionary<string, Scheme?> ();
+        }
+
+        // AOT-safe: use the source-generated JSON serializer to create empty dictionary instances.
+        // This avoids Activator.CreateInstance, whose target constructors are trimmed by the AOT linker
+        // for closed generic dictionary types not otherwise statically reachable.
+        // Only used when no comparer is needed — Deserialize("{}") always creates a default-comparer instance.
+        if (comparer is null)
+        {
+            try
+            {
+                JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (dictType);
+
+                if (jsonTypeInfo is not null)
+                {
+                    IDictionary? result = JsonSerializer.Deserialize ("{}", jsonTypeInfo) as IDictionary;
+
+                    if (result is not null)
+                    {
+                        return result;
+                    }
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                // JSON serializer context may not be initialized — fall through to reflective construction.
+            }
         }
 
         try
