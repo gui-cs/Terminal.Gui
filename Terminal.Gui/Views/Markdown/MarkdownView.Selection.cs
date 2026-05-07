@@ -296,19 +296,22 @@ public partial class Markdown
             return text;
         }
 
-        string markerText = text [BulletPrefix.Length..];
+        string remainder = text [BulletPrefix.Length..];
 
-        if (string.Equals (markerText, $"{Glyphs.CheckStateChecked} ", StringComparison.Ordinal))
+        string checkedGlyph = $"{Glyphs.CheckStateChecked} ";
+        string uncheckedGlyph = $"{Glyphs.CheckStateUnChecked} ";
+
+        if (remainder.StartsWith (checkedGlyph, StringComparison.Ordinal))
         {
-            return "- [x] ";
+            return "- [x] " + remainder [checkedGlyph.Length..];
         }
 
-        if (string.Equals (markerText, $"{Glyphs.CheckStateUnChecked} ", StringComparison.Ordinal))
+        if (remainder.StartsWith (uncheckedGlyph, StringComparison.Ordinal))
         {
-            return "- [ ] ";
+            return "- [ ] " + remainder [uncheckedGlyph.Length..];
         }
 
-        return "- " + markerText;
+        return "- " + remainder;
     }
 
     private int GetLineDisplayWidth (int lineIdx)

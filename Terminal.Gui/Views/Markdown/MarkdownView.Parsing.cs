@@ -180,7 +180,7 @@ public partial class Markdown
 
             string marker = list.IsOrdered ? $"{listItem.Order}. " : "• ";
             string itemPrefix = prefix + marker;
-            string itemCont = contPrefix + new string (' ', marker.Length);
+            string itemCont = contPrefix + new string (' ', marker.GetColumns ());
 
             var isFirst = true;
 
@@ -197,7 +197,7 @@ public partial class Markdown
                         string checkbox = done ? $"{Glyphs.CheckStateChecked} " : $"{Glyphs.CheckStateUnChecked} ";
                         string taskPrefix = itemPrefix + checkbox;
                         // To align wrapped task text after variable-width glyph markers, include the trailing space in the continuation indent.
-                        string taskCont = contPrefix + new string (' ', marker.Length + checkbox.GetColumns ());
+                        string taskCont = contPrefix + new string (' ', marker.GetColumns () + checkbox.GetColumns ());
 
                         List<InlineRun> runs = WalkInlines (firstInline.NextSibling, role);
                         TrimLeadingSpace (runs);
