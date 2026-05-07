@@ -253,6 +253,54 @@ public class TableViewTests : TestDriverBase
         Assert.Equal (2, tableView.Value!.SelectedCell.Y);
     }
 
+    // Claude - Opus 4.7
+    // Regression: setting CollectionNavigator to null disables type-to-search and lets printable keys bubble
+    [Fact]
+    public void CollectionNavigator_Null_DisablesTypeToSearch_KeyNotConsumed ()
+    {
+        var dt = new DataTable ();
+        dt.Columns.Add ("blah");
+        dt.Rows.Add ("apricot");
+        dt.Rows.Add ("bat");
+        dt.Rows.Add ("candle");
+
+        TableView tableView = new () { Table = new DataTableSource (dt), CollectionNavigator = null };
+        tableView.HasFocus = true;
+
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
+
+        // Key.B would normally jump to "bat" (row 1) — with navigator disabled, selection must not move
+        // and the key event must not be consumed (returns false so it can bubble to the SuperView).
+        bool consumed = tableView.NewKeyDownEvent (Key.B);
+
+        Assert.False (consumed);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
+    }
+
+    // Claude - Opus 4.7
+    // Regression: with CollectionNavigator = null, HotKey path must not throw
+    [Fact]
+    public void CollectionNavigator_Null_HotKey_DoesNotThrow ()
+    {
+        var dt = new DataTable ();
+        dt.Columns.Add ("blah");
+        dt.Rows.Add ("apricot");
+        dt.Rows.Add ("bat");
+
+        TableView tableView = new ()
+        {
+            Table = new DataTableSource (dt),
+            CollectionNavigator = null,
+            HotKey = Key.B
+        };
+        tableView.HasFocus = true;
+
+        Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.B));
+
+        Assert.Null (ex);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
+    }
+
     // Copilot
     // Behavior: Space toggles multi-selection via ToggleExtend command
     [Fact]
