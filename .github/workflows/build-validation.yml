@@ -66,8 +66,8 @@ jobs:
 
     - name: AOT NuGet Smoke Test (publish and run using NuGet package)
       run: |
-        dotnet restore ./Examples/NativeAot/SmokeTest/SmokeTest.csproj
-        dotnet publish ./Examples/NativeAot/SmokeTest/SmokeTest.csproj --configuration Release --output ./aot-nuget-publish -property:NoWarn=0618%3B0612
+        dotnet restore ./Examples/NativeAot.SmokeTest/SmokeTest.csproj
+        dotnet publish ./Examples/NativeAot.SmokeTest/SmokeTest.csproj --configuration Release --output ./aot-nuget-publish -property:NoWarn=0618%3B0612
         chmod +x ./aot-nuget-publish/SmokeTest
         ./aot-nuget-publish/SmokeTest
 
