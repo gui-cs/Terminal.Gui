@@ -1903,5 +1903,59 @@ public class MarkdownViewTests (ITestOutputHelper output)
         hostCode.Dispose ();
         hostNoCode.Dispose ();
     }
+
+    // Claude - Opus 4.7
+    [Theory]
+    [CombinatorialData]
+    public void HotKey_Command_SetsFocus_OnNextSubView (bool hasHotKey)
+    {
+        View superView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown md = new () { CanFocus = false };
+        md.HotKey = hasHotKey ? Key.A.WithAlt : Key.Empty;
+        View nextSubView = new () { CanFocus = true };
+        superView.Add (md, nextSubView);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        Assert.False (md.HasFocus);
+        Assert.False (nextSubView.HasFocus);
+
+        md.InvokeCommand (Command.HotKey);
+
+        Assert.False (md.HasFocus);
+        Assert.Equal (hasHotKey, nextSubView.HasFocus);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void CanFocus_True_HotKey_DoesNotForward_ToPeer ()
+    {
+        View superView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown md = new () { CanFocus = true, HotKey = Key.A.WithAlt };
+        View nextSubView = new () { CanFocus = true };
+        superView.Add (md, nextSubView);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        md.InvokeCommand (Command.HotKey);
+
+        Assert.True (md.HasFocus);
+        Assert.False (nextSubView.HasFocus);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void CanFocus_False_HotKey_NoNextPeer_DoesNotFocusMarkdown ()
+    {
+        View superView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown md = new () { CanFocus = false, HotKey = Key.A.WithAlt };
+        superView.Add (md);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        md.InvokeCommand (Command.HotKey);
+
+        Assert.False (md.HasFocus);
+    }
 }
 

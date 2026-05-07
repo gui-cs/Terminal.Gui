@@ -87,6 +87,38 @@ public partial class Markdown : View, IDesignable
         SetupBindingsAndCommands ();
     }
 
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     If <see cref="View.CanFocus"/> is <see langword="false"/> and a valid <see cref="View.HotKey"/>
+    ///     is set, the hotkey is forwarded to the next peer in <see cref="View.SuperView"/>'s
+    ///     <see cref="View.SubViews"/> — mirroring <see cref="Label"/> so that a non-focusable
+    ///     <see cref="Markdown"/> describing a focusable view (e.g. a <see cref="TextField"/>) moves
+    ///     focus to that view when its hotkey is pressed.
+    /// </remarks>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        // If Markdown can't focus, forward HotKey to the next peer in the SubView list
+        if (CanFocus || !HotKey.IsValid)
+        {
+            return base.OnActivating (args);
+        }
+        int me = SuperView?.SubViews.IndexOf (this) ?? -1;
+
+        if (me == -1 || !(me < SuperView?.SubViews.Count - 1))
+        {
+            return base.OnActivating (args);
+        }
+        bool handled = SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
+
+        if (!handled)
+        {
+            return base.OnActivating (args);
+        }
+        args.Handled = true;
+
+        return true;
+    }
+
     /// <summary>Gets or sets the Markdown-formatted text displayed by this view.</summary>
     /// <value>The raw Markdown string. Setting this property triggers reparsing, re-layout, and a redraw.</value>
     public override string Text { get => _markdown; set => SetMarkdown (value); }
