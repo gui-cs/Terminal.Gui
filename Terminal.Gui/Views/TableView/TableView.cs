@@ -165,8 +165,12 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
         }
     }
 
-    /// <summary>Navigator for cycling the selected item in the table by typing. Set to null to disable this feature.</summary>
-    public ICollectionNavigator CollectionNavigator { get; set; }
+    /// <summary>
+    ///     Navigator for cycling the selected row in the table by typing. Set to <see langword="null"/> to disable
+    ///     type-to-search navigation; printable keys not otherwise bound will then bubble through normal key handling
+    ///     instead of being consumed for incremental row navigation.
+    /// </summary>
+    public ICollectionNavigator? CollectionNavigator { get; set; }
 
     /// <summary>
     ///     The maximum number of characters to render in any given column.  This prevents one long column from pushing
