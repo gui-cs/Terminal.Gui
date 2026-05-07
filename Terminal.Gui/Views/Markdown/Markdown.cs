@@ -420,9 +420,9 @@ public partial class Markdown : View, IDesignable
     /// <summary>Gets a short but comprehensive Markdown sample covering common features.</summary>
     public static string DefaultMarkdownSample { get; } = """
                                                           # Terminal.Gui Markdown Sample 🚀
-                                                          
+
                                                           ## TOC
-                                                          
+
                                                           * [Basic Formatting](#basic-formatting)
                                                           * [Links](#links)
                                                           * [Checklist](#checklist)
@@ -430,7 +430,7 @@ public partial class Markdown : View, IDesignable
                                                           * [Tables](#tables)
                                                           * [Separators](#separators)
                                                           * [Block Quotes](#block-quotes)
-                                                          
+
                                                           ## Basic Formatting
 
                                                           Rich text with **bold**, *italic*, `inline code`, and ~~strikethrough~~.
@@ -447,9 +447,9 @@ public partial class Markdown : View, IDesignable
                                                           - [ ] Images 😒
 
                                                           ## Code Blocks
-                                                          
+
                                                           **csharp** code block with syntax highlighting:
-                                                          
+
                                                           ```csharp
                                                           Console.WriteLine ("Hello, Terminal.Gui! 🌍");
                                                           var x = 42;
@@ -459,7 +459,7 @@ public partial class Markdown : View, IDesignable
 
                                                           ```md
                                                           # Heading 1
-                                                          
+
                                                           Plain text. *Formatted text* with **bold** and `inline code`.
 
                                                           Link:  [SyntaxHighlighting](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
@@ -473,7 +473,7 @@ public partial class Markdown : View, IDesignable
                                                           ```
 
                                                           ## Tables
-                                                          
+
                                                           **table** with links, emojis, and markdown in cells:
 
                                                           | Feature        | Status        |
@@ -490,11 +490,11 @@ public partial class Markdown : View, IDesignable
                                                           | Row 2 👋     | 🔛 I'm shorter but still centered 🔛 |
 
                                                           ## Separators
-                                                          
+
                                                           This text is before the thematic break.
-                                                          
+
                                                           ---
-                                                          
+
                                                           And this text is after. Thematic breaks are rendered as full-width horizontal lines that automatically adjust to the layout width.
 
                                                           ## Block Quotes
