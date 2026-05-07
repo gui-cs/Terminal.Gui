@@ -101,6 +101,11 @@ public partial class TableView
 
     private bool CycleToNextTableEntryBeginningWith (Key key)
     {
+        // Type-to-search disabled
+        if (CollectionNavigator is null)
+        {
+            return false;
+        }
         int row = _cursorRow;
 
         // There is a multi select going on and not just for the current row
