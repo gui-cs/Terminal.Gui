@@ -15,7 +15,7 @@ jobs:
     name: Build All Configurations
     runs-on: ubuntu-latest
     
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
 
     - name: Checkout code
@@ -55,6 +55,9 @@ jobs:
       run: |
         dotnet build ./Examples/NativeAot/NativeAot.csproj --configuration Release -property:NoWarn=0618%3B0612
         dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release -property:NoWarn=0618%3B0612
+
+    - name: AOT Publish (catches trimming and reflection errors)
+      run: dotnet publish ./Examples/NativeAot/NativeAot.csproj --configuration Release -property:NoWarn=0618%3B0612
 
     - name: Build Release Solution
       run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612

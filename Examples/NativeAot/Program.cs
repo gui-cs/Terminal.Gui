@@ -1,21 +1,26 @@
-﻿// This is a test application for a native Aot file.
+// Native AOT test application for Terminal.Gui.
+//
+// This is an AOT-safe equivalent of UICatalog's AllViewsTester. It statically instantiates
+// every IDesignable view and calls EnableForDesign() to populate demo data — exercising the
+// config-property deep-cloning, JSON serialization, and dictionary construction paths that
+// are most sensitive to AOT trimming.
+//
+// Unlike AllViewsView (which uses Activator.CreateInstance and MakeGenericType), this file
+// constructs every view explicitly, making it safe for native AOT compilation.
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Terminal.Gui.Configuration;
-using Terminal.Gui.Views;
-using Terminal.Gui.App;
-using Terminal.Gui.ViewBase;
-using Terminal.Gui.Input;
+using UICatalog.Scenarios;
 
 namespace NativeAot;
 
 public static class Program
 {
-    private static void Main (string [] args)
+    private static void Main ()
     {
-#pragma warning disable IL2026, IL3050 // Run() has attributes for AOT compatibility
+#pragma warning disable IL2026, IL3050
         Run ();
 #pragma warning restore IL2026, IL3050
     }
@@ -24,14 +29,14 @@ public static class Program
     [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
     private static void Run ()
     {
-        ConfigurationManager.Enable(ConfigLocations.All);
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        #region The code in this region is not intended for use in a native Aot self-contained. It's just here to make sure there is no functionality break with localization in Terminal.Gui using self-contained
+        IApplication app = Application.Create ().Init ();
 
-        if (Equals(Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture) && Application.SupportedCultures!.Count == 0)
+        #region Localization sanity check
+
+        if (Equals (Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture) && Application.SupportedCultures!.Count == 0)
         {
-            // Only happens if the project has <InvariantGlobalization>true</InvariantGlobalization>
             Debug.Assert (Application.SupportedCultures.Count == 0);
         }
         else
@@ -42,86 +47,140 @@ public static class Program
 
         #endregion
 
-        ExampleWindow app = new ();
-        Application.Run (app);
-
-        // Dispose the app object before shutdown
+        app.Run<AotAllViewsWindow> ();
         app.Dispose ();
-
-        // Before the application exits, reset Terminal.Gui for clean shutdown
-        Application.Shutdown ();
-
-        // To see this output on the screen it must be done after shutdown,
-        // which restores the previous screen.
-        Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
     }
 }
 
-// Defines a top-level window with border and title
-public class ExampleWindow : Window
+/// <summary>
+///     AOT-safe mini AllViewsTester. Statically constructs every <see cref="IDesignable"/> view
+///     and calls <see cref="IDesignable.EnableForDesign()"/> to populate demo data, then displays
+///     them in a scrollable list of titled frames.
+/// </summary>
+public sealed class AotAllViewsWindow : Runnable
 {
-    public static string? UserName;
+    private const int MAX_HEIGHT = 12;
 
-    public ExampleWindow ()
+    public AotAllViewsWindow ()
     {
-        Title = $"Example App ({Application.GetDefaultKey (Command.Quit)} to quit)";
+        Title = $"AOT All Views ({Application.GetDefaultKey (Command.Quit)} to quit)";
 
-        // Create input components and labels
-        var usernameLabel = new Label { Text = "Username:" };
-
-        var userNameText = new TextField
+        // ── MenuBar (config host: MenuBar, Menu) ─────────────────────
+        MenuBar menuBar = new ()
         {
-            // Position text field adjacent to the label
-            X = Pos.Right (usernameLabel) + 1,
-
-            // Fill remaining horizontal space
-            Width = Dim.Fill ()
+            Menus =
+            [
+                new MenuBarItem ("_File", [new MenuItem ("_Quit", "", () => App?.RequestStop ())]),
+                new MenuBarItem ("_Help", [new MenuItem ("_About", "", () => MessageBox.Query (App!, "About", "AOT All Views Tester", "OK"))])
+            ]
         };
 
-        var passwordLabel = new Label
+        // ── StatusBar (config host: StatusBar) ───────────────────────
+        StatusBar statusBar = new ();
+
+        // ── ViewPropertiesEditor (linked from UICatalog — no reflection, AOT-safe) ──
+        ViewPropertiesEditor propsEditor = new ()
         {
-            Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1
+            Title = "Properties",
+            Width = Dim.Percent (30),
+            Height = Dim.Fill (statusBar),
+            X = Pos.AnchorEnd (),
+            AutoSelectViewToEdit = true,
+            AutoSelectAdornments = false,
+            BorderStyle = LineStyle.Dotted
         };
 
-        var passwordText = new TextField
+        // ── Scrollable container for all views ───────────────────────
+        View container = new () { Y = Pos.Bottom (menuBar), Width = Dim.Fill (propsEditor), Height = Dim.Fill (statusBar), CanFocus = true };
+
+        container.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+
+        container.ViewportChanged += (sender, _) =>
+                                     {
+                                         if (sender is View sendingView)
+                                         {
+                                             sendingView.SetContentHeight (sendingView.GetHeightRequiredForSubViews ());
+                                         }
+                                     };
+
+        // Scope auto-select to views within the container
+        propsEditor.AutoSelectSuperView = container;
+
+        View? previous = null;
+
+        foreach ((string name, View view) in CreateAllViews ())
         {
-            Secret = true,
-
-            // align with the text box above
-            X = Pos.Left (userNameText),
-            Y = Pos.Top (passwordLabel),
-            Width = Dim.Fill ()
-        };
-
-        // Create login button
-        var btnLogin = new Button
-        {
-            Text = "Login",
-            Y = Pos.Bottom (passwordLabel) + 1,
-
-            // center the login button horizontally
-            X = Pos.Center (),
-            IsDefault = true
-        };
-
-        // When login button is clicked display a message popup
-        btnLogin.Accepting += (s, e) =>
-        {
-            if (userNameText.Text == "admin" && passwordText.Text == "password")
+            FrameView frame = new ()
             {
-                MessageBox.Query (App!, "Logging In", "Login Successful", "Ok");
-                UserName = userNameText.Text;
-                Application.RequestStop ();
-            }
-            else
-            {
-                MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "Ok");
-            }
-            // Anytime Accepting is handled, make sure to set e.Handled to true.
-            e.Handled = true;
-        };
+                CanFocus = true,
+                Title = name,
+                Y = previous is { } ? Pos.Bottom (previous) : 0,
+                Width = Dim.Fill (),
+                Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: MAX_HEIGHT)
+            };
 
-        // Add the views to the Window
-        Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
+            if (view.Width == Dim.Absolute (0))
+            {
+                view.Width = Dim.Fill ();
+            }
+
+            if (view.Height == Dim.Absolute (0))
+            {
+                view.Height = MAX_HEIGHT - 2;
+            }
+
+            frame.Add (view);
+            container.Add (frame);
+            previous = frame;
+        }
+
+        Shortcut quitShortcut = new () { Text = "Quit", Key = Application.GetDefaultKey(Command.Quit), Action = RequestStop };
+
+        statusBar.Add (quitShortcut);
+
+        Add (menuBar, container, propsEditor, statusBar);
+    }
+
+    /// <summary>
+    ///     Statically creates every <see cref="IDesignable"/> view. No reflection, no
+    ///     CreateInstance — fully AOT-safe.
+    /// </summary>
+    private static IEnumerable<(string Name, View View)> CreateAllViews ()
+    {
+        // ── Core controls (IDesignable — EnableForDesign populates demo data) ──
+        yield return Design (new Button ());
+        yield return Design (new ColorPicker ());
+        yield return Design (new DropDownList ());
+        yield return Design (new FlagSelector ());
+        yield return Design (new GraphView ());
+        yield return Design (new HexView ());
+        yield return Design (new Link { Text = "Terminal.Gui on GitHub", Url = "https://github.com/gui-cs/Terminal.Gui" });
+        yield return Design (new ListView ());
+        yield return Design (new OptionSelector ());
+        yield return Design (new ProgressBar ());
+        yield return Design (new ScrollBar { Orientation = Orientation.Horizontal });
+        yield return Design (new Shortcut ());
+        yield return Design (new SpinnerView ());
+        yield return Design (new Tabs ());
+        yield return Design (new TextField ());
+        yield return Design (new TextValidateField ());
+        yield return Design (new TextView ());
+        yield return Design (new TreeView ());
+
+        // ── Views without IDesignable (still AOT-relevant as config hosts or common views) ──
+        yield return (nameof (CharMap), new CharMap ());
+        yield return (nameof (CheckBox), new CheckBox { Text = "Check me" });
+        yield return (nameof (DatePicker), new DatePicker ());
+        yield return (nameof (FrameView), new FrameView { Title = "FrameView", Text = "Content" });
+        yield return (nameof (Label), new Label { Text = "This is a Label." });
+        yield return (nameof (Line), new Line ());
+        yield return (nameof (NumericUpDown), new NumericUpDown ());
+    }
+
+    private static (string Name, View View) Design<T> (T view) where T : View, IDesignable
+    {
+        view.EnableForDesign ();
+
+        return (typeof (T).Name, view);
     }
 }

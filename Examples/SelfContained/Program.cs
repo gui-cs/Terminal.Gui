@@ -3,8 +3,8 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using Terminal.Gui.Configuration;
 using Terminal.Gui.App;
+using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
@@ -26,6 +26,9 @@ public static class Program
     {
         ConfigurationManager.Enable (ConfigLocations.All);
 
+        // Use Inline mode — renders below the shell prompt without alternate screen buffer
+        Application.AppModel = AppModel.Inline;
+
         IApplication app = Application.Create ();
         app.Init ();
 
@@ -45,8 +48,7 @@ public static class Program
         #endregion
 
         using ExampleWindow exampleWindow = new ();
-        string? userName = app.Run (exampleWindow) as string;
-
+        var userName = app.Run (exampleWindow) as string;
 
         // Shutdown the application in order to free resources and clean up the terminal
         app.Dispose ();
@@ -77,10 +79,7 @@ public class ExampleWindow : Runnable<string>
             Width = Dim.Fill ()
         };
 
-        var passwordLabel = new Label
-        {
-            Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1
-        };
+        var passwordLabel = new Label { Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1 };
 
         var passwordText = new TextField
         {
@@ -104,21 +103,19 @@ public class ExampleWindow : Runnable<string>
         };
 
         // When login button is clicked display a message popup
-        btnLogin.Accepting += (s, e) =>
-                           {
-                               if (userNameText.Text == "admin" && passwordText.Text == "password")
-                               {
-                                   MessageBox.Query (App!, "Logging In", "Login Successful", "Ok");
-                                   Result = userNameText.Text;
-                                   App?.RequestStop ();
-                               }
-                               else
-                               {
-                                   MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "Ok");
-                               }
-                               // When Accepting is handled, set e.Handled to true to prevent further processing.
-                               e.Handled = true;
-                           };
+        btnLogin.Accepted += (_, _) =>
+                              {
+                                  if (userNameText.Text == "admin" && passwordText.Text == "password")
+                                  {
+                                      MessageBox.Query (App!, "Logging In", "Login Successful", "Ok");
+                                      Result = userNameText.Text;
+                                      App?.RequestStop ();
+                                  }
+                                  else
+                                  {
+                                      MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "Ok");
+                                  }
+                              };
 
         // Add the views to the Window
         Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
