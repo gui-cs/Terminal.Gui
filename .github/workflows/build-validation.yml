@@ -57,7 +57,12 @@ jobs:
         dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release -property:NoWarn=0618%3B0612
 
     - name: AOT Publish (catches trimming and reflection errors)
-      run: dotnet publish ./Examples/NativeAot/NativeAot.csproj --configuration Release -property:NoWarn=0618%3B0612
+      run: dotnet publish ./Examples/NativeAot/NativeAot.csproj --configuration Release --output ./aot-publish -property:NoWarn=0618%3B0612
+
+    - name: AOT Smoke Test (run the published AOT binary)
+      run: |
+        chmod +x ./aot-publish/NativeAot
+        ./aot-publish/NativeAot --smoke-test
 
     - name: Build Release Solution
       run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612
