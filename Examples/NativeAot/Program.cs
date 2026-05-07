@@ -1,23 +1,24 @@
 // Native AOT test application for Terminal.Gui.
-// Exercises the config-property-hosting view types that are most sensitive to AOT trimming:
-// Button, CheckBox, Dialog, FrameView, Label, MenuBar, Menu, MessageBox, OptionSelector,
-// StatusBar, TextField, TextView, Window.
+//
+// This is an AOT-safe equivalent of UICatalog's AllViewsTester. It statically instantiates
+// every IDesignable view and calls EnableForDesign() to populate demo data — exercising the
+// config-property deep-cloning, JSON serialization, and dictionary construction paths that
+// are most sensitive to AOT trimming.
+//
+// Unlike AllViewsView (which uses Activator.CreateInstance and MakeGenericType), this file
+// constructs every view explicitly, making it safe for native AOT compilation.
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Input;
-using Terminal.Gui.ViewBase;
-using Terminal.Gui.Views;
+using UICatalog.Scenarios;
 
 namespace NativeAot;
 
 public static class Program
 {
-    private static void Main (string [] args)
+    private static void Main ()
     {
 #pragma warning disable IL2026, IL3050
         Run ();
@@ -46,170 +47,140 @@ public static class Program
 
         #endregion
 
-        string? result = app.Run<AotTestWindow> ().GetResult<string> ();
+        app.Run<AotAllViewsWindow> ();
         app.Dispose ();
-
-        Console.WriteLine (string.IsNullOrEmpty (result) ? "Cancelled" : $"Result: {result}");
     }
 }
 
 /// <summary>
-///     A window that exercises the Terminal.Gui view types most sensitive to AOT trimming.
-///     Each view type with a <see cref="ConfigurationPropertyAttribute" /> is instantiated here
-///     so that its config properties are deep-cloned during initialization, exercising the
-///     <see cref="DeepCloner" /> code paths that are prone to AOT failures.
+///     AOT-safe mini AllViewsTester. Statically constructs every <see cref="IDesignable"/> view
+///     and calls <see cref="IDesignable.EnableForDesign()"/> to populate demo data, then displays
+///     them in a scrollable list of titled frames.
 /// </summary>
-public sealed class AotTestWindow : Runnable<string?>
+public sealed class AotAllViewsWindow : Runnable
 {
-    public AotTestWindow ()
-    {
-        Title = $"AOT Test ({Application.GetDefaultKey (Command.Quit)} to quit)";
+    private const int MAX_HEIGHT = 12;
 
-        // ── MenuBar ──────────────────────────────────────────────────
+    public AotAllViewsWindow ()
+    {
+        Title = $"AOT All Views ({Application.GetDefaultKey (Command.Quit)} to quit)";
+
+        // ── MenuBar (config host: MenuBar, Menu) ─────────────────────
         MenuBar menuBar = new ()
         {
             Menus =
             [
-                new MenuBarItem (
-                                 "File",
-                                 [
-                                     new MenuItem ("Open", "", () => { }),
-                                     new MenuItem ("Quit", "", () => App?.RequestStop ())
-                                 ]),
-                new MenuBarItem (
-                                 "Help",
-                                 [
-                                     new MenuItem ("About", "", () => MessageBox.Query (App!, "About", "Native AOT Test App", "OK"))
-                                 ])
+                new MenuBarItem ("_File", [new MenuItem ("_Quit", "", () => App?.RequestStop ())]),
+                new MenuBarItem ("_Help", [new MenuItem ("_About", "", () => MessageBox.Query (App!, "About", "AOT All Views Tester", "OK"))])
             ]
         };
 
-        // ── Login area (FrameView) ───────────────────────────────────
-        FrameView loginFrame = new ()
+        // ── StatusBar (config host: StatusBar) ───────────────────────
+        StatusBar statusBar = new ();
+
+        // ── ViewPropertiesEditor (linked from UICatalog — no reflection, AOT-safe) ──
+        ViewPropertiesEditor propsEditor = new ()
         {
-            Title = "Login",
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = 6
+            Title = "Properties",
+            Width = Dim.Percent (30),
+            Height = Dim.Fill (statusBar),
+            X = Pos.AnchorEnd (),
+            AutoSelectViewToEdit = true,
+            AutoSelectAdornments = false,
+            BorderStyle = LineStyle.Dotted
         };
 
-        Label usernameLabel = new () { Text = "Username:" };
+        // ── Scrollable container for all views ───────────────────────
+        View container = new () { Y = Pos.Bottom (menuBar), Width = Dim.Fill (propsEditor), Height = Dim.Fill (statusBar), CanFocus = true };
 
-        TextField userNameText = new ()
+        container.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+
+        container.ViewportChanged += (sender, _) =>
+                                     {
+                                         if (sender is View sendingView)
+                                         {
+                                             sendingView.SetContentHeight (sendingView.GetHeightRequiredForSubViews ());
+                                         }
+                                     };
+
+        // Scope auto-select to views within the container
+        propsEditor.AutoSelectSuperView = container;
+
+        View? previous = null;
+
+        foreach ((string name, View view) in CreateAllViews ())
         {
-            X = Pos.Right (usernameLabel) + 1,
-            Width = Dim.Fill ()
-        };
+            FrameView frame = new ()
+            {
+                CanFocus = true,
+                Title = name,
+                Y = previous is { } ? Pos.Bottom (previous) : 0,
+                Width = Dim.Fill (),
+                Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: MAX_HEIGHT)
+            };
 
-        Label passwordLabel = new ()
-        {
-            Text = "Password:",
-            X = Pos.Left (usernameLabel),
-            Y = Pos.Bottom (usernameLabel) + 1
-        };
+            if (view.Width == Dim.Absolute (0))
+            {
+                view.Width = Dim.Fill ();
+            }
 
-        TextField passwordText = new ()
-        {
-            Secret = true,
-            X = Pos.Left (userNameText),
-            Y = Pos.Top (passwordLabel),
-            Width = Dim.Fill ()
-        };
+            if (view.Height == Dim.Absolute (0))
+            {
+                view.Height = MAX_HEIGHT - 2;
+            }
 
-        loginFrame.Add (usernameLabel, userNameText, passwordLabel, passwordText);
+            frame.Add (view);
+            container.Add (frame);
+            previous = frame;
+        }
 
-        // ── Options area (CheckBox, OptionSelector) ──────────────────
-        FrameView optionsFrame = new ()
-        {
-            Title = "Options",
-            X = 0,
-            Y = Pos.Bottom (loginFrame),
-            Width = Dim.Fill (),
-            Height = 5
-        };
+        Shortcut quitShortcut = new () { Text = "Quit", Key = Application.GetDefaultKey(Command.Quit), Action = RequestStop };
 
-        CheckBox rememberMe = new ()
-        {
-            Text = "Remember me",
-            X = 0,
-            Y = 0
-        };
+        statusBar.Add (quitShortcut);
 
-        OptionSelector loginMode = new ()
-        {
-            X = Pos.Right (rememberMe) + 4,
-            Y = 0,
-            Labels = ["Standard", "SSO", "Token"]
-        };
+        Add (menuBar, container, propsEditor, statusBar);
+    }
 
-        optionsFrame.Add (rememberMe, loginMode);
+    /// <summary>
+    ///     Statically creates every <see cref="IDesignable"/> view. No reflection, no
+    ///     CreateInstance — fully AOT-safe.
+    /// </summary>
+    private static IEnumerable<(string Name, View View)> CreateAllViews ()
+    {
+        // ── Core controls (IDesignable — EnableForDesign populates demo data) ──
+        yield return Design (new Button ());
+        yield return Design (new ColorPicker ());
+        yield return Design (new DropDownList ());
+        yield return Design (new FlagSelector ());
+        yield return Design (new GraphView ());
+        yield return Design (new HexView ());
+        yield return Design (new Link { Text = "Terminal.Gui on GitHub", Url = "https://github.com/gui-cs/Terminal.Gui" });
+        yield return Design (new ListView ());
+        yield return Design (new OptionSelector ());
+        yield return Design (new ProgressBar ());
+        yield return Design (new ScrollBar { Orientation = Orientation.Horizontal });
+        yield return Design (new Shortcut ());
+        yield return Design (new SpinnerView ());
+        yield return Design (new Tabs ());
+        yield return Design (new TextField ());
+        yield return Design (new TextValidateField ());
+        yield return Design (new TextView ());
+        yield return Design (new TreeView ());
 
-        // ── Notes area (TextView) ────────────────────────────────────
-        FrameView notesFrame = new ()
-        {
-            Title = "Notes",
-            X = 0,
-            Y = Pos.Bottom (optionsFrame),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (3)
-        };
+        // ── Views without IDesignable (still AOT-relevant as config hosts or common views) ──
+        yield return (nameof (CharMap), new CharMap ());
+        yield return (nameof (CheckBox), new CheckBox { Text = "Check me" });
+        yield return (nameof (DatePicker), new DatePicker ());
+        yield return (nameof (FrameView), new FrameView { Title = "FrameView", Text = "Content" });
+        yield return (nameof (Label), new Label { Text = "This is a Label." });
+        yield return (nameof (Line), new Line ());
+        yield return (nameof (NumericUpDown), new NumericUpDown ());
+    }
 
-        TextView notesText = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            Text = "Enter any notes here..."
-        };
+    private static (string Name, View View) Design<T> (T view) where T : View, IDesignable
+    {
+        view.EnableForDesign ();
 
-        notesFrame.Add (notesText);
-
-        // ── Login button ─────────────────────────────────────────────
-        Button btnLogin = new ()
-        {
-            Text = "Login",
-            Y = Pos.AnchorEnd (2),
-            X = Pos.Center (),
-            IsDefault = true
-        };
-
-        btnLogin.Accepting += (_, e) =>
-                               {
-                                   if (userNameText.Text == "admin" && passwordText.Text == "password")
-                                   {
-                                       MessageBox.Query (App!, "Logging In", "Login Successful", "OK");
-                                       Result = userNameText.Text;
-                                       App?.RequestStop ();
-                                   }
-                                   else
-                                   {
-                                       MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "OK");
-                                   }
-
-                                   e.Handled = true;
-                               };
-
-        // ── StatusBar ────────────────────────────────────────────────
-        StatusBar statusBar = new ()
-        {
-            Y = Pos.AnchorEnd (1)
-        };
-
-        Shortcut helpShortcut = new ()
-        {
-            Text = "Help",
-            Key = Key.F1,
-            BindKeyToApplication = true
-        };
-
-        helpShortcut.Accepting += (_, e) =>
-                                   {
-                                       MessageBox.Query (App!, "Help", "This is the AOT test application.", "OK");
-                                       e.Handled = true;
-                                   };
-
-        statusBar.Add (helpShortcut);
-
-        Add (menuBar, loginFrame, optionsFrame, notesFrame, btnLogin, statusBar);
+        return (typeof (T).Name, view);
     }
 }

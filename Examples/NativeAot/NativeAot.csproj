@@ -11,4 +11,20 @@
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 
+  <!-- Link AOT-safe editor files from UICatalog (no reflection, no heavy deps) -->
+  <ItemGroup>
+    <Compile Include="..\UICatalog\Scenarios\EditorsAndHelpers\ExpanderButton.cs" Link="Editors\ExpanderButton.cs" />
+    <Compile Include="..\UICatalog\Scenarios\EditorsAndHelpers\EditorBase.cs" Link="Editors\EditorBase.cs" />
+    <Compile Include="..\UICatalog\Scenarios\EditorsAndHelpers\ViewPropertiesEditor.cs" Link="Editors\ViewPropertiesEditor.cs" />
+  </ItemGroup>
+
+  <!-- Global usings needed by the linked UICatalog editor files -->
+  <ItemGroup>
+    <Using Include="Terminal.Gui.App" />
+    <Using Include="Terminal.Gui.Drawing" />
+    <Using Include="Terminal.Gui.Input" />
+    <Using Include="Terminal.Gui.ViewBase" />
+    <Using Include="Terminal.Gui.Views" />
+  </ItemGroup>
+
 </Project>

@@ -1,23 +1,30 @@
 # Terminal.Gui Native AOT Example
 
-This project tests the `Terminal.Gui` library as a native AOT application, ensuring that
-AOT-sensitive code paths (configuration deep-cloning, JSON serialization, dictionary
-construction) work correctly after trimming.
+This project is an **AOT-safe mini AllViewsTester**. Unlike UICatalog's `AllViewsView` (which
+uses `Activator.CreateInstance` and `MakeGenericType`), this example statically constructs every
+`IDesignable` view and calls `EnableForDesign()` to populate demo data.
 
 ## What it exercises
 
-The example deliberately instantiates views from all major config-property-hosting types:
-`Button`, `CheckBox`, `Dialog` (via `MessageBox`), `FrameView`, `Label`, `MenuBar`, `Menu`,
-`OptionSelector` (`SelectorBase`), `StatusBar`, `TextField`, `TextView`, `Window`.
+Every view type that implements `IDesignable` is instantiated and displayed in a scrollable
+list of titled frames. This exercises the full configuration initialization pipeline — 
+`ConfigurationManager.Initialize`, `DeepCloner`, `SourceGenerationContext`, and all
+config-property-hosting types — under actual AOT trimming.
 
-This ensures that `DeepCloner`, `SourceGenerationContext`, and `ConfigurationManager.Initialize`
-exercise the typed and JSON-based dictionary construction paths that are most sensitive to AOT
-trimming.
+A `ViewPropertiesEditor` panel (linked from UICatalog's `EditorsAndHelpers/` — no copy,
+no reflection) lets you edit properties of the focused view. This proves the editor
+infrastructure is also AOT-safe.
+
+Views tested: `Button`, `CheckBox`, `ColorPicker`, `DatePicker`, `DropDownList`,
+`FlagSelector`, `GraphView`, `HexView`, `Label`, `Line`, `Link`, `ListView`,
+`NumericUpDown`, `OptionSelector`, `ProgressBar`, `ScrollBar`, `Shortcut`, `SpinnerView`,
+`Tabs`, `TextField`, `TextValidateField`, `TextView`, `TreeView`, `CharMap`, `FrameView`,
+`MenuBar`, `Menu`, `StatusBar`, `MessageBox` (via dialog), `Dialog` (via `Wizard` base).
 
 ## Publishing
 
-Unlike self-contained single-file publishing, native AOT publishing must be generated on the
-same platform as the target. Cross-compilation is not supported.
+Native AOT publishing must target the same platform as the host. Cross-compilation is not
+supported.
 
 ```bash
 # Linux
@@ -32,5 +39,4 @@ dotnet publish -c Release -r win-x64 --self-contained
 
 ## Debugging
 
-When executing directly from the native AOT binary and needing to debug, attach to the
-debugger like any other standalone application and select `Native Code`.
+To debug the native AOT binary, attach to the process and select `Native Code`.
