@@ -255,6 +255,151 @@ public class MarkdownViewTests (ITestOutputHelper output)
         window.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void Tab_Navigation_Cycles_Through_Table_Links ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = new ();
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Find the table SubView
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+        Assert.True (tableView.CanFocus);
+
+        // Give focus to the table
+        tableView.SetFocus ();
+
+        // Activate to check first focused link
+        tableView.InvokeCommand (Command.Accept);
+
+        // Advance focus forward
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+
+        // Should have activated two distinct links
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Contains ("https://a.com", activatedUrls);
+        Assert.Contains ("https://b.com", activatedUrls);
+
+        window.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Enter_Activates_Focused_Table_Link ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | info |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        // Focus the table — the first link becomes active
+        tableView.SetFocus ();
+
+        // Simulate Enter key via Command.Accept
+        tableView.InvokeCommand (Command.Accept);
+
+        Assert.Equal ("https://a.com", clickedUrl);
+
+        window.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void ShiftTab_Navigation_Cycles_Backwards_Through_Table_Links ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = new ();
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        // Focus the table — first link (alpha) becomes active on focus gain
+        tableView.SetFocus ();
+
+        // Advance forward to second link (beta)
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+        Assert.Single (activatedUrls);
+        Assert.Equal ("https://b.com", activatedUrls [0]);
+
+        // Navigate backward — should go back to first link (alpha)
+        markdownView.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Equal ("https://a.com", activatedUrls [1]);
+
+        window.Dispose ();
+    }
+
     [Fact]
     public void Image_Fallback_Text_Renders ()
     {
