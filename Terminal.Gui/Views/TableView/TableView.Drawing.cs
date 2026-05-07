@@ -185,6 +185,9 @@ public partial class TableView
     {
         // Renders a line at the bottom of the table after all the data like:
         // └─────────────────────────────────┴──────────┴──────┴──────────┴────────┴────────────────────────────────────────────┘
+        bool renderFirstOuterVerticalLine = Style.ShowVerticalCellLines && Style.ShowVerticalCellLineForFirstColumn;
+        bool renderLastOuterVerticalLine = Style.ShowVerticalCellLines && Style.ShowVerticalCellLineForLastColumn;
+
         for (var c = 0; c < availableWidth; c++)
         {
             // Start by assuming we just draw a straight line the
@@ -195,8 +198,10 @@ public partial class TableView
             {
                 if (c == 0)
                 {
-                    // for first character render line
-                    rune = Glyphs.LLCorner;
+                    if (renderFirstOuterVerticalLine)
+                    {
+                        rune = Glyphs.LLCorner;
+                    }
                 }
                 else if (columnsToRender.Any (r => r.X == c + 1))
                 {
@@ -205,8 +210,10 @@ public partial class TableView
                 }
                 else if (c == availableWidth - 1)
                 {
-                    // for the last character in the table
-                    rune = Glyphs.LRCorner;
+                    if (renderLastOuterVerticalLine)
+                    {
+                        rune = Glyphs.LRCorner;
+                    }
                 }
                 else if (!Style.ExpandLastColumn && columnsToRender.Any (r => r.IsVeryLast && r.X + r.Width - 1 == c))
                 {
@@ -234,7 +241,7 @@ public partial class TableView
         ClearLine (row, Viewport.Width);
 
         // render start of line
-        if (_style.ShowVerticalHeaderLines)
+        if (_style.ShowVerticalHeaderLines && Style.ShowVerticalCellLineForFirstColumn)
         {
             RenderRune (0, row, Glyphs.VLine);
         }
@@ -259,7 +266,7 @@ public partial class TableView
             Move (current.X - Viewport.X, row);
             AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
 
-            if (!Style.ExpandLastColumn && current.IsVeryLast)
+            if (!Style.ExpandLastColumn && current.IsVeryLast && Style.ShowVerticalCellLineForLastColumn)
             {
                 SetAttribute (GetAttributeForRole (VisualRole.Normal));
                 RenderSeparator (current.X + current.Width - 1, row, true);
@@ -270,7 +277,7 @@ public partial class TableView
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         // render end of line
-        if (_style.ShowVerticalHeaderLines)
+        if (_style.ShowVerticalHeaderLines && Style.ShowVerticalCellLineForLastColumn)
         {
             RenderRune (availableWidth - 1, row, Glyphs.VLine);
         }
@@ -280,6 +287,9 @@ public partial class TableView
     {
         // Renders a line above table headers (when visible) like:
         // ┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
+        bool renderFirstOuterVerticalLine = Style.ShowVerticalHeaderLines && Style.ShowVerticalCellLineForFirstColumn;
+        bool renderLastOuterVerticalLine = Style.ShowVerticalHeaderLines && Style.ShowVerticalCellLineForLastColumn;
+
         for (var c = 0; c < availableWidth; c++)
         {
             Rune rune = Glyphs.HLine;
@@ -288,7 +298,10 @@ public partial class TableView
             {
                 if (c == 0)
                 {
-                    rune = Glyphs.ULCorner;
+                    if (renderFirstOuterVerticalLine)
+                    {
+                        rune = Glyphs.ULCorner;
+                    }
                 }
 
                 // if the next column is the start of a header
@@ -298,7 +311,10 @@ public partial class TableView
                 }
                 else if (c == availableWidth - 1)
                 {
-                    rune = Glyphs.URCorner;
+                    if (renderLastOuterVerticalLine)
+                    {
+                        rune = Glyphs.URCorner;
+                    }
                 }
 
                 // if the next console column is the last column's end
@@ -322,6 +338,9 @@ public partial class TableView
          */
         // Renders a line below the table headers (when visible) like:
         // ├──────────┼───────────┼───────────────────┼──────────┼────────┼─────────────┤
+        bool renderFirstOuterVerticalLine = Style.ShowVerticalHeaderLines && Style.ShowVerticalCellLineForFirstColumn;
+        bool renderLastOuterVerticalLine = Style.ShowVerticalHeaderLines && Style.ShowVerticalCellLineForLastColumn;
+
         for (var c = 0; c < availableWidth; c++)
         {
             // Start by assuming we just draw a straight line the
@@ -333,8 +352,10 @@ public partial class TableView
             {
                 if (c == 0)
                 {
-                    // for first character render line
-                    rune = Style.ShowVerticalCellLines ? Glyphs.LeftTee : Glyphs.LLCorner;
+                    if (renderFirstOuterVerticalLine)
+                    {
+                        rune = Style.ShowVerticalCellLines ? Glyphs.LeftTee : Glyphs.LLCorner;
+                    }
                 }
 
                 // if the next column is the start of a header
@@ -344,8 +365,10 @@ public partial class TableView
                 }
                 else if (c == availableWidth - 1)
                 {
-                    // for the last character in the table
-                    rune = Style.ShowVerticalCellLines ? Glyphs.RightTee : Glyphs.LRCorner;
+                    if (renderLastOuterVerticalLine)
+                    {
+                        rune = Style.ShowVerticalCellLines ? Glyphs.RightTee : Glyphs.LRCorner;
+                    }
                 }
 
                 // if the next console column is the last column's end
@@ -446,7 +469,7 @@ public partial class TableView
 
             RenderSeparator (current.X - 1, row, false);
 
-            if (!Style.ExpandLastColumn && current.IsVeryLast)
+            if (!Style.ExpandLastColumn && current.IsVeryLast && Style.ShowVerticalCellLineForLastColumn)
             {
                 RenderSeparator (current.X + current.Width - 1, row, false);
             }
@@ -477,11 +500,14 @@ public partial class TableView
         SetAttribute (rowScheme.Normal);
 
         // render start and end of line
-        RenderRune (0, row, Glyphs.VLine);
+        if (Style.ShowVerticalCellLineForFirstColumn)
+        {
+            RenderRune (0, row, Glyphs.VLine);
+        }
 
         ColumnToRender? lastCol = columnsToRender.LastOrDefault ();
 
-        if (lastCol != null)
+        if (lastCol != null && Style.ShowVerticalCellLineForLastColumn)
         {
             RenderRune (lastCol.X + lastCol.Width - 1, row, Glyphs.VLine);
         }

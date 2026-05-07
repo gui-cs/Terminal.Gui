@@ -1190,6 +1190,58 @@ public class TableViewTests : TestDriverBase
         tableView.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void ShowVerticalCellLines_CanHideOuterBorders_AndPreserveInnerSeparators ()
+    {
+        IDriver driver = CreateTestDriver (20, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 20, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = true;
+        tableView.Style.ShowVerticalHeaderLines = true;
+        tableView.Style.ExpandLastColumn = false;
+        tableView.Style.ShowVerticalCellLineForFirstColumn = false;
+        tableView.Style.ShowVerticalCellLineForLastColumn = false;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("A", "B");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        Cell [,] contents = driver.Contents!;
+        TableView.ColumnToRender [] columns = GetColumnsToRender (tableView);
+
+        Assert.Equal (2, columns.Length);
+
+        int leftBorderCol = 0;
+        int innerSeparatorCol = columns [1].X - 1;
+        int rightBorderCol = columns [1].X + columns [1].Width - 1;
+
+        Assert.NotEqual (Glyphs.VLine.ToString (), contents [0, leftBorderCol].Grapheme);
+        Assert.Equal (Glyphs.VLine.ToString (), contents [0, innerSeparatorCol].Grapheme);
+        Assert.NotEqual (Glyphs.VLine.ToString (), contents [0, rightBorderCol].Grapheme);
+
+        Assert.NotEqual (Glyphs.VLine.ToString (), contents [1, leftBorderCol].Grapheme);
+        Assert.Equal (Glyphs.VLine.ToString (), contents [1, innerSeparatorCol].Grapheme);
+        Assert.NotEqual (Glyphs.VLine.ToString (), contents [1, rightBorderCol].Grapheme);
+
+        tableView.Dispose ();
+    }
+
     // Claude - Opus 4.7
     // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/5126
     // Clicking outside the row area of a TableView (e.g. below the last row) must
@@ -1218,6 +1270,46 @@ public class TableViewTests : TestDriverBase
         Assert.Equal (0, activatingFired);
 
         tableView.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void CalculateContentSize_HidingOuterVerticalCellLines_ReclaimsBothOuterColumns ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("A", "B");
+
+        using TableView tableViewWithOuterBorders = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 20, 5)
+        };
+        tableViewWithOuterBorders.BeginInit ();
+        tableViewWithOuterBorders.EndInit ();
+        tableViewWithOuterBorders.Style.ShowHeaders = true;
+        tableViewWithOuterBorders.Style.ShowVerticalCellLines = true;
+        tableViewWithOuterBorders.Style.ShowVerticalHeaderLines = true;
+        tableViewWithOuterBorders.Style.ExpandLastColumn = false;
+        tableViewWithOuterBorders.RefreshContentSize ();
+
+        using TableView tableViewWithoutOuterBorders = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 20, 5)
+        };
+        tableViewWithoutOuterBorders.BeginInit ();
+        tableViewWithoutOuterBorders.EndInit ();
+        tableViewWithoutOuterBorders.Style.ShowHeaders = true;
+        tableViewWithoutOuterBorders.Style.ShowVerticalCellLines = true;
+        tableViewWithoutOuterBorders.Style.ShowVerticalHeaderLines = true;
+        tableViewWithoutOuterBorders.Style.ExpandLastColumn = false;
+        tableViewWithoutOuterBorders.Style.ShowVerticalCellLineForFirstColumn = false;
+        tableViewWithoutOuterBorders.Style.ShowVerticalCellLineForLastColumn = false;
+        tableViewWithoutOuterBorders.RefreshContentSize ();
+
+        Assert.Equal (tableViewWithOuterBorders.GetContentSize ().Width - 2, tableViewWithoutOuterBorders.GetContentSize ().Width);
     }
 
     // Claude - Opus 4.7

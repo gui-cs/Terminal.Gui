@@ -72,6 +72,18 @@ public class TableStyle
     /// <summary>True to render a solid line vertical line between cells</summary>
     public bool ShowVerticalCellLines { get; set; } = true;
 
+    /// <summary>
+    ///     Gets or sets whether the left-most visible column renders a vertical line on its left side when vertical
+    ///     lines are enabled.
+    /// </summary>
+    public bool ShowVerticalCellLineForFirstColumn { get; set; } = true;
+
+    /// <summary>
+    ///     Gets or sets whether the right-most visible column renders a vertical line on its right side when vertical
+    ///     lines are enabled.
+    /// </summary>
+    public bool ShowVerticalCellLineForLastColumn { get; set; } = true;
+
     /// <summary>True to render a solid line vertical line between headers</summary>
     public bool ShowVerticalHeaderLines { get; set; } = true;
 
