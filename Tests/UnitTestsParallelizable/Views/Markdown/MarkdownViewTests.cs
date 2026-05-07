@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using System.Text;
 using JetBrains.Annotations;
 using UnitTests;
 
@@ -1904,58 +1905,143 @@ public class MarkdownViewTests (ITestOutputHelper output)
         hostNoCode.Dispose ();
     }
 
-    // Claude - Opus 4.7
-    [Theory]
-    [CombinatorialData]
-    public void HotKey_Command_SetsFocus_OnNextSubView (bool hasHotKey)
+    // Copilot
+    [Fact]
+    public void CanFocus_False_Text_HotKeySpecifier_SetsFocus_Next ()
     {
-        View superView = new () { CanFocus = true };
-        Terminal.Gui.Views.Markdown md = new () { CanFocus = false };
-        md.HotKey = hasHotKey ? Key.A.WithAlt : Key.Empty;
-        View nextSubView = new () { CanFocus = true };
-        superView.Add (md, nextSubView);
-        superView.BeginInit ();
-        superView.EndInit ();
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = false,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+        View nextView = new () { CanFocus = true };
 
-        Assert.False (md.HasFocus);
-        Assert.False (nextSubView.HasFocus);
+        markdown.HotKeySpecifier = (Rune)'_';
 
-        md.InvokeCommand (Command.HotKey);
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
 
-        Assert.False (md.HasFocus);
-        Assert.Equal (hasHotKey, nextSubView.HasFocus);
+        Assert.Equal (Key.M, markdown.HotKey);
+        Assert.True (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.True (nextView.HasFocus);
     }
 
-    // Claude - Opus 4.7
+    // Copilot
     [Fact]
-    public void CanFocus_True_HotKey_DoesNotForward_ToPeer ()
+    public void CanFocus_False_LeftButtonClicked_SetsFocus_Next ()
     {
-        View superView = new () { CanFocus = true };
-        Terminal.Gui.Views.Markdown md = new () { CanFocus = true, HotKey = Key.A.WithAlt };
-        View nextSubView = new () { CanFocus = true };
-        superView.Add (md, nextSubView);
-        superView.BeginInit ();
-        superView.EndInit ();
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            X = 0,
+            Y = 1,
+            Width = 20,
+            Height = 1,
+            CanFocus = false,
+            Text = "_Markdown"
+        };
+        View nextView = new ()
+        {
+            X = Pos.Right (markdown),
+            Y = Pos.Top (markdown),
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
 
-        md.InvokeCommand (Command.HotKey);
+        markdown.HotKeySpecifier = (Rune)'_';
 
-        Assert.True (md.HasFocus);
-        Assert.False (nextSubView.HasFocus);
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+        Assert.True (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = markdown.Frame.Location, Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.False (markdown.HasFocus);
+        Assert.True (nextView.HasFocus);
     }
 
-    // Claude - Opus 4.7
+    // Copilot
     [Fact]
-    public void CanFocus_False_HotKey_NoNextPeer_DoesNotFocusMarkdown ()
+    public void CanFocus_True_Text_HotKeySpecifier_SetsFocus_OnMarkdown ()
     {
-        View superView = new () { CanFocus = true };
-        Terminal.Gui.Views.Markdown md = new () { CanFocus = false, HotKey = Key.A.WithAlt };
-        superView.Add (md);
-        superView.BeginInit ();
-        superView.EndInit ();
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = true,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+        View nextView = new () { CanFocus = true };
 
-        md.InvokeCommand (Command.HotKey);
+        markdown.HotKeySpecifier = (Rune)'_';
 
-        Assert.False (md.HasFocus);
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (otherView.HasFocus);
+        Assert.True (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_False_Text_HotKeySpecifier_NoNextPeer_DoesNotFocusMarkdown ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = false,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (markdown);
+
+        Assert.Equal (Key.M, markdown.HotKey);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (markdown.HasFocus);
     }
 }
-

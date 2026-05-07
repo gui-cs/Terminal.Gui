@@ -123,6 +123,17 @@ public partial class Markdown : View, IDesignable
     /// <value>The raw Markdown string. Setting this property triggers reparsing, re-layout, and a redraw.</value>
     public override string Text { get => _markdown; set => SetMarkdown (value); }
 
+    /// <inheritdoc/>
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set
+        {
+            TitleTextFormatter.HotKeySpecifier = TextFormatter.HotKeySpecifier = value;
+            UpdateHotKeyFromMarkdown ();
+        }
+    }
+
     /// <summary>Gets or sets the Markdig <see cref="Markdig.MarkdownPipeline"/> used for parsing.</summary>
     /// <value>
     ///     A custom pipeline, or <see langword="null"/> to use the default pipeline
@@ -298,11 +309,34 @@ public partial class Markdown : View, IDesignable
         }
 
         _markdown = value;
+        UpdateHotKeyFromMarkdown ();
         _scrollToTopPending = true;
         InvalidateParsedAndLayout ();
 
         OnMarkdownChanged ();
         MarkdownChanged?.Invoke (this, EventArgs.Empty);
+    }
+
+    private void UpdateHotKeyFromMarkdown ()
+    {
+        if (HotKeySpecifier == new Rune ('\xFFFF'))
+        {
+            HotKey = Key.Empty;
+
+            return;
+        }
+
+        if (TextFormatter.FindHotKey (_markdown, HotKeySpecifier, out _, out Key hotKey))
+        {
+            if (HotKey != hotKey)
+            {
+                HotKey = hotKey;
+            }
+
+            return;
+        }
+
+        HotKey = Key.Empty;
     }
 
     private void InvalidateParsedAndLayout ()
