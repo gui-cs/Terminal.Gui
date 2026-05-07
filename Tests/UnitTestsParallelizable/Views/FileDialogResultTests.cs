@@ -1,5 +1,6 @@
 // Copilot
 
+using System.Reflection;
 using System.IO.Abstractions.TestingHelpers;
 
 namespace UnitTests.Views;
@@ -151,6 +152,22 @@ public class FileDialogResultTests
         // Assert - Result should be cleared, Canceled should be true
         Assert.Null (sd.Result);
         Assert.True (sd.Canceled);
+    }
+
+    [Fact]
+    public void OpenDialog_UsesInnerTableSeparatorsWithoutOuterBorders ()
+    {
+        using OpenDialog od = new TestableOpenDialog ();
+
+        FieldInfo? tableViewField = typeof (FileDialog).GetField ("_tableView", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull (tableViewField);
+
+        TableView tableView = Assert.IsType<TableView> (tableViewField!.GetValue (od));
+
+        Assert.True (tableView.Style.ShowVerticalCellLines);
+        Assert.True (tableView.Style.ShowVerticalHeaderLines);
+        Assert.False (tableView.Style.ShowVerticalCellLineForFirstColumn);
+        Assert.False (tableView.Style.ShowVerticalCellLineForLastColumn);
     }
 
     /// <summary>Testable subclass that exposes the internal file-system constructor.</summary>
