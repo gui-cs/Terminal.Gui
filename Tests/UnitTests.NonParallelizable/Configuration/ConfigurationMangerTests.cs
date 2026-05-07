@@ -98,7 +98,8 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
                    || binding.Macos is { Length: > 0 };
         }
 
-        static void AssertKeyArraysAreDeepCopies (Key [] currentKeys, Key [] cachedKeys)
+#nullable enable
+        static void AssertKeyArraysAreDeepCopies (Key []? currentKeys, Key []? cachedKeys)
         {
             if (currentKeys is null)
             {
@@ -117,6 +118,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
                 Assert.Equal (currentKeys [i], cachedKeys [i]);
             }
         }
+#nullable restore
     }
 
     [Fact]
