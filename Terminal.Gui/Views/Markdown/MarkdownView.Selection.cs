@@ -296,12 +296,12 @@ public partial class Markdown
 
         string markerText = text [BulletPrefix.Length..];
 
-        if (markerText == $"{Glyphs.CheckStateChecked} ")
+        if (string.Equals (markerText, $"{Glyphs.CheckStateChecked} ", StringComparison.Ordinal))
         {
             return "- [x] ";
         }
 
-        if (markerText == $"{Glyphs.CheckStateUnChecked} ")
+        if (string.Equals (markerText, $"{Glyphs.CheckStateUnChecked} ", StringComparison.Ordinal))
         {
             return "- [ ] ";
         }
