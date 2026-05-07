@@ -124,6 +124,11 @@ public partial class Markdown : View, IDesignable
     public override string Text { get => _markdown; set => SetMarkdown (value); }
 
     /// <inheritdoc/>
+    /// <remarks>
+    ///     Unlike <see cref="Label"/>, <see cref="Markdown"/> derives <see cref="View.HotKey"/>
+    ///     from <see cref="Text"/> (the raw markdown) rather than <see cref="View.Title"/>,
+    ///     because <see cref="Text"/> does not flow through <c>Title</c>.
+    /// </remarks>
     public override Rune HotKeySpecifier
     {
         get => base.HotKeySpecifier;
