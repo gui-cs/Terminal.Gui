@@ -703,11 +703,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Style_TaskDone_Renders_Strikethrough ()
+    public void Style_TaskDone_Renders_Checked_Glyph_With_Strikethrough ()
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- [x] D");
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• [x] " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + $"• {Glyphs.CheckStateChecked} " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
                                            output,
                                            app.Driver);
 
@@ -716,11 +716,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Style_TaskTodo_Renders_Bold ()
+    public void Style_TaskTodo_Renders_Unchecked_Glyph_With_Bold ()
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- [ ] T");
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• [ ] T" + @"\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + $"• {Glyphs.CheckStateUnChecked} T" + @"\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();

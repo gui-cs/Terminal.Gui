@@ -74,16 +74,17 @@ public partial class Markdown
         int startRow = Math.Max (start.Y, Viewport.Y);
         int endRow = Math.Min (end.Y, Viewport.Y + Viewport.Height - 1);
 
-        bool anySubViewRows = false;
+        var anySubViewRows = false;
 
         for (int lineIdx = startRow; lineIdx <= Math.Min (endRow, _renderedLines.Count - 1); lineIdx++)
         {
-            if (_renderedLines [lineIdx].IsTable || _renderedLines [lineIdx].IsCodeBlock)
+            if (!_renderedLines [lineIdx].IsTable && !_renderedLines [lineIdx].IsCodeBlock)
             {
-                anySubViewRows = true;
-
-                break;
+                continue;
             }
+            anySubViewRows = true;
+
+            break;
         }
 
         if (!anySubViewRows)
@@ -105,7 +106,7 @@ public partial class Markdown
         {
             RenderedLine line = _renderedLines [lineIdx];
 
-            if (!line.IsTable && !line.IsCodeBlock)
+            if (line is { IsTable: false, IsCodeBlock: false })
             {
                 continue;
             }
@@ -116,7 +117,7 @@ public partial class Markdown
             int screenStartCol = screenOrigin.X;
             int cols = Viewport.Width;
 
-            for (int col = 0; col < cols; col++)
+            for (var col = 0; col < cols; col++)
             {
                 int sc = screenStartCol + col;
 
