@@ -170,31 +170,36 @@ public abstract class OutputBase
                 }
             }
 
-            // Flush buffered output for row
-            if (outputStringBuilder.Length <= 0)
+            // Flush buffered output for row. Even when nothing remains buffered, an OSC 8 hyperlink
+            // may still be open in the terminal because it was started in a prior batch flushed by
+            // WriteToConsole and the row ended (or only clean cells followed) before any cell with
+            // a different URL closed it. Emit the close so the link does not bleed into later rows.
+            if (outputStringBuilder.Length <= 0 && _lastUrl is null)
             {
                 continue;
             }
 
             if (IsLegacyConsole)
             {
-                Write (outputStringBuilder);
-            }
-            else
-            {
-                SetCursorPositionImpl (lastCol, row);
-
-                // Close any open hyperlink before processing URLs
-                if (_lastUrl is { })
+                if (outputStringBuilder.Length > 0)
                 {
-                    outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
-                    _lastUrl = null;
+                    Write (outputStringBuilder);
                 }
 
-                // Wrap URLs with OSC 8 hyperlink sequences
-                StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);
-                Write (processed);
+                continue;
             }
+
+            if (_lastUrl is { })
+            {
+                outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+                _lastUrl = null;
+            }
+
+            SetCursorPositionImpl (lastCol, row);
+
+            // Wrap URLs with OSC 8 hyperlink sequences
+            StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);
+            Write (processed);
         }
 
         if (IsLegacyConsole)
