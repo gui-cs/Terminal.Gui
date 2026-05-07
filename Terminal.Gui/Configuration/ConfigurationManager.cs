@@ -246,7 +246,7 @@ public static class ConfigurationManager
 
     private static PlatformKeyBinding ClonePlatformKeyBinding (PlatformKeyBinding binding)
     {
-        return new ()
+        return binding with
         {
             All = CloneKeyArray (binding.All),
             Windows = CloneKeyArray (binding.Windows),
