@@ -1,10 +1,36 @@
-# Terminal.Gui C# SelfContained
+# Terminal.Gui Native AOT Example
 
-This project aims to test the `Terminal.Gui` library to create a simple `native AOT` `self-container` GUI application in C#, ensuring that all its features are available.
+This project tests the `Terminal.Gui` library as a native AOT application, ensuring that
+AOT-sensitive code paths (configuration deep-cloning, JSON serialization, dictionary
+construction) work correctly after trimming.
 
-With `Debug` the `.csproj` is used and with `Release` the latest `nuget package` is used, either in `Solution Configurations` or in `Profile Publish` or in the `Publish_linux-x64` or in the `Publish_osx-x64` files.
-Unlike self-contained single-file publishing, native AOT publishing must be generated on the same platform as the target execution version. Therefore, if the target execution is Linux, then the publishing must be generated on a Linux operating system. Attempting to generate on Windows for the Linux target will throw an exception.
+## What it exercises
 
-To publish the `native AOT` file in `Debug` or `Release` mode, it is not necessary to select it in the `Solution Configurations`, just choose the `Debug` or `Release` configuration in the `Publish Profile` or the `*.sh` files.
+The example deliberately instantiates views from all major config-property-hosting types:
+`Button`, `CheckBox`, `Dialog` (via `MessageBox`), `FrameView`, `Label`, `MenuBar`, `Menu`,
+`OptionSelector` (`SelectorBase`), `StatusBar`, `TextField`, `TextView`, `Window`.
 
-When executing the file directly from the `native AOT` file and needing to debug it, it will be necessary to attach it to the debugger, just like any other standalone application and selecting `Native Code`.
+This ensures that `DeepCloner`, `SourceGenerationContext`, and `ConfigurationManager.Initialize`
+exercise the typed and JSON-based dictionary construction paths that are most sensitive to AOT
+trimming.
+
+## Publishing
+
+Unlike self-contained single-file publishing, native AOT publishing must be generated on the
+same platform as the target. Cross-compilation is not supported.
+
+```bash
+# Linux
+dotnet publish -c Release -r linux-x64 --self-contained
+
+# macOS
+dotnet publish -c Release -r osx-x64 --self-contained
+
+# Windows
+dotnet publish -c Release -r win-x64 --self-contained
+```
+
+## Debugging
+
+When executing directly from the native AOT binary and needing to debug, attach to the
+debugger like any other standalone application and select `Native Code`.

@@ -1,13 +1,17 @@
-﻿// This is a test application for a native Aot file.
+// Native AOT test application for Terminal.Gui.
+// Exercises the config-property-hosting view types that are most sensitive to AOT trimming:
+// Button, CheckBox, Dialog, FrameView, Label, MenuBar, Menu, MessageBox, OptionSelector,
+// StatusBar, TextField, TextView, Window.
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using Terminal.Gui.Configuration;
-using Terminal.Gui.Views;
 using Terminal.Gui.App;
-using Terminal.Gui.ViewBase;
+using Terminal.Gui.Configuration;
+using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
 
 namespace NativeAot;
 
@@ -15,7 +19,7 @@ public static class Program
 {
     private static void Main (string [] args)
     {
-#pragma warning disable IL2026, IL3050 // Run() has attributes for AOT compatibility
+#pragma warning disable IL2026, IL3050
         Run ();
 #pragma warning restore IL2026, IL3050
     }
@@ -24,14 +28,14 @@ public static class Program
     [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
     private static void Run ()
     {
-        ConfigurationManager.Enable(ConfigLocations.All);
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        #region The code in this region is not intended for use in a native Aot self-contained. It's just here to make sure there is no functionality break with localization in Terminal.Gui using self-contained
+        IApplication app = Application.Create ().Init ();
 
-        if (Equals(Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture) && Application.SupportedCultures!.Count == 0)
+        #region Localization sanity check
+
+        if (Equals (Thread.CurrentThread.CurrentUICulture, CultureInfo.InvariantCulture) && Application.SupportedCultures!.Count == 0)
         {
-            // Only happens if the project has <InvariantGlobalization>true</InvariantGlobalization>
             Debug.Assert (Application.SupportedCultures.Count == 0);
         }
         else
@@ -42,86 +46,170 @@ public static class Program
 
         #endregion
 
-        ExampleWindow app = new ();
-        Application.Run (app);
-
-        // Dispose the app object before shutdown
+        string? result = app.Run<AotTestWindow> ().GetResult<string> ();
         app.Dispose ();
 
-        // Before the application exits, reset Terminal.Gui for clean shutdown
-        Application.Shutdown ();
-
-        // To see this output on the screen it must be done after shutdown,
-        // which restores the previous screen.
-        Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
+        Console.WriteLine (string.IsNullOrEmpty (result) ? "Cancelled" : $"Result: {result}");
     }
 }
 
-// Defines a top-level window with border and title
-public class ExampleWindow : Window
+/// <summary>
+///     A window that exercises the Terminal.Gui view types most sensitive to AOT trimming.
+///     Each view type with a <see cref="ConfigurationPropertyAttribute" /> is instantiated here
+///     so that its config properties are deep-cloned during initialization, exercising the
+///     <see cref="DeepCloner" /> code paths that are prone to AOT failures.
+/// </summary>
+public sealed class AotTestWindow : Runnable<string?>
 {
-    public static string? UserName;
-
-    public ExampleWindow ()
+    public AotTestWindow ()
     {
-        Title = $"Example App ({Application.GetDefaultKey (Command.Quit)} to quit)";
+        Title = $"AOT Test ({Application.GetDefaultKey (Command.Quit)} to quit)";
 
-        // Create input components and labels
-        var usernameLabel = new Label { Text = "Username:" };
-
-        var userNameText = new TextField
+        // ── MenuBar ──────────────────────────────────────────────────
+        MenuBar menuBar = new ()
         {
-            // Position text field adjacent to the label
-            X = Pos.Right (usernameLabel) + 1,
+            Menus =
+            [
+                new MenuBarItem (
+                                 "File",
+                                 [
+                                     new MenuItem ("Open", "", () => { }),
+                                     new MenuItem ("Quit", "", () => App?.RequestStop ())
+                                 ]),
+                new MenuBarItem (
+                                 "Help",
+                                 [
+                                     new MenuItem ("About", "", () => MessageBox.Query (App!, "About", "Native AOT Test App", "OK"))
+                                 ])
+            ]
+        };
 
-            // Fill remaining horizontal space
+        // ── Login area (FrameView) ───────────────────────────────────
+        FrameView loginFrame = new ()
+        {
+            Title = "Login",
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = 6
+        };
+
+        Label usernameLabel = new () { Text = "Username:" };
+
+        TextField userNameText = new ()
+        {
+            X = Pos.Right (usernameLabel) + 1,
             Width = Dim.Fill ()
         };
 
-        var passwordLabel = new Label
+        Label passwordLabel = new ()
         {
-            Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1
+            Text = "Password:",
+            X = Pos.Left (usernameLabel),
+            Y = Pos.Bottom (usernameLabel) + 1
         };
 
-        var passwordText = new TextField
+        TextField passwordText = new ()
         {
             Secret = true,
-
-            // align with the text box above
             X = Pos.Left (userNameText),
             Y = Pos.Top (passwordLabel),
             Width = Dim.Fill ()
         };
 
-        // Create login button
-        var btnLogin = new Button
+        loginFrame.Add (usernameLabel, userNameText, passwordLabel, passwordText);
+
+        // ── Options area (CheckBox, OptionSelector) ──────────────────
+        FrameView optionsFrame = new ()
+        {
+            Title = "Options",
+            X = 0,
+            Y = Pos.Bottom (loginFrame),
+            Width = Dim.Fill (),
+            Height = 5
+        };
+
+        CheckBox rememberMe = new ()
+        {
+            Text = "Remember me",
+            X = 0,
+            Y = 0
+        };
+
+        OptionSelector loginMode = new ()
+        {
+            X = Pos.Right (rememberMe) + 4,
+            Y = 0,
+            Labels = ["Standard", "SSO", "Token"]
+        };
+
+        optionsFrame.Add (rememberMe, loginMode);
+
+        // ── Notes area (TextView) ────────────────────────────────────
+        FrameView notesFrame = new ()
+        {
+            Title = "Notes",
+            X = 0,
+            Y = Pos.Bottom (optionsFrame),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (3)
+        };
+
+        TextView notesText = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = "Enter any notes here..."
+        };
+
+        notesFrame.Add (notesText);
+
+        // ── Login button ─────────────────────────────────────────────
+        Button btnLogin = new ()
         {
             Text = "Login",
-            Y = Pos.Bottom (passwordLabel) + 1,
-
-            // center the login button horizontally
+            Y = Pos.AnchorEnd (2),
             X = Pos.Center (),
             IsDefault = true
         };
 
-        // When login button is clicked display a message popup
-        btnLogin.Accepting += (s, e) =>
+        btnLogin.Accepting += (_, e) =>
+                               {
+                                   if (userNameText.Text == "admin" && passwordText.Text == "password")
+                                   {
+                                       MessageBox.Query (App!, "Logging In", "Login Successful", "OK");
+                                       Result = userNameText.Text;
+                                       App?.RequestStop ();
+                                   }
+                                   else
+                                   {
+                                       MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "OK");
+                                   }
+
+                                   e.Handled = true;
+                               };
+
+        // ── StatusBar ────────────────────────────────────────────────
+        StatusBar statusBar = new ()
         {
-            if (userNameText.Text == "admin" && passwordText.Text == "password")
-            {
-                MessageBox.Query (App!, "Logging In", "Login Successful", "Ok");
-                UserName = userNameText.Text;
-                Application.RequestStop ();
-            }
-            else
-            {
-                MessageBox.ErrorQuery (App!, "Logging In", "Incorrect username or password", "Ok");
-            }
-            // Anytime Accepting is handled, make sure to set e.Handled to true.
-            e.Handled = true;
+            Y = Pos.AnchorEnd (1)
         };
 
-        // Add the views to the Window
-        Add (usernameLabel, userNameText, passwordLabel, passwordText, btnLogin);
+        Shortcut helpShortcut = new ()
+        {
+            Text = "Help",
+            Key = Key.F1,
+            BindKeyToApplication = true
+        };
+
+        helpShortcut.Accepting += (_, e) =>
+                                   {
+                                       MessageBox.Query (App!, "Help", "This is the AOT test application.", "OK");
+                                       e.Handled = true;
+                                   };
+
+        statusBar.Add (helpShortcut);
+
+        Add (menuBar, loginFrame, optionsFrame, notesFrame, btnLogin, statusBar);
     }
 }
