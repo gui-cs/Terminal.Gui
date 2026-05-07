@@ -196,6 +196,7 @@ public partial class Markdown
                         MarkdownStyleRole role = done ? MarkdownStyleRole.TaskDone : MarkdownStyleRole.TaskTodo;
                         string checkbox = $"{(done ? Glyphs.CheckStateChecked : Glyphs.CheckStateUnChecked)} ";
                         string taskPrefix = itemPrefix + checkbox;
+                        // Include the trailing space in the continuation indent so wrapped task text aligns after the glyph marker.
                         string taskCont = contPrefix + new string (' ', marker.Length + checkbox.GetColumns ());
 
                         List<InlineRun> runs = WalkInlines (firstInline.NextSibling, role);

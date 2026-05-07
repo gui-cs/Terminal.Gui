@@ -287,7 +287,7 @@ public partial class Markdown
     /// <summary>Converts rendered list marker text back to Markdown source marker text for selection and clipboard operations.</summary>
     private static string TranslateListMarkerText (string text)
     {
-        if (string.IsNullOrEmpty (text) || !text.StartsWith ("• ", StringComparison.Ordinal))
+        if (string.IsNullOrEmpty (text) || text.Length < 2 || !text.StartsWith ("• ", StringComparison.Ordinal))
         {
             return text;
         }
