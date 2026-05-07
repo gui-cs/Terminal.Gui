@@ -1,0 +1,22 @@
+<!--
+  AOT smoke test project that references Terminal.Gui via NuGet PackageReference
+  (not ProjectReference). This catches AOT runtime errors that only manifest
+  when consuming the published NuGet package, where trimming decisions differ
+  from a direct project reference build.
+
+  Used by CI only — not included in Terminal.sln.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Terminal.Gui" Version="*" />
+  </ItemGroup>
+
+</Project>

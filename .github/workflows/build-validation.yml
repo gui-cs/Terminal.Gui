@@ -15,7 +15,7 @@ jobs:
     name: Build All Configurations
     runs-on: ubuntu-latest
     
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
 
     - name: Checkout code
@@ -63,6 +63,13 @@ jobs:
       run: |
         chmod +x ./aot-publish/NativeAot
         ./aot-publish/NativeAot --smoke-test
+
+    - name: AOT NuGet Smoke Test (publish and run using NuGet package)
+      run: |
+        dotnet restore ./Examples/NativeAot/SmokeTest/SmokeTest.csproj
+        dotnet publish ./Examples/NativeAot/SmokeTest/SmokeTest.csproj --configuration Release --output ./aot-nuget-publish -property:NoWarn=0618%3B0612
+        chmod +x ./aot-nuget-publish/SmokeTest
+        ./aot-nuget-publish/SmokeTest
 
     - name: Build Release Solution
       run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612
