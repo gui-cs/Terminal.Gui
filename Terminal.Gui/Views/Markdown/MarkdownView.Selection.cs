@@ -258,10 +258,8 @@ public partial class Markdown
 
         foreach (StyledSegment segment in line.Segments)
         {
-            // Translate the display bullet character back to standard markdown list syntax.
-            // The ListMarker may be "• " (plain), "• [x] " (done task), or "• [ ] " (open task).
-            string text = segment.StyleRole == MarkdownStyleRole.ListMarker && segment.Text.StartsWith ("• ")
-                              ? "- " + segment.Text [2..]
+            string text = segment.StyleRole == MarkdownStyleRole.ListMarker
+                              ? TranslateListMarkerText (segment.Text)
                               : segment.Text;
 
             foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
@@ -284,6 +282,28 @@ public partial class Markdown
                 contentX += gw;
             }
         }
+    }
+
+    private static string TranslateListMarkerText (string text)
+    {
+        if (!text.StartsWith ("• "))
+        {
+            return text;
+        }
+
+        string markerText = text [2..];
+
+        if (markerText == $"{Glyphs.CheckStateChecked} ")
+        {
+            return "- [x] ";
+        }
+
+        if (markerText == $"{Glyphs.CheckStateUnChecked} ")
+        {
+            return "- [ ] ";
+        }
+
+        return "- " + markerText;
     }
 
     private int GetLineDisplayWidth (int lineIdx)

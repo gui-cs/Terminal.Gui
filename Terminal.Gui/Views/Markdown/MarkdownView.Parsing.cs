@@ -194,9 +194,9 @@ public partial class Markdown
                     {
                         bool done = tl.Checked;
                         MarkdownStyleRole role = done ? MarkdownStyleRole.TaskDone : MarkdownStyleRole.TaskTodo;
-                        string checkbox = done ? "[x] " : "[ ] ";
+                        string checkbox = $"{(done ? Glyphs.CheckStateChecked : Glyphs.CheckStateUnChecked)} ";
                         string taskPrefix = itemPrefix + checkbox;
-                        string taskCont = contPrefix + new string (' ', marker.Length + 4);
+                        string taskCont = contPrefix + new string (' ', marker.Length + checkbox.GetColumns ());
 
                         List<InlineRun> runs = WalkInlines (firstInline.NextSibling, role);
                         TrimLeadingSpace (runs);
