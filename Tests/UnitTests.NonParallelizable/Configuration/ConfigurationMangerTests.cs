@@ -58,8 +58,19 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
     public void HardCodedDefaultCache_KeyBindingDictionaries_Are_Typed_Deep_Copies ()
     {
         // Copilot
-        AssertKeyBindingDictionaryIsDeepCopy ("Application.DefaultKeyBindings", Application.DefaultKeyBindings!);
-        AssertKeyBindingDictionaryIsDeepCopy ("View.DefaultKeyBindings", View.DefaultKeyBindings!);
+        Assert.False (IsEnabled);
+        Application.ResetState (true);
+
+        try
+        {
+            AssertKeyBindingDictionaryIsDeepCopy ("Application.DefaultKeyBindings", Application.DefaultKeyBindings!);
+            AssertKeyBindingDictionaryIsDeepCopy ("View.DefaultKeyBindings", View.DefaultKeyBindings!);
+        }
+        finally
+        {
+            Disable (true);
+            Application.ResetState (true);
+        }
 
         static void AssertKeyBindingDictionaryIsDeepCopy (string propertyName, Dictionary<Command, PlatformKeyBinding> currentBindings)
         {
