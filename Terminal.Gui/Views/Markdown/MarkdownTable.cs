@@ -169,8 +169,12 @@ public sealed class MarkdownTable : View, IDesignable
     {
         if (maxWidth == _lastComputedWidth)
         {
+            System.Diagnostics.Debug.WriteLine ($"[TRACE] Recalculate({maxWidth}) - SKIPPED (same as _lastComputedWidth)");
+
             return;
         }
+
+        System.Diagnostics.Debug.WriteLine ($"[TRACE] Recalculate({maxWidth}) - COMPUTING (was {_lastComputedWidth})");
 
         _lastComputedWidth = maxWidth;
         _columnWidths = ComputeColumnWidths (_data, maxWidth);
@@ -188,6 +192,7 @@ public sealed class MarkdownTable : View, IDesignable
         }
 
         RenderedHeight = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
+        System.Diagnostics.Debug.WriteLine ($"[TRACE] Recalculate({maxWidth}) → RenderedHeight={RenderedHeight}");
         Height = RenderedHeight;
 
         BuildLinkRegions ();

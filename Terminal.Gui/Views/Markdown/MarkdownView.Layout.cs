@@ -87,6 +87,7 @@ public partial class Markdown
                     Width = Dim.Fill ()
                 };
                 tableView.Recalculate (tableLayoutWidth);
+                System.Diagnostics.Debug.WriteLine ($"[TRACE-LAYOUT] After Recalculate({tableLayoutWidth}): RenderedHeight={tableView.RenderedHeight}");
 
                 // Forward link clicks from the table to this Markdown view's LinkClicked event.
                 tableView.LinkClicked += (_, e) =>
