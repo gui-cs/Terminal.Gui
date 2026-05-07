@@ -325,7 +325,7 @@ public sealed class MarkdownTable : View, IDesignable
         MarkdownLinkEventArgs args = new (url);
         LinkClicked?.Invoke (this, args);
 
-        if (!args.Handled)
+        if (!args.Handled && !url.StartsWith ('#'))
         {
             Link.OpenUrl (url);
         }

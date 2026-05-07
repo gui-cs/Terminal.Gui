@@ -91,6 +91,12 @@ public partial class Markdown
                 // Forward link clicks from the table to this Markdown view's LinkClicked event.
                 tableView.LinkClicked += (_, e) =>
                                          {
+                                             // Handle anchor links the same way as paragraph links
+                                             if (e.Url.StartsWith ('#'))
+                                             {
+                                                 ScrollToAnchor (e.Url);
+                                             }
+
                                              if (!RaiseLinkClicked (e.Url))
                                              {
                                                  return;

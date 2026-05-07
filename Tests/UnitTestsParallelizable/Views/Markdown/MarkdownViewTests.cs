@@ -400,6 +400,127 @@ public class MarkdownViewTests (ITestOutputHelper output)
         window.Dispose ();
     }
 
+    // Copilot - Opus 4.6 - verify Issue 1: anchor links in tables should scroll to heading
+    [Fact]
+    public void Anchor_Link_In_Table_Scrolls_To_Heading ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        // Create markdown with a heading and a table containing an anchor link to it.
+        // The heading must be far enough below the table that scrolling is needed.
+        string markdown = """
+                          | Name | Link |
+                          |------|------|
+                          | jump | [go](#target) |
+
+                          Line 1
+
+                          Line 2
+
+                          Line 3
+
+                          Line 4
+
+                          Line 5
+
+                          Line 6
+
+                          Line 7
+
+                          Line 8
+
+                          Line 9
+
+                          ## Target
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 10 };
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Viewport should start at top
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // Find the table and activate the anchor link
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        tableView.SetFocus ();
+        tableView.InvokeCommand (Command.Accept);
+
+        // The anchor link should have been reported
+        Assert.Equal ("#target", clickedUrl);
+
+        // The viewport should have scrolled down to the heading
+        Assert.True (markdownView.Viewport.Y > 0, "Viewport should have scrolled to the anchor target");
+
+        window.Dispose ();
+    }
+
+    // Copilot - Opus 4.6 - verify Issue 2: duplicate URLs in different cells create separate navigable entries
+    [Fact]
+    public void Duplicate_Urls_In_Different_Cells_Are_Separately_Navigable ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        // Two cells in different rows with the same URL — should be independently navigable
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [link](https://same.com) | info |
+                          | [link](https://same.com) | info |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = [];
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+        Assert.True (tableView.CanFocus);
+
+        // Focus the table — first link becomes active
+        tableView.SetFocus ();
+        tableView.InvokeCommand (Command.Accept);
+
+        // Advance to second link (same URL but different cell)
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+
+        // Both activations should have fired — proving they are independently navigable
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Equal ("https://same.com", activatedUrls [0]);
+        Assert.Equal ("https://same.com", activatedUrls [1]);
+
+        window.Dispose ();
+    }
+
     [Fact]
     public void Image_Fallback_Text_Renders ()
     {
