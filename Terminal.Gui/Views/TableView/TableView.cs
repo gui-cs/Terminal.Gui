@@ -243,6 +243,25 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
     }
 
     /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        // Cancel Activate when a mouse click lands outside any cell (e.g. below the
+        // last row or in the header area). Without this, the Activating event would
+        // fire even though no cell was actually selected, surprising subscribers.
+        if (!TryGetMouseCellHit (args.Context, out Point? hit))
+        {
+            return false;
+        }
+
+        if (hit is null)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     protected override void OnActivated (ICommandContext? ctx)
     {
         if (ctx?.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)
@@ -252,26 +271,65 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
             return;
         }
 
-        if (ctx?.Binding is not MouseBinding mouseBinding || mouseBinding.MouseEvent is null)
+        if (!TryGetMouseCellHit (ctx, out Point? hit) || hit is null)
         {
             return;
         }
-        int boundsX = mouseBinding.MouseEvent.Position!.Value.X;
-        int boundsY = mouseBinding.MouseEvent.Position!.Value.Y;
+
+        MouseBinding mouseBinding = (MouseBinding)ctx!.Binding!;
+        SetSelection (hit.Value.X, hit.Value.Y, mouseBinding.MouseEvent!.Flags.FastHasFlags (MouseFlags.Shift));
+
+        Update ();
+    }
+
+    // Returns true when the binding represents a left-click on this TableView; in that case
+    // hit is the cell that was clicked, or null if the click was outside any cell (e.g. header,
+    // below the last row, or right of the last rendered column). Returns false for non-mouse or
+    // non-left-click bindings.
+    private bool TryGetMouseCellHit (ICommandContext? ctx, out Point? hit)
+    {
+        hit = null;
+
+        if (ctx?.Binding is not MouseBinding mouseBinding || mouseBinding.MouseEvent is null)
+        {
+            return false;
+        }
 
         if (!mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
         {
-            return;
+            return false;
         }
-        Point? hit = ScreenToCell (boundsX, boundsY);
 
-        if (hit is null)
+        int clientX = mouseBinding.MouseEvent.Position!.Value.X;
+        int clientY = mouseBinding.MouseEvent.Position!.Value.Y;
+
+        hit = ScreenToCell (clientX, clientY);
+
+        // ScreenToCell maps far-right X positions onto the last column (its column lookup picks
+        // the largest X with X <= clientX, with no upper-bound check). When ExpandLastColumn is
+        // false there is visible whitespace to the right of the last rendered column; reject
+        // hits that fall there so clicks in that whitespace don't raise Activating.
+        if (hit is not null && !IsXWithinAnyRenderedColumn (clientX))
         {
-            return;
+            hit = null;
         }
-        SetSelection (hit.Value.X, hit.Value.Y, mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.Shift));
 
-        Update ();
+        return true;
+    }
+
+    private bool IsXWithinAnyRenderedColumn (int clientX)
+    {
+        int viewportX = clientX + Viewport.X;
+
+        foreach (ColumnToRender col in NonHiddenCellInfos ())
+        {
+            if (viewportX >= col.X && viewportX < col.X + col.Width)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>
