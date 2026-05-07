@@ -204,7 +204,7 @@ public static class ConfigurationManager
                 // Some getters (notably ThemeManager.Themes while uninitialized) synthesize composite
                 // objects from other configuration properties, so a single populate-and-clone pass can
                 // observe half-initialized cache entries and persist null/default values into the clone.
-                hardCodedProperty.Value.PropertyValue = DeepCloner.DeepClone (hardCodedProperty.Value.PropertyValue);
+                hardCodedProperty.Value.PropertyValue = CloneHardCodedPropertyValue (hardCodedProperty.Value.PropertyValue);
                 hardCodedProperty.Value.Immutable = true;
             }
         }
@@ -220,6 +220,58 @@ public static class ConfigurationManager
         // BUGBUG: This a partial workaround.
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
         ThemeManager.Themes? [ThemeManager.Theme].Apply ();
+    }
+
+    // AOT trimming removes the reflective Dictionary<,> constructor that DeepCloner relies on.
+    // Each non-trivially-cloneable config property type needs a typed clone path here to stay AOT-safe.
+    private static object? CloneHardCodedPropertyValue (object? propertyValue)
+    {
+        if (propertyValue is Dictionary<Command, PlatformKeyBinding> keyBindings)
+        {
+            return CloneKeyBindings (keyBindings);
+        }
+
+        return DeepCloner.DeepClone (propertyValue);
+    }
+
+    private static Dictionary<Command, PlatformKeyBinding> CloneKeyBindings (Dictionary<Command, PlatformKeyBinding> source)
+    {
+        Dictionary<Command, PlatformKeyBinding> clone = new (source.Comparer);
+
+        foreach (KeyValuePair<Command, PlatformKeyBinding> kvp in source)
+        {
+            clone [kvp.Key] = ClonePlatformKeyBinding (kvp.Value);
+        }
+
+        return clone;
+    }
+
+    private static PlatformKeyBinding ClonePlatformKeyBinding (PlatformKeyBinding binding)
+    {
+        return binding with
+        {
+            All = CloneKeyArray (binding.All),
+            Windows = CloneKeyArray (binding.Windows),
+            Linux = CloneKeyArray (binding.Linux),
+            Macos = CloneKeyArray (binding.Macos)
+        };
+    }
+
+    private static Key []? CloneKeyArray (Key []? keys)
+    {
+        if (keys is null)
+        {
+            return null;
+        }
+
+        Key [] clonedKeys = new Key [keys.Length];
+
+        for (int i = 0; i < keys.Length; i++)
+        {
+            clonedKeys [i] = new (keys [i]);
+        }
+
+        return clonedKeys;
     }
 
     #endregion Initialization
