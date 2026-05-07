@@ -271,7 +271,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
                           """;
 
         Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
-        var activatedUrls = new List<string> ();
+        List<string> activatedUrls = new ();
 
         markdownView.LinkClicked += (_, e) =>
                                     {
@@ -366,7 +366,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
                           """;
 
         Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
-        var activatedUrls = new List<string> ();
+        List<string> activatedUrls = new ();
 
         markdownView.LinkClicked += (_, e) =>
                                     {
