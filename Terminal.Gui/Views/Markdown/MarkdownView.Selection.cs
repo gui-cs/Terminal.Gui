@@ -130,7 +130,7 @@ public partial class Markdown
 
         (Point start, Point end) = GetNormalizedSelection ();
         List<string> outputLines = [];
-        bool inCodeBlock = false;
+        var inCodeBlock = false;
 
         string? currentCodeLanguage = null;
 
@@ -172,7 +172,7 @@ public partial class Markdown
                 currentCodeLanguage = null;
             }
 
-            if (line.IsTable && line.TableData is { } tableData)
+            if (line is { IsTable: true, TableData: { } tableData })
             {
                 // Each table occupies several zero-width placeholder rows that all share the
                 // same TableData instance.  Only reconstruct the table markdown the first time
@@ -236,13 +236,13 @@ public partial class Markdown
         yield return "| " + string.Join (" | ", tableData.Headers) + " |";
 
         // Separator row — encode column alignment
-        IEnumerable<string> separators = tableData.ColumnAlignments.Select (
-            alignment => alignment switch
-            {
-                Alignment.Center => ":---:",
-                Alignment.End    => "---:",
-                _                => "---"
-            });
+        IEnumerable<string> separators = tableData.ColumnAlignments.Select (alignment => alignment switch
+                                                                                         {
+                                                                                             Alignment.Center => ":---:",
+                                                                                             Alignment.End => "---:",
+                                                                                             _ => "---"
+                                                                                         });
+
         yield return "| " + string.Join (" | ", separators) + " |";
 
         // Body rows
@@ -258,9 +258,7 @@ public partial class Markdown
 
         foreach (StyledSegment segment in line.Segments)
         {
-            string text = segment.StyleRole == MarkdownStyleRole.ListMarker
-                              ? TranslateListMarkerText (segment.Text)
-                              : segment.Text;
+            string text = segment.StyleRole == MarkdownStyleRole.ListMarker ? TranslateListMarkerText (segment.Text) : segment.Text;
 
             foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
             {
@@ -289,17 +287,17 @@ public partial class Markdown
     /// <returns>The Markdown source marker text, or <paramref name="text"/> when it is not a rendered list marker.</returns>
     private static string TranslateListMarkerText (string text)
     {
-        const string BulletPrefix = "• ";
+        const string BULLET_PREFIX = "• ";
 
-        if (!text.StartsWith (BulletPrefix, StringComparison.Ordinal))
+        if (!text.StartsWith (BULLET_PREFIX, StringComparison.Ordinal))
         {
             return text;
         }
 
-        string remainder = text [BulletPrefix.Length..];
+        string remainder = text [BULLET_PREFIX.Length..];
 
-        string checkedGlyph = $"{Glyphs.CheckStateChecked} ";
-        string uncheckedGlyph = $"{Glyphs.CheckStateUnChecked} ";
+        var checkedGlyph = $"{Glyphs.CheckStateChecked} ";
+        var uncheckedGlyph = $"{Glyphs.CheckStateUnChecked} ";
 
         if (remainder.StartsWith (checkedGlyph, StringComparison.Ordinal))
         {
