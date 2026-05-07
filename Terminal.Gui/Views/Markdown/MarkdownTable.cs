@@ -40,6 +40,10 @@ public sealed class MarkdownTable : View, IDesignable
     // Last width used for column computation — tracks when recalculation is needed
     private int _lastComputedWidth;
 
+    // Link regions within the table, built after layout
+    private readonly List<TableLinkRegion> _linkRegions = [];
+    private int _activeLinkIndex = -1;
+
     private static readonly TableData _emptyData = new ([], [], []);
 
     /// <summary>Initializes a new empty <see cref="MarkdownTable"/>.</summary>
@@ -55,6 +59,7 @@ public sealed class MarkdownTable : View, IDesignable
         Margin.Thickness = new Thickness (0);
 
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+        AddCommand (Command.Accept, () => ActivateCurrentLink ());
     }
 
     /// <summary>
@@ -184,6 +189,8 @@ public sealed class MarkdownTable : View, IDesignable
 
         RenderedHeight = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
         Height = RenderedHeight;
+
+        BuildLinkRegions ();
     }
 
     /// <summary>
@@ -223,6 +230,11 @@ public sealed class MarkdownTable : View, IDesignable
             return;
         }
 
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
         string? url = HitTestLink (pos.X, pos.Y);
 
         if (url is null)
@@ -230,15 +242,101 @@ public sealed class MarkdownTable : View, IDesignable
             return;
         }
 
+        // Set active link to the clicked link region
+        for (var i = 0; i < _linkRegions.Count; i++)
+        {
+            if (_linkRegions [i].Url == url)
+            {
+                _activeLinkIndex = i;
+                SetNeedsDraw ();
+
+                break;
+            }
+        }
+
+        RaiseLinkClicked (url);
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Cycles through link regions on Tab / Shift+Tab. Returns <see langword="false"/>
+    ///     when there are no more links in that direction, allowing focus to leave the view.
+    /// </remarks>
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        if (behavior is { } && behavior != TabStop)
+        {
+            return false;
+        }
+
+        if (_linkRegions.Count == 0)
+        {
+            return false;
+        }
+
+        int delta = direction == NavigationDirection.Forward ? 1 : -1;
+
+        if (_activeLinkIndex < 0)
+        {
+            // First entry — select first or last link
+            _activeLinkIndex = delta > 0 ? 0 : _linkRegions.Count - 1;
+            SetNeedsDraw ();
+
+            return true;
+        }
+
+        int next = _activeLinkIndex + delta;
+
+        // If we've gone past either end, clear selection and let focus leave
+        if (next < 0 || next >= _linkRegions.Count)
+        {
+            _activeLinkIndex = -1;
+            SetNeedsDraw ();
+
+            return false;
+        }
+
+        _activeLinkIndex = next;
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
+    {
+        if (!newHasFocus)
+        {
+            _activeLinkIndex = -1;
+            SetNeedsDraw ();
+        }
+
+        base.OnHasFocusChanged (newHasFocus, previousFocusedView, focusedView);
+    }
+
+    /// <summary>Activates the currently highlighted link (Enter key).</summary>
+    private bool ActivateCurrentLink ()
+    {
+        if (_activeLinkIndex < 0 || _activeLinkIndex >= _linkRegions.Count)
+        {
+            return false;
+        }
+
+        RaiseLinkClicked (_linkRegions [_activeLinkIndex].Url);
+
+        return true;
+    }
+
+    /// <summary>Raises <see cref="LinkClicked"/> and opens the URL if not handled.</summary>
+    private void RaiseLinkClicked (string url)
+    {
         MarkdownLinkEventArgs args = new (url);
         LinkClicked?.Invoke (this, args);
 
-        if (args.Handled)
+        if (!args.Handled)
         {
-            return;
+            Link.OpenUrl (url);
         }
-
-        Link.OpenUrl (url);
     }
 
     /// <summary>
@@ -473,19 +571,43 @@ public sealed class MarkdownTable : View, IDesignable
                         attr = attr with { Style = attr.Style | TextStyle.Bold };
                     }
 
-                    SetAttribute (attr);
+                    bool isLink = !string.IsNullOrWhiteSpace (seg.Url) && Uri.IsWellFormedUriString (seg.Url, UriKind.Absolute);
+                    bool isActive = isLink && HasFocus && IsActiveLinkUrl (seg.Url!);
 
-                    foreach (string grapheme in GraphemeHelper.GetGraphemes (seg.Text))
+                    if (isActive)
                     {
-                        int gw = Math.Max (grapheme.GetColumns (), 1);
+                        attr = new Attribute (attr.Background, attr.Foreground, attr.Style);
+                    }
 
-                        if (drawX - x >= colWidth - 1)
+                    // Set OSC8 URL for link segments
+                    if (isLink && Driver is { })
+                    {
+                        Driver.CurrentUrl = seg.Url;
+                    }
+
+                    try
+                    {
+                        SetAttribute (attr);
+
+                        foreach (string grapheme in GraphemeHelper.GetGraphemes (seg.Text))
                         {
-                            break;
-                        }
+                            int gw = Math.Max (grapheme.GetColumns (), 1);
 
-                        AddStr (drawX, y, grapheme);
-                        drawX += gw;
+                            if (drawX - x >= colWidth - 1)
+                            {
+                                break;
+                            }
+
+                            AddStr (drawX, y, grapheme);
+                            drawX += gw;
+                        }
+                    }
+                    finally
+                    {
+                        if (isLink && Driver is { })
+                        {
+                            Driver.CurrentUrl = null;
+                        }
                     }
                 }
 
@@ -961,6 +1083,69 @@ public sealed class MarkdownTable : View, IDesignable
         }
 
         return text [..charCount];
+    }
+
+    /// <summary>Returns <see langword="true"/> if the given URL matches the currently active link.</summary>
+    private bool IsActiveLinkUrl (string url)
+    {
+        if (_activeLinkIndex < 0 || _activeLinkIndex >= _linkRegions.Count)
+        {
+            return false;
+        }
+
+        return _linkRegions [_activeLinkIndex].Url == url;
+    }
+
+    /// <summary>
+    ///     Builds the list of navigable link regions by scanning all cell segments.
+    ///     Called after <see cref="Recalculate"/>.
+    /// </summary>
+    private void BuildLinkRegions ()
+    {
+        _linkRegions.Clear ();
+        _activeLinkIndex = -1;
+
+        scanCellSegments (_headerSegments);
+
+        foreach (List<StyledSegment> [] rowSegs in _rowSegments)
+        {
+            scanCellSegments (rowSegs);
+        }
+
+        // Make the table focusable and navigable when it contains links
+        bool hasLinks = _linkRegions.Count > 0;
+        CanFocus = hasLinks;
+        TabStop = hasLinks ? TabBehavior.TabStop : TabBehavior.NoStop;
+
+        return;
+
+        void scanCellSegments (List<StyledSegment> [] cellSegments)
+        {
+            foreach (List<StyledSegment> cellSegs in cellSegments)
+            {
+                foreach (StyledSegment seg in cellSegs)
+                {
+                    if (string.IsNullOrWhiteSpace (seg.Url))
+                    {
+                        continue;
+                    }
+
+                    // Avoid duplicates (same URL appearing in multiple segments of the same link)
+                    if (_linkRegions.Count > 0 && _linkRegions [^1].Url == seg.Url)
+                    {
+                        continue;
+                    }
+
+                    _linkRegions.Add (new TableLinkRegion { Url = seg.Url! });
+                }
+            }
+        }
+    }
+
+    /// <summary>A navigable link within the table. Tracks only the URL for activation and Tab cycling.</summary>
+    private sealed class TableLinkRegion
+    {
+        public string Url { get; init; } = "";
     }
 
     /// <inheritdoc/>
