@@ -87,9 +87,57 @@ public partial class Markdown : View, IDesignable
         SetupBindingsAndCommands ();
     }
 
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     If <see cref="View.CanFocus"/> is <see langword="false"/> and a valid <see cref="View.HotKey"/>
+    ///     is set, the hotkey is forwarded to the next peer in <see cref="View.SuperView"/>'s
+    ///     <see cref="View.SubViews"/> — mirroring <see cref="Label"/> so that a non-focusable
+    ///     <see cref="Markdown"/> describing a focusable view (e.g. a <see cref="TextField"/>) moves
+    ///     focus to that view when its hotkey is pressed.
+    /// </remarks>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        // If Markdown can't focus, forward HotKey to the next peer in the SubView list
+        if (CanFocus || !HotKey.IsValid)
+        {
+            return base.OnActivating (args);
+        }
+        int me = SuperView?.SubViews.IndexOf (this) ?? -1;
+
+        if (me == -1 || !(me < SuperView?.SubViews.Count - 1))
+        {
+            return base.OnActivating (args);
+        }
+        bool handled = SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
+
+        if (!handled)
+        {
+            return base.OnActivating (args);
+        }
+        args.Handled = true;
+
+        return true;
+    }
+
     /// <summary>Gets or sets the Markdown-formatted text displayed by this view.</summary>
     /// <value>The raw Markdown string. Setting this property triggers reparsing, re-layout, and a redraw.</value>
     public override string Text { get => _markdown; set => SetMarkdown (value); }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Unlike <see cref="Label"/>, <see cref="Markdown"/> derives <see cref="View.HotKey"/>
+    ///     from <see cref="Text"/> (the raw markdown) rather than <see cref="View.Title"/>,
+    ///     because <see cref="Text"/> does not flow through <c>Title</c>.
+    /// </remarks>
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set
+        {
+            TitleTextFormatter.HotKeySpecifier = TextFormatter.HotKeySpecifier = value;
+            UpdateHotKeyFromMarkdown ();
+        }
+    }
 
     /// <summary>Gets or sets the Markdig <see cref="Markdig.MarkdownPipeline"/> used for parsing.</summary>
     /// <value>
@@ -266,11 +314,34 @@ public partial class Markdown : View, IDesignable
         }
 
         _markdown = value;
+        UpdateHotKeyFromMarkdown ();
         _scrollToTopPending = true;
         InvalidateParsedAndLayout ();
 
         OnMarkdownChanged ();
         MarkdownChanged?.Invoke (this, EventArgs.Empty);
+    }
+
+    private void UpdateHotKeyFromMarkdown ()
+    {
+        if (HotKeySpecifier == new Rune ('\xFFFF'))
+        {
+            HotKey = Key.Empty;
+
+            return;
+        }
+
+        if (TextFormatter.FindHotKey (_markdown, HotKeySpecifier, out _, out Key hotKey))
+        {
+            if (HotKey != hotKey)
+            {
+                HotKey = hotKey;
+            }
+
+            return;
+        }
+
+        HotKey = Key.Empty;
     }
 
     private void InvalidateParsedAndLayout ()
