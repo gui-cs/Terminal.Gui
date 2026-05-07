@@ -285,6 +285,8 @@ public partial class Markdown
     }
 
     /// <summary>Converts rendered list marker text back to Markdown source marker text for selection and clipboard operations.</summary>
+    /// <param name="text">The rendered list marker text.</param>
+    /// <returns>The Markdown source marker text, or <paramref name="text"/> when it is not a rendered list marker.</returns>
     private static string TranslateListMarkerText (string text)
     {
         const string BulletPrefix = "• ";
