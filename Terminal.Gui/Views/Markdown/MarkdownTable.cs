@@ -332,15 +332,6 @@ public sealed class MarkdownTable : View, IDesignable
     }
 
     /// <summary>
-    ///     Returns the URL of the link at the given viewport position, or <see langword="null"/>
-    ///     if no link segment occupies that position.
-    /// </summary>
-    internal string? HitTestLink (int viewportX, int viewportY)
-    {
-        return HitTestLinkRegion (viewportX, viewportY)?.url;
-    }
-
-    /// <summary>
     ///     Returns the link region index at the given viewport position, or -1 if none.
     /// </summary>
     private int HitTestLinkIndex (int viewportX, int viewportY)
@@ -388,7 +379,7 @@ public sealed class MarkdownTable : View, IDesignable
         }
 
         List<StyledSegment> []? cellSegments = null;
-        var rowIndex = -1; // -1 = header
+        int rowIndex = -1; // -1 = header
 
         if (y < _headerRowHeight)
         {
@@ -429,7 +420,7 @@ public sealed class MarkdownTable : View, IDesignable
         // Determine which column the click is in.
         int x = viewportX;
         x--; // skip left border
-        var col = -1;
+        int col = -1;
 
         for (var c = 0; c < _columnWidths.Length; c++)
         {
@@ -1115,7 +1106,10 @@ public sealed class MarkdownTable : View, IDesignable
         return text [..charCount];
     }
 
-    /// <summary>Returns <see langword="true"/> if the segment at the given row/col with the given URL is the currently active link.</summary>
+    /// <summary>
+    ///     Returns <see langword="true"/> if the segment at the given row/col with the given URL is the currently active
+    ///     link.
+    /// </summary>
     private bool IsActiveLinkAt (int rowIndex, int colIndex, string url)
     {
         if (_activeLinkIndex < 0 || _activeLinkIndex >= _linkRegions.Count)
@@ -1137,11 +1131,11 @@ public sealed class MarkdownTable : View, IDesignable
         _linkRegions.Clear ();
         _activeLinkIndex = -1;
 
-        scanCellSegments (_headerSegments, -1);
+        ScanCellSegments (_headerSegments, -1);
 
         for (var r = 0; r < _rowSegments.Length; r++)
         {
-            scanCellSegments (_rowSegments [r], r);
+            ScanCellSegments (_rowSegments [r], r);
         }
 
         // Make the table focusable and navigable when it contains links
@@ -1151,7 +1145,7 @@ public sealed class MarkdownTable : View, IDesignable
 
         return;
 
-        void scanCellSegments (List<StyledSegment> [] cellSegments, int rowIndex)
+        void ScanCellSegments (List<StyledSegment> [] cellSegments, int rowIndex)
         {
             for (var col = 0; col < cellSegments.Length; col++)
             {
