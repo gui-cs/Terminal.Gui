@@ -88,6 +88,10 @@ public partial class Markdown
                 };
                 tableView.Recalculate (tableLayoutWidth);
 
+                // Capture the rendered height BEFORE Add() — Add triggers EndInit → Layout
+                // which may recalculate the table at a stale content width, corrupting RenderedHeight.
+                int tableHeight = tableView.RenderedHeight;
+
                 // Forward link clicks from the table to this Markdown view's LinkClicked event.
                 tableView.LinkClicked += (_, e) =>
                                          {
@@ -107,9 +111,6 @@ public partial class Markdown
 
                 _tableViews.Add (tableView);
                 Add (tableView);
-
-                // Use actual table height (accounts for word-wrapped rows at current width)
-                int tableHeight = tableView.RenderedHeight;
 
                 // Reserve placeholder lines so content height is correct
                 for (var i = 0; i < tableHeight; i++)
