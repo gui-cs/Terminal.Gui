@@ -393,23 +393,27 @@ public static class DeepCloner
         // AOT-safe: use the source-generated JSON serializer to create empty dictionary instances.
         // This avoids Activator.CreateInstance, whose target constructors are trimmed by the AOT linker
         // for closed generic dictionary types not otherwise statically reachable.
-        try
+        // Only used when no comparer is needed — Deserialize("{}") always creates a default-comparer instance.
+        if (comparer is null)
         {
-            JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (dictType);
-
-            if (jsonTypeInfo is not null)
+            try
             {
-                IDictionary? result = JsonSerializer.Deserialize ("{}", jsonTypeInfo) as IDictionary;
+                JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (dictType);
 
-                if (result is not null)
+                if (jsonTypeInfo is not null)
                 {
-                    return result;
+                    IDictionary? result = JsonSerializer.Deserialize ("{}", jsonTypeInfo) as IDictionary;
+
+                    if (result is not null)
+                    {
+                        return result;
+                    }
                 }
             }
-        }
-        catch (Exception)
-        {
-            // JSON serializer context may not contain this dictionary type — fall through to reflective construction.
+            catch (InvalidOperationException)
+            {
+                // JSON serializer context may not be initialized — fall through to reflective construction.
+            }
         }
 
         try
