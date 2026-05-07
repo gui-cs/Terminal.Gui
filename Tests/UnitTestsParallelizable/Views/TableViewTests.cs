@@ -1201,4 +1201,120 @@ public class TableViewTests : TestDriverBase
 
         tableView.Dispose ();
     }
+
+    // Claude - Opus 4.7
+    // Click in horizontal whitespace (right of the last rendered column) must not
+    // raise Activating. Disable ExpandLastColumn so the last column doesn't fill
+    // the viewport and there is real whitespace to the right.
+    [Fact]
+    public void Click_RightOfLastColumn_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 40, 10) };
+        tableView.Style.ExpandLastColumn = false;
+        tableView.Table = BuildTable (2, 2);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // BuildTable column "Col0" / "Col1" rendered with values like "R0C0" gives
+        // narrow columns. With ExpandLastColumn=false and viewport width 40, x=35 is
+        // well past the right edge of the last rendered column.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (35, 3),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Click on the column header area must not raise Activating — the click
+    // doesn't correspond to a data cell.
+    [Fact]
+    public void Click_OnHeader_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+        tableView.Table = BuildTable (2, 2);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // The header occupies y=0..2 (overline + header text + underline). y=1 is
+        // the header text line.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (1, 1),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Click on a TableView with no Table set must not raise Activating.
+    [Fact]
+    public void Click_EmptyTable_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+
+        // Intentionally no Table assigned.
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (5, 5),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Click on a Table that has zero rows (header rendered but no data) must not
+    // raise Activating regardless of where in the data area the user clicks.
+    [Fact]
+    public void Click_TableWithZeroRows_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+        tableView.Table = BuildTable (2, 0);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // y=3 is just past the header, in what would be the first data row if any
+        // existed. With zero rows, ScreenToCell must return null.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (1, 3),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
 }

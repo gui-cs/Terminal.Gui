@@ -279,8 +279,9 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
     }
 
     // Returns true when the binding represents a left-click on this TableView; in that case
-    // hit is the cell that was clicked, or null if the click was outside any cell (e.g. header
-    // or below the last row). Returns false for non-mouse or non-left-click bindings.
+    // hit is the cell that was clicked, or null if the click was outside any cell (e.g. header,
+    // below the last row, or right of the last rendered column). Returns false for non-mouse or
+    // non-left-click bindings.
     private bool TryGetMouseCellHit (ICommandContext? ctx, out Point? hit)
     {
         hit = null;
@@ -295,9 +296,36 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
             return false;
         }
 
-        hit = ScreenToCell (mouseBinding.MouseEvent.Position!.Value.X, mouseBinding.MouseEvent.Position!.Value.Y);
+        int clientX = mouseBinding.MouseEvent.Position!.Value.X;
+        int clientY = mouseBinding.MouseEvent.Position!.Value.Y;
+
+        hit = ScreenToCell (clientX, clientY);
+
+        // ScreenToCell maps far-right X positions onto the last column (its column lookup picks
+        // the largest X with X <= clientX, with no upper-bound check). When ExpandLastColumn is
+        // false there is visible whitespace to the right of the last rendered column; reject
+        // hits that fall there so clicks in that whitespace don't raise Activating.
+        if (hit is not null && !IsXWithinAnyRenderedColumn (clientX))
+        {
+            hit = null;
+        }
 
         return true;
+    }
+
+    private bool IsXWithinAnyRenderedColumn (int clientX)
+    {
+        int viewportX = clientX + Viewport.X;
+
+        foreach (ColumnToRender col in NonHiddenCellInfos ())
+        {
+            if (viewportX >= col.X && viewportX < col.X + col.Width)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>
