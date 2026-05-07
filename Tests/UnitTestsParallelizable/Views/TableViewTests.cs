@@ -1141,4 +1141,64 @@ public class TableViewTests : TestDriverBase
 
         tableView.Dispose ();
     }
+
+    // Claude - Opus 4.7
+    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/5126
+    // Clicking outside the row area of a TableView (e.g. below the last row) must
+    // not raise the Activating event.
+    [Fact]
+    public void Click_OutsideRows_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+        tableView.Table = BuildTable (2, 2);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // Construct a left-click well below the last data row. With a 2-row table,
+        // y=9 is past the rows so ScreenToCell returns null.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (1, 9),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Companion to Click_OutsideRows_DoesNotRaise_Activating: clicking on a real
+    // cell still raises Activating as before.
+    [Fact]
+    public void Click_OnRow_Raises_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+        tableView.Table = BuildTable (2, 2);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // y=3 lands on the first data row. The default header style consumes 3 lines
+        // (overline + header text + underline), so y=0..2 is header and y=3 is the
+        // first data row.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (1, 3),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (1, activatingFired);
+
+        tableView.Dispose ();
+    }
 }

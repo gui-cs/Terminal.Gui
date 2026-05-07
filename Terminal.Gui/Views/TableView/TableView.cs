@@ -239,6 +239,25 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
     }
 
     /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        // Cancel Activate when a mouse click lands outside any cell (e.g. below the
+        // last row or in the header area). Without this, the Activating event would
+        // fire even though no cell was actually selected, surprising subscribers.
+        if (!TryGetMouseCellHit (args.Context, out Point? hit))
+        {
+            return false;
+        }
+
+        if (hit is null)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
     protected override void OnActivated (ICommandContext? ctx)
     {
         if (ctx?.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)
@@ -248,26 +267,37 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
             return;
         }
 
-        if (ctx?.Binding is not MouseBinding mouseBinding || mouseBinding.MouseEvent is null)
+        if (!TryGetMouseCellHit (ctx, out Point? hit) || hit is null)
         {
             return;
         }
-        int boundsX = mouseBinding.MouseEvent.Position!.Value.X;
-        int boundsY = mouseBinding.MouseEvent.Position!.Value.Y;
+
+        MouseBinding mouseBinding = (MouseBinding)ctx!.Binding!;
+        SetSelection (hit.Value.X, hit.Value.Y, mouseBinding.MouseEvent!.Flags.FastHasFlags (MouseFlags.Shift));
+
+        Update ();
+    }
+
+    // Returns true when the binding represents a left-click on this TableView; in that case
+    // hit is the cell that was clicked, or null if the click was outside any cell (e.g. header
+    // or below the last row). Returns false for non-mouse or non-left-click bindings.
+    private bool TryGetMouseCellHit (ICommandContext? ctx, out Point? hit)
+    {
+        hit = null;
+
+        if (ctx?.Binding is not MouseBinding mouseBinding || mouseBinding.MouseEvent is null)
+        {
+            return false;
+        }
 
         if (!mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
         {
-            return;
+            return false;
         }
-        Point? hit = ScreenToCell (boundsX, boundsY);
 
-        if (hit is null)
-        {
-            return;
-        }
-        SetSelection (hit.Value.X, hit.Value.Y, mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.Shift));
+        hit = ScreenToCell (mouseBinding.MouseEvent.Position!.Value.X, mouseBinding.MouseEvent.Position!.Value.Y);
 
-        Update ();
+        return true;
     }
 
     /// <inheritdoc/>
