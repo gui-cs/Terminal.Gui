@@ -284,9 +284,10 @@ public partial class Markdown
         }
     }
 
+    /// <summary>Converts rendered list marker text back to Markdown source marker text for selection and clipboard operations.</summary>
     private static string TranslateListMarkerText (string text)
     {
-        if (!text.StartsWith ("• "))
+        if (string.IsNullOrEmpty (text) || !text.StartsWith ("• ", StringComparison.Ordinal))
         {
             return text;
         }
