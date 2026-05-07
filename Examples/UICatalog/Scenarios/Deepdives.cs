@@ -69,6 +69,7 @@ public class Deepdives : Scenario
                                      {
                                          _statusShortcut?.Title = e.Url;
                                          SelectDocFromLink (e.Url);
+                                         e.Handled = true;
                                      };
 
         // Reset the content width control only when viewport SIZE changes (not scroll position)

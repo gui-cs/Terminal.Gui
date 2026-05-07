@@ -235,26 +235,18 @@ public sealed class MarkdownTable : View, IDesignable
             SetFocus ();
         }
 
-        string? url = HitTestLink (pos.X, pos.Y);
+        int linkIndex = HitTestLinkIndex (pos.X, pos.Y);
 
-        if (url is null)
+        if (linkIndex < 0)
         {
             return;
         }
 
         // Set active link to the clicked link region
-        for (var i = 0; i < _linkRegions.Count; i++)
-        {
-            if (_linkRegions [i].Url == url)
-            {
-                _activeLinkIndex = i;
-                SetNeedsDraw ();
+        _activeLinkIndex = linkIndex;
+        SetNeedsDraw ();
 
-                break;
-            }
-        }
-
-        RaiseLinkClicked (url);
+        RaiseLinkClicked (_linkRegions [linkIndex].Url);
     }
 
     /// <inheritdoc/>
@@ -345,6 +337,40 @@ public sealed class MarkdownTable : View, IDesignable
     /// </summary>
     internal string? HitTestLink (int viewportX, int viewportY)
     {
+        return HitTestLinkRegion (viewportX, viewportY)?.url;
+    }
+
+    /// <summary>
+    ///     Returns the link region index at the given viewport position, or -1 if none.
+    /// </summary>
+    private int HitTestLinkIndex (int viewportX, int viewportY)
+    {
+        (string url, int rowIndex, int colIndex)? hit = HitTestLinkRegion (viewportX, viewportY);
+
+        if (hit is null)
+        {
+            return -1;
+        }
+
+        for (var i = 0; i < _linkRegions.Count; i++)
+        {
+            TableLinkRegion region = _linkRegions [i];
+
+            if (region.RowIndex == hit.Value.rowIndex && region.ColIndex == hit.Value.colIndex && region.Url == hit.Value.url)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    ///     Returns the URL and cell position (row/col) of the link at the given viewport position,
+    ///     or <see langword="null"/> if no link segment occupies that position.
+    /// </summary>
+    private (string url, int rowIndex, int colIndex)? HitTestLinkRegion (int viewportX, int viewportY)
+    {
         if (_columnWidths.Length == 0)
         {
             return null;
@@ -362,11 +388,13 @@ public sealed class MarkdownTable : View, IDesignable
         }
 
         List<StyledSegment> []? cellSegments = null;
+        var rowIndex = -1; // -1 = header
 
         if (y < _headerRowHeight)
         {
             // Click in the header row
             cellSegments = _headerSegments;
+            rowIndex = -1;
         }
         else
         {
@@ -384,6 +412,7 @@ public sealed class MarkdownTable : View, IDesignable
                 if (y < _bodyRowHeights [r])
                 {
                     cellSegments = _rowSegments [r];
+                    rowIndex = r;
 
                     break;
                 }
@@ -458,7 +487,7 @@ public sealed class MarkdownTable : View, IDesignable
 
             if (textX >= runX && textX < runX + segWidth && !string.IsNullOrWhiteSpace (seg.Url))
             {
-                return seg.Url;
+                return (seg.Url, rowIndex, col);
             }
 
             runX += segWidth;
@@ -491,7 +520,7 @@ public sealed class MarkdownTable : View, IDesignable
         var y = 1; // Below top border
 
         // Header row
-        DrawWrappedRow (_headerSegments, _data.ColumnAlignments, y, _headerRowHeight, true);
+        DrawWrappedRow (_headerSegments, _data.ColumnAlignments, y, _headerRowHeight, true, -1);
         y += _headerRowHeight;
 
         // Skip header separator (1 line)
@@ -500,12 +529,12 @@ public sealed class MarkdownTable : View, IDesignable
         // Body rows
         for (var r = 0; r < _rowSegments.Length; r++)
         {
-            DrawWrappedRow (_rowSegments [r], _data.ColumnAlignments, y, _bodyRowHeights [r], false);
+            DrawWrappedRow (_rowSegments [r], _data.ColumnAlignments, y, _bodyRowHeights [r], false, r);
             y += _bodyRowHeights [r];
         }
     }
 
-    private void DrawWrappedRow (List<StyledSegment> [] cellSegments, Alignment [] alignments, int startY, int rowHeight, bool isHeader)
+    private void DrawWrappedRow (List<StyledSegment> [] cellSegments, Alignment [] alignments, int startY, int rowHeight, bool isHeader, int rowIndex)
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
         Color? themeBg = UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null;
@@ -571,16 +600,17 @@ public sealed class MarkdownTable : View, IDesignable
                         attr = attr with { Style = attr.Style | TextStyle.Bold };
                     }
 
-                    bool isLink = !string.IsNullOrWhiteSpace (seg.Url) && Uri.IsWellFormedUriString (seg.Url, UriKind.Absolute);
-                    bool isActive = isLink && HasFocus && IsActiveLinkUrl (seg.Url!);
+                    bool hasUrl = !string.IsNullOrWhiteSpace (seg.Url);
+                    bool isAbsoluteUrl = hasUrl && Uri.IsWellFormedUriString (seg.Url, UriKind.Absolute);
+                    bool isActive = hasUrl && HasFocus && IsActiveLinkAt (rowIndex, col, seg.Url!);
 
                     if (isActive)
                     {
                         attr = new Attribute (attr.Background, attr.Foreground, attr.Style);
                     }
 
-                    // Set OSC8 URL for link segments
-                    if (isLink && Driver is { })
+                    // Set OSC8 URL for link segments (only absolute URIs)
+                    if (isAbsoluteUrl && Driver is { })
                     {
                         Driver.CurrentUrl = seg.Url;
                     }
@@ -604,7 +634,7 @@ public sealed class MarkdownTable : View, IDesignable
                     }
                     finally
                     {
-                        if (isLink && Driver is { })
+                        if (isAbsoluteUrl && Driver is { })
                         {
                             Driver.CurrentUrl = null;
                         }
@@ -1085,15 +1115,17 @@ public sealed class MarkdownTable : View, IDesignable
         return text [..charCount];
     }
 
-    /// <summary>Returns <see langword="true"/> if the given URL matches the currently active link.</summary>
-    private bool IsActiveLinkUrl (string url)
+    /// <summary>Returns <see langword="true"/> if the segment at the given row/col with the given URL is the currently active link.</summary>
+    private bool IsActiveLinkAt (int rowIndex, int colIndex, string url)
     {
         if (_activeLinkIndex < 0 || _activeLinkIndex >= _linkRegions.Count)
         {
             return false;
         }
 
-        return _linkRegions [_activeLinkIndex].Url == url;
+        TableLinkRegion active = _linkRegions [_activeLinkIndex];
+
+        return active.RowIndex == rowIndex && active.ColIndex == colIndex && active.Url == url;
     }
 
     /// <summary>
@@ -1105,11 +1137,11 @@ public sealed class MarkdownTable : View, IDesignable
         _linkRegions.Clear ();
         _activeLinkIndex = -1;
 
-        scanCellSegments (_headerSegments);
+        scanCellSegments (_headerSegments, -1);
 
-        foreach (List<StyledSegment> [] rowSegs in _rowSegments)
+        for (var r = 0; r < _rowSegments.Length; r++)
         {
-            scanCellSegments (rowSegs);
+            scanCellSegments (_rowSegments [r], r);
         }
 
         // Make the table focusable and navigable when it contains links
@@ -1119,33 +1151,45 @@ public sealed class MarkdownTable : View, IDesignable
 
         return;
 
-        void scanCellSegments (List<StyledSegment> [] cellSegments)
+        void scanCellSegments (List<StyledSegment> [] cellSegments, int rowIndex)
         {
-            foreach (List<StyledSegment> cellSegs in cellSegments)
+            for (var col = 0; col < cellSegments.Length; col++)
             {
-                foreach (StyledSegment seg in cellSegs)
+                string? lastUrlInCell = null;
+
+                foreach (StyledSegment seg in cellSegments [col])
                 {
                     if (string.IsNullOrWhiteSpace (seg.Url))
                     {
+                        lastUrlInCell = null;
+
                         continue;
                     }
 
-                    // Avoid duplicates (same URL appearing in multiple segments of the same link)
-                    if (_linkRegions.Count > 0 && _linkRegions [^1].Url == seg.Url)
+                    // Avoid duplicates from multi-segment rendering of the same link within one cell
+                    if (seg.Url == lastUrlInCell)
                     {
                         continue;
                     }
 
-                    _linkRegions.Add (new TableLinkRegion { Url = seg.Url! });
+                    lastUrlInCell = seg.Url;
+                    _linkRegions.Add (new TableLinkRegion { Url = seg.Url!, RowIndex = rowIndex, ColIndex = col });
                 }
             }
         }
     }
 
-    /// <summary>A navigable link within the table. Tracks only the URL for activation and Tab cycling.</summary>
+    /// <summary>A navigable link within the table. Tracks URL and cell position for unique identification.</summary>
     private sealed class TableLinkRegion
     {
+        /// <summary>The target URL of the link.</summary>
         public string Url { get; init; } = "";
+
+        /// <summary>Row index: -1 for header, 0..N for body rows.</summary>
+        public int RowIndex { get; init; }
+
+        /// <summary>Column index within the row.</summary>
+        public int ColIndex { get; init; }
     }
 
     /// <inheritdoc/>
