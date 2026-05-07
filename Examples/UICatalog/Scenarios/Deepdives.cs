@@ -65,8 +65,7 @@ public class Deepdives : Scenario
         _markdownView.LinkClicked += (_, e) =>
                                      {
                                          _statusShortcut?.Title = e.Url;
-
-                                         e.Handled = true;
+                                         SelectDocFromLink (e.Url);
                                      };
 
         // Reset the content width control only when viewport SIZE changes (not scroll position)
@@ -250,6 +249,61 @@ public class Deepdives : Scenario
 
         DocEntry entry = _docs [e.NewValue.Value];
         _ = LoadDocContentAsync (entry);
+    }
+
+    private void SelectDocFromLink (string url)
+    {
+        if (_docList is null || _docs.Count == 0)
+        {
+            return;
+        }
+
+        string relativePath = url;
+
+        if (relativePath.StartsWith ("~/docs/", StringComparison.Ordinal))
+        {
+            relativePath = relativePath ["~/docs/".Length..];
+        }
+
+        int queryIndex = relativePath.IndexOf ('?');
+
+        if (queryIndex >= 0)
+        {
+            relativePath = relativePath [..queryIndex];
+        }
+
+        int anchorIndex = relativePath.IndexOf ('#');
+
+        if (anchorIndex >= 0)
+        {
+            relativePath = relativePath [..anchorIndex];
+        }
+
+        if (string.IsNullOrWhiteSpace (relativePath))
+        {
+            return;
+        }
+
+        int slashIndex = relativePath.LastIndexOf ('/');
+        string docName = slashIndex >= 0 ? relativePath [(slashIndex + 1)..] : relativePath;
+        docName = Uri.UnescapeDataString (docName);
+
+        int docIndex = _docs.FindIndex (d => string.Equals (d.Name, docName, StringComparison.OrdinalIgnoreCase));
+
+        if (docIndex < 0 && !docName.EndsWith (".md", StringComparison.OrdinalIgnoreCase))
+        {
+            docIndex = _docs.FindIndex (
+                                        d => string.Equals (
+                                                            d.Name,
+                                                            $"{docName}.md",
+                                                            StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (docIndex >= 0)
+        {
+            _docList.SelectedItem = docIndex;
+            _statusShortcut?.Title = _docs [docIndex].Name;
+        }
     }
 
     private async Task LoadDocContentAsync (DocEntry entry)

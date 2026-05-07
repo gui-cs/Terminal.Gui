@@ -419,44 +419,52 @@ public partial class Markdown : View, IDesignable
 
     /// <summary>Gets a short but comprehensive Markdown sample covering common features.</summary>
     public static string DefaultMarkdownSample { get; } = """
-                                                          # Terminal.GuiMarkdown Sample 🚀
+                                                          # Terminal.Gui Markdown Sample 🚀
+                                                          
+                                                          ## TOC
+                                                          
+                                                          * [Basic Formatting](#basic-formatting)
+                                                          * [Links](#links)
+                                                          * [Checklist](#checklist)
+                                                          * [Code Blocks](#code-blocks)
+                                                          * [Tables](#tables)
+                                                          * [Separators](#separators)
+                                                          * [Block Quotes](#block-quotes)
+                                                          
+                                                          ## Basic Formatting
 
                                                           Rich text with **bold**, *italic*, `inline code`, and ~~strikethrough~~.
 
-                                                          ## Links & Images
+                                                          ## Links
 
-                                                          API Docs:
-
-                                                          * [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
-                                                          * [MarkdownTable](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) for more info.
-                                                          * [MarkdownCodeBlock](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownCodeBlock.html) for more info.
+                                                          * [Markdown API docs](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
 
                                                           ## Checklist
 
-                                                          - [x] Bold & italic ✅
-                                                          - [x] Code blocks 🔧
-                                                          - [ ] Emojis 🎉
+                                                          - [x] Text with **bold**, *italic*, `inline code`, and ~~strikethrough~~ ✅
+                                                          - [x] Inline `Code` 🔧
+                                                          - [x] [Links](https://github.com/gui-cs) 🎉
+                                                          - [ ] Images 😒
 
-                                                          ## Code Block (csharp)
-
+                                                          ## Code Blocks
+                                                          
+                                                          **csharp** code block with syntax highlighting:
+                                                          
                                                           ```csharp
                                                           Console.WriteLine ("Hello, Terminal.Gui! 🌍");
                                                           var x = 42;
                                                           ```
 
-                                                          ## Code Block (markdown)
+                                                          **markdown** code block illustrating nested markdown:
 
                                                           ```md
                                                           # Heading 1
-
-                                                          Text
-
-                                                          ## Heading 2
+                                                          
+                                                          Plain text. *Formatted text* with **bold** and `inline code`.
 
                                                           Link:  [SyntaxHighlighting](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
 
                                                           - [x] Checked
-                                                          - [ ] Not Checked
 
                                                           | Col | Col2 |
                                                           |-----|:----:|
@@ -464,25 +472,30 @@ public partial class Markdown : View, IDesignable
                                                           | B   | Two  |
                                                           ```
 
-                                                          ## Table
+                                                          ## Tables
+                                                          
+                                                          **table** with links, emojis, and markdown in cells:
 
-                                                          | Feature       | Status        |
-                                                          |---------------|---------------|
-                                                          | [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! |
-                                                          | Tables        | ✅ For sure!  |
-                                                          | Code blocks   | ✅ Awesome!   |
-                                                          | Emojis 🎉    | ✅ Whoa!      |
+                                                          | Feature        | Status        |
+                                                          |----------------|---------------|
+                                                          | [Links](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! |
+                                                          | Inline `code`  | ✅ *Awesome!*   |
+                                                          | Emojis 🎉      | ✅ **Whoa!**      |
 
-                                                          ### Table (centered column 2)
-
-                                                          ## Table
+                                                          **table** with different alignments:
 
                                                           | First         | Second |
                                                           |---------------|:------:|
-                                                          | Row 1         | Czech: ✅ me out. I'm long. |
-                                                          | Row 2 👋      | ✅ Shorter  |
+                                                          | Row 1         | Czech (✅) me out. I'm long and centered. |
+                                                          | Row 2 👋     | 🔛 I'm shorter but still centered 🔛 |
 
+                                                          ## Separators
+                                                          
+                                                          This text is before the thematic break.
+                                                          
                                                           ---
+                                                          
+                                                          And this text is after. Thematic breaks are rendered as full-width horizontal lines that automatically adjust to the layout width.
 
                                                           ## Block Quotes
 

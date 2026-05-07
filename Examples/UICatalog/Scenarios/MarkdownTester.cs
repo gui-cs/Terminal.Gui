@@ -64,14 +64,11 @@ public class MarkdownTester : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill (),
+            Height = Dim.Fill () - 1,
             SyntaxHighlighter = new TextMateSyntaxHighlighter ()
         };
 
         previewFrame.Add (preview);
-
-        // Opt-in: handle link clicks so Link.OpenUrl is not called in this demo scenario.
-        preview.LinkClicked += (_, e) => e.Handled = true;
 
         // Update preview when editor text changes
         editor.ContentsChanged += (_, _) => { preview.Text = editor.Text; };
