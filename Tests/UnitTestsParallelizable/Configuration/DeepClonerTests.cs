@@ -640,6 +640,31 @@ public class DeepClonerTests
         Assert.Empty (cloned!);
     }
 
+    // Copilot
+    [Fact]
+    public void CloneDictionary_ShouldClone_ColorName16Dictionary ()
+    {
+        // Arrange: Dictionary<ColorName16, string> — the type that crashes under AOT
+        // when CreateDictionaryInstance uses Activator.CreateInstance (see issue #5259).
+        Dictionary<ColorName16, string> original = new ()
+        {
+            [ColorName16.Black] = "000000",
+            [ColorName16.Red] = "FF0000",
+            [ColorName16.White] = "FFFFFF"
+        };
+
+        // Act
+        Dictionary<ColorName16, string>? cloned = DeepCloner.DeepClone (original);
+
+        // Assert
+        Assert.NotNull (cloned);
+        Assert.NotSame (original, cloned);
+        Assert.Equal (original.Count, cloned.Count);
+        Assert.Equal (original [ColorName16.Black], cloned [ColorName16.Black]);
+        Assert.Equal (original [ColorName16.Red], cloned [ColorName16.Red]);
+        Assert.Equal (original [ColorName16.White], cloned [ColorName16.White]);
+    }
+
     [Fact]
     public void CloneDictionary_With_Unsupported_Dictionary_Throws ()
     {

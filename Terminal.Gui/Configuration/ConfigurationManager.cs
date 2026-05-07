@@ -266,7 +266,7 @@ public static class ConfigurationManager
 
         Key [] clonedKeys = new Key [keys.Length];
 
-        for (var i = 0; i < keys.Length; i++)
+        for (int i = 0; i < keys.Length; i++)
         {
             clonedKeys [i] = new (keys [i]);
         }

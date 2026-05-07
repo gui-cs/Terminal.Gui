@@ -14,6 +14,8 @@
 8. [Data Table](#data-table)
 9. [Tree View](#tree-view)
 10. [Status Bar with Shortcuts](#status-bar-with-shortcuts)
+11. [Scrollable Content Container](#scrollable-content-container)
+12. [Standard Application Layout](#standard-application-layout)
 
 ---
 
@@ -552,7 +554,12 @@ public sealed class TreeWindow : Runnable
 
 ## Status Bar with Shortcuts
 
-Application status bar with keyboard shortcuts.
+`StatusBar` auto-positions at the bottom (`Y = Pos.AnchorEnd ()`, `Width = Dim.Fill ()`)
+— **do NOT set `Y` or `Width` manually**. Content above it should use `Dim.Fill (1)` to
+leave room.
+
+For shortcuts that need to work app-wide (not just when focused), set `BindKeyToApplication = true`
+and handle the `Accepting` event (not `Action`).
 
 ```csharp
 public sealed class StatusBarApp : Runnable
@@ -563,43 +570,83 @@ public sealed class StatusBarApp : Runnable
 
         TextView editor = new ()
         {
-            X = 0,
-            Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill (1)  // Leave room for status bar
+            Height = Dim.Fill (1)  // Leave 1 row for StatusBar
         };
 
-        StatusBar statusBar = new ()
+        StatusBar statusBar = new ();
+        // StatusBar auto-positions at bottom — do NOT set Y or Width
+
+        Shortcut saveShortcut = new ()
         {
-            Y = Pos.AnchorEnd (1),
-            Visible = true
+            Title = "Save",
+            Key = Key.S.WithCtrl,
+            BindKeyToApplication = true
         };
 
-        statusBar.Add (
-            new Shortcut
-            {
-                Title = "New",
-                Key = Key.N.WithCtrl,
-                Action = () => MessageBox.Query (App!, "New", "Creating new file...", "OK")
-            },
-            new Shortcut
-            {
-                Title = "Save",
-                Key = Key.S.WithCtrl,
-                Action = () => MessageBox.Query (App!, "Save", "Saving file...", "OK")
-            },
-            new Shortcut
-            {
-                Title = "Quit",
-                Key = Key.Q.WithCtrl,
-                Action = () => App!.RequestStop ()
-            }
-        );
+        saveShortcut.Accepting += (_, e) =>
+                                  {
+                                      MessageBox.Query (App!, "Save", "Saving...", "OK");
+                                      e.Handled = true;
+                                  };
 
+        Shortcut quitShortcut = new ()
+        {
+            Title = "Quit",
+            Key = Key.Q.WithCtrl,
+            BindKeyToApplication = true
+        };
+
+        quitShortcut.Accepting += (_, e) =>
+                                  {
+                                      App?.RequestStop ();
+                                      e.Handled = true;
+                                  };
+
+        statusBar.Add (saveShortcut, quitShortcut);
         Add (editor, statusBar);
     }
 }
 ```
+
+---
+
+## Scrollable Content Container
+
+To make a `View` scrollable, set `ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar`.
+**Do NOT create custom subclasses just for scrolling** — the built-in scrollbar handles mouse
+wheel, drag, and viewport management automatically.
+
+```csharp
+// ✅ Correct — just set the flag on a plain View
+View container = new ()
+{
+    Width = Dim.Fill (),
+    Height = Dim.Fill (),
+    CanFocus = true
+};
+
+container.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+
+// Add subviews stacked vertically
+View? previous = null;
+
+foreach (View item in items)
+{
+    item.Y = previous is { } ? Pos.Bottom (previous) : 0;
+    item.Width = Dim.Fill ();
+    container.Add (item);
+    previous = item;
+}
+
+// ❌ Wrong — do NOT create a custom subclass just for scrolling
+// internal class ScrollableContainer : View { ... AddCommand(...) ... }
+```
+
+Only subclass (like `AllViewsView` does) when you need **additional** keyboard command
+bindings (e.g., arrow keys for line-by-line scrolling, PageUp/PageDown, Home/End) beyond
+what the scrollbar provides. Even then, prefer adding bindings in the owning `Runnable`
+if possible.
 
 ---
 
