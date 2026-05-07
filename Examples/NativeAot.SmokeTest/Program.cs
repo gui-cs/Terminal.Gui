@@ -1,6 +1,7 @@
 // AOT smoke test that consumes Terminal.Gui via NuGet package.
-// Exercises Application lifecycle, view creation, and config-property
-// deep-cloning paths that are most sensitive to AOT trimming.
+// Exercises the full Application lifecycle — Init, RunAsync, layout, draw,
+// event loop, and Dispose — using the published NuGet package to catch
+// AOT trimming issues that only manifest with PackageReference builds.
 
 using System.Diagnostics.CodeAnalysis;
 using Terminal.Gui.App;
@@ -12,16 +13,16 @@ namespace SmokeTest;
 
 public static class Program
 {
-    private static int Main ()
+    private static async Task<int> Main ()
     {
 #pragma warning disable IL2026, IL3050
-        return Run ();
+        return await RunAsync ();
 #pragma warning restore IL2026, IL3050
     }
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init")]
     [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init")]
-    private static int Run ()
+    private static async Task<int> RunAsync ()
     {
         try
         {
@@ -29,33 +30,12 @@ public static class Program
 
             IApplication app = Application.Create ().Init ();
 
-            // Create a representative set of views that exercise AOT-sensitive paths
-            List<View> views =
-            [
-                new Button { Text = "OK" },
-                new Label { Text = "Hello AOT" },
-                new TextField { Text = "editable" },
-                new CheckBox { Text = "Check me" },
-                new ProgressBar { Fraction = 0.5f },
-                new DatePicker (),
-                new NumericUpDown<int> (),
-                new ListView (),
-                new OptionSelector (),
-                new FrameView { Title = "Frame" },
-                new TextView { Text = "Multi-line" },
-                new DropDownList ()
-            ];
-
-            // Verify views were created and have content
-            foreach (View view in views)
-            {
-                // Touch layout to trigger Pos/Dim evaluation
-                _ = view.Frame;
-            }
-
+            // Run the full app lifecycle with a timeout — exercises layout, draw, and event loop
+            using CancellationTokenSource cts = new (TimeSpan.FromSeconds (5));
+            await app.RunAsync<SmokeTestWindow> (cts.Token);
             app.Dispose ();
 
-            Console.WriteLine ($"AOT NuGet smoke test passed: {views.Count} views created successfully.");
+            Console.WriteLine ("AOT NuGet smoke test passed: full app lifecycle completed successfully.");
 
             return 0;
         }
@@ -65,5 +45,31 @@ public static class Program
 
             return 1;
         }
+    }
+}
+
+/// <summary>
+///     Minimal window that creates representative views exercising AOT-sensitive paths.
+/// </summary>
+public sealed class SmokeTestWindow : Runnable
+{
+    public SmokeTestWindow ()
+    {
+        Title = "AOT NuGet Smoke Test";
+
+        Add (
+              new Button { Text = "OK" },
+              new Label { Text = "Hello AOT", Y = 1 },
+              new TextField { Text = "editable", Y = 2, Width = 20 },
+              new CheckBox { Text = "Check me", Y = 3 },
+              new ProgressBar { Fraction = 0.5f, Y = 4, Width = 20 },
+              new DatePicker { Y = 5 },
+              new NumericUpDown<int> { Y = 6 },
+              new ListView { Y = 7, Width = 20, Height = 3 },
+              new OptionSelector { Y = 10 },
+              new FrameView { Title = "Frame", Y = 11, Width = 20, Height = 3 },
+              new TextView { Text = "Multi-line", Y = 14, Width = 20, Height = 3 },
+              new DropDownList { Y = 17, Width = 20 }
+             );
     }
 }

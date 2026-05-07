@@ -18,16 +18,16 @@ namespace NativeAot;
 
 public static class Program
 {
-    private static void Main (string [] args)
+    private static async Task Main (string [] args)
     {
 #pragma warning disable IL2026, IL3050
-        Run (args);
+        await RunAsync (args);
 #pragma warning restore IL2026, IL3050
     }
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
     [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
-    private static void Run (string [] args)
+    private static async Task RunAsync (string [] args)
     {
         bool smokeTest = args.Length > 0 && args [0] == "--smoke-test";
 
@@ -51,11 +51,11 @@ public static class Program
 
         if (smokeTest)
         {
-            // CI smoke test: create all views, verify no AOT crashes, then exit
-            AotAllViewsWindow window = new ();
-            int viewCount = window.SubViews.Count ();
+            // CI smoke test: run the full app lifecycle with a timeout
+            using CancellationTokenSource cts = new (TimeSpan.FromSeconds (5));
+            await app.RunAsync<AotAllViewsWindow> (cts.Token);
             app.Dispose ();
-            Console.WriteLine ($"AOT smoke test passed: {viewCount} top-level subviews created successfully.");
+            Console.WriteLine ("AOT smoke test passed: full app lifecycle completed successfully.");
 
             return;
         }
