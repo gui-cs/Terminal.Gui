@@ -222,6 +222,8 @@ public static class ConfigurationManager
         ThemeManager.Themes? [ThemeManager.Theme].Apply ();
     }
 
+    // AOT trimming removes the reflective Dictionary<,> constructor that DeepCloner relies on.
+    // Each non-trivially-cloneable config property type needs a typed clone path here to stay AOT-safe.
     private static object? CloneHardCodedPropertyValue (object? propertyValue)
     {
         if (propertyValue is Dictionary<Command, PlatformKeyBinding> keyBindings)
