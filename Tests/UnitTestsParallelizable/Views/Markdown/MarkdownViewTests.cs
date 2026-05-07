@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using System.Text;
 using JetBrains.Annotations;
 using UnitTests;
 
@@ -2223,5 +2224,144 @@ public class MarkdownViewTests (ITestOutputHelper output)
         hostCode.Dispose ();
         hostNoCode.Dispose ();
     }
-}
 
+    // Copilot
+    [Fact]
+    public void CanFocus_False_Text_HotKeySpecifier_SetsFocus_Next ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = false,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+        View nextView = new () { CanFocus = true };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+        Assert.True (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_False_LeftButtonClicked_SetsFocus_Next ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            X = 0,
+            Y = 1,
+            Width = 20,
+            Height = 1,
+            CanFocus = false,
+            Text = "_Markdown"
+        };
+        View nextView = new ()
+        {
+            X = Pos.Right (markdown),
+            Y = Pos.Top (markdown),
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+        Assert.True (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = markdown.Frame.Location, Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.False (markdown.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_True_Text_HotKeySpecifier_SetsFocus_OnMarkdown ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = true,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+        View nextView = new () { CanFocus = true };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (otherView.HasFocus);
+        Assert.True (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_False_Text_HotKeySpecifier_NoNextPeer_DoesNotFocusMarkdown ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = false,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (markdown);
+
+        Assert.Equal (Key.M, markdown.HotKey);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (markdown.HasFocus);
+    }
+}
