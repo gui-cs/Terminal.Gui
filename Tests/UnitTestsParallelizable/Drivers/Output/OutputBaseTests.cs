@@ -444,4 +444,109 @@ public class OutputBaseTests
 
         app.Dispose ();
     }
+
+    // Claude - Opus 4.7
+    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // When dirty cells with a URL are flushed mid-row because a clean cell follows,
+    // the OSC 8 hyperlink remains open in the terminal. If no more dirty cells appear
+    // on the row, the end-of-row code must still emit the OSC 8 close sequence so the
+    // hyperlink does not bleed into the next row.
+    [Fact]
+    public void Write_UrlFollowedByCleanCells_ClosesHyperlinkAtRowEnd ()
+    {
+        // Arrange: 5-col row. URL at cols 0-1, clean cells at cols 2-4.
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (5, 1);
+
+        // First frame: write URL cells then clear dirty by flushing
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("AB");
+        buffer.CurrentUrl = null;
+        output.Write (buffer);
+
+        // Second frame: only re-mark the URL cells dirty so cols 2-4 stay clean.
+        buffer.Contents! [0, 0].IsDirty = true;
+        buffer.Contents! [0, 1].IsDirty = true;
+        buffer.DirtyLines [0] = true;
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert: every OSC 8 start sequence is followed by an OSC 8 close before the row ends.
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int startIdx = result.IndexOf (start, StringComparison.Ordinal);
+        Assert.True (startIdx >= 0, "OSC 8 start sequence not emitted");
+
+        int endIdx = result.IndexOf (end, startIdx + start.Length, StringComparison.Ordinal);
+        Assert.True (endIdx > startIdx, "OSC 8 hyperlink was not closed before the row ended");
+    }
+
+    // Claude - Opus 4.7
+    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // When a Link's display area shrinks (or a Link is replaced), the cells previously
+    // associated with a URL may be overdrawn by content that has no URL. Those cells
+    // must be removed from the URL map so OSC 8 sequences are not re-emitted for them.
+    [Fact]
+    public void AddStr_NoCurrentUrl_ClearsStaleUrlMapping ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (5, 1);
+
+        // First write: cells get associated with a URL
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("HELLO");
+        buffer.CurrentUrl = null;
+
+        Assert.Equal ("https://example.com", buffer.GetCellUrl (0, 0));
+        Assert.Equal ("https://example.com", buffer.GetCellUrl (4, 0));
+
+        // Act: overwrite cells with no CurrentUrl set (simulates a non-link view redrawing)
+        buffer.Move (0, 0);
+        buffer.AddStr ("WORLD");
+
+        // Assert: stale URL associations are cleared
+        Assert.Null (buffer.GetCellUrl (0, 0));
+        Assert.Null (buffer.GetCellUrl (1, 0));
+        Assert.Null (buffer.GetCellUrl (2, 0));
+        Assert.Null (buffer.GetCellUrl (3, 0));
+        Assert.Null (buffer.GetCellUrl (4, 0));
+
+        // And the rendered output for the second frame contains no OSC 8 sequences
+        string result = output.ToAnsi (buffer);
+        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink ("https://example.com"), result);
+    }
+
+    // Claude - Opus 4.7
+    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // When CurrentUrl changes from one URL to another for the same cell, the URL map
+    // should reflect the new URL (verifying the URL clear path does not break re-assignment).
+    [Fact]
+    public void AddStr_DifferentUrl_OverwritesUrlMapping ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (3, 1);
+
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://one.com";
+        buffer.AddStr ("ABC");
+
+        // Act: rewrite same cells with a different URL
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://two.com";
+        buffer.AddStr ("ABC");
+
+        // Assert: cells now report the new URL
+        Assert.Equal ("https://two.com", buffer.GetCellUrl (0, 0));
+        Assert.Equal ("https://two.com", buffer.GetCellUrl (1, 0));
+        Assert.Equal ("https://two.com", buffer.GetCellUrl (2, 0));
+    }
 }
