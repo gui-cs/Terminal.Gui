@@ -51,7 +51,7 @@ public static class Program
 
         if (smokeTest)
         {
-            RunDictionaryCloneSmokeChecks ();
+            ExerciseDictionaryDeepCloning ();
 
             // CI smoke test: run the full app lifecycle with a timeout
             using CancellationTokenSource cts = new (TimeSpan.FromSeconds (5));
@@ -66,7 +66,10 @@ public static class Program
         app.Dispose ();
     }
 
-    private static void RunDictionaryCloneSmokeChecks ()
+    /// <summary>
+    ///     To validate AOT compatibility of dictionary deep cloning, call DeepClone on key dictionaries.
+    /// </summary>
+    private static void ExerciseDictionaryDeepCloning ()
     {
         _ = DeepCloner.DeepClone (Color.Colors16);
         _ = DeepCloner.DeepClone (Application.DefaultKeyBindings);
