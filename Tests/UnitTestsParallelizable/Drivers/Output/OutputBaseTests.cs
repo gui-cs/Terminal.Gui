@@ -360,6 +360,69 @@ public class OutputBaseTests
         Assert.True (secondStart < 0, "No OSC 8 start should appear on row 1");
     }
 
+    // Copilot - GPT-5.4
+    // Regression coverage for plain-text URL auto-linking used by TextView/Editor.
+    // If a previously auto-linked URL is overwritten by non-URL text, the redraw must
+    // explicitly clear hyperlink state before writing the replacement text.
+    [Fact]
+    public void Write_AutoDetectedUrl_ThenPlainText_EmitsOsc8CloseBeforeReplacement ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (24, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("plain replacement      ");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int replacementIdx = result.IndexOf ("plain replacement", StringComparison.Ordinal);
+        int endIdx = result.IndexOf (end, StringComparison.Ordinal);
+
+        Assert.DoesNotContain (start, result);
+        Assert.True (replacementIdx >= 0, "Replacement text was not emitted");
+        Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before replacement text");
+    }
+
+    // Copilot - GPT-5.4
+    // Regression coverage for deleting all text in the Editor scenario.
+    // Clearing a row that previously contained an auto-detected URL must emit an OSC 8
+    // close so terminals do not keep hyperlink metadata at the former URL location.
+    [Fact]
+    public void Write_AutoDetectedUrl_ThenSpaces_EmitsOsc8CloseBeforeClearingCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (24, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("                        ");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        // Assert
+        Assert.Contains (" ", result);
+        Assert.Contains (end, result);
+    }
+
     // Copilot
     [Fact]
     public void ToAnsi_LegacyConsole_NoOsc8 ()

@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace Terminal.Gui.Drivers;
 
@@ -21,10 +22,14 @@ public class OutputBufferImpl : IOutputBuffer
     private int _rows;
 
     /// <summary>
-    ///     Maps cell positions to URLs for OSC 8 hyperlink support.
-    ///     Only stores entries for cells that actually have URLs, minimizing memory overhead.
+    ///     Maps cell positions to explicitly assigned URLs for OSC 8 hyperlink support.
     /// </summary>
-    private Dictionary<Point, string>? _urlMap;
+    private Dictionary<Point, string>? _explicitUrlMap;
+
+    /// <summary>
+    ///     Maps cell positions to auto-detected URLs found in plain text content.
+    /// </summary>
+    private Dictionary<Point, string>? _autoUrlMap;
 
     private Rune _column1ReplacementChar = Glyphs.WideGlyphReplacement;
 
@@ -58,15 +63,21 @@ public class OutputBufferImpl : IOutputBuffer
     /// <returns>The URL if one exists, otherwise null.</returns>
     public string? GetCellUrl (int col, int row)
     {
-        // Fast-path: skip locking when no URLs have been set
-        if (_urlMap is null)
+        if (_explicitUrlMap is null && _autoUrlMap is null)
         {
             return null;
         }
 
         lock (_contentsLock)
         {
-            return _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
+            Point point = new (col, row);
+
+            if (_explicitUrlMap?.TryGetValue (point, out string? explicitUrl) == true)
+            {
+                return explicitUrl;
+            }
+
+            return _autoUrlMap?.TryGetValue (point, out string? autoUrl) == true ? autoUrl : null;
         }
     }
 
@@ -298,8 +309,8 @@ public class OutputBufferImpl : IOutputBuffer
 
         DirtyLines = new bool [Rows];
 
-        // Clear the URL map
-        _urlMap?.Clear ();
+        _explicitUrlMap?.Clear ();
+        _autoUrlMap?.Clear ();
 
         for (var row = 0; row < Rows; row++)
         {
@@ -417,7 +428,7 @@ public class OutputBufferImpl : IOutputBuffer
         }
         else
         {
-            _urlMap?.Remove (new Point (col, row));
+            _explicitUrlMap?.Remove (new Point (col, row));
         }
     }
 
@@ -429,8 +440,59 @@ public class OutputBufferImpl : IOutputBuffer
     /// <param name="url">The URL to associate with this cell.</param>
     private void SetCellUrl (int col, int row, string url)
     {
-        _urlMap ??= [];
-        _urlMap [new Point (col, row)] = url;
+        _explicitUrlMap ??= [];
+        _explicitUrlMap [new Point (col, row)] = url;
+    }
+
+    internal void SyncAutoUrlsForRow (int row)
+    {
+        lock (_contentsLock)
+        {
+            SyncAutoUrlsForRowCore (row);
+        }
+    }
+
+    internal void SyncAutoUrlsForAllRows ()
+    {
+        lock (_contentsLock)
+        {
+            for (int row = 0; row < Rows; row++)
+            {
+                SyncAutoUrlsForRowCore (row);
+            }
+        }
+    }
+
+    private void SyncAutoUrlsForRowCore (int row)
+    {
+        if (Contents is null || row < 0 || row >= Rows)
+        {
+            return;
+        }
+
+        for (int col = 0; col < Cols; col++)
+        {
+            _autoUrlMap?.Remove (new Point (col, row));
+        }
+
+        StringBuilder rowText = new (Cols);
+
+        for (int col = 0; col < Cols; col++)
+        {
+            string grapheme = Contents [row, col].Grapheme;
+            rowText.Append (string.IsNullOrEmpty (grapheme) ? " " : grapheme);
+        }
+
+        foreach (Osc8UrlLinker.UrlRange range in Osc8UrlLinker.FindUrls (rowText.ToString ()))
+        {
+            int end = Math.Min (range.Start + range.Length, Cols);
+
+            for (int col = range.Start; col < end; col++)
+            {
+                _autoUrlMap ??= [];
+                _autoUrlMap [new Point (col, row)] = range.Url;
+            }
+        }
     }
 
     /// <summary>

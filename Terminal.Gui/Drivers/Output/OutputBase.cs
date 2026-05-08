@@ -57,6 +57,7 @@ public abstract class OutputBase
 
     // Last URL used for tracking hyperlink state
     private string? _lastUrl = null;
+    private readonly HashSet<int> _rowsWithUrls = [];
 
     private readonly StringBuilder _lastOutputStringBuilder = new ();
     private bool _clearLastOutputPending;
@@ -93,8 +94,21 @@ public abstract class OutputBase
                 return;
             }
 
+            if (!IsLegacyConsole && buffer is OutputBufferImpl outputBuffer)
+            {
+                outputBuffer.SyncAutoUrlsForRow (row);
+            }
+
+            bool rowHadUrlsPreviously = _rowsWithUrls.Contains (row);
+            bool rowHasUrlsNow = !IsLegacyConsole && RowContainsUrls (buffer, row, cols);
+
             outputStringBuilder.Clear ();
             _lastUrl = null; // Reset URL state at the start of each row
+
+            if (!IsLegacyConsole && rowHadUrlsPreviously && !rowHasUrlsNow)
+            {
+                outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+            }
 
             // Process columns in row
             for (int col = left; col < cols; col++)
@@ -197,9 +211,16 @@ public abstract class OutputBase
 
             SetCursorPositionImpl (lastCol, row);
 
-            // Wrap URLs with OSC 8 hyperlink sequences
-            StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);
-            Write (processed);
+            Write (outputStringBuilder);
+
+            if (rowHasUrlsNow)
+            {
+                _rowsWithUrls.Add (row);
+            }
+            else
+            {
+                _rowsWithUrls.Remove (row);
+            }
         }
 
         if (IsLegacyConsole)
@@ -442,6 +463,11 @@ public abstract class OutputBase
             return output.ToString ();
         }
 
+        if (buffer is OutputBufferImpl outputBuffer)
+        {
+            outputBuffer.SyncAutoUrlsForAllRows ();
+        }
+
         StringBuilder ansiOutput = new ();
         Attribute? lastAttr = null;
 
@@ -451,24 +477,28 @@ public abstract class OutputBase
     }
 
     /// <summary>
-    ///     Writes buffered output to console, wrapping URLs with OSC 8 hyperlinks (non-legacy only),
-    ///     then clears the buffer and advances <paramref name="lastCol"/> by <paramref name="outputWidth"/>.
+    ///     Writes buffered output to console, then clears the buffer and advances
+    ///     <paramref name="lastCol"/> by <paramref name="outputWidth"/>.
     /// </summary>
     private void WriteToConsole (StringBuilder output, ref int lastCol, ref int outputWidth)
     {
-        if (IsLegacyConsole)
-        {
-            Write (output);
-        }
-        else
-        {
-            // Wrap URLs with OSC 8 hyperlink sequences
-            StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-            Write (processed);
-        }
+        Write (output);
 
         output.Clear ();
         lastCol += outputWidth;
         outputWidth = 0;
+    }
+
+    private static bool RowContainsUrls (IOutputBuffer buffer, int row, int cols)
+    {
+        for (int col = 0; col < cols; col++)
+        {
+            if (!string.IsNullOrEmpty (buffer.GetCellUrl (col, row)))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
