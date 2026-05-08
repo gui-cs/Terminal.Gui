@@ -252,6 +252,20 @@ public partial class TextView
         }
     }
 
+    /// <inheritdoc/>
+    protected override bool OnPasted (PasteEventArgs args)
+    {
+        if (_isReadOnly || string.IsNullOrEmpty (args.Text))
+        {
+            return false;
+        }
+
+        InsertText (args.Text);
+        args.Handled = true;
+
+        return true;
+    }
+
     /// <summary>Replaces all the text based on the match case.</summary>
     /// <param name="textToFind">The text to find.</param>
     /// <param name="matchCase">The match case setting.</param>

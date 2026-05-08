@@ -671,6 +671,29 @@ public interface IApplication : IDisposable
     /// </remarks>
     IMouse Mouse { get; set; }
 
+    /// <summary>
+    ///     Raised when the terminal delivers a bracketed paste. Fires before the paste is dispatched
+    ///     to the focused view; set <see cref="System.ComponentModel.HandledEventArgs.Handled"/> on
+    ///     the event arguments to <see langword="true"/> to prevent the focused view from receiving
+    ///     the paste.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Bracketed paste mode is enabled automatically by the driver. On terminals that do not
+    ///         support bracketed paste (or have it disabled by user configuration) the pasted text is
+    ///         delivered as ordinary key events and this event does not fire.
+    ///     </para>
+    /// </remarks>
+    event EventHandler<PasteEventArgs>? Paste;
+
+    /// <summary>
+    ///     Raises the <see cref="Paste"/> event with <paramref name="text"/>, then dispatches the paste
+    ///     to the focused view via <see cref="View.NewPasteEvent"/> if not already handled.
+    /// </summary>
+    /// <param name="text">The pasted content with bracketing markers stripped.</param>
+    /// <returns><see langword="true"/> if the paste was handled.</returns>
+    bool RaisePasteEvent (string text);
+
     #endregion Input (Mouse/Keyboard)
 
     #region Layout and Drawing

@@ -230,6 +230,34 @@ internal partial class ApplicationImpl : IApplication
         set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
+    /// <inheritdoc/>
+    public event EventHandler<PasteEventArgs>? Paste;
+
+    /// <inheritdoc/>
+    public bool RaisePasteEvent (string text)
+    {
+        PasteEventArgs args = new (text);
+
+        Paste?.Invoke (this, args);
+
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        // Route to the focused view (mirrors keyboard dispatch). If no view is focused, fall through
+        // to the top-most runnable so embedded TextField / TextView still receives pastes when the
+        // user has not explicitly clicked into a control yet.
+        View? target = Navigation?.GetFocused () ?? TopRunnableView;
+
+        if (target is null)
+        {
+            return false;
+        }
+
+        return target.NewPasteEvent (args);
+    }
+
     #endregion Input (Mouse/Keyboard)
 
     #region Navigation and Popover

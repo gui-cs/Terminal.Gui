@@ -67,6 +67,8 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         // Enable keyboard handling
         Parser.HandleKeyboard = true;
 
+        Parser.Paste += (_, text) => RaisePasteEvent (text);
+
         Parser.Keyboard += (_, keyEvent) =>
                            {
                                Key normalizedKeyEvent = OnKeyboardEventParsed (keyEvent);
@@ -337,6 +339,16 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     /// <inheritdoc/>
     public event EventHandler<string>? AnsiSequenceSwallowed;
+
+    #endregion
+
+    #region Paste Events
+
+    /// <inheritdoc/>
+    public event EventHandler<string>? Paste;
+
+    /// <inheritdoc/>
+    public void RaisePasteEvent (string text) => Paste?.Invoke (this, text);
 
     #endregion
 

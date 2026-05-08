@@ -21,5 +21,11 @@ public enum AnsiResponseParserState
     ///     Parser has encountered Esc[ and considers that it is in the process
     ///     of reading an ANSI sequence.
     /// </summary>
-    InResponse
+    InResponse,
+
+    /// <summary>
+    ///     Parser has encountered the bracketed-paste start sequence (<c>ESC[200~</c>) and is
+    ///     accumulating pasted content until the matching end sequence (<c>ESC[201~</c>).
+    /// </summary>
+    InBracketedPaste
 }

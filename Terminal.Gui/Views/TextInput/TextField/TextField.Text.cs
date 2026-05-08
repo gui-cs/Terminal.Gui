@@ -39,6 +39,20 @@ public partial class TextField
         }
     }
 
+    /// <inheritdoc/>
+    protected override bool OnPasted (PasteEventArgs args)
+    {
+        if (ReadOnly || string.IsNullOrEmpty (args.Text))
+        {
+            return false;
+        }
+
+        InsertText (args.Text, false);
+        args.Handled = true;
+
+        return true;
+    }
+
     /// <summary>Raises the <see cref="TextChanging"/> event, enabling canceling the change or adjusting the text.</summary>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> if the event was cancelled or the text was adjusted by the event.</returns>

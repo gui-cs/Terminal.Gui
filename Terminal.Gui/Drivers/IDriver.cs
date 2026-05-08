@@ -424,6 +424,13 @@ public interface IDriver : IDisposable
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<Mouse>? MouseEvent;
 
+    /// <summary>
+    ///     Event fired when a bracketed paste is received from the terminal. The string contains the
+    ///     raw pasted text with the ANSI bracketing markers stripped. Only fires on terminals that
+    ///     support bracketed paste mode (most modern terminals).
+    /// </summary>
+    event EventHandler<string>? Paste;
+
     #endregion Input Events
 
     #region ANSI Escape Sequences
