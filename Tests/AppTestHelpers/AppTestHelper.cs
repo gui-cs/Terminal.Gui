@@ -154,8 +154,8 @@ public partial class AppTestHelper : IDisposable
                                                                           }
                                                                       };
 
-                                         CancellationToken runToken = _ansiInput.ExternalCancellationTokenSource!.Token;
-                                         await app.RunAsync (runnable, runToken);
+                                         CancellationToken helperCancellationToken = _ansiInput.ExternalCancellationTokenSource!.Token;
+                                         await app.RunAsync (runnable, helperCancellationToken);
 
                                          if (runnable is View runnableView)
                                          {
