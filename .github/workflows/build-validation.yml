@@ -9,11 +9,18 @@ on:
     branches: [ main, develop ]
     paths-ignore:
       - '**.md'
+
+permissions:
+  contents: read
       
 jobs:
   build-validation:
-    name: Build All Configurations
-    runs-on: ubuntu-latest
+    name: Build Validation (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
     
     timeout-minutes: 20
     steps:
@@ -59,12 +66,20 @@ jobs:
     - name: AOT Publish (catches trimming and reflection errors)
       run: dotnet publish ./Examples/NativeAot/NativeAot.csproj --configuration Release --output ./aot-publish -property:NoWarn=0618%3B0612
 
-    - name: AOT Smoke Test (run the published AOT binary)
+    - name: AOT Smoke Test (run the published AOT binary on Linux)
+      if: runner.os == 'Linux'
       env:
         DisableRealDriverIO: "1"
       run: |
         chmod +x ./aot-publish/NativeAot
         ./aot-publish/NativeAot --smoke-test
+
+    - name: AOT Smoke Test (run the published AOT binary on Windows)
+      if: runner.os == 'Windows'
+      env:
+        DisableRealDriverIO: "1"
+      shell: pwsh
+      run: ./aot-publish/NativeAot.exe --smoke-test
 
     - name: Build Release Solution
       run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612
