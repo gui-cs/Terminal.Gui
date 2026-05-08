@@ -38,4 +38,41 @@ public class ButtonDrawingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output, app.Driver);
     }
+
+    // Copilot
+    [Fact]
+    public void Focused_FixedWidth_Button_Highlight_Is_Continuous ()
+    {
+        const int width = 10;
+
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (width, 1);
+
+        Runnable runnable = new () { Width = width, Height = 1 };
+        app.Begin (runnable);
+
+        Button button = new ()
+        {
+            Text = "_OK",
+            X = 0,
+            Y = 0,
+            Width = width,
+            Height = 1,
+            ShadowStyle = null
+        };
+
+        runnable.Add (button);
+        button.SetFocus ();
+        app.LayoutAndDraw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre ($"{Glyphs.LeftBracket}   OK   {Glyphs.RightBracket}", output, app.Driver);
+        DriverAssert.AssertDriverAttributesAre (
+            "0000100000",
+            output,
+            app.Driver,
+            button.GetAttributeForRole (VisualRole.Focus),
+            button.GetAttributeForRole (VisualRole.HotFocus)
+        );
+    }
 }

@@ -268,6 +268,13 @@ public class Button : View, IDesignable, IAcceptTarget
         Driver.SetAttribute (normalAttr);
         Driver.AddRune (_rightBracket);
 
+        if (interiorRect.Width > 0)
+        {
+            Driver.Move (interiorRect.X, delimiterRow);
+            Driver.SetAttribute (normalAttr);
+            Driver.AddStr (new string (' ', interiorRect.Width));
+        }
+
         if (interiorRect.Width > 0 && !string.IsNullOrEmpty (interiorText))
         {
             _interiorTextFormatter.Draw (Driver, interiorRect, normalAttr, hotAttr, Rectangle.Empty);
