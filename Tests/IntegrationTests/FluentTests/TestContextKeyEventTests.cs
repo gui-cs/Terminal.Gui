@@ -23,7 +23,9 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
                                                    app.Keyboard.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Quit));
                                                });
 
-        Assert.True (SpinWait.SpinUntil (() => top is { IsRunning: false }, TimeSpan.FromSeconds (5)));
+        Assert.True (
+            SpinWait.SpinUntil (() => top is { IsRunning: false }, TimeSpan.FromSeconds (5)),
+            "TopRunnable did not stop within timeout.");
     }
 
     [Theory]

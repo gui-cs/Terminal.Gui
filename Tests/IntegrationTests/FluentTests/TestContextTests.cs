@@ -111,8 +111,9 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
             _out,
             TimeSpan.FromMilliseconds (50));
 
-        Assert.True (SpinWait.SpinUntil (() => helper.Finished, TimeSpan.FromSeconds (5)));
-        Assert.True (helper.Finished);
+        Assert.True (
+            SpinWait.SpinUntil (() => helper.Finished, TimeSpan.FromSeconds (5)),
+            "AppTestHelper did not finish after timeout cancellation.");
     }
 
     [Fact]
@@ -127,7 +128,9 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
             () => helper.Then (_ => throw expectedException));
 
         Assert.Same (expectedException, exception);
-        Assert.True (SpinWait.SpinUntil (() => helper.Finished, TimeSpan.FromSeconds (5)));
+        Assert.True (
+            SpinWait.SpinUntil (() => helper.Finished, TimeSpan.FromSeconds (5)),
+            "AppTestHelper did not finish after action failure.");
     }
 
     [Theory]
