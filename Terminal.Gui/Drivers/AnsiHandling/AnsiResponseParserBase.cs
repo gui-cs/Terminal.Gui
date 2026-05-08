@@ -99,14 +99,13 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
     protected void ResetState ()
     {
-        State = AnsiResponseParserState.Normal;
-        _inOscSequence = false;
-        _oscExpectingBackslash = false;
-        _pasteBuffer.Clear ();
-        _pasteEndMatchLength = 0;
-
         lock (_lockState)
         {
+            State = AnsiResponseParserState.Normal;
+            _inOscSequence = false;
+            _oscExpectingBackslash = false;
+            _pasteBuffer.Clear ();
+            _pasteEndMatchLength = 0;
             _heldContent.ClearHeld ();
         }
     }
@@ -730,6 +729,31 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         State = AnsiResponseParserState.Normal;
 
         Paste?.Invoke (this, text);
+    }
+
+    /// <summary>
+    ///     Flushes any in-flight bracketed-paste buffer as a <see cref="Paste"/> event and returns the
+    ///     parser to <see cref="AnsiResponseParserState.Normal"/>. Called by the input processor when
+    ///     the paste has been idle too long, so a terminal that drops the <c>ESC[201~</c> end marker
+    ///     does not strand pasted content forever.
+    /// </summary>
+    /// <returns>
+    ///     <see langword="true"/> if a partial paste was flushed; <see langword="false"/> if the
+    ///     parser was not in <see cref="AnsiResponseParserState.InBracketedPaste"/>.
+    /// </returns>
+    internal bool FlushStaleBracketedPaste ()
+    {
+        lock (_lockState)
+        {
+            if (State != AnsiResponseParserState.InBracketedPaste)
+            {
+                return false;
+            }
+
+            FlushPaste ();
+
+            return true;
+        }
     }
 
     #endregion

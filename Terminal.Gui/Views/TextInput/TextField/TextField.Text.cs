@@ -47,10 +47,40 @@ public partial class TextField
             return false;
         }
 
-        InsertText (args.Text, false);
+        // TextField is single-line — take only the first line of the paste and drop control
+        // characters. This mirrors the existing clipboard-Paste command (see TextField.Commands.cs)
+        // and matches Windows Terminal's FilterStringForPaste behavior for single-line targets.
+        string sanitized = SanitizeSingleLinePaste (args.Text);
+
+        if (sanitized.Length == 0)
+        {
+            return false;
+        }
+
+        InsertText (sanitized, false);
         args.Handled = true;
 
         return true;
+    }
+
+    private static string SanitizeSingleLinePaste (string text)
+    {
+        int newline = text.IndexOfAny (['\r', '\n']);
+        string firstLine = newline >= 0 ? text [..newline] : text;
+
+        // Strip C0/C1 control chars (including ESC). Keep tabs since the existing TextField
+        // accepts a literal tab in its text. DEL (0x7F) is dropped.
+        StringBuilder sb = new (firstLine.Length);
+
+        foreach (char c in firstLine)
+        {
+            if (c == '\t' || (c >= 0x20 && c < 0x7F) || c >= 0xA0)
+            {
+                sb.Append (c);
+            }
+        }
+
+        return sb.ToString ();
     }
 
     /// <summary>Raises the <see cref="TextChanging"/> event, enabling canceling the change or adjusting the text.</summary>

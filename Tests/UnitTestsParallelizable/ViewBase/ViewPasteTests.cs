@@ -136,7 +136,64 @@ public class ViewPasteTests
         Assert.Equal ("abc", textView.Text);
     }
 
-    private class TrackingView : View
+    [Fact]
+    public void TextField_OnPasted_TakesFirstLineOnly ()
+    {
+        TextField field = new () { Text = string.Empty };
+
+        bool handled = field.NewPasteEvent (new ("first\nsecond\rthird"));
+
+        Assert.True (handled);
+        Assert.Equal ("first", field.Text);
+    }
+
+    [Fact]
+    public void TextField_OnPasted_StripsControlCharsIncludingEscape ()
+    {
+        TextField field = new () { Text = string.Empty };
+
+        // Embed an ESC[31m color sequence and a literal bell character — both must be stripped.
+        bool handled = field.NewPasteEvent (new ("ab[31mcd"));
+
+        Assert.True (handled);
+        Assert.Equal ("ab[31mcd", field.Text);
+    }
+
+    [Fact]
+    public void TextField_OnPasted_AllControlChars_DoesNotInsert ()
+    {
+        TextField field = new () { Text = "x" };
+
+        bool handled = field.NewPasteEvent (new (""));
+
+        Assert.False (handled);
+        Assert.Equal ("x", field.Text);
+    }
+
+    [Fact]
+    public void TextView_OnPasted_NormalizesCarriageReturnToLineFeed ()
+    {
+        TextView textView = new () { Text = string.Empty };
+
+        // Mix of CR (terminal default), CRLF, and bare LF — all should become \n in the model.
+        bool handled = textView.NewPasteEvent (new ("a\rb\r\nc\nd"));
+
+        Assert.True (handled);
+        Assert.Equal ("a\nb\nc\nd", textView.Text);
+    }
+
+    [Fact]
+    public void TextView_OnPasted_StripsEscapeAndOtherControlChars ()
+    {
+        TextView textView = new () { Text = string.Empty };
+
+        bool handled = textView.NewPasteEvent (new ("a[31mbc\td"));
+
+        Assert.True (handled);
+        Assert.Equal ("a[31mbc\td", textView.Text);
+    }
+
+    private sealed class TrackingView : View
     {
         public Action? OnPastedCalled { get; set; }
         public bool OnPastedReturn { get; set; }

@@ -260,10 +260,49 @@ public partial class TextView
             return false;
         }
 
-        InsertText (args.Text);
+        // Normalize newlines (terminals send \r for paste line breaks, some send \r\n) and strip
+        // C0/C1 control chars except tab/newline. Mirrors Windows Terminal's FilterStringForPaste.
+        string sanitized = SanitizeMultiLinePaste (args.Text);
+
+        if (sanitized.Length == 0)
+        {
+            return false;
+        }
+
+        InsertText (sanitized);
         args.Handled = true;
 
         return true;
+    }
+
+    private static string SanitizeMultiLinePaste (string text)
+    {
+        StringBuilder sb = new (text.Length);
+
+        for (var i = 0; i < text.Length; i++)
+        {
+            char c = text [i];
+
+            if (c == '\r')
+            {
+                // Collapse CR and CRLF into LF so the text model sees a single newline form.
+                sb.Append ('\n');
+
+                if (i + 1 < text.Length && text [i + 1] == '\n')
+                {
+                    i++;
+                }
+
+                continue;
+            }
+
+            if (c == '\n' || c == '\t' || (c >= 0x20 && c < 0x7F) || c >= 0xA0)
+            {
+                sb.Append (c);
+            }
+        }
+
+        return sb.ToString ();
     }
 
     /// <summary>Replaces all the text based on the match case.</summary>

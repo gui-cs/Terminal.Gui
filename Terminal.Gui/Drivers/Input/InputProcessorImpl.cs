@@ -17,6 +17,15 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
 
     /// <summary>
+    ///     Timeout for detecting a stranded bracketed-paste session. If the terminal opens a paste with
+    ///     <c>ESC[200~</c> but never delivers the matching <c>ESC[201~</c> end marker (dropped
+    ///     connection, broken terminal), the buffered content is flushed after this duration so input
+    ///     resumes flowing. Pastes legitimately span seconds for large clipboards, so this is much
+    ///     longer than <see cref="_escTimeout"/>.
+    /// </summary>
+    private readonly TimeSpan _bracketedPasteTimeout = TimeSpan.FromSeconds (5);
+
+    /// <summary>
     ///     ANSI response parser for handling escape sequences from the input stream.
     /// </summary>
     internal AnsiResponseParser<TInputRecord> Parser { get; }
@@ -122,8 +131,32 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
             ProcessAfterParsing (input);
         }
 
+        FlushStaleBracketedPasteIfNeeded ();
+
         // Check for expired deferred clicks
         CheckForExpiredMouseClicks ();
+    }
+
+    private void FlushStaleBracketedPasteIfNeeded ()
+    {
+        if (Parser.State != AnsiResponseParserState.InBracketedPaste)
+        {
+            return;
+        }
+
+        if (_timeProvider.Now - Parser.StateChangedAt < _bracketedPasteTimeout)
+        {
+            return;
+        }
+
+        Logging.Warning (
+                         $"{
+                             nameof (InputProcessorImpl<TInputRecord>)
+                         } flushing stale bracketed-paste buffer after {
+                             _bracketedPasteTimeout.TotalSeconds
+                         }s without an end marker");
+
+        Parser.FlushStaleBracketedPaste ();
     }
 
     /// <summary>

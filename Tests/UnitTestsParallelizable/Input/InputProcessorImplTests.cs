@@ -74,6 +74,49 @@ public class InputProcessorImplTests (ITestOutputHelper output)
 
     #endregion
 
+    #region Bracketed Paste Stale Flush
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void FlushStaleBracketedPaste_WhenInPasteState_DispatchesPartialBufferAndResetsToNormal ()
+    {
+        AnsiResponseParser parser = new (new SystemTimeProvider ());
+
+        string? captured = null;
+        parser.Paste += (_, text) => captured = text;
+
+        parser.ProcessInput (EscSeqUtils.CSI_BracketedPasteStart + "stranded");
+        Assert.Equal (AnsiResponseParserState.InBracketedPaste, parser.State);
+        Assert.Null (captured);
+
+        bool flushed = parser.FlushStaleBracketedPaste ();
+
+        Assert.True (flushed);
+        Assert.Equal ("stranded", captured);
+        Assert.Equal (AnsiResponseParserState.Normal, parser.State);
+
+        // Subsequent input flows normally.
+        string output = parser.ProcessInput ("typed");
+        Assert.Equal ("typed", output);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void FlushStaleBracketedPaste_WhenNotInPasteState_IsNoOp ()
+    {
+        AnsiResponseParser parser = new (new SystemTimeProvider ());
+
+        var fired = false;
+        parser.Paste += (_, _) => fired = true;
+
+        bool flushed = parser.FlushStaleBracketedPaste ();
+
+        Assert.False (flushed);
+        Assert.False (fired);
+    }
+
+    #endregion
+
     #region Surrogate Pair Tests
 
     // CoPilot: claude-3-7-sonnet-20250219

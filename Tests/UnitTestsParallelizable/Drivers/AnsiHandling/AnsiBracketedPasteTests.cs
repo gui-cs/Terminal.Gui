@@ -122,4 +122,115 @@ public class AnsiBracketedPasteTests
         Assert.Equal (string.Empty, output);
         Assert.Equal (AnsiResponseParserState.Normal, _parser.State);
     }
+
+    [Theory]
+    [InlineData (1)]
+    [InlineData (2)]
+    [InlineData (3)]
+    [InlineData (4)]
+    [InlineData (5)]
+    [InlineData (6)]
+    public void Paste_StartMarkerSplitAtEveryByteBoundary_StillDetected (int splitAt)
+    {
+        string? captured = null;
+        _parser.Paste += (_, text) => captured = text;
+
+        string startMarker = EscSeqUtils.CSI_BracketedPasteStart;
+        string firstChunk = startMarker [..splitAt];
+        string secondChunk = startMarker [splitAt..] + "PAYLOAD" + EscSeqUtils.CSI_BracketedPasteEnd;
+
+        _parser.ProcessInput (firstChunk);
+        _parser.ProcessInput (secondChunk);
+
+        Assert.Equal ("PAYLOAD", captured);
+        Assert.Equal (AnsiResponseParserState.Normal, _parser.State);
+    }
+
+    [Theory]
+    [InlineData (1)]
+    [InlineData (2)]
+    [InlineData (3)]
+    [InlineData (4)]
+    [InlineData (5)]
+    [InlineData (6)]
+    public void Paste_EndMarkerSplitAtEveryByteBoundary_StillDetected (int splitAt)
+    {
+        string? captured = null;
+        _parser.Paste += (_, text) => captured = text;
+
+        string endMarker = EscSeqUtils.CSI_BracketedPasteEnd;
+
+        _parser.ProcessInput (EscSeqUtils.CSI_BracketedPasteStart + "body");
+        _parser.ProcessInput (endMarker [..splitAt]);
+        _parser.ProcessInput (endMarker [splitAt..]);
+
+        Assert.Equal ("body", captured);
+        Assert.Equal (AnsiResponseParserState.Normal, _parser.State);
+    }
+
+    [Fact]
+    public void Paste_BodyEndsWithPartialEndMarkerAcrossCalls_DoesNotTerminateEarly ()
+    {
+        string? captured = null;
+        _parser.Paste += (_, text) => captured = text;
+
+        // First chunk legitimately contains "ESC[20" at the end (a near-end-marker prefix).
+        // Second chunk supplies a different char so the prefix is rejected, then the real body
+        // and end marker.
+        _parser.ProcessInput (EscSeqUtils.CSI_BracketedPasteStart + "head[20");
+        _parser.ProcessInput ($"X-tail{EscSeqUtils.CSI_BracketedPasteEnd}");
+
+        Assert.Equal ("head[20X-tail", captured);
+    }
+
+    [Fact]
+    public void Paste_TwoConsecutivePastes_BothDelivered ()
+    {
+        List<string> captured = [];
+        _parser.Paste += (_, text) => captured.Add (text);
+
+        string input = $"{EscSeqUtils.CSI_BracketedPasteStart}A{EscSeqUtils.CSI_BracketedPasteEnd}"
+                       + $"between"
+                       + $"{EscSeqUtils.CSI_BracketedPasteStart}B{EscSeqUtils.CSI_BracketedPasteEnd}";
+
+        string output = _parser.ProcessInput (input);
+
+        Assert.Equal (["A", "B"], captured);
+        Assert.Equal ("between", output);
+    }
+
+    [Fact]
+    public void Paste_BodyContainsLiteralStartMarker_AppendedAsContent ()
+    {
+        // A well-behaved terminal won't emit a nested start marker, but a hostile or buggy one might.
+        // We treat any bytes between the outer start and end markers as paste content.
+        string? captured = null;
+        _parser.Paste += (_, text) => captured = text;
+
+        _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}before[200~after{EscSeqUtils.CSI_BracketedPasteEnd}");
+
+        Assert.Equal ("before[200~after", captured);
+    }
+
+    [Fact]
+    public void Paste_ResetMidPaste_DiscardsBufferAndReturnsToNormal ()
+    {
+        string? captured = null;
+        _parser.Paste += (_, text) => captured = text;
+
+        _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}partial");
+        Assert.Equal (AnsiResponseParserState.InBracketedPaste, _parser.State);
+
+        // Release/Reset is the parser's escape hatch for stale escape sequences. While in
+        // bracketed-paste mode it must not silently drop the buffer — but the documented
+        // behavior here is that Release returns to Normal. Verify state, and verify that
+        // input flow resumes cleanly afterward.
+        _parser.Release ();
+
+        Assert.Null (captured);
+        Assert.Equal (AnsiResponseParserState.Normal, _parser.State);
+
+        string output = _parser.ProcessInput ("typed");
+        Assert.Equal ("typed", output);
+    }
 }

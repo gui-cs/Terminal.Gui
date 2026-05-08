@@ -245,17 +245,18 @@ internal partial class ApplicationImpl : IApplication
             return true;
         }
 
-        // Route to the focused view (mirrors keyboard dispatch). If no view is focused, fall through
-        // to the top-most runnable so embedded TextField / TextView still receives pastes when the
-        // user has not explicitly clicked into a control yet.
-        View? target = Navigation?.GetFocused () ?? TopRunnableView;
+        // Route only to the focused view — paste data is text destined for a text-input control,
+        // and silently dispatching to a non-text container would either drop the paste or surprise
+        // the user. Apps that want to handle pastes without a focused view should subscribe to
+        // Application.Paste and set Handled.
+        View? focused = Navigation?.GetFocused ();
 
-        if (target is null)
+        if (focused is null)
         {
             return false;
         }
 
-        return target.NewPasteEvent (args);
+        return focused.NewPasteEvent (args);
     }
 
     #endregion Input (Mouse/Keyboard)
