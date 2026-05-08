@@ -328,29 +328,32 @@ public partial class AppTestHelper : IDisposable
         Exception? actionException = null;
 
         App?.Invoke (app =>
-                     {
-                         try
-                         {
-                             action (app);
+        {
+            try
+            {
+                action (app);
 
-                             //Logging.Trace ("Action completed");
-                             ctsActionCompleted.Cancel ();
-                         }
-                         catch (Exception e)
-                         {
-                             Logging.Warning ($"Action failed with exception: {e}");
-                             _backgroundException = e;
-                             actionException = e;
-                             _ansiInput.ExternalCancellationTokenSource?.Cancel ();
-                         }
-                      });
+                //Logging.Trace ("Action completed");
+                ctsActionCompleted.Cancel ();
+            }
+            catch (Exception e)
+            {
+                Logging.Warning ($"Action failed with exception: {e}");
+                _backgroundException = e;
+                actionException = e;
+                _ansiInput.ExternalCancellationTokenSource?.Cancel ();
+            }
+        });
 
         // Blocks until either the action completes, the run stops, or the timeout/hard-stop token is cancelled.
-        WaitHandle.WaitAny ([
-                                _runCancellationTokenSource.Token.WaitHandle,
-                                ctsActionCompleted.Token.WaitHandle,
-                                _ansiInput.ExternalCancellationTokenSource!.Token.WaitHandle
-                            ]);
+        WaitHandle [] waitHandles =
+        [
+            _runCancellationTokenSource.Token.WaitHandle,
+            ctsActionCompleted.Token.WaitHandle,
+            _ansiInput.ExternalCancellationTokenSource!.Token.WaitHandle
+        ];
+
+        WaitHandle.WaitAny (waitHandles);
 
         if (actionException is { })
         {

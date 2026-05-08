@@ -17,11 +17,11 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         IRunnable? top = null;
 
         using AppTestHelper helper = With.A<Window> (40, 10, d)
-                                               .Then ((app) =>
-                                                      {
-                                                          top = app!.TopRunnable;
-                                                          app.Keyboard.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Quit));
-                                                      });
+                                               .Then (app =>
+                                               {
+                                                   top = app!.TopRunnable;
+                                                   app.Keyboard.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Quit));
+                                               });
 
         Assert.True (SpinWait.SpinUntil (() => top is { IsRunning: false }, TimeSpan.FromSeconds (5)));
     }
