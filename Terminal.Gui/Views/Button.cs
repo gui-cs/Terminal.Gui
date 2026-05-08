@@ -249,33 +249,26 @@ public class Button : View, IDesignable, IAcceptTarget
         _interiorTextFormatter.ConstrainToWidth = interiorRect.Width;
         _interiorTextFormatter.ConstrainToHeight = interiorRect.Height;
 
-        Region drawRegion = new (drawRect);
+        Region? interiorDrawRegion = (interiorRect.Width > 0 && !string.IsNullOrEmpty (interiorText))
+            ? _interiorTextFormatter.GetDrawRegion (interiorRect)
+            : null;
 
-        if (interiorRect.Width > 0 && !string.IsNullOrEmpty (interiorText))
-        {
-            drawRegion.Combine (_interiorTextFormatter.GetDrawRegion (interiorRect), RegionOp.Union);
-        }
+        context?.AddDrawnRegion (new Region (drawRect));
 
-        context?.AddDrawnRegion (drawRegion);
+        int delimiterRow = GetDelimiterRow (drawRect, interiorDrawRegion);
 
-        int delimiterRow = GetDelimiterRow (drawRect, interiorRect, interiorText);
+        // Fill the entire content area with the focus/normal attribute to ensure continuous
+        // highlight across all rows and across the bracket columns.
+        Driver.SetAttribute (normalAttr);
+        Driver.FillRect (drawRect);
 
         Driver.Move (drawRect.X, delimiterRow);
-        Driver.SetAttribute (normalAttr);
         Driver.AddRune (_leftBracket);
 
         Driver.Move (drawRect.X + drawRect.Width - 1, delimiterRow);
-        Driver.SetAttribute (normalAttr);
         Driver.AddRune (_rightBracket);
 
-        if (interiorRect.Width > 0)
-        {
-            Driver.Move (interiorRect.X, delimiterRow);
-            Driver.SetAttribute (normalAttr);
-            Driver.AddStr (new string (' ', interiorRect.Width));
-        }
-
-        if (interiorRect.Width > 0 && !string.IsNullOrEmpty (interiorText))
+        if (interiorDrawRegion is not null)
         {
             _interiorTextFormatter.Draw (Driver, interiorRect, normalAttr, hotAttr, Rectangle.Empty);
         }
@@ -293,6 +286,8 @@ public class Button : View, IDesignable, IAcceptTarget
         return true;
     }
 
+    // GetDecoratedText (called by UpdateTextFormatterText for Dim.Auto sizing) and GetInteriorText
+    // (called by OnDrawingText for rendering) must remain in sync when modifying button text formatting.
     private string GetDecoratedText ()
     {
         if (NoDecorations)
@@ -318,11 +313,11 @@ public class Button : View, IDesignable, IAcceptTarget
         return $" {Text} ";
     }
 
-    private int GetDelimiterRow (Rectangle drawRect, Rectangle interiorRect, string interiorText)
+    private int GetDelimiterRow (Rectangle drawRect, Region? interiorDrawRegion)
     {
-        if (interiorRect.Width > 0 && !string.IsNullOrEmpty (interiorText))
+        if (interiorDrawRegion is not null)
         {
-            Rectangle interiorBounds = _interiorTextFormatter.GetDrawRegion (interiorRect).GetBounds ();
+            Rectangle interiorBounds = interiorDrawRegion.GetBounds ();
 
             if (!interiorBounds.IsEmpty)
             {
