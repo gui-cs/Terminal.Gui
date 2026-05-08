@@ -13,7 +13,8 @@ name: Notify clet
 #     (queried by `dotnet package search`) lags by minutes, which broke
 #     this workflow once before — see gui-cs/clet workflow run 25406348354.
 #   - Channel is derived from the triggering workflow's branch:
-#     main ⇒ tg-main-published, anything else ⇒ tg-develop-published.
+#     develop ⇒ tg-develop-published, anything else (main, release
+#     branches like v2.1.0-rc.4, tags) ⇒ tg-main-published.
 
 on:
   workflow_run:
@@ -46,12 +47,12 @@ jobs:
           fi
           echo "tg_version=$TG_VER" >> "$GITHUB_OUTPUT"
           BRANCH="${{ github.event.workflow_run.head_branch }}"
-          if [ "$BRANCH" = "main" ] || [ "$BRANCH" = "master" ]; then
-            echo "event_type=tg-main-published" >> "$GITHUB_OUTPUT"
-            echo "Channel: main ($TG_VER from $BRANCH)"
-          else
+          if [ "$BRANCH" = "develop" ]; then
             echo "event_type=tg-develop-published" >> "$GITHUB_OUTPUT"
             echo "Channel: develop ($TG_VER from $BRANCH)"
+          else
+            echo "event_type=tg-main-published" >> "$GITHUB_OUTPUT"
+            echo "Channel: main ($TG_VER from $BRANCH)"
           fi
 
       - name: Wait for NuGet flat-container to index the version
