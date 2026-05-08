@@ -41,6 +41,49 @@ public class ButtonDrawingTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot
     [Fact]
+    public void Focused_FixedWidth_Button_MultiRow_Highlight_Is_Continuous ()
+    {
+        const int width = 10;
+        const int height = 3;
+
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (width, height);
+
+        Runnable runnable = new () { Width = width, Height = height };
+        app.Begin (runnable);
+
+        Button button = new ()
+        {
+            Text = "_OK",
+            X = 0,
+            Y = 0,
+            Width = width,
+            Height = height,
+            ShadowStyle = null
+        };
+
+        runnable.Add (button);
+        button.SetFocus ();
+        app.LayoutAndDraw ();
+
+        // All rows must carry the Focus attribute — verifies the highlight is continuous
+        // across rows above and below the text (not just the delimiter row).
+        DriverAssert.AssertDriverAttributesAre (
+            """
+            0000000000
+            0000100000
+            0000000000
+            """,
+            output,
+            app.Driver,
+            button.GetAttributeForRole (VisualRole.Focus),
+            button.GetAttributeForRole (VisualRole.HotFocus)
+        );
+    }
+
+    // Copilot
+    [Fact]
     public void Focused_FixedWidth_Button_Highlight_Is_Continuous ()
     {
         const int width = 10;

@@ -241,13 +241,62 @@ public class Button : View, IDesignable, IAcceptTarget
         Attribute hotAttr = HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
         string interiorText = GetInteriorText ();
 
-        _interiorTextFormatter.Text = interiorText;
-        _interiorTextFormatter.Alignment = TextAlignment;
-        _interiorTextFormatter.VerticalAlignment = VerticalTextAlignment;
-        _interiorTextFormatter.Direction = TextDirection;
-        _interiorTextFormatter.PreserveTrailingSpaces = PreserveTrailingSpaces;
-        _interiorTextFormatter.ConstrainToWidth = interiorRect.Width;
-        _interiorTextFormatter.ConstrainToHeight = interiorRect.Height;
+        // Mirror all TextFormatter settings onto _interiorTextFormatter. Guard each assignment
+        // so NeedsFormat is not set when a value is unchanged.
+        if (_interiorTextFormatter.Text != interiorText)
+        {
+            _interiorTextFormatter.Text = interiorText;
+        }
+
+        if (_interiorTextFormatter.Alignment != TextAlignment)
+        {
+            _interiorTextFormatter.Alignment = TextAlignment;
+        }
+
+        if (_interiorTextFormatter.VerticalAlignment != VerticalTextAlignment)
+        {
+            _interiorTextFormatter.VerticalAlignment = VerticalTextAlignment;
+        }
+
+        if (_interiorTextFormatter.Direction != TextDirection)
+        {
+            _interiorTextFormatter.Direction = TextDirection;
+        }
+
+        if (_interiorTextFormatter.PreserveTrailingSpaces != PreserveTrailingSpaces)
+        {
+            _interiorTextFormatter.PreserveTrailingSpaces = PreserveTrailingSpaces;
+        }
+
+        if (_interiorTextFormatter.MultiLine != TextFormatter.MultiLine)
+        {
+            _interiorTextFormatter.MultiLine = TextFormatter.MultiLine;
+        }
+
+        if (_interiorTextFormatter.WordWrap != TextFormatter.WordWrap)
+        {
+            _interiorTextFormatter.WordWrap = TextFormatter.WordWrap;
+        }
+
+        if (_interiorTextFormatter.TabWidth != TextFormatter.TabWidth)
+        {
+            _interiorTextFormatter.TabWidth = TextFormatter.TabWidth;
+        }
+
+        if (_interiorTextFormatter.PreserveTabs != TextFormatter.PreserveTabs)
+        {
+            _interiorTextFormatter.PreserveTabs = TextFormatter.PreserveTabs;
+        }
+
+        if (_interiorTextFormatter.ConstrainToWidth != interiorRect.Width)
+        {
+            _interiorTextFormatter.ConstrainToWidth = interiorRect.Width;
+        }
+
+        if (_interiorTextFormatter.ConstrainToHeight != interiorRect.Height)
+        {
+            _interiorTextFormatter.ConstrainToHeight = interiorRect.Height;
+        }
 
         Region? interiorDrawRegion = (interiorRect.Width > 0 && !string.IsNullOrEmpty (interiorText))
             ? _interiorTextFormatter.GetDrawRegion (interiorRect)
