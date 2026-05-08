@@ -104,7 +104,12 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
     public void RunAsync_Timeout_Stops_Application ()
     {
         // Copilot
-        using AppTestHelper helper = With.A<Window> (40, 10, DriverRegistry.Names.ANSI, _out, TimeSpan.FromMilliseconds (50));
+        using AppTestHelper helper = With.A<Window> (
+            40,
+            10,
+            DriverRegistry.Names.ANSI,
+            _out,
+            TimeSpan.FromMilliseconds (50));
 
         Assert.True (SpinWait.SpinUntil (() => helper.Finished, TimeSpan.FromSeconds (5)));
         Assert.True (helper.Finished);

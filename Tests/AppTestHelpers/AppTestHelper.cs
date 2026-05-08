@@ -1,5 +1,6 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Time;
@@ -109,6 +110,7 @@ public partial class AppTestHelper : IDisposable
 
     /// <summary>
     ///     Constructor for tests that need to run the application with IApplication.RunAsync.
+    ///     The runnable observes the helper's linked cancellation token, including timeout cancellation.
     /// </summary>
     internal AppTestHelper (Func<IRunnable> runnableBuilder, int width, int height, string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
@@ -357,7 +359,7 @@ public partial class AppTestHelper : IDisposable
 
         if (actionException is { })
         {
-            throw actionException;
+            ExceptionDispatchInfo.Capture (actionException).Throw ();
         }
 
         // Logging.Trace ($"Return from WaitIteration");

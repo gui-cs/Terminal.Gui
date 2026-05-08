@@ -36,7 +36,7 @@ public static class With
     }
 
     /// <summary>
-    ///     Overload that takes a function to create instance <paramref name="runnableFactory"/> after application is initialized.
+    /// Overload that takes a function to create instance <paramref name="runnableFactory"/> after application is initialized.
     /// </summary>
     /// <param name="runnableFactory"></param>
     /// <param name="width"></param>
