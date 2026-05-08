@@ -51,6 +51,8 @@ public static class Program
 
         if (smokeTest)
         {
+            RunDictionaryCloneSmokeChecks ();
+
             // CI smoke test: run the full app lifecycle with a timeout
             using CancellationTokenSource cts = new (TimeSpan.FromSeconds (5));
             await app.RunAsync<AotAllViewsWindow> (cts.Token);
@@ -62,6 +64,16 @@ public static class Program
 
         app.Run<AotAllViewsWindow> ();
         app.Dispose ();
+    }
+
+    private static void RunDictionaryCloneSmokeChecks ()
+    {
+        _ = DeepCloner.DeepClone (Color.Colors16);
+        _ = DeepCloner.DeepClone (Application.DefaultKeyBindings);
+        _ = DeepCloner.DeepClone (View.DefaultKeyBindings);
+        _ = DeepCloner.DeepClone (View.ViewKeyBindings);
+        _ = DeepCloner.DeepClone (ThemeManager.Themes);
+        _ = DeepCloner.DeepClone (SchemeManager.Schemes);
     }
 }
 
