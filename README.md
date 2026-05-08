@@ -71,6 +71,10 @@ app.Run (window);
 
 See the [Examples](Examples/README.md) for more.
 
+# Showcase
+
+See the [Showcase](https://gui-cs.github.io/Terminal.Gui/docs/showcase) for applications built with Terminal.Gui.
+
 # Documentation 
 
 Comprehensive documentation is at [gui-cs.github.io/Terminal.Gui](https://gui-cs.github.io/Terminal.Gui).
