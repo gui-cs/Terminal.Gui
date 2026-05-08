@@ -15,7 +15,7 @@ permissions:
       
 jobs:
   build-validation:
-    name: Build and Test (${{ matrix.os }})
+    name: Build Validation (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
