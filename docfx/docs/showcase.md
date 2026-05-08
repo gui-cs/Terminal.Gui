@@ -2,6 +2,9 @@
 
 ## Applications Built with Terminal.Gui
 
+- **[clet](https://github.com/gui-cs/clet)** - CLI-lets: simple CLI commands that prompt the user with rich TUI inputs (select, confirm, file picker, date, color, etc.) and return typed JSON. One binary, every prompt, JSON out. Works for humans and AI agents alike.
+  ![clet](https://raw.githubusercontent.com/gui-cs/clet/develop/docs/images/hero.png)
+  ⠀
 - **[UI Catalog](https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
   ![Sample app](../images/sample.gif)  
   ⠀
