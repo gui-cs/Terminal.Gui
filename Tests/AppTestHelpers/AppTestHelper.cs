@@ -108,7 +108,7 @@ public partial class AppTestHelper : IDisposable
     }
 
     /// <summary>
-    ///     Constructor for tests that need to run the application with Application.Run.
+    ///     Constructor for tests that need to run the application with IApplication.RunAsync.
     /// </summary>
     internal AppTestHelper (Func<IRunnable> runnableBuilder, int width, int height, string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
@@ -120,7 +120,7 @@ public partial class AppTestHelper : IDisposable
         CommonInit (width, height, timeout);
 
         // Start the application in a background thread
-        _runTask = Task.Run (() =>
+        _runTask = Task.Run (async () =>
                              {
                                  _loggerScope = Logging.PushLogger (_testLogger!);
 
@@ -140,18 +140,20 @@ public partial class AppTestHelper : IDisposable
                                          _booting.Release ();
                                      }
 
-                                     if (App is { Initialized: true })
+                                     if (App is { Initialized: true } app)
                                      {
                                          IRunnable runnable = runnableBuilder ();
 
-                                         runnable.IsRunningChanged += (s, e) =>
+                                         runnable.IsRunningChanged += (_, e) =>
                                                                       {
                                                                           if (!e.Value)
                                                                           {
                                                                               Finished = true;
                                                                           }
                                                                       };
-                                         App?.Run (runnable); // This will block, but it's on a background thread now
+
+                                         CancellationToken runToken = _ansiInput.ExternalCancellationTokenSource!.Token;
+                                         await app.RunAsync (runnable, runToken);
 
                                          if (runnable is View runnableView)
                                          {
@@ -159,7 +161,7 @@ public partial class AppTestHelper : IDisposable
                                          }
 
                                          //Logging.Trace ("Application.Run completed");
-                                         App?.Dispose ();
+                                         app.Dispose ();
                                          _runCancellationTokenSource.Cancel ();
                                      }
                                  }
@@ -321,7 +323,9 @@ public partial class AppTestHelper : IDisposable
         {
             action = app => { };
         }
+
         CancellationTokenSource ctsActionCompleted = new ();
+        Exception? actionException = null;
 
         App?.Invoke (app =>
                      {
@@ -336,14 +340,22 @@ public partial class AppTestHelper : IDisposable
                          {
                              Logging.Warning ($"Action failed with exception: {e}");
                              _backgroundException = e;
+                             actionException = e;
                              _ansiInput.ExternalCancellationTokenSource?.Cancel ();
                          }
-                     });
+                      });
 
-        // Blocks until either the token or the hardStopToken is cancelled.
-        // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
-        // ExternalCancellationTokenSource is redundant because it's linked to _runCancellationTokenSource
-        WaitHandle.WaitAny ([_runCancellationTokenSource.Token.WaitHandle, ctsActionCompleted.Token.WaitHandle]);
+        // Blocks until either the action completes, the run stops, or the timeout/hard-stop token is cancelled.
+        WaitHandle.WaitAny ([
+                                _runCancellationTokenSource.Token.WaitHandle,
+                                ctsActionCompleted.Token.WaitHandle,
+                                _ansiInput.ExternalCancellationTokenSource!.Token.WaitHandle
+                            ]);
+
+        if (actionException is { })
+        {
+            throw actionException;
+        }
 
         // Logging.Trace ($"Return from WaitIteration");
         return this;

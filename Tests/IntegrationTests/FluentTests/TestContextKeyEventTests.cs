@@ -14,12 +14,16 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
     [MemberData (nameof (GetAllDriverNames))]
     public void QuitKey_ViaApplication_Stops (string d)
     {
+        IRunnable? top = null;
+
         using AppTestHelper helper = With.A<Window> (40, 10, d)
-                                              .Then ((app) =>
-                                                     {
-                                                         app?.Keyboard.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Quit));
-                                                         Assert.False (app!.TopRunnable!.IsRunning);
-                                                     });
+                                               .Then ((app) =>
+                                                      {
+                                                          top = app!.TopRunnable;
+                                                          app.Keyboard.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Quit));
+                                                      });
+
+        Assert.True (SpinWait.SpinUntil (() => top is { IsRunning: false }, TimeSpan.FromSeconds (5)));
     }
 
     [Theory]
