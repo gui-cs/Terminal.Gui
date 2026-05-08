@@ -15,7 +15,7 @@ jobs:
     name: Build All Configurations
     runs-on: ubuntu-latest
     
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
 
     - name: Checkout code
@@ -57,7 +57,14 @@ jobs:
         dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release -property:NoWarn=0618%3B0612
 
     - name: AOT Publish (catches trimming and reflection errors)
-      run: dotnet publish ./Examples/NativeAot/NativeAot.csproj --configuration Release -property:NoWarn=0618%3B0612
+      run: dotnet publish ./Examples/NativeAot/NativeAot.csproj --configuration Release --output ./aot-publish -property:NoWarn=0618%3B0612
+
+    - name: AOT Smoke Test (run the published AOT binary)
+      env:
+        DisableRealDriverIO: "1"
+      run: |
+        chmod +x ./aot-publish/NativeAot
+        ./aot-publish/NativeAot --smoke-test
 
     - name: Build Release Solution
       run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612

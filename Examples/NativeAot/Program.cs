@@ -18,17 +18,19 @@ namespace NativeAot;
 
 public static class Program
 {
-    private static void Main ()
+    private static async Task Main (string [] args)
     {
 #pragma warning disable IL2026, IL3050
-        Run ();
+        await RunAsync (args);
 #pragma warning restore IL2026, IL3050
     }
 
     [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
     [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IDriver, String)")]
-    private static void Run ()
+    private static async Task RunAsync (string [] args)
     {
+        bool smokeTest = args.Length > 0 && args [0] == "--smoke-test";
+
         ConfigurationManager.Enable (ConfigLocations.All);
 
         IApplication app = Application.Create ().Init ();
@@ -46,6 +48,17 @@ public static class Program
         }
 
         #endregion
+
+        if (smokeTest)
+        {
+            // CI smoke test: run the full app lifecycle with a timeout
+            using CancellationTokenSource cts = new (TimeSpan.FromSeconds (5));
+            await app.RunAsync<AotAllViewsWindow> (cts.Token);
+            app.Dispose ();
+            Console.WriteLine ("AOT smoke test passed: full app lifecycle completed successfully.");
+
+            return;
+        }
 
         app.Run<AotAllViewsWindow> ();
         app.Dispose ();
