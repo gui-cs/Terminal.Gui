@@ -462,20 +462,23 @@ public class MarkdownViewSelectionTests
     }
 
     // Copilot - partial drag selection spanning lines inside a csharp code block (with 🌍)
+    // The selection covers all code lines but no non-code content, so no fence delimiters
+    // should appear in the output (mirrors the copy-button behaviour on MarkdownCodeBlock).
     [Fact]
-    public void PartialSelection_FencedCodeBlock_SelectedText_Preserves_Fence_Context ()
+    public void PartialSelection_FencedCodeBlock_SelectedText_DoesNotIncludeFence ()
     {
         string md = "```csharp\nConsole.WriteLine (\"Hello, Terminal.Gui! 🌍\");\nvar x = 42;\n```";
         (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
 
-        // Select both code lines (rendered as lines 0 and 1 — fence lines are not in _renderedLines)
+        // Select both code lines (rendered as lines 0 and 1 — fence lines are not in _renderedLines).
+        // End at x=10 (one short of "var x = 42;" width=11) so IsFullDocumentSelected() returns false.
         mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        mv.NewMouseEvent (new Mouse { Position = new Point (12, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+        mv.NewMouseEvent (new Mouse { Position = new Point (10, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
 
         string? selected = mv.SelectedText;
 
         Assert.NotNull (selected);
-        Assert.Contains ("```csharp", selected);
+        Assert.DoesNotContain ("```", selected);
         Assert.Contains ("Console.WriteLine", selected);
         Assert.Contains ("🌍", selected);
 
@@ -759,6 +762,226 @@ public class MarkdownViewSelectionTests
 
         // Should NOT equal the full source markdown because the selection started at col 1
         Assert.NotEqual (md, selected);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Regression test for #5270.
+    // When the Markdown view is scrolled (Viewport.Y > 0) and the selection overlay runs
+    // for table rows, DrawSelectionOverlayOnSubViewRows must read from ScreenContents at
+    // the CORRECT screen row.  The bug passed drawRow (viewport-relative) to ContentToScreen
+    // instead of lineIdx (content-relative), causing ContentToScreen to double-subtract
+    // Viewport.Y and read from the wrong row — displaying header content where body content
+    // should appear.
+    [Fact]
+    public void SelectionOverlay_On_Table_Is_Synced_When_Scrolled ()
+    {
+        // Layout:
+        //   row 0 : "para"  (paragraph text)
+        //   row 1 : ""      (blank between paragraph and table)
+        //   rows 2-6 : 5-row table  (top border, header, separator, body, bottom border)
+        const int SCREEN_WIDTH = 30;
+        const int SCREEN_HEIGHT = 5; // Must be less than content height (7) so scrolling is possible
+
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (SCREEN_WIDTH, SCREEN_HEIGHT);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        Scheme scheme = new (new Attribute (Color.Black, Color.White));
+        window.SetScheme (scheme);
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Text = "para\n\n| H | V |\n|---|---|\n| 1 | 2 |",
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        mv.SchemeName = null;
+        mv.SetScheme (scheme);
+        window.Add (mv);
+
+        // Initial draw at Viewport.Y=0 to populate ScreenContents with the table rows.
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Scroll past "para" and the blank line so only the table is visible.
+        mv.Viewport = mv.Viewport with { Y = 2 };
+
+        // Activate a full selection, then redraw so the overlay runs while scrolled.
+        mv.SelectAll ();
+        app.LayoutAndDraw ();
+
+        // The body row "│ 1 │ 2 │" must be visible.
+        // With the bug, DrawSelectionOverlayOnSubViewRows passes drawRow (viewport-relative)
+        // to ContentToScreen instead of lineIdx (content-relative).  ContentToScreen then
+        // double-subtracts Viewport.Y=2, so the body row reads from screen row 1 (the header)
+        // and overwrites "│ 1 │ 2 │" with "│ H │ V │" — making "1" and "2" disappear.
+        string screen = app.Driver.ToString ();
+        Assert.Contains ("1", screen);
+        Assert.Contains ("2", screen);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // --- Issue #5273: partial selection inside a code block must not include fence delimiters ---
+
+    // Copilot - Claude Sonnet 4.6
+    // Selecting only middle lines of a multi-line code block should not produce fence delimiters.
+    [Fact]
+    public void PartialSelection_InsideCodeBlock_DoesNotIncludeFenceDelimiters ()
+    {
+        // 4 code lines; select only the middle two (lines 1 and 2)
+        string md = "```csharp\nline A\nline B\nline C\nline D\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Rendered lines 0-3 are the four code lines (fence lines are stripped during parse).
+        // Press on line 1, drag to end of line 2.
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 1), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (60, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("line B", selected);
+        Assert.Contains ("line C", selected);
+        Assert.DoesNotContain ("```", selected);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // Selection starts before the code block (on a paragraph line) and ends inside it.
+    // Only the opening fence should be present; the closing fence must be omitted.
+    [Fact]
+    public void PartialSelection_StartBeforeCodeBlock_EndInside_HasOpeningFenceOnly ()
+    {
+        string md = "Before\n```csharp\nline A\nline B\nline C\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Rendered line 0 = "Before", lines 1-3 = code lines.
+        // Press on line 0, drag to line 2 (mid-block).
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (60, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("Before", selected);
+        Assert.Contains ("```csharp", selected);
+        Assert.Contains ("line A", selected);
+        Assert.Contains ("line B", selected);
+        Assert.DoesNotContain ("line C", selected);
+
+        // Opening fence present; closing fence absent because selection ends mid-block.
+        int fenceCount = CountOccurrences (selected, "```");
+        Assert.Equal (1, fenceCount);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // Selection starts inside a code block and ends after it (on a paragraph line).
+    // A closing fence is expected because the selection crosses the block's end, even
+    // though no opening fence was emitted (the selection began inside the block).
+    [Fact]
+    public void PartialSelection_StartInsideCodeBlock_EndAfter_HasClosingFenceOnly ()
+    {
+        string md = "```csharp\nline A\nline B\nline C\n```\nAfter";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Rendered lines 0-2 = code lines, line 3 = "After".
+        // Press on line 1 (mid-block), drag to line 3 (after block).
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 1), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (60, 3), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("line B", selected);
+        Assert.Contains ("line C", selected);
+        Assert.Contains ("After", selected);
+        Assert.DoesNotContain ("line A", selected);
+
+        // Closing fence present because selection crosses out of the code block; no opening fence.
+        int fenceCount = CountOccurrences (selected, "```");
+        Assert.Equal (1, fenceCount);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // Regression guard: selecting all lines of a code block starting from its first line should
+    // produce NO fence delimiters — the selection is entirely within the fenced region.
+    [Fact]
+    public void PartialSelection_AllLinesOfCodeBlock_FromFirstLine_NoFences ()
+    {
+        // Three code lines; select only the first two to avoid triggering IsFullDocumentSelected().
+        string md = "```csharp\nline A\nline B\nline C\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Press on line 0 (first code line), drag to end of line 1.
+        // end.Y=1 < lastLine=2, so IsFullDocumentSelected() returns false and partial-selection runs.
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (6, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("line A", selected);
+        Assert.Contains ("line B", selected);
+        Assert.DoesNotContain ("line C", selected);
+        Assert.DoesNotContain ("```", selected);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Regression test for partial code-block selection highlight.
+    // When only part of a code-block line is selected (e.g. start or end of multi-line selection
+    // falls inside the block), DrawSelectionOverlayOnSubViewRows must NOT highlight the entire
+    // row — it must respect the per-column IsInSelection check, exactly as DrawRenderedLine does
+    // for plain text lines.  The bug applied selAttr to every column unconditionally.
+    [Fact]
+    public void SelectionOverlay_On_CodeBlock_HighlightsOnlySelectedColumns ()
+    {
+        // Code block with two lines; select only from column 3 of line 0 to the end.
+        // Line 0 columns 0-2 must NOT carry the selection background.
+        string md = "```\nABCDEF\nGHIJKL\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 20, height: 5);
+
+        app.LayoutAndDraw ();
+
+        // Anchor at col 3 of rendered line 0, drag to end of line 1.
+        mv.NewMouseEvent (new Mouse { Position = new Point (3, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (20, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+        app.LayoutAndDraw ();
+
+        // Inspect raw screen buffer: the first 3 columns of line 0 must use Normal (not Focus) role.
+        Scheme scheme = mv.GetScheme ()!;
+        Attribute focus = scheme.Focus;
+
+        Cell [,]? screen = app.Driver!.Contents;
+        Assert.NotNull (screen);
+
+        // Line 0 of the code block is screen row 0 (no preceding content).
+        for (int col = 0; col < 3; col++)
+        {
+            Assert.NotEqual (focus, screen [0, col].Attribute);
+        }
+
+        // Column 3 onwards on line 0 must carry the selection (focus) attribute.
+        for (int col = 3; col < 6; col++)
+        {
+            Assert.Equal (focus, screen [0, col].Attribute);
+        }
 
         window.Dispose ();
         app.Dispose ();
