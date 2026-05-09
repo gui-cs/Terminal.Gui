@@ -112,7 +112,7 @@ public partial class Markdown
             }
 
             int drawRow = lineIdx - Viewport.Y;
-            Point screenOrigin = ContentToScreen (new Point (0, drawRow));
+            Point screenOrigin = ContentToScreen (new Point (0, lineIdx));
             int screenRow = screenOrigin.Y;
             int screenStartCol = screenOrigin.X;
             int cols = Viewport.Width;

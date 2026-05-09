@@ -764,6 +764,67 @@ public class MarkdownViewSelectionTests
         app.Dispose ();
     }
 
+    // Copilot - Regression test for #5270.
+    // When the Markdown view is scrolled (Viewport.Y > 0) and the selection overlay runs
+    // for table rows, DrawSelectionOverlayOnSubViewRows must read from ScreenContents at
+    // the CORRECT screen row.  The bug passed drawRow (viewport-relative) to ContentToScreen
+    // instead of lineIdx (content-relative), causing ContentToScreen to double-subtract
+    // Viewport.Y and read from the wrong row — displaying header content where body content
+    // should appear.
+    [Fact]
+    public void SelectionOverlay_On_Table_Is_Synced_When_Scrolled ()
+    {
+        // Layout:
+        //   row 0 : "para"  (paragraph text)
+        //   row 1 : ""      (blank between paragraph and table)
+        //   rows 2-6 : 5-row table  (top border, header, separator, body, bottom border)
+        const int SCREEN_WIDTH = 30;
+        const int SCREEN_HEIGHT = 5; // Must be less than content height (7) so scrolling is possible
+
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (SCREEN_WIDTH, SCREEN_HEIGHT);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        Scheme scheme = new (new Attribute (Color.Black, Color.White));
+        window.SetScheme (scheme);
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Text = "para\n\n| H | V |\n|---|---|\n| 1 | 2 |",
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        mv.SchemeName = null;
+        mv.SetScheme (scheme);
+        window.Add (mv);
+
+        // Initial draw at Viewport.Y=0 to populate ScreenContents with the table rows.
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Scroll past "para" and the blank line so only the table is visible.
+        mv.Viewport = mv.Viewport with { Y = 2 };
+
+        // Activate a full selection, then redraw so the overlay runs while scrolled.
+        mv.SelectAll ();
+        app.LayoutAndDraw ();
+
+        // The body row "│ 1 │ 2 │" must be visible.
+        // With the bug, DrawSelectionOverlayOnSubViewRows passes drawRow (viewport-relative)
+        // to ContentToScreen instead of lineIdx (content-relative).  ContentToScreen then
+        // double-subtracts Viewport.Y=2, so the body row reads from screen row 1 (the header)
+        // and overwrites "│ 1 │ 2 │" with "│ H │ V │" — making "1" and "2" disappear.
+        string screen = app.Driver.ToString ();
+        Assert.Contains ("1", screen);
+        Assert.Contains ("2", screen);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
     private static int CountOccurrences (string text, string pattern)
     {
         int count = 0;
