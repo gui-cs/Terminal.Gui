@@ -131,8 +131,19 @@ public partial class Markdown
         (Point start, Point end) = GetNormalizedSelection ();
         List<string> outputLines = [];
         var inCodeBlock = false;
-
         string? currentCodeLanguage = null;
+
+        // Fences are injected only when the selection crosses a code-block boundary:
+        //   • Opening fence: only when the selection already contains non-code content
+        //     before the code block (the selection crosses from outside into the block).
+        //   • Closing fence: always when the selection crosses out of the code block into
+        //     non-code content — regardless of whether an opening fence was emitted.
+        //   • No trailing fence: when the selection ends inside a code block, no closing
+        //     fence is added; the selection ends mid-block.
+        // This produces no fences for a selection entirely within a code block, matching
+        // the behaviour of the copy-button on MarkdownCodeBlock.
+        var selectionHasNonCodeContent = false;
+        var codeOpenFenceEmitted = false;
 
         // Track the last table instance that was output.  All placeholder rows for the
         // same table share the same TableData reference, so we use ReferenceEquals to
@@ -150,26 +161,50 @@ public partial class Markdown
 
                 if (!inCodeBlock)
                 {
-                    // Entering a code block: inject the opening fence with optional language tag
-                    outputLines.Add ($"```{nextCodeLanguage ?? string.Empty}");
                     inCodeBlock = true;
                     currentCodeLanguage = nextCodeLanguage;
+
+                    // Only inject the opening fence when non-code content has already been
+                    // output — that is, the selection crosses from outside into this code block.
+                    if (selectionHasNonCodeContent)
+                    {
+                        outputLines.Add ($"```{nextCodeLanguage ?? string.Empty}");
+                        codeOpenFenceEmitted = true;
+                    }
+                    else
+                    {
+                        codeOpenFenceEmitted = false;
+                    }
                 }
                 else if (!string.Equals (currentCodeLanguage, nextCodeLanguage, StringComparison.Ordinal))
                 {
-                    // Transitioning directly between two code blocks: close the current fence
-                    // and open the next one so adjacent fenced blocks are preserved.
-                    outputLines.Add ("```");
+                    // Transitioning directly between two adjacent code blocks of different
+                    // languages: close the current fence (if opened) and open the next one.
+                    if (codeOpenFenceEmitted)
+                    {
+                        outputLines.Add ("```");
+                    }
+
                     outputLines.Add ($"```{nextCodeLanguage ?? string.Empty}");
+                    codeOpenFenceEmitted = true;
                     currentCodeLanguage = nextCodeLanguage;
                 }
             }
             else if (inCodeBlock)
             {
-                // Leaving a code block: inject the closing fence
+                // Leaving a code block into non-code content: always inject the closing fence.
+                // The selection crosses the block's end boundary regardless of whether the
+                // opening fence was emitted (e.g., when the selection started inside the block).
                 outputLines.Add ("```");
+
                 inCodeBlock = false;
+                codeOpenFenceEmitted = false;
                 currentCodeLanguage = null;
+                selectionHasNonCodeContent = true;
+            }
+            else
+            {
+                selectionHasNonCodeContent = true;
             }
 
             if (line is { IsTable: true, TableData: { } tableData })
@@ -195,11 +230,6 @@ public partial class Markdown
             StringBuilder lineSb = new ();
             AppendLineText (lineSb, line, lineStartX, lineEndX);
             outputLines.Add (lineSb.ToString ());
-        }
-
-        if (inCodeBlock)
-        {
-            outputLines.Add ("```");
         }
 
         return string.Join ("\n", outputLines);
