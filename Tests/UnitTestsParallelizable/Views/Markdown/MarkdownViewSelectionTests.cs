@@ -462,20 +462,23 @@ public class MarkdownViewSelectionTests
     }
 
     // Copilot - partial drag selection spanning lines inside a csharp code block (with 🌍)
+    // The selection covers all code lines but no non-code content, so no fence delimiters
+    // should appear in the output (mirrors the copy-button behaviour on MarkdownCodeBlock).
     [Fact]
-    public void PartialSelection_FencedCodeBlock_SelectedText_Preserves_Fence_Context ()
+    public void PartialSelection_FencedCodeBlock_SelectedText_DoesNotIncludeFence ()
     {
         string md = "```csharp\nConsole.WriteLine (\"Hello, Terminal.Gui! 🌍\");\nvar x = 42;\n```";
         (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
 
-        // Select both code lines (rendered as lines 0 and 1 — fence lines are not in _renderedLines)
+        // Select both code lines (rendered as lines 0 and 1 — fence lines are not in _renderedLines).
+        // End at x=10 (one short of "var x = 42;" width=11) so IsFullDocumentSelected() returns false.
         mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        mv.NewMouseEvent (new Mouse { Position = new Point (12, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+        mv.NewMouseEvent (new Mouse { Position = new Point (10, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
 
         string? selected = mv.SelectedText;
 
         Assert.NotNull (selected);
-        Assert.Contains ("```csharp", selected);
+        Assert.DoesNotContain ("```", selected);
         Assert.Contains ("Console.WriteLine", selected);
         Assert.Contains ("🌍", selected);
 
@@ -820,6 +823,122 @@ public class MarkdownViewSelectionTests
         string screen = app.Driver.ToString ();
         Assert.Contains ("1", screen);
         Assert.Contains ("2", screen);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // --- Issue #5273: partial selection inside a code block must not include fence delimiters ---
+
+    // Copilot - Claude Sonnet 4.6
+    // Selecting only middle lines of a multi-line code block should not produce fence delimiters.
+    [Fact]
+    public void PartialSelection_InsideCodeBlock_DoesNotIncludeFenceDelimiters ()
+    {
+        // 4 code lines; select only the middle two (lines 1 and 2)
+        string md = "```csharp\nline A\nline B\nline C\nline D\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Rendered lines 0-3 are the four code lines (fence lines are stripped during parse).
+        // Press on line 1, drag to end of line 2.
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 1), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (60, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("line B", selected);
+        Assert.Contains ("line C", selected);
+        Assert.DoesNotContain ("```", selected);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // Selection starts before the code block (on a paragraph line) and ends inside it.
+    // Only the opening fence should be present; the closing fence must be omitted.
+    [Fact]
+    public void PartialSelection_StartBeforeCodeBlock_EndInside_HasOpeningFenceOnly ()
+    {
+        string md = "Before\n```csharp\nline A\nline B\nline C\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Rendered line 0 = "Before", lines 1-3 = code lines.
+        // Press on line 0, drag to line 2 (mid-block).
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (60, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("Before", selected);
+        Assert.Contains ("```csharp", selected);
+        Assert.Contains ("line A", selected);
+        Assert.Contains ("line B", selected);
+        Assert.DoesNotContain ("line C", selected);
+
+        // Opening fence present; closing fence absent because selection ends mid-block.
+        int fenceCount = CountOccurrences (selected, "```");
+        Assert.Equal (1, fenceCount);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // Selection starts inside a code block and ends after it (on a paragraph line).
+    // A closing fence is expected because the selection crosses the block's end, even
+    // though no opening fence was emitted (the selection began inside the block).
+    [Fact]
+    public void PartialSelection_StartInsideCodeBlock_EndAfter_HasClosingFenceOnly ()
+    {
+        string md = "```csharp\nline A\nline B\nline C\n```\nAfter";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Rendered lines 0-2 = code lines, line 3 = "After".
+        // Press on line 1 (mid-block), drag to line 3 (after block).
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 1), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (60, 3), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("line B", selected);
+        Assert.Contains ("line C", selected);
+        Assert.Contains ("After", selected);
+        Assert.DoesNotContain ("line A", selected);
+
+        // Closing fence present because selection crosses out of the code block; no opening fence.
+        int fenceCount = CountOccurrences (selected, "```");
+        Assert.Equal (1, fenceCount);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // Regression guard: selecting all lines of a code block starting from its first line should
+    // produce NO fence delimiters — the selection is entirely within the fenced region.
+    [Fact]
+    public void PartialSelection_AllLinesOfCodeBlock_FromFirstLine_NoFences ()
+    {
+        // Three code lines; select only the first two to avoid triggering IsFullDocumentSelected().
+        string md = "```csharp\nline A\nline B\nline C\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Press on line 0 (first code line), drag to end of line 1.
+        // end.Y=1 < lastLine=2, so IsFullDocumentSelected() returns false and partial-selection runs.
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (6, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("line A", selected);
+        Assert.Contains ("line B", selected);
+        Assert.DoesNotContain ("line C", selected);
+        Assert.DoesNotContain ("```", selected);
 
         window.Dispose ();
         app.Dispose ();
