@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Drawing;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Describes a request to render a given <see cref="SixelData"/> at a given <see cref="ScreenPosition"/>.
@@ -21,4 +21,20 @@ public class SixelToRender
     /// Gets or sets the unique identifier for this sixel render operation.
     /// </summary>
     public string? Id { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether this sixel needs to be re-rendered to the terminal.
+    ///     When <see langword="false"/>, the output pipeline skips writing this sixel's data.
+    ///     Set to <see langword="true"/> when the owning view's content is invalidated (e.g. via
+    ///     <see cref="ViewBase.View.SetNeedsDraw()"/>).
+    /// </summary>
+    public bool IsDirty { get; set; } = true;
+
+    /// <summary>
+    ///     Gets or sets whether this sixel should always be rendered to the terminal.
+    ///     When <see langword="true"/>, the output pipeline always writes this sixel's data.
+    ///     Set to <see langword="false"/> to only render when the owning view's content is
+    ///     invalidated (e.g. via <see cref="ViewBase.View.SetNeedsDraw()"/>).
+    /// </summary>
+    public bool AlwaysRender { get; set; } = false;
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using Terminal.Gui.Tracing;
 
@@ -269,6 +269,14 @@ internal class DriverImpl : IDriver
     #endregion Screen and Display
 
     #region Color Support
+
+    /// <inheritdoc/>
+    public SixelSupportResult? SixelSupport { get; private set; }
+
+    /// <summary>
+    ///     Sets the terminal's sixel support result (detected during initialization).
+    /// </summary>
+    internal void SetSixelSupport (SixelSupportResult result) => SixelSupport = result;
 
     /// <inheritdoc/>
     public bool SupportsTrueColor => !IsLegacyConsole;
