@@ -250,6 +250,49 @@ public class MarkdownViewSelectionTests
         mv.Dispose ();
     }
 
+    // Copilot - Regression: #5272 — Ctrl+LeftButtonReleased must NOT be bound to Context
+    // The base View class adds this binding; Markdown must remove it so Ctrl+Click can follow
+    // links without triggering the context menu popover.
+    [Fact]
+    public void MouseBindings_CtrlLeftButtonReleased_IsNotBoundTo_Context ()
+    {
+        Terminal.Gui.Views.Markdown mv = new ();
+
+        bool found = mv.MouseBindings.TryGet (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl, out _);
+
+        Assert.False (found);
+
+        mv.Dispose ();
+    }
+
+    // Copilot - Regression: #5272 — Ctrl+Click on a link opens the link and does NOT show context menu
+    [Fact]
+    public void CtrlClick_On_Link_Opens_Link_And_Does_Not_Show_Context_Menu ()
+    {
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("[Click](https://example.com)");
+
+        mv.SetFocus ();
+
+        var linkClicked = false;
+
+        mv.LinkClicked += (_, e) =>
+                          {
+                              linkClicked = true;
+                              e.Handled = true;
+                          };
+
+        // Simulate Ctrl+Click: press, Ctrl+release, Ctrl+clicked
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased | MouseFlags.Ctrl });
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.True (linkClicked);
+        Assert.True (mv.ContextMenu is null || !mv.ContextMenu.Visible);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
     // Copilot - verifies that a drag (press + position-report) activates the selection
     [Fact]
     public void Drag_Mouse_Creates_Selection ()
