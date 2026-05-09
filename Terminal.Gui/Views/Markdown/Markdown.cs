@@ -36,7 +36,7 @@ namespace Terminal.Gui.Views;
 ///         </item>
 ///         <item>
 ///             <term>Shift+F10 / Right-click</term>
-///             <description>Opens a context menu with <b>Select All</b> and <b>Copy</b> items.</description>
+///             <description>Opens a context menu with <b>Select All</b> and <b>Copy</b> items. Right-clicking on a hyperlink also adds a <b>Copy Link</b> item that copies the URL to the clipboard.</description>
 ///         </item>
 ///     </list>
 ///     <para>Default mouse bindings:</para>
@@ -74,6 +74,7 @@ public partial class Markdown : View, IDesignable
     private int _layoutWidth = -1;
     private int _maxLineWidth;
     private int _activeLinkIndex = -1;
+    private string? _contextMenuLinkUrl;
     private bool _inLayout;
     private bool _scrollToTopPending;
     private int _externalContentWidth;
