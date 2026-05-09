@@ -57,15 +57,28 @@ public abstract class OutputBase
 
     // Last URL used for tracking hyperlink state
     private string? _lastUrl = null;
+
+    // Rows that contained URLs in the last rendered frame; used to emit OSC 8 close
+    // before re-rendering a row that has since lost all URL cells, so terminals don't
+    // keep stale hyperlink metadata.
     private readonly HashSet<int> _rowsWithUrls = [];
+
+    // Identifies the buffer state we last synced _rowsWithUrls against. When the buffer
+    // is replaced, resized, or its URL maps are wiped, this stops matching and we drop
+    // the stale tracking before reading it.
+    private IOutputBuffer? _lastTrackedBuffer;
+    private int _lastTrackedRows;
+    private int _lastTrackedCols;
+    private int _lastTrackedUrlVersion;
 
     private readonly StringBuilder _lastOutputStringBuilder = new ();
     private bool _clearLastOutputPending;
 
     /// <summary>
-    ///     Writes dirty cells from the buffer to the console. Hides cursor, iterates rows/cols,
-    ///     skips clean cells, batches dirty cells into ANSI sequences, wraps URLs with OSC 8,
-    ///     then renders sixel images. Cursor visibility is managed by <c>ApplicationMainLoop.SetCursor()</c>.
+    ///     Writes dirty cells from the buffer to the console. Iterates rows/cols, skips clean cells,
+    ///     batches dirty cells into ANSI sequences, emits OSC 8 hyperlink start/close around URL cells,
+    ///     and finally renders queued sixel images. Cursor visibility is managed by
+    ///     <c>ApplicationMainLoop.SetCursor()</c>.
     /// </summary>
     public virtual void Write (IOutputBuffer buffer)
     {
@@ -77,6 +90,8 @@ public abstract class OutputBase
         int cols = buffer.Cols;
         Attribute? redrawAttr = null;
         int lastCol = -1;
+
+        InvalidateRowsWithUrlsIfStale (buffer, rows, cols);
 
         // Process each row
         for (int row = top; row < rows; row++)
@@ -500,5 +515,22 @@ public abstract class OutputBase
         }
 
         return false;
+    }
+
+    private void InvalidateRowsWithUrlsIfStale (IOutputBuffer buffer, int rows, int cols)
+    {
+        int urlVersion = buffer is OutputBufferImpl outputBuffer ? outputBuffer.UrlStateVersion : 0;
+
+        if (!ReferenceEquals (_lastTrackedBuffer, buffer)
+            || _lastTrackedRows != rows
+            || _lastTrackedCols != cols
+            || _lastTrackedUrlVersion != urlVersion)
+        {
+            _rowsWithUrls.Clear ();
+            _lastTrackedBuffer = buffer;
+            _lastTrackedRows = rows;
+            _lastTrackedCols = cols;
+            _lastTrackedUrlVersion = urlVersion;
+        }
     }
 }

@@ -31,6 +31,15 @@ public class OutputBufferImpl : IOutputBuffer
     /// </summary>
     private Dictionary<Point, string>? _autoUrlMap;
 
+    private int _urlStateVersion;
+
+    /// <summary>
+    ///     Monotonic counter incremented when URL state is wiped (e.g. via
+    ///     <see cref="ClearContents(bool)"/> or <see cref="SetSize"/>). Consumers
+    ///     that cache per-frame URL-row tracking can compare to detect resets.
+    /// </summary>
+    internal int UrlStateVersion => _urlStateVersion;
+
     private Rune _column1ReplacementChar = Glyphs.WideGlyphReplacement;
 
     private Region? _clip;
@@ -309,8 +318,14 @@ public class OutputBufferImpl : IOutputBuffer
 
         DirtyLines = new bool [Rows];
 
-        _explicitUrlMap?.Clear ();
-        _autoUrlMap?.Clear ();
+        // Null out (rather than Clear) so GetCellUrl's null fast-path stays effective
+        // for the lifetime of the buffer until URLs are introduced again.
+        if (_explicitUrlMap is { } || _autoUrlMap is { })
+        {
+            _explicitUrlMap = null;
+            _autoUrlMap = null;
+            _urlStateVersion++;
+        }
 
         for (var row = 0; row < Rows; row++)
         {
@@ -470,28 +485,60 @@ public class OutputBufferImpl : IOutputBuffer
             return;
         }
 
-        for (int col = 0; col < Cols; col++)
+        if (_autoUrlMap is { Count: > 0 })
         {
-            _autoUrlMap?.Remove (new Point (col, row));
+            for (int col = 0; col < Cols; col++)
+            {
+                _autoUrlMap.Remove (new Point (col, row));
+            }
         }
 
+        // Build the row text and a parallel char-to-column map so grapheme clusters
+        // wider than a single char (ZWJ emoji, base + combining mark) don't shift the
+        // detected URL out of alignment with its actual columns.
         StringBuilder rowText = new (Cols);
+        int [] colByChar = new int [Cols * 2];
+        int charCount = 0;
 
         for (int col = 0; col < Cols; col++)
         {
             string grapheme = Contents [row, col].Grapheme;
-            rowText.Append (string.IsNullOrEmpty (grapheme) ? " " : grapheme);
+            string append = string.IsNullOrEmpty (grapheme) ? " " : grapheme;
+            rowText.Append (append);
+
+            if (charCount + append.Length > colByChar.Length)
+            {
+                Array.Resize (ref colByChar, Math.Max (colByChar.Length * 2, charCount + append.Length));
+            }
+
+            for (int k = 0; k < append.Length; k++)
+            {
+                colByChar [charCount++] = col;
+            }
         }
 
         foreach (Osc8UrlLinker.UrlRange range in Osc8UrlLinker.FindUrls (rowText.ToString ()))
         {
-            int end = Math.Min (range.Start + range.Length, Cols);
+            if (range.Start >= charCount)
+            {
+                continue;
+            }
 
-            for (int col = range.Start; col < end; col++)
+            int startCol = colByChar [range.Start];
+            int lastCharIdx = range.Start + range.Length - 1;
+            int endCol = lastCharIdx < charCount ? colByChar [lastCharIdx] + 1 : Cols;
+            endCol = Math.Min (endCol, Cols);
+
+            for (int col = startCol; col < endCol; col++)
             {
                 _autoUrlMap ??= [];
                 _autoUrlMap [new Point (col, row)] = range.Url;
             }
+        }
+
+        if (_autoUrlMap is { Count: 0 })
+        {
+            _autoUrlMap = null;
         }
     }
 
