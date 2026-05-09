@@ -120,7 +120,7 @@ public abstract class OutputBase
             outputStringBuilder.Clear ();
             _lastUrl = null; // Reset URL state at the start of each row
 
-            if (!IsLegacyConsole && rowHadUrlsPreviously && !rowHasUrlsNow)
+            if (!IsLegacyConsole && rowHadUrlsPreviously)
             {
                 outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
             }

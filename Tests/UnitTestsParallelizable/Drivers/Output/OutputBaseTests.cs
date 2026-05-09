@@ -425,6 +425,35 @@ public class OutputBaseTests
         Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before replacement spaces");
     }
 
+    // Copilot - GPT-5.4
+    // Regression coverage for the remaining floating-underline case when a row still contains
+    // a URL after redraw, but cells that were formerly part of a URL are now plain text.
+    // Warp appears to need an explicit OSC 8 close before those replacement cells are emitted;
+    // otherwise the old hyperlink metadata can remain attached to the old screen columns.
+    [Fact]
+    public void Write_AutoDetectedUrl_MovedWithinSameRow_ClosesBeforePlainReplacement ()
+    {
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (48, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://one.example then trailing text            ");
+        output.Write (buffer);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("plain intro then https://two.example            ");
+
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int replacementIdx = result.IndexOf ("plain intro then ", StringComparison.Ordinal);
+        int endIdx = result.IndexOf (end, StringComparison.Ordinal);
+
+        Assert.True (replacementIdx >= 0, "Replacement plain text was not emitted");
+        Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before the old linked cells are redrawn as plain text");
+    }
+
     // Claude - Opus 4.7
     // Regression coverage for the char-vs-column mismatch in SyncAutoUrlsForRowCore.
     // When a multi-codepoint grapheme (ZWJ emoji, base + combining mark) precedes a URL
