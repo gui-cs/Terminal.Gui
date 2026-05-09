@@ -59,7 +59,10 @@ public partial class Markdown
 
         // The base class binds LeftButtonReleased → Activate; remove that so Activate
         // fires only on LeftButtonClicked (not twice per click which would clear selection).
+        // Also remove the base class Ctrl+LeftButtonReleased → Context binding so that
+        // Ctrl+Click can follow links without triggering the context menu popover.
         MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
 
         // Right-click is handled directly in OnMouseEvent so that the view can be focused
