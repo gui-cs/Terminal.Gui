@@ -134,14 +134,16 @@ public partial class Markdown
         string? currentCodeLanguage = null;
 
         // Fences are injected only when the selection crosses a code-block boundary:
-        //   • Opening fence: only when the selection already contains non-code content
-        //     before the code block (the selection crosses from outside into the block).
+        //   • Opening fence: emitted when entering a code block after selected non-code
+        //     content, and also when transitioning directly to an adjacent selected code
+        //     block whose opening fence has not yet been written.
         //   • Closing fence: always when the selection crosses out of the code block into
         //     non-code content — regardless of whether an opening fence was emitted.
         //   • No trailing fence: when the selection ends inside a code block, no closing
         //     fence is added; the selection ends mid-block.
         // This produces no fences for a selection entirely within a code block, matching
-        // the behaviour of the copy-button on MarkdownCodeBlock.
+        // the behaviour of the copy-button on MarkdownCodeBlock. codeOpenFenceEmitted
+        // tracks whether the current selected code block already has its opening fence.
         var selectionHasNonCodeContent = false;
         var codeOpenFenceEmitted = false;
 
