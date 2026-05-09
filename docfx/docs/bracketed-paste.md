@@ -24,7 +24,7 @@ If the application event is not handled, the paste is dispatched to the focused 
 
 `TextField` is a single-line control. When it receives a paste it takes the first line only (splitting on `\r` or `\n`) and strips C0 / C1 control characters except tab. This matches the behavior of the existing clipboard-paste command.
 
-`TextView` is multi-line. It accepts the full payload, normalizing `\r` and `\r\n` line breaks to `\n`, and strips C0 / C1 control characters except tab and newline. This mirrors [Windows Terminal's `FilterStringForPaste`](https://github.com/microsoft/terminal/blob/main/src/types/utils.cpp).
+`TextView` is multi-line. It accepts the full payload, normalizing `\r` and `\r\n` into logical line breaks in the text model, and strips C0 / C1 control characters except tab and newline. This mirrors [Windows Terminal's `FilterStringForPaste`](https://github.com/microsoft/terminal/blob/main/src/types/utils.cpp).
 
 To pass the raw payload through unmodified, subscribe to <xref:Terminal.Gui.ViewBase.View.Pasted> instead of relying on the default `OnPasted` — the event is raised after the virtual method, so a subscriber that sets `Handled = true` after the default insertion will only stop further bubbling, not undo the insertion. To override the default, subclass the view and override `OnPasted`.
 
@@ -34,7 +34,7 @@ On terminals that do not support bracketed paste mode (older versions of `xterm`
 
 ## Stranded pastes
 
-If the terminal sends `ESC[200~` but the matching `ESC[201~` is dropped (broken connection, terminated remote shell), the parser would otherwise hold the buffered paste content forever. Terminal.Gui flushes the partial buffer as a `Paste` event after a 5-second idle timeout so input flow resumes. There is also a hard cap of 1 MiB on the paste buffer size; payloads exceeding it are truncated.
+If the terminal sends `ESC[200~` but the matching `ESC[201~` is dropped (broken connection, terminated remote shell), the parser would otherwise hold the buffered paste content forever. Terminal.Gui flushes the partial buffer as a `Paste` event after a 5-second idle timeout measured from the most recent paste byte so an active slow paste is not cut off prematurely. There is also a hard cap of 1 MiB on the paste buffer size; payloads exceeding it are truncated, and the remaining bytes are discarded until the matching end marker arrives so tail bytes do not leak into normal input processing.
 
 ## Security considerations
 

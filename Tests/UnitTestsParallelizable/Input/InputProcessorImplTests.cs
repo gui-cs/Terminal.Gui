@@ -115,6 +115,64 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         Assert.False (fired);
     }
 
+    [Fact]
+    public void ProcessQueue_BracketedPaste_DoesNotFlushWhileBytesContinueArriving ()
+    {
+        VirtualTimeProvider timeProvider = new ();
+        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        TestInputProcessor processor = new (queue, true, timeProvider);
+
+        string? captured = null;
+        processor.Paste += (_, text) => captured = text;
+
+        TestInputQueueHelper.EnqueueString (queue, EscSeqUtils.CSI_BracketedPasteStart + "ab");
+        processor.ProcessQueue ();
+
+        Assert.Equal (AnsiResponseParserState.InBracketedPaste, processor.Parser.State);
+        Assert.Null (captured);
+
+        timeProvider.Advance (TimeSpan.FromSeconds (4));
+        TestInputQueueHelper.EnqueueString (queue, "cd");
+        processor.ProcessQueue ();
+
+        Assert.Null (captured);
+
+        timeProvider.Advance (TimeSpan.FromSeconds (4));
+        processor.ProcessQueue ();
+
+        Assert.Null (captured);
+        Assert.Equal (AnsiResponseParserState.InBracketedPaste, processor.Parser.State);
+
+        TestInputQueueHelper.EnqueueString (queue, EscSeqUtils.CSI_BracketedPasteEnd);
+        processor.ProcessQueue ();
+
+        Assert.Equal ("abcd", captured);
+        Assert.Equal (AnsiResponseParserState.Normal, processor.Parser.State);
+    }
+
+    [Fact]
+    public void ProcessQueue_BracketedPaste_FlushesAfterIdleTimeout ()
+    {
+        VirtualTimeProvider timeProvider = new ();
+        ConcurrentQueue<ConsoleKeyInfo> queue = new ();
+        TestInputProcessor processor = new (queue, true, timeProvider);
+
+        string? captured = null;
+        processor.Paste += (_, text) => captured = text;
+
+        TestInputQueueHelper.EnqueueString (queue, EscSeqUtils.CSI_BracketedPasteStart + "stranded");
+        processor.ProcessQueue ();
+
+        Assert.Equal (AnsiResponseParserState.InBracketedPaste, processor.Parser.State);
+        Assert.Null (captured);
+
+        timeProvider.Advance (TimeSpan.FromSeconds (6));
+        processor.ProcessQueue ();
+
+        Assert.Equal ("stranded", captured);
+        Assert.Equal (AnsiResponseParserState.Normal, processor.Parser.State);
+    }
+
     #endregion
 
     #region Surrogate Pair Tests
@@ -649,7 +707,7 @@ internal class TestInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
 {
     private readonly bool _useParser;
 
-    public TestInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, bool useParser = false) : base (inputBuffer, new TestKeyConverter ()) =>
+    public TestInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, bool useParser = false, ITimeProvider? timeProvider = null) : base (inputBuffer, new TestKeyConverter (), timeProvider) =>
         _useParser = useParser;
 
     protected override void Process (ConsoleKeyInfo input)
@@ -663,6 +721,17 @@ internal class TestInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
         {
             // For surrogate pair tests, process directly
             ProcessAfterParsing (input);
+        }
+    }
+}
+
+internal static class TestInputQueueHelper
+{
+    public static void EnqueueString (ConcurrentQueue<ConsoleKeyInfo> queue, string text)
+    {
+        foreach (char c in text)
+        {
+            queue.Enqueue (new ConsoleKeyInfo (c, 0, false, false, false));
         }
     }
 }

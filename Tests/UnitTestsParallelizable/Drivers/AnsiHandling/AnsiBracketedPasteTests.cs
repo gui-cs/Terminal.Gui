@@ -77,11 +77,11 @@ public class AnsiBracketedPasteTests
         string? captured = null;
         _parser.Paste += (_, text) => captured = text;
 
-        string trickyPayload = "[201"; // looks like the start of the end marker but missing '~'
+        string trickyPayload = "\u001b[201"; // looks like the start of the end marker but missing '~'
 
         string output = _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}{trickyPayload}rest{EscSeqUtils.CSI_BracketedPasteEnd}");
 
-        Assert.Equal ("[201rest", captured);
+        Assert.Equal ("\u001b[201rest", captured);
         Assert.Equal (string.Empty, output);
     }
 
@@ -98,18 +98,63 @@ public class AnsiBracketedPasteTests
     }
 
     [Fact]
-    public void Paste_OversizedPayload_TruncatesAndReturnsToNormal ()
+    public void Paste_OversizedPayload_TruncatesAndWaitsForEndMarker ()
     {
         string? captured = null;
         _parser.Paste += (_, text) => captured = text;
 
         // Build a payload larger than the max paste length so the parser must flush mid-paste.
-        var longBody = new string ('x', AnsiResponseParserBase.MaxBracketedPasteLength + 100);
+        string longBody = new ('x', AnsiResponseParserBase.MaxBracketedPasteLength + 100);
 
         _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}{longBody}");
 
         Assert.NotNull (captured);
         Assert.Equal (AnsiResponseParserBase.MaxBracketedPasteLength, captured!.Length);
+        Assert.Equal (AnsiResponseParserState.DiscardingBracketedPasteRemainder, _parser.State);
+    }
+
+    [Fact]
+    public void Paste_OversizedPayload_DiscardsRemainderUntilEndMarker ()
+    {
+        List<string> captured = [];
+        _parser.Paste += (_, text) => captured.Add (text);
+
+        string payload = new ('x', AnsiResponseParserBase.MaxBracketedPasteLength);
+        string expectedPayload = new ('x', AnsiResponseParserBase.MaxBracketedPasteLength);
+
+        string firstOutput = _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}{payload}");
+        string secondOutput = _parser.ProcessInput ($"tail{EscSeqUtils.CSI_BracketedPasteEnd}typed");
+
+        Assert.Equal ([expectedPayload], captured);
+        Assert.Equal (string.Empty, firstOutput);
+        Assert.Equal ("typed", secondOutput);
+        Assert.Equal (AnsiResponseParserState.Normal, _parser.State);
+    }
+
+    [Theory]
+    [InlineData (1)]
+    [InlineData (2)]
+    [InlineData (3)]
+    [InlineData (4)]
+    [InlineData (5)]
+    public void Paste_EndMarkerStraddlingSizeBoundary_DoesNotLeakMarkerBytesOrStayDiscarding (int markerBytesInBuffer)
+    {
+        List<string> captured = [];
+        _parser.Paste += (_, text) => captured.Add (text);
+
+        string endMarker = EscSeqUtils.CSI_BracketedPasteEnd;
+        string body = new ('x', AnsiResponseParserBase.MaxBracketedPasteLength - markerBytesInBuffer);
+        string partialMarker = endMarker [..markerBytesInBuffer];
+        string remainingMarker = endMarker [markerBytesInBuffer..];
+
+        _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}{body}{partialMarker}");
+
+        Assert.Equal ([body], captured);
+        Assert.Equal (AnsiResponseParserState.DiscardingBracketedPasteRemainder, _parser.State);
+
+        string output = _parser.ProcessInput ($"{remainingMarker}typed");
+
+        Assert.Equal ("typed", output);
         Assert.Equal (AnsiResponseParserState.Normal, _parser.State);
     }
 
@@ -177,10 +222,10 @@ public class AnsiBracketedPasteTests
         // First chunk legitimately contains "ESC[20" at the end (a near-end-marker prefix).
         // Second chunk supplies a different char so the prefix is rejected, then the real body
         // and end marker.
-        _parser.ProcessInput (EscSeqUtils.CSI_BracketedPasteStart + "head[20");
+        _parser.ProcessInput (EscSeqUtils.CSI_BracketedPasteStart + "head\u001b[20");
         _parser.ProcessInput ($"X-tail{EscSeqUtils.CSI_BracketedPasteEnd}");
 
-        Assert.Equal ("head[20X-tail", captured);
+        Assert.Equal ("head\u001b[20X-tail", captured);
     }
 
     [Fact]
@@ -207,9 +252,9 @@ public class AnsiBracketedPasteTests
         string? captured = null;
         _parser.Paste += (_, text) => captured = text;
 
-        _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}before[200~after{EscSeqUtils.CSI_BracketedPasteEnd}");
+        _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}before{EscSeqUtils.CSI_BracketedPasteStart}after{EscSeqUtils.CSI_BracketedPasteEnd}");
 
-        Assert.Equal ("before[200~after", captured);
+        Assert.Equal ($"before{EscSeqUtils.CSI_BracketedPasteStart}after", captured);
     }
 
     [Fact]
@@ -232,5 +277,25 @@ public class AnsiBracketedPasteTests
 
         string output = _parser.ProcessInput ("typed");
         Assert.Equal ("typed", output);
+    }
+
+    [Fact]
+    public void FlushStaleBracketedPaste_WhenDiscarding_ReturnsToNormalWithoutAnotherPasteEvent ()
+    {
+        List<string> captured = [];
+        _parser.Paste += (_, text) => captured.Add (text);
+
+        string payload = new ('x', AnsiResponseParserBase.MaxBracketedPasteLength);
+
+        _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}{payload}");
+
+        Assert.Equal (AnsiResponseParserState.DiscardingBracketedPasteRemainder, _parser.State);
+        Assert.Single (captured);
+
+        bool flushed = _parser.FlushStaleBracketedPaste ();
+
+        Assert.True (flushed);
+        Assert.Single (captured);
+        Assert.Equal (AnsiResponseParserState.Normal, _parser.State);
     }
 }

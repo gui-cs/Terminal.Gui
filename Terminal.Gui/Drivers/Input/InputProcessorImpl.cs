@@ -139,22 +139,23 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     private void FlushStaleBracketedPasteIfNeeded ()
     {
-        if (Parser.State != AnsiResponseParserState.InBracketedPaste)
+        if (Parser.State is not AnsiResponseParserState.InBracketedPaste
+            and not AnsiResponseParserState.DiscardingBracketedPasteRemainder)
         {
             return;
         }
 
-        if (_timeProvider.Now - Parser.StateChangedAt < _bracketedPasteTimeout)
+        if (_timeProvider.Now - Parser.LastBracketedPasteInputAt < _bracketedPasteTimeout)
         {
             return;
         }
 
         Logging.Warning (
                          $"{
-                             nameof (InputProcessorImpl<TInputRecord>)
-                         } flushing stale bracketed-paste buffer after {
-                             _bracketedPasteTimeout.TotalSeconds
-                         }s without an end marker");
+                              nameof (InputProcessorImpl<TInputRecord>)
+                         } abandoning stale bracketed-paste state after {
+                              _bracketedPasteTimeout.TotalSeconds
+                         }s without activity");
 
         Parser.FlushStaleBracketedPaste ();
     }

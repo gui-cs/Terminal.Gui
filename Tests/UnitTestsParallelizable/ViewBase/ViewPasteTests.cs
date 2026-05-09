@@ -153,7 +153,7 @@ public class ViewPasteTests
         TextField field = new () { Text = string.Empty };
 
         // Embed an ESC[31m color sequence and a literal bell character — both must be stripped.
-        bool handled = field.NewPasteEvent (new ("ab[31mcd"));
+        bool handled = field.NewPasteEvent (new ("ab\u001b[31mc\u0007d"));
 
         Assert.True (handled);
         Assert.Equal ("ab[31mcd", field.Text);
@@ -164,22 +164,22 @@ public class ViewPasteTests
     {
         TextField field = new () { Text = "x" };
 
-        bool handled = field.NewPasteEvent (new (""));
+        bool handled = field.NewPasteEvent (new ("\u001b\u0007\u0003"));
 
         Assert.False (handled);
         Assert.Equal ("x", field.Text);
     }
 
     [Fact]
-    public void TextView_OnPasted_NormalizesCarriageReturnToLineFeed ()
+    public void TextView_OnPasted_NormalizesCarriageReturnsToLogicalLineBreaks ()
     {
         TextView textView = new () { Text = string.Empty };
 
-        // Mix of CR (terminal default), CRLF, and bare LF — all should become \n in the model.
+        // Mix of CR (terminal default), CRLF, and bare LF — all should become logical line breaks.
         bool handled = textView.NewPasteEvent (new ("a\rb\r\nc\nd"));
 
         Assert.True (handled);
-        Assert.Equal ("a\nb\nc\nd", textView.Text);
+        Assert.Equal ($"a{Environment.NewLine}b{Environment.NewLine}c{Environment.NewLine}d", textView.Text);
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public class ViewPasteTests
     {
         TextView textView = new () { Text = string.Empty };
 
-        bool handled = textView.NewPasteEvent (new ("a[31mbc\td"));
+        bool handled = textView.NewPasteEvent (new ("a\u001b[31mb\u0007c\td"));
 
         Assert.True (handled);
         Assert.Equal ("a[31mbc\td", textView.Text);

@@ -27,5 +27,11 @@ public enum AnsiResponseParserState
     ///     Parser has encountered the bracketed-paste start sequence (<c>ESC[200~</c>) and is
     ///     accumulating pasted content until the matching end sequence (<c>ESC[201~</c>).
     /// </summary>
-    InBracketedPaste
+    InBracketedPaste,
+
+    /// <summary>
+    ///     Parser has already delivered the truncated prefix of an oversized bracketed paste and is
+    ///     discarding the remaining bytes until the matching end sequence (<c>ESC[201~</c>) arrives.
+    /// </summary>
+    DiscardingBracketedPasteRemainder
 }
