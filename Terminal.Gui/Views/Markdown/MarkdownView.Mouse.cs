@@ -276,6 +276,28 @@ public partial class Markdown
     }
 
     /// <summary>
+    ///     Returns the URL of the link region at content coordinates (<paramref name="contentX"/>,
+    ///     <paramref name="contentY"/>), or <see langword="null"/> if no link covers that position.
+    /// </summary>
+    private string? FindLinkUrlAt (int contentX, int contentY)
+    {
+        foreach (MarkdownLinkRegion region in _linkRegions)
+        {
+            if (region.Line != contentY)
+            {
+                continue;
+            }
+
+            if (contentX >= region.StartX && contentX < region.EndXExclusive)
+            {
+                return region.Url;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     ///     Builds the deduplicated list of link regions by scanning rendered lines.
     ///     Called at the end of <see cref="BuildRenderedLines"/>.
     /// </summary>

@@ -326,7 +326,15 @@ public partial class Markdown
     {
         DisposeContextMenu ();
 
-        PopoverMenu menu = new ([new MenuItem (this, Command.SelectAll), new MenuItem (this, Command.Copy)])
+        List<View?> menuItems = [new MenuItem (this, Command.SelectAll), new MenuItem (this, Command.Copy)];
+
+        if (_contextMenuLinkUrl is { } url)
+        {
+            menuItems.Insert (0, null);
+            menuItems.Insert (0, new MenuItem ("Copy _Link", action: () => App?.Clipboard?.TrySetClipboardData (url)));
+        }
+
+        PopoverMenu menu = new (menuItems)
         {
 #if DEBUG
             Id = "markdownContextMenu"
@@ -366,6 +374,15 @@ public partial class Markdown
 
     private bool ShowContextMenu (Point? screenPosition = null)
     {
+        if (screenPosition is { } pos)
+        {
+            Point viewportPos = ScreenToViewport (pos);
+            int contentX = Viewport.X + viewportPos.X;
+            int contentY = Viewport.Y + viewportPos.Y;
+            _contextMenuLinkUrl = FindLinkUrlAt (contentX, contentY);
+            CreateContextMenu ();
+        }
+
         Point menuPosition = screenPosition ?? GetContextMenuScreenPosition ();
         ContextMenu?.MakeVisible (menuPosition);
 
