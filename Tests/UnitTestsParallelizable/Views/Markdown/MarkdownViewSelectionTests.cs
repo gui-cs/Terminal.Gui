@@ -944,6 +944,49 @@ public class MarkdownViewSelectionTests
         app.Dispose ();
     }
 
+    // Copilot - Regression test for partial code-block selection highlight.
+    // When only part of a code-block line is selected (e.g. start or end of multi-line selection
+    // falls inside the block), DrawSelectionOverlayOnSubViewRows must NOT highlight the entire
+    // row — it must respect the per-column IsInSelection check, exactly as DrawRenderedLine does
+    // for plain text lines.  The bug applied selAttr to every column unconditionally.
+    [Fact]
+    public void SelectionOverlay_On_CodeBlock_HighlightsOnlySelectedColumns ()
+    {
+        // Code block with two lines; select only from column 3 of line 0 to the end.
+        // Line 0 columns 0-2 must NOT carry the selection background.
+        string md = "```\nABCDEF\nGHIJKL\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 20, height: 5);
+
+        app.LayoutAndDraw ();
+
+        // Anchor at col 3 of rendered line 0, drag to end of line 1.
+        mv.NewMouseEvent (new Mouse { Position = new Point (3, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (20, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+        app.LayoutAndDraw ();
+
+        // Inspect raw screen buffer: the first 3 columns of line 0 must use Normal (not Focus) role.
+        Scheme scheme = mv.GetScheme ()!;
+        Attribute focus = scheme.Focus;
+
+        Cell [,]? screen = app.Driver!.Contents;
+        Assert.NotNull (screen);
+
+        // Line 0 of the code block is screen row 0 (no preceding content).
+        for (int col = 0; col < 3; col++)
+        {
+            Assert.NotEqual (focus, screen [0, col].Attribute);
+        }
+
+        // Column 3 onwards on line 0 must carry the selection (focus) attribute.
+        for (int col = 3; col < 6; col++)
+        {
+            Assert.Equal (focus, screen [0, col].Attribute);
+        }
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
     private static int CountOccurrences (string text, string pattern)
     {
         int count = 0;

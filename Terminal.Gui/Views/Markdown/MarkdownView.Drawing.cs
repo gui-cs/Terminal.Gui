@@ -100,8 +100,6 @@ public partial class Markdown
         Rectangle viewportScreen = ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size));
         SetClip (new Region (viewportScreen));
 
-        SetAttribute (selAttr);
-
         for (int lineIdx = startRow; lineIdx <= Math.Min (endRow, _renderedLines.Count - 1); lineIdx++)
         {
             RenderedLine line = _renderedLines [lineIdx];
@@ -126,11 +124,17 @@ public partial class Markdown
                     continue;
                 }
 
-                string grapheme = contents [screenRow, sc].Grapheme;
+                Cell cell = contents [screenRow, sc];
+                string grapheme = string.IsNullOrEmpty (cell.Grapheme) ? " " : cell.Grapheme;
+                int contentX = col + Viewport.X;
 
-                if (string.IsNullOrEmpty (grapheme))
+                if (IsInSelection (lineIdx, contentX))
                 {
-                    grapheme = " ";
+                    SetAttribute (selAttr);
+                }
+                else
+                {
+                    SetAttribute (cell.Attribute ?? GetAttributeForRole (VisualRole.Normal));
                 }
 
                 AddStr (col, drawRow, grapheme);
