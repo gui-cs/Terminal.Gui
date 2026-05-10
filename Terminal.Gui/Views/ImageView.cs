@@ -113,7 +113,7 @@ public class ImageView : View, IDesignable
 
         // Calculate target size in pixels based on viewport and cell resolution
         int targetWidthInPixels = boundsRect.Width * pixelsPerCellX;
-        int targetHeightInPixels = SixelEncoder.GetHeightInPixels (boundsRect.Height, pixelsPerCellY);
+        int targetHeightInPixels = SixelEncoder?.GetHeightInPixels (boundsRect.Height, pixelsPerCellY) ?? boundsRect.Height * pixelsPerCellY;
 
         return new Rectangle (boundsRect.X * pixelsPerCellX, boundsRect.Y * pixelsPerCellY, targetWidthInPixels, targetHeightInPixels);
     }
