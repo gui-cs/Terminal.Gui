@@ -38,12 +38,22 @@
 	<ItemGroup>
 		<ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
 		<ProjectReference Include="..\AppTestHelpers\AppTestHelpers.csproj" />
+		<ProjectReference Include="..\TestAssets\ConfigPropertyTypeLoad\ConsumerLib\ConsumerLib.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\TestAssets\ConfigPropertyTypeLoad\AttrProviderMissing\AttrProviderMissing.csproj" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="xunit.runner.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
+	<Target Name="CopyConfigPropertyTypeLoadFixtures" AfterTargets="Build">
+		<PropertyGroup>
+			<ConfigPropertyTypeLoadFixtureRoot>$(TargetDir)ConfigPropertyTypeLoadFixtures\</ConfigPropertyTypeLoadFixtureRoot>
+		</PropertyGroup>
+		<MakeDir Directories="$(ConfigPropertyTypeLoadFixtureRoot)" />
+		<Copy SourceFiles="..\TestAssets\ConfigPropertyTypeLoad\ConsumerLib\bin\$(Configuration)\netstandard2.0\ConsumerLib.dll" DestinationFolder="$(ConfigPropertyTypeLoadFixtureRoot)" />
+		<Copy SourceFiles="..\TestAssets\ConfigPropertyTypeLoad\AttrProviderMissing\bin\$(Configuration)\netstandard2.0\FakeCodeAnalysis.dll" DestinationFolder="$(ConfigPropertyTypeLoadFixtureRoot)" />
+	</Target>
 	<ItemGroup>
 		<Using Include="System.Drawing" />
 		<Using Include="Terminal.Gui" />
