@@ -51,7 +51,6 @@ public class Images : Scenario
     private OptionSelector _osPaletteBuilder;
     private OptionSelector _osDistanceAlgorithm;
     private NumericUpDown _popularityThreshold;
-    private SixelToRender _sixelImage;
 
     // Start by assuming no support — updated from driver-level detection
     private SixelSupportResult _sixelSupportResult = new ();
@@ -179,15 +178,7 @@ public class Images : Scenario
             SixelToRender sixelToRender = null;
             _app.Driver?.GetOutput ().GetSixels ().TryDequeue (out sixelToRender);
 
-            if (sixelToRender is { Id: "sixelImage" })
-            {
-                _app.Driver?.GetOutput ().GetSixels ().Enqueue (_sixelImage);
 
-                if (_app.Driver?.GetOutput ().GetSixels ().Count > 1)
-                {
-                    _app.Driver?.GetOutput ().GetSixels ().TryDequeue (out _);
-                }
-            }
 
             GenerateSixelFire (false);
 
@@ -527,28 +518,7 @@ public class Images : Scenario
 
         _sixelImageSize = e.OldContentSize;
 
-        if (_sixelImage is { })
-        {
-            SixelToRender sixelToRender = null;
-            _app.Driver?.GetOutput ().GetSixels ().TryDequeue (out sixelToRender);
 
-            if (sixelToRender is { Id: "fireSixel" })
-            {
-                _app.Driver?.GetOutput ().GetSixels ().Enqueue (_fireSixel);
-
-                if (_app.Driver?.GetOutput ().GetSixels ().Count > 1)
-                {
-                    _app.Driver?.GetOutput ().GetSixels ().TryDequeue (out _);
-                }
-            }
-
-            GenerateSixelImage (false);
-
-            if (!string.IsNullOrEmpty (_sixelImage.SixelData))
-            {
-                _app.Driver?.GetOutput ().GetSixels ().Enqueue (_sixelImage);
-            }
-        }
     }
 
     private IPaletteBuilder GetPaletteBuilder ()
