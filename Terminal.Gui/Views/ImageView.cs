@@ -124,15 +124,15 @@ public class ImageView : View, IDesignable
     /// <remarks>
     ///     <para>
     ///         This method calculates the largest possible size for the given image that will fit
-    ///         within the current <see cref="Viewport"/> while maintaining its aspect ratio.
+    ///         within the current <see cref="View.Viewport"/> while maintaining its aspect ratio.
     ///     </para>
     ///     <para>
-    ///         The calculation is based on the terminal's cell resolution and the <see cref="Viewport"/>
+    ///         The calculation is based on the terminal's cell resolution and the <see cref="View.Viewport"/>
     ///         size, returning the exact pixel dimensions and position required for the scaled image.
     ///     </para>
     /// </remarks>
     /// <param name="imageSize">The original size of the image to scale.</param>
-    /// <returns>The scaled size of the image that fits within the <see cref="Viewport"/>.</returns>
+    /// <returns>The scaled size of the image that fits within the <see cref="View.Viewport"/>.</returns>
     public Size FitImageInViewportInPixels (Size imageSize)
     {
         Rectangle viewportInPixels = ViewportToScreenInPixels ();
