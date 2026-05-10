@@ -563,7 +563,8 @@ public class Images : Scenario
         encoder.Quantizer.DistanceAlgorithm = GetDistanceAlgorithm ();
         _sixelView.SixelEncoder = encoder;
 
-        _sixelView.Image = ConvertToColorArray (_fullResImage);
+        Size targetSize = _sixelView.FitImageInViewportInPixels (new Size (_fullResImage.Width, _fullResImage.Height));
+        _sixelView.Image = ConvertToColorArray (_fullResImage.Clone (i => i.Resize (targetSize.Width, targetSize.Height)));
 
         if (openDialog)
         {

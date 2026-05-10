@@ -87,6 +87,72 @@ public class ImageView : View, IDesignable
     /// </summary>
     public bool IsUsingSixel => UseSixel && App?.Driver?.SixelSupport is { IsSupported: true };
 
+    /// <summary>
+    ///     Converts the Viewport to screen coordinates in pixels.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method accounts for the terminal's cell resolution and the viewport's
+    ///         size, returning the exact pixel dimensions and position required for
+    ///         fully cover the viewport.
+    ///     </para>
+    /// </remarks>
+    /// <returns>The screen coordinates of the Viewport in pixels.</returns>
+    public Rectangle ViewportToScreenInPixels ()
+    {
+        SixelSupportResult? support = App?.Driver?.SixelSupport;
+
+        if (support is null)
+        {
+            throw new InvalidOperationException (@"No sixel support available.");
+        }
+
+        int pixelsPerCellX = support.Resolution.Width;
+        int pixelsPerCellY = support.Resolution.Height;
+        Rectangle boundsRect = ViewportToScreen ();
+
+        // Calculate target size in pixels based on viewport and cell resolution
+        int targetWidthInPixels = boundsRect.Width * pixelsPerCellX;
+        int targetHeightInPixels = SixelEncoder.GetHeightInPixels (boundsRect.Height, pixelsPerCellY);
+
+        return new Rectangle (boundsRect.X * pixelsPerCellX, boundsRect.Y * pixelsPerCellY, targetWidthInPixels, targetHeightInPixels);
+    }
+
+    /// <summary>
+    ///     Scales an image to fit within the current Viewport while maintaining aspect ratio.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method calculates the largest possible size for the given image that will fit
+    ///         within the current <see cref="Viewport"/> while maintaining its aspect ratio.
+    ///     </para>
+    ///     <para>
+    ///         The calculation is based on the terminal's cell resolution and the <see cref="Viewport"/>
+    ///         size, returning the exact pixel dimensions and position required for the scaled image.
+    ///     </para>
+    /// </remarks>
+    /// <param name="imageSize">The original size of the image to scale.</param>
+    /// <returns>The scaled size of the image that fits within the <see cref="Viewport"/>.</returns>
+    public Size FitImageInViewportInPixels (Size imageSize)
+    {
+        Rectangle viewportInPixels = ViewportToScreenInPixels ();
+
+        if (imageSize.Width == 0 || imageSize.Height == 0)
+        {
+            return Size.Empty;
+        }
+
+        // Calculate aspect-ratio-preserving size
+        double widthScale = (double)viewportInPixels.Width / imageSize.Width;
+        double heightScale = (double)viewportInPixels.Height / imageSize.Height;
+        double scale = Math.Min (widthScale, heightScale);
+
+        int newWidth = Math.Max (1, (int)(imageSize.Width * scale));
+        int newHeight = Math.Max (1, (int)(imageSize.Height * scale));
+
+        return new Size (newWidth, newHeight);
+    }
+
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
@@ -106,7 +172,7 @@ public class ImageView : View, IDesignable
             DrawCellBased ();
         }
 
-        context?.AddDrawnRectangle (GetRenderableArea ());
+        context?.AddDrawnRectangle (ViewportToScreen ());
 
         return true;
     }
@@ -188,16 +254,6 @@ public class ImageView : View, IDesignable
         }
     }
 
-    private Rectangle GetRenderableArea ()
-    {
-        Rectangle frame = FrameToScreen ();
-        return new (
-          frame.X + (Margin?.Thickness.Left ?? 0) + (Border?.Thickness.Left ?? 0),
-          frame.Y + (Margin?.Thickness.Top ?? 0) + (Border?.Thickness.Top ?? 0),
-          frame.Width - (Margin?.Thickness.Horizontal ?? 0) - (Border?.Thickness.Horizontal ?? 0),
-          frame.Height - (Margin?.Thickness.Vertical ?? 0) - (Border?.Thickness.Vertical ?? 0));
-    }
-
     private void UpdateSixelData ()
     {
         SixelSupportResult? support = App?.Driver?.SixelSupport;
@@ -208,22 +264,16 @@ public class ImageView : View, IDesignable
         }
 
         // Use caller-provided encoder or create a default one
-        if (SixelEncoder == null)
+        if (SixelEncoder is null)
         {
-            SixelEncoder = new SixelEncoder { AvoidBottomScroll = true };
+            SixelEncoder = new SixelEncoder ();
             SixelEncoder.Quantizer.MaxColors = Math.Min (SixelEncoder.Quantizer.MaxColors, support.MaxPaletteColors);
         }
 
-        int pixelsPerCellX = support.Resolution.Width;
-        int pixelsPerCellY = support.Resolution.Height;
-        Rectangle boundsRect = GetRenderableArea ();
-
-        // Calculate target size in pixels based on viewport and cell resolution
-        int targetWidthInPixels = boundsRect.Width * pixelsPerCellX;
-        int targetHeightInPixels = SixelEncoder.GetHeightInPixels (boundsRect.Height, pixelsPerCellY);
+        Rectangle targetRect = ViewportToScreenInPixels ();
 
         // Scale the image to the target pixel size while maintaining aspect ratio
-        Color [,]? scaled = GetScaledImage (targetWidthInPixels, targetHeightInPixels);
+        Color [,]? scaled = GetScaledImage (targetRect.Width, targetRect.Height);
 
         if (scaled is null)
         {
@@ -264,37 +314,20 @@ public class ImageView : View, IDesignable
         int newWidth = Math.Max (1, (int)(srcWidth * scale));
         int newHeight = Math.Max (1, (int)(srcHeight * scale));
 
-        // Check if cached scaled image is still valid
-        if (_scaledImage is { }
-            && _scaledImage.GetLength (0) == newWidth
-            && _scaledImage.GetLength (1) == newHeight)
+        // We can start with the input image, maybe it's the correct size already
+        if (_scaledImage is null)
         {
-            return _scaledImage;
+            _scaledImage = _image;
         }
 
         // Nearest-neighbor scale
         if (_scaledImage is null || _scaledImage.GetLength (0) != newWidth || _scaledImage.GetLength (1) != newHeight)
         {
             _scaledImage = new Color [newWidth, newHeight];
+            ScaleNearestNeighbor (_image, _scaledImage);
         }
 
-        ScaleNearestNeighbor (_image, _scaledImage);
-
         return _scaledImage;
-    }
-
-    /// <summary>
-    ///     Scales a <c>Color[,]</c> pixel array using nearest-neighbor interpolation.
-    /// </summary>
-    /// <param name="source">The source pixel array indexed as [x, y].</param>
-    /// <param name="newWidth">The desired output width.</param>
-    /// <param name="newHeight">The desired output height.</param>
-    /// <returns>A new <c>Color[,]</c> array of the specified dimensions.</returns>
-    public static Color [,] ScaleNearestNeighbor (Color [,] source, int newWidth, int newHeight)
-    {
-        var result = new Color [newWidth, newHeight];
-        ScaleNearestNeighbor (source, result);
-        return result;
     }
 
     /// <summary>

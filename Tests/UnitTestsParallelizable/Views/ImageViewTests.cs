@@ -144,16 +144,17 @@ public class ImageViewTests
     public void ScaleNearestNeighbor_IdentityScale_PreservesPixels ()
     {
         Color [,] source = CreateGradientImage (4, 4);
-        Color [,] result = ImageView.ScaleNearestNeighbor (source, 4, 4);
+        Color [,] destination = new Color [4, 4];
+        ImageView.ScaleNearestNeighbor (source, destination);
 
-        Assert.Equal (4, result.GetLength (0));
-        Assert.Equal (4, result.GetLength (1));
+        Assert.Equal (4, destination.GetLength (0));
+        Assert.Equal (4, destination.GetLength (1));
 
         for (int x = 0; x < 4; x++)
         {
             for (int y = 0; y < 4; y++)
             {
-                Assert.Equal (source [x, y], result [x, y]);
+                Assert.Equal (source [x, y], destination [x, y]);
             }
         }
     }
@@ -162,17 +163,18 @@ public class ImageViewTests
     public void ScaleNearestNeighbor_Upscale_CorrectDimensions ()
     {
         Color [,] source = CreateSolidImage (2, 2, new Color (100, 100, 100));
-        Color [,] result = ImageView.ScaleNearestNeighbor (source, 6, 6);
+        Color [,] destination = new Color [6, 6];
+        ImageView.ScaleNearestNeighbor (source, destination);
 
-        Assert.Equal (6, result.GetLength (0));
-        Assert.Equal (6, result.GetLength (1));
+        Assert.Equal (6, destination.GetLength (0));
+        Assert.Equal (6, destination.GetLength (1));
 
         // All pixels should be the same color since source is solid
         for (int x = 0; x < 6; x++)
         {
             for (int y = 0; y < 6; y++)
             {
-                Assert.Equal (new Color (100, 100, 100), result [x, y]);
+                Assert.Equal (new Color (100, 100, 100), destination [x, y]);
             }
         }
     }
@@ -181,17 +183,18 @@ public class ImageViewTests
     public void ScaleNearestNeighbor_Downscale_CorrectDimensions ()
     {
         Color [,] source = CreateSolidImage (10, 10, new Color (50, 50, 50));
-        Color [,] result = ImageView.ScaleNearestNeighbor (source, 3, 3);
+        Color [,] destination = new Color [3, 3];
+        ImageView.ScaleNearestNeighbor (source, destination);
 
-        Assert.Equal (3, result.GetLength (0));
-        Assert.Equal (3, result.GetLength (1));
+        Assert.Equal (3, destination.GetLength (0));
+        Assert.Equal (3, destination.GetLength (1));
 
         // All pixels should still be solid
         for (int x = 0; x < 3; x++)
         {
             for (int y = 0; y < 3; y++)
             {
-                Assert.Equal (new Color (50, 50, 50), result [x, y]);
+                Assert.Equal (new Color (50, 50, 50), destination [x, y]);
             }
         }
     }
@@ -200,29 +203,31 @@ public class ImageViewTests
     public void ScaleNearestNeighbor_1x1_Target_ProducesOnePixel ()
     {
         Color [,] source = CreateGradientImage (10, 10);
-        Color [,] result = ImageView.ScaleNearestNeighbor (source, 1, 1);
+        Color [,] destination = new Color [1, 1];
+        ImageView.ScaleNearestNeighbor (source, destination);
 
-        Assert.Equal (1, result.GetLength (0));
-        Assert.Equal (1, result.GetLength (1));
+        Assert.Equal (1, destination.GetLength (0));
+        Assert.Equal (1, destination.GetLength (1));
 
         // Should be the top-left pixel (nearest neighbor from 0,0)
-        Assert.Equal (source [0, 0], result [0, 0]);
+        Assert.Equal (source [0, 0], destination [0, 0]);
     }
 
     [Fact]
     public void ScaleNearestNeighbor_NonSquare_ScalesCorrectly ()
     {
         Color [,] source = CreateSolidImage (4, 2, new Color (200, 100, 50));
-        Color [,] result = ImageView.ScaleNearestNeighbor (source, 8, 4);
+        Color [,] destination = new Color [8, 4];
+        ImageView.ScaleNearestNeighbor (source, destination);
 
-        Assert.Equal (8, result.GetLength (0));
-        Assert.Equal (4, result.GetLength (1));
+        Assert.Equal (8, destination.GetLength (0));
+        Assert.Equal (4, destination.GetLength (1));
 
         for (int x = 0; x < 8; x++)
         {
             for (int y = 0; y < 4; y++)
             {
-                Assert.Equal (new Color (200, 100, 50), result [x, y]);
+                Assert.Equal (new Color (200, 100, 50), destination [x, y]);
             }
         }
     }
@@ -404,6 +409,282 @@ public class ImageViewTests
     }
 
     #endregion SixelToRender IsDirty Flag
+
+    #region ViewportToScreenInPixels
+    [Fact]
+    public void ViewportToScreenInPixels_Throws_WhenNoSixelSupport ()
+    {
+        ImageView imageView = new () { Width = 10, Height = 5 };
+        View host = new () { Width = 20, Height = 20 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        // No App/Driver — should throw
+        Assert.Throws<InvalidOperationException> (() => imageView.ViewportToScreenInPixels ());
+
+        host.Dispose ();
+    }
+
+    [Fact]
+    public void ViewportToScreenInPixels_ReturnsCorrectPixelRect ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        // Configure sixel support with 10x20 pixel resolution per cell
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        ImageView imageView = new () { Width = 8, Height = 4, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        // Width: 8 cells * 10 px/cell = 80 px
+        Assert.Equal (80, pixelRect.Width);
+
+        // Height: 4 cells * 20 px/cell = 80 px (via GetHeightInPixels)
+        Assert.Equal (80, pixelRect.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void ViewportToScreenInPixels_AccountsForViewPosition ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        ImageView imageView = new () { X = 3, Y = 2, Width = 5, Height = 3, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        // X: 3 cells * 10 px/cell = 30 px
+        Assert.Equal (30, pixelRect.X);
+
+        // Y: 2 cells * 20 px/cell = 40 px
+        Assert.Equal (40, pixelRect.Y);
+
+        // Width: 5 cells * 10 px/cell = 50 px
+        Assert.Equal (50, pixelRect.Width);
+
+        // Height: 3 cells * 20 px/cell = 60 px
+        Assert.Equal (60, pixelRect.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void ViewportToScreenInPixels_DifferentResolution ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        // Use a non-default resolution (8x16)
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (8, 16) });
+
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        // Width: 10 cells * 8 px/cell = 80 px
+        Assert.Equal (80, pixelRect.Width);
+
+        // Height: 5 cells * 16 px/cell = 80 px
+        Assert.Equal (80, pixelRect.Height);
+
+        runnable.Dispose ();
+    }
+
+    #endregion ViewportToScreenInPixels
+
+    #region FitImageInViewportInPixels
+
+    [Fact]
+    public void FitImageInViewportInPixels_ZeroSizeImage_ReturnsEmpty ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Size result = imageView.FitImageInViewportInPixels (new Size (0, 0));
+        Assert.Equal (Size.Empty, result);
+
+        result = imageView.FitImageInViewportInPixels (new Size (100, 0));
+        Assert.Equal (Size.Empty, result);
+
+        result = imageView.FitImageInViewportInPixels (new Size (0, 100));
+        Assert.Equal (Size.Empty, result);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportInPixels_ImageFitsExactly ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Viewport: 10 cells * 10 px = 100 px wide, 5 cells * 20 px = 100 px tall
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Image is exactly the viewport pixel size
+        Size result = imageView.FitImageInViewportInPixels (new Size (100, 100));
+
+        Assert.Equal (100, result.Width);
+        Assert.Equal (100, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportInPixels_WideImage_ScalesToFitWidth ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Viewport: 10 cells * 10 px = 100 px wide, 5 cells * 20 px = 100 px tall
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Image is 200x100 (2:1 aspect) — width-constrained
+        // Scale = min(100/200, 100/100) = min(0.5, 1.0) = 0.5
+        // Result: 200*0.5 = 100 wide, 100*0.5 = 50 tall
+        Size result = imageView.FitImageInViewportInPixels (new Size (200, 100));
+
+        Assert.Equal (100, result.Width);
+        Assert.Equal (50, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportInPixels_TallImage_ScalesToFitHeight ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Viewport: 10 cells * 10 px = 100 px wide, 5 cells * 20 px = 100 px tall
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Image is 100x200 (1:2 aspect) — height-constrained
+        // Scale = min(100/100, 100/200) = min(1.0, 0.5) = 0.5
+        // Result: 100*0.5 = 50 wide, 200*0.5 = 100 tall
+        Size result = imageView.FitImageInViewportInPixels (new Size (100, 200));
+
+        Assert.Equal (50, result.Width);
+        Assert.Equal (100, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportInPixels_SmallImage_ScalesUp ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Viewport: 10 cells * 10 px = 100 px wide, 5 cells * 20 px = 100 px tall
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Image is 10x20 (1:2 aspect) — height-constrained
+        // Scale = min(100/10, 100/20) = min(10, 5) = 5
+        // Result: 10*5 = 50 wide, 20*5 = 100 tall
+        Size result = imageView.FitImageInViewportInPixels (new Size (10, 20));
+
+        Assert.Equal (50, result.Width);
+        Assert.Equal (100, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportInPixels_VerySmallImage_ClampsToMinimumOne ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // 1x1 viewport = 10x20 pixel viewport
+        ImageView imageView = new () { Width = 1, Height = 1, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Even with a 1000x1 image scaled to fit 10x20, width and height should be >= 1
+        Size result = imageView.FitImageInViewportInPixels (new Size (1000, 1));
+
+        Assert.True (result.Width >= 1);
+        Assert.True (result.Height >= 1);
+
+        runnable.Dispose ();
+    }
+
+    #endregion FitImageInViewportInPixels
 
     #region Helper Methods
 
