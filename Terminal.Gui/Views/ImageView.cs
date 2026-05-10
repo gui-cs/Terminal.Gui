@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace Terminal.Gui.Views;
 
@@ -34,7 +34,7 @@ public class ImageView : View, IDesignable
     private string? _cachedSixelData;
 
     // Cell-based rendering cache
-    private readonly ConcurrentDictionary<Color, Attribute> _attributeCache = new ();
+    private readonly Dictionary<Color, Attribute> _attributeCache = new ();
 
     /// <summary>
     ///     Gets or sets the pixel data to display. The array is indexed as [x, y] where
@@ -141,13 +141,11 @@ public class ImageView : View, IDesignable
             {
                 Color pixel = scaled [x, y];
 
-                Attribute attr = _attributeCache.GetOrAdd (
-                                                           pixel,
-                                                           c => new Attribute (
-                                                                              new Color (),
-                                                                              c
-                                                                             )
-                                                          );
+                if (!_attributeCache.TryGetValue (pixel, out Attribute attr))
+                {
+                    attr = new Attribute (new Color (), pixel);
+                    _attributeCache.Add (pixel, attr);
+                }
 
                 SetAttribute (attr);
                 AddRune (x, y, (Rune)' ');
@@ -275,7 +273,12 @@ public class ImageView : View, IDesignable
         }
 
         // Nearest-neighbor scale
-        _scaledImage = ScaleNearestNeighbor (_image, newWidth, newHeight);
+        if (_scaledImage is null || _scaledImage.GetLength (0) != newWidth || _scaledImage.GetLength (1) != newHeight)
+        {
+            _scaledImage = new Color [newWidth, newHeight];
+        }
+
+        ScaleNearestNeighbor (_image, _scaledImage);
 
         return _scaledImage;
     }
@@ -289,22 +292,33 @@ public class ImageView : View, IDesignable
     /// <returns>A new <c>Color[,]</c> array of the specified dimensions.</returns>
     public static Color [,] ScaleNearestNeighbor (Color [,] source, int newWidth, int newHeight)
     {
+        var result = new Color [newWidth, newHeight];
+        ScaleNearestNeighbor (source, result);
+        return result;
+    }
+
+    /// <summary>
+    ///     Scales a <c>Color[,]</c> pixel array into a destination array using nearest-neighbor interpolation.
+    /// </summary>
+    /// <param name="source">The source pixel array indexed as [x, y].</param>
+    /// <param name="destination">The destination pixel array indexed as [x, y].</param>
+    public static void ScaleNearestNeighbor (Color [,] source, Color [,] destination)
+    {
         int srcWidth = source.GetLength (0);
         int srcHeight = source.GetLength (1);
-        Color [,] result = new Color [newWidth, newHeight];
+        int newWidth = destination.GetLength (0);
+        int newHeight = destination.GetLength (1);
 
         for (int y = 0; y < newHeight; y++)
         {
-            int srcY = Math.Min ((int)((double)y / newHeight * srcHeight), srcHeight - 1);
+            int srcY = Math.Min (y * srcHeight / newHeight, srcHeight - 1);
 
             for (int x = 0; x < newWidth; x++)
             {
-                int srcX = Math.Min ((int)((double)x / newWidth * srcWidth), srcWidth - 1);
-                result [x, y] = source [srcX, srcY];
+                int srcX = Math.Min (x * srcWidth / newWidth, srcWidth - 1);
+                destination [x, y] = source [srcX, srcY];
             }
         }
-
-        return result;
     }
 
     /// <inheritdoc/>
