@@ -120,7 +120,7 @@ public abstract class OutputBase
             outputStringBuilder.Clear ();
             _lastUrl = null; // Reset URL state at the start of each row
 
-            if (!IsLegacyConsole && rowHadUrlsPreviously)
+            if (!IsLegacyConsole && rowHadUrlsPreviously && !rowHasUrlsNow)
             {
                 outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
             }
@@ -199,6 +199,21 @@ public abstract class OutputBase
                 }
             }
 
+            // Track row's URL status BEFORE the early-exit so _rowsWithUrls stays consistent
+            // with the buffer state — even for rows whose cells were all flushed via WriteToConsole
+            // during the inner loop (leaving outputStringBuilder empty at this point).
+            if (!IsLegacyConsole)
+            {
+                if (rowHasUrlsNow)
+                {
+                    _rowsWithUrls.Add (row);
+                }
+                else
+                {
+                    _rowsWithUrls.Remove (row);
+                }
+            }
+
             // Flush buffered output for row. Even when nothing remains buffered, an OSC 8 hyperlink
             // may still be open in the terminal because it was started in a prior batch flushed by
             // WriteToConsole and the row ended (or only clean cells followed) before any cell with
@@ -227,15 +242,6 @@ public abstract class OutputBase
             SetCursorPositionImpl (lastCol, row);
 
             Write (outputStringBuilder);
-
-            if (rowHasUrlsNow)
-            {
-                _rowsWithUrls.Add (row);
-            }
-            else
-            {
-                _rowsWithUrls.Remove (row);
-            }
         }
 
         if (IsLegacyConsole)

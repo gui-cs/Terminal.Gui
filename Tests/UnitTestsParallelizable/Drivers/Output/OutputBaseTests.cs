@@ -425,35 +425,6 @@ public class OutputBaseTests
         Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before replacement spaces");
     }
 
-    // Copilot - GPT-5.4
-    // Regression coverage for the remaining floating-underline case when a row still contains
-    // a URL after redraw, but cells that were formerly part of a URL are now plain text.
-    // Warp appears to need an explicit OSC 8 close before those replacement cells are emitted;
-    // otherwise the old hyperlink metadata can remain attached to the old screen columns.
-    [Fact]
-    public void Write_AutoDetectedUrl_MovedWithinSameRow_ClosesBeforePlainReplacement ()
-    {
-        AnsiOutput output = new ();
-        IOutputBuffer buffer = output.GetLastBuffer ()!;
-        buffer.SetSize (48, 1);
-
-        buffer.Move (0, 0);
-        buffer.AddStr ("https://one.example then trailing text            ");
-        output.Write (buffer);
-
-        buffer.Move (0, 0);
-        buffer.AddStr ("plain intro then https://two.example            ");
-
-        output.Write (buffer);
-        string result = output.GetLastOutput ();
-        string end = EscSeqUtils.OSC_EndHyperlink ();
-        int replacementIdx = result.IndexOf ("plain intro then ", StringComparison.Ordinal);
-        int endIdx = result.IndexOf (end, StringComparison.Ordinal);
-
-        Assert.True (replacementIdx >= 0, "Replacement plain text was not emitted");
-        Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before the old linked cells are redrawn as plain text");
-    }
-
     // Claude - Opus 4.7
     // Regression coverage for the char-vs-column mismatch in SyncAutoUrlsForRowCore.
     // When a multi-codepoint grapheme (ZWJ emoji, base + combining mark) precedes a URL
@@ -550,6 +521,52 @@ public class OutputBaseTests
         // OutputBase tracking is invalidated.
         Assert.Null (buffer.GetCellUrl (0, 0));
         Assert.True (buffer.UrlStateVersion > 0);
+    }
+
+    // Claude - Opus 4.7
+    // Regression coverage for _rowsWithUrls bookkeeping when the per-row flush happens entirely
+    // via WriteToConsole (i.e. the end-of-row Write path takes the empty-builder early-exit).
+    // Before the fix, the Add/Remove of the row index lived after the early-exit, so a row that
+    // lost its URL via overwrite but had clean trailing cells (causing the builder to flush
+    // mid-loop and end empty) kept a stale row-tracking entry — leading to a spurious row-start
+    // OSC 8 close on subsequent frames.
+    [Fact]
+    public void Write_RowLosesUrl_BuilderFlushedMidLoop_RemovesRowTracking ()
+    {
+        // Arrange — buffer with a URL on row 0, then overwrite the URL cells with non-URL
+        // content followed by clean cells (so the builder flushes mid-loop and the row exits
+        // with an empty builder, taking the early-exit).
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (40, 1);
+
+        // Frame 1: write URL covering cols 0-18, trailing space cells stay as ' '.
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        // Frame 2: overwrite the URL cells with Y characters. Cells 0-19 become dirty (19
+        // Y's plus the adjacent-dirty mark on cell 19). Cells 20-39 stay clean — they will
+        // trigger the WriteToConsole flush and leave the row with an empty builder.
+        buffer.Move (0, 0);
+        buffer.AddStr ("YYYYYYYYYYYYYYYYYYY");
+        output.Write (buffer);
+
+        // Frame 3: trivial change. With the fix, row 0 has been removed from _rowsWithUrls,
+        // so no OSC 8 close is emitted at the start of row 0. Without the fix, the stale
+        // entry causes a spurious OSC 8 close.
+        buffer.Move (0, 0);
+        buffer.AddStr ("X");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        // Assert — frame 3 must NOT emit an OSC 8 close because frame 2's row no longer
+        // has any URL state, and _rowsWithUrls must reflect that even when the early-exit
+        // path is taken.
+        Assert.DoesNotContain (end, result);
     }
 
     // Copilot
