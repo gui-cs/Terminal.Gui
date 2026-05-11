@@ -1,9 +1,10 @@
+using System.Drawing;
+using System.Text;
 using BenchmarkDotNet.Attributes;
 using Terminal.Gui.App;
 using Terminal.Gui.Drivers;
 using Terminal.Gui.Input;
 using Terminal.Gui.Testing;
-using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
 namespace Terminal.Gui.Benchmarks.Scrolling;
@@ -23,8 +24,8 @@ namespace Terminal.Gui.Benchmarks.Scrolling;
 [BenchmarkCategory ("Scrolling", "TextView")]
 public class TextViewScrollBenchmark
 {
-    private const int ScreenWidth = 80;
-    private const int ScreenHeight = 25;
+    private const int SCREEN_HEIGHT = 25;
+    private const int SCREEN_WIDTH = 80;
 
     private IApplication _app = null!;
     private IInputInjector _injector = null!;
@@ -32,42 +33,16 @@ public class TextViewScrollBenchmark
     private SessionToken? _session;
     private TextView _textView = null!;
 
-    /// <summary>Total number of lines loaded into the <see cref="TextView"/>.</summary>
-    [Params (1_000, 5_000)]
-    public int Lines { get; set; }
-
-    /// <summary>Creates the application, builds the document, and warms up the view.</summary>
-    [GlobalSetup]
-    public void Setup ()
+    /// <summary>Disposes the application after all iterations.</summary>
+    [GlobalCleanup]
+    public void Cleanup ()
     {
-        _app = Application.Create ();
-        _app.Init (DriverRegistry.Names.ANSI);
-        _app.Driver!.SetScreenSize (ScreenWidth, ScreenHeight);
-
-        _runnable = new () { Width = ScreenWidth, Height = ScreenHeight };
-        _session = _app.Begin (_runnable);
-
-        string text = BuildText (Lines);
-        _textView = new ()
+        if (_session is { })
         {
-            X = 0,
-            Y = 0,
-            Width = ScreenWidth,
-            Height = ScreenHeight,
-            Text = text,
-            WordWrap = false,
-            ReadOnly = true
-        };
-        _runnable.Add (_textView);
+            _app.End (_session);
+        }
 
-        // Focus the text view so key bindings resolve to it.
-        _textView.SetFocus ();
-
-        // Cache injector to avoid per-call lookup overhead.
-        _injector = _app.GetInputInjector ();
-
-        // Warm up: prime JIT and layout caches.
-        _app.LayoutAndDraw (true);
+        _app.Dispose ();
     }
 
     /// <summary>
@@ -78,8 +53,23 @@ public class TextViewScrollBenchmark
     public void IterationSetup ()
     {
         // Place caret at bottom-right of the visible viewport so CursorDown scrolls.
-        _textView.InsertionPoint = new (0, ScreenHeight - 1);
+        _textView.InsertionPoint = new Point (0, SCREEN_HEIGHT - 1);
         _textView.SetNeedsDraw ();
+    }
+
+    /// <summary>Total number of lines loaded into the <see cref="TextView"/>.</summary>
+    [Params (1_000, 5_000)]
+    public int Lines { get; set; }
+
+    /// <summary>
+    ///     Injects a single <see cref="Key.PageDown"/> keystroke and redraws.
+    ///     Each iteration rebuilds a full page — measures viewport-sized jump cost.
+    /// </summary>
+    [Benchmark]
+    public void PageDown_OneStep ()
+    {
+        _injector.InjectKey (Key.PageDown);
+        _app.LayoutAndDraw ();
     }
 
     /// <summary>
@@ -104,32 +94,44 @@ public class TextViewScrollBenchmark
         _app.LayoutAndDraw ();
     }
 
-    /// <summary>
-    ///     Injects a single <see cref="Key.PageDown"/> keystroke and redraws.
-    ///     Each iteration rebuilds a full page — measures viewport-sized jump cost.
-    /// </summary>
-    [Benchmark]
-    public void PageDown_OneStep ()
+    /// <summary>Creates the application, builds the document, and warms up the view.</summary>
+    [GlobalSetup]
+    public void Setup ()
     {
-        _injector.InjectKey (Key.PageDown);
-        _app.LayoutAndDraw ();
-    }
+        _app = Application.Create ();
+        _app.Init (DriverRegistry.Names.ANSI);
+        _app.Driver!.SetScreenSize (SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    /// <summary>Disposes the application after all iterations.</summary>
-    [GlobalCleanup]
-    public void Cleanup ()
-    {
-        if (_session is not null)
+        _runnable = new Runnable { Width = SCREEN_WIDTH, Height = SCREEN_HEIGHT };
+        _session = _app.Begin (_runnable);
+
+        string text = BuildText (Lines);
+
+        _textView = new TextView
         {
-            _app.End (_session);
-        }
+            X = 0,
+            Y = 0,
+            Width = SCREEN_WIDTH,
+            Height = SCREEN_HEIGHT,
+            Text = text,
+            WordWrap = false,
+            ReadOnly = true
+        };
+        _runnable.Add (_textView);
 
-        _app.Dispose ();
+        // Focus the text view so key bindings resolve to it.
+        _textView.SetFocus ();
+
+        // Cache injector to avoid per-call lookup overhead.
+        _injector = _app.GetInputInjector ();
+
+        // Warm up: prime JIT and layout caches.
+        _app.LayoutAndDraw (true);
     }
 
     private static string BuildText (int lineCount)
     {
-        System.Text.StringBuilder sb = new (lineCount * 85);
+        StringBuilder sb = new (lineCount * 85);
 
         for (var lineIndex = 0; lineIndex < lineCount; lineIndex++)
         {

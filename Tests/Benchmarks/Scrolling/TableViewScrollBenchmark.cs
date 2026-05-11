@@ -5,7 +5,6 @@ using Terminal.Gui.App;
 using Terminal.Gui.Drivers;
 using Terminal.Gui.Input;
 using Terminal.Gui.Testing;
-using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
 namespace Terminal.Gui.Benchmarks.Scrolling;
@@ -24,9 +23,9 @@ namespace Terminal.Gui.Benchmarks.Scrolling;
 [BenchmarkCategory ("Scrolling", "TableView")]
 public class TableViewScrollBenchmark
 {
-    private const int ColumnCount = 10;
-    private const int ScreenWidth = 120;
-    private const int ScreenHeight = 25;
+    private const int COLUMN_COUNT = 10;
+    private const int SCREEN_HEIGHT = 25;
+    private const int SCREEN_WIDTH = 120;
 
     private IApplication _app = null!;
     private IInputInjector _injector = null!;
@@ -34,39 +33,16 @@ public class TableViewScrollBenchmark
     private SessionToken? _session;
     private TableView _tableView = null!;
 
-    /// <summary>Total number of data rows loaded into the <see cref="TableView"/>.</summary>
-    [Params (100, 1_000)]
-    public int Rows { get; set; }
-
-    /// <summary>Creates the application, builds the data table, and warms up the view.</summary>
-    [GlobalSetup]
-    public void Setup ()
+    /// <summary>Disposes the application after all iterations.</summary>
+    [GlobalCleanup]
+    public void Cleanup ()
     {
-        _app = Application.Create ();
-        _app.Init (DriverRegistry.Names.ANSI);
-        _app.Driver!.SetScreenSize (ScreenWidth, ScreenHeight);
-
-        _runnable = new () { Width = ScreenWidth, Height = ScreenHeight };
-        _session = _app.Begin (_runnable);
-
-        DataTable dt = BuildDataTable (Rows, ColumnCount);
-        _tableView = new (new DataTableSource (dt))
+        if (_session is { })
         {
-            X = 0,
-            Y = 0,
-            Width = ScreenWidth,
-            Height = ScreenHeight
-        };
-        _runnable.Add (_tableView);
+            _app.End (_session);
+        }
 
-        // Focus so key bindings resolve.
-        _tableView.SetFocus ();
-
-        // Cache injector to avoid per-call lookup overhead.
-        _injector = _app.GetInputInjector ();
-
-        // Warm up.
-        _app.LayoutAndDraw (true);
+        _app.Dispose ();
     }
 
     /// <summary>
@@ -77,31 +53,10 @@ public class TableViewScrollBenchmark
     {
         // TableView reserves row 0 for the header; data rows start at display row 1.
         // Place selection at the last visible data row.
-        int visibleDataRows = ScreenHeight - 1; // subtract header row
+        int visibleDataRows = SCREEN_HEIGHT - 1; // subtract header row
         _tableView.RowOffset = 0;
         _tableView.Value = new TableSelection (new Point (0, Math.Min (visibleDataRows - 1, Rows - 1)));
         _tableView.SetNeedsDraw ();
-    }
-
-    /// <summary>
-    ///     Injects a single <see cref="Key.CursorDown"/> keystroke and redraws.
-    ///     With the selection at the viewport boundary this triggers a row scroll.
-    /// </summary>
-    [Benchmark (Baseline = true)]
-    public void ScrollDown_OneStep ()
-    {
-        _injector.InjectKey (Key.CursorDown);
-        _app.LayoutAndDraw ();
-    }
-
-    /// <summary>
-    ///     Injects a single <see cref="Key.CursorUp"/> keystroke and redraws.
-    /// </summary>
-    [Benchmark]
-    public void ScrollUp_OneStep ()
-    {
-        _injector.InjectKey (Key.CursorUp);
-        _app.LayoutAndDraw ();
     }
 
     /// <summary>
@@ -111,6 +66,21 @@ public class TableViewScrollBenchmark
     public void PageDown_OneStep ()
     {
         _injector.InjectKey (Key.PageDown);
+        _app.LayoutAndDraw ();
+    }
+
+    /// <summary>Total number of data rows loaded into the <see cref="TableView"/>.</summary>
+    [Params (100, 1_000)]
+    public int Rows { get; set; }
+
+    /// <summary>
+    ///     Injects a single <see cref="Key.CursorDown"/> keystroke and redraws.
+    ///     With the selection at the viewport boundary this triggers a row scroll.
+    /// </summary>
+    [Benchmark (Baseline = true)]
+    public void ScrollDown_OneStep ()
+    {
+        _injector.InjectKey (Key.CursorDown);
         _app.LayoutAndDraw ();
     }
 
@@ -125,16 +95,39 @@ public class TableViewScrollBenchmark
         _app.LayoutAndDraw ();
     }
 
-    /// <summary>Disposes the application after all iterations.</summary>
-    [GlobalCleanup]
-    public void Cleanup ()
+    /// <summary>
+    ///     Injects a single <see cref="Key.CursorUp"/> keystroke and redraws.
+    /// </summary>
+    [Benchmark]
+    public void ScrollUp_OneStep ()
     {
-        if (_session is not null)
-        {
-            _app.End (_session);
-        }
+        _injector.InjectKey (Key.CursorUp);
+        _app.LayoutAndDraw ();
+    }
 
-        _app.Dispose ();
+    /// <summary>Creates the application, builds the data table, and warms up the view.</summary>
+    [GlobalSetup]
+    public void Setup ()
+    {
+        _app = Application.Create ();
+        _app.Init (DriverRegistry.Names.ANSI);
+        _app.Driver!.SetScreenSize (SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        _runnable = new Runnable { Width = SCREEN_WIDTH, Height = SCREEN_HEIGHT };
+        _session = _app.Begin (_runnable);
+
+        DataTable dt = BuildDataTable (Rows, COLUMN_COUNT);
+        _tableView = new TableView (new DataTableSource (dt)) { X = 0, Y = 0, Width = SCREEN_WIDTH, Height = SCREEN_HEIGHT };
+        _runnable.Add (_tableView);
+
+        // Focus so key bindings resolve.
+        _tableView.SetFocus ();
+
+        // Cache injector to avoid per-call lookup overhead.
+        _injector = _app.GetInputInjector ();
+
+        // Warm up.
+        _app.LayoutAndDraw (true);
     }
 
     private static DataTable BuildDataTable (int rows, int cols)
@@ -148,7 +141,7 @@ public class TableViewScrollBenchmark
 
         for (var rowIndex = 0; rowIndex < rows; rowIndex++)
         {
-            object [] row = new object [cols];
+            var row = new object [cols];
 
             for (var colIndex = 0; colIndex < cols; colIndex++)
             {
