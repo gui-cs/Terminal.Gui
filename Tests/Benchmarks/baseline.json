@@ -1,0 +1,147 @@
+{
+  "_comment": "Baseline benchmark results for the scrolling performance gate.",
+  "_howto": "Re-run 'dotnet run --project Tests/Benchmarks -c Release -- --filter \"*Scroll*\" -j short --exporters json' then update this file.",
+  "_version": "1",
+  "benchmarks": [
+    {
+      "type": "BaselineScrollBenchmark",
+      "method": "ViewportScroll_Down",
+      "params": "ContentHeight=1000",
+      "meanNs": 150000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "BaselineScrollBenchmark",
+      "method": "ViewportScroll_Down",
+      "params": "ContentHeight=10000",
+      "meanNs": 150000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "BaselineScrollBenchmark",
+      "method": "ViewportScroll_Up",
+      "params": "ContentHeight=1000",
+      "meanNs": 150000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "BaselineScrollBenchmark",
+      "method": "ViewportScroll_Up",
+      "params": "ContentHeight=10000",
+      "meanNs": 150000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "BaselineScrollBenchmark",
+      "method": "ViewportScroll_PageDown",
+      "params": "ContentHeight=1000",
+      "meanNs": 150000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "BaselineScrollBenchmark",
+      "method": "ViewportScroll_PageDown",
+      "params": "ContentHeight=10000",
+      "meanNs": 150000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TextViewScrollBenchmark",
+      "method": "ScrollDown_OneStep",
+      "params": "Lines=1000",
+      "meanNs": 500000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TextViewScrollBenchmark",
+      "method": "ScrollDown_OneStep",
+      "params": "Lines=5000",
+      "meanNs": 500000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TextViewScrollBenchmark",
+      "method": "ScrollUp_OneStep",
+      "params": "Lines=1000",
+      "meanNs": 500000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TextViewScrollBenchmark",
+      "method": "ScrollUp_OneStep",
+      "params": "Lines=5000",
+      "meanNs": 500000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TextViewScrollBenchmark",
+      "method": "PageDown_OneStep",
+      "params": "Lines=1000",
+      "meanNs": 500000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TextViewScrollBenchmark",
+      "method": "PageDown_OneStep",
+      "params": "Lines=5000",
+      "meanNs": 500000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ListViewScrollBenchmark",
+      "method": "ScrollDown_OneStep",
+      "params": "Items=1000",
+      "meanNs": 200000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ListViewScrollBenchmark",
+      "method": "ScrollDown_OneStep",
+      "params": "Items=10000",
+      "meanNs": 200000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ListViewScrollBenchmark",
+      "method": "PageDown_OneStep",
+      "params": "Items=1000",
+      "meanNs": 200000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ListViewScrollBenchmark",
+      "method": "PageDown_OneStep",
+      "params": "Items=10000",
+      "meanNs": 200000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TableViewScrollBenchmark",
+      "method": "ScrollDown_OneStep",
+      "params": "Rows=100",
+      "meanNs": 300000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TableViewScrollBenchmark",
+      "method": "ScrollDown_OneStep",
+      "params": "Rows=1000",
+      "meanNs": 300000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TableViewScrollBenchmark",
+      "method": "PageDown_OneStep",
+      "params": "Rows=100",
+      "meanNs": 300000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "TableViewScrollBenchmark",
+      "method": "PageDown_OneStep",
+      "params": "Rows=1000",
+      "meanNs": 300000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    }
+  ]
+}
