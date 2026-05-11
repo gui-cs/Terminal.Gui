@@ -273,10 +273,18 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public SixelSupportResult? SixelSupport { get; private set; }
 
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
+
     /// <summary>
     ///     Sets the terminal's sixel support result (detected during initialization).
     /// </summary>
-    internal void SetSixelSupport (SixelSupportResult result) => SixelSupport = result;
+    internal void SetSixelSupport (SixelSupportResult result)
+    {
+        SixelSupportResult? old = SixelSupport;
+        SixelSupport = result;
+        SixelSupportChanged?.Invoke (this, new ValueChangedEventArgs<SixelSupportResult?> (old, result));
+    }
 
     /// <inheritdoc/>
     public bool SupportsTrueColor => !IsLegacyConsole;

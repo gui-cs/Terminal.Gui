@@ -136,6 +136,11 @@ public interface IDriver : IDisposable
     /// </remarks>
     SixelSupportResult? SixelSupport { get; }
 
+    /// <summary>
+    ///     Raised when <see cref="SixelSupport"/> changes (e.g. after terminal color detection completes).
+    /// </summary>
+    event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
+
     /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
     bool SupportsTrueColor { get; }
 

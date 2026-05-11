@@ -239,7 +239,7 @@ public class ImageViewTests
     [Fact]
     public void CellBasedRendering_DrawsBackgroundColors ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 10, Height = 10 };
@@ -272,7 +272,7 @@ public class ImageViewTests
     [Fact]
     public void CellBasedRendering_WithNullImage_DrawsNothing ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 10, Height = 10 };
@@ -295,7 +295,7 @@ public class ImageViewTests
     [Fact]
     public void CellBasedRendering_ScalesImageToViewport ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 20, Height = 20 };
@@ -430,7 +430,7 @@ public class ImageViewTests
     [Fact]
     public void ViewportToScreenInPixels_ReturnsCorrectPixelRect ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };
@@ -458,7 +458,7 @@ public class ImageViewTests
     [Fact]
     public void ViewportToScreenInPixels_AccountsForViewPosition ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };
@@ -491,7 +491,7 @@ public class ImageViewTests
     [Fact]
     public void ViewportToScreenInPixels_DifferentResolution ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };
@@ -523,7 +523,7 @@ public class ImageViewTests
     [Fact]
     public void FitImageInViewportInPixels_ZeroSizeImage_ReturnsEmpty ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };
@@ -551,7 +551,7 @@ public class ImageViewTests
     [Fact]
     public void FitImageInViewportInPixels_ImageFitsExactly ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };
@@ -577,7 +577,7 @@ public class ImageViewTests
     [Fact]
     public void FitImageInViewportInPixels_WideImage_ScalesToFitWidth ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };
@@ -605,7 +605,7 @@ public class ImageViewTests
     [Fact]
     public void FitImageInViewportInPixels_TallImage_ScalesToFitHeight ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };
@@ -633,7 +633,7 @@ public class ImageViewTests
     [Fact]
     public void FitImageInViewportInPixels_SmallImage_ScalesUp ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };
@@ -661,7 +661,7 @@ public class ImageViewTests
     [Fact]
     public void FitImageInViewportInPixels_VerySmallImage_ClampsToMinimumOne ()
     {
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
         Runnable runnable = new () { Width = 40, Height = 20 };

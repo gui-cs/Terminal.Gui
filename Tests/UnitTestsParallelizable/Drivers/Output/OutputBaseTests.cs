@@ -756,6 +756,53 @@ public class OutputBaseTests
     }
 
     [Fact]
+    public void DriverImpl_SetSixelSupport_RaisesSixelSupportChangedEvent ()
+    {
+        // Arrange
+        using DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 new AnsiOutput (),
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        SixelSupportResult firstResult = new ()
+        {
+            IsSupported = true,
+            MaxPaletteColors = 256,
+            SupportsTransparency = false
+        };
+
+        SixelSupportResult secondResult = new ()
+        {
+            IsSupported = true,
+            MaxPaletteColors = 512,
+            SupportsTransparency = true
+        };
+
+        List<ValueChangedEventArgs<SixelSupportResult?>> raisedArgs = [];
+
+        driver.SixelSupportChanged += (_, e) => raisedArgs.Add (e);
+
+        // Act 1: first call, old value should be null
+        driver.SetSixelSupport (firstResult);
+
+        // Assert 1
+        Assert.Single (raisedArgs);
+        Assert.Null (raisedArgs [0].OldValue);
+        Assert.Same (firstResult, raisedArgs [0].NewValue);
+
+        // Act 2: second call, old value should be firstResult
+        driver.SetSixelSupport (secondResult);
+
+        // Assert 2
+        Assert.Equal (2, raisedArgs.Count);
+        Assert.Same (firstResult, raisedArgs [1].OldValue);
+        Assert.Same (secondResult, raisedArgs [1].NewValue);
+    }
+
+    [Fact]
     public void DriverImpl_SetSixelSupport_StoresResult ()
     {
         // Arrange

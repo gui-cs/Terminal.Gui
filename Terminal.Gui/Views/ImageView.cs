@@ -1,5 +1,5 @@
+using System.Buffers;
 using System.Collections.Generic;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -53,6 +53,7 @@ public class ImageView : View, IDesignable
             _image = value;
             _scaledImage = null;
             _cachedSixelData = null;
+            _attributeCache.Clear ();
             UpdateSixelData ();
             SetNeedsDraw ();
         }
@@ -231,6 +232,11 @@ public class ImageView : View, IDesignable
             return;
         }
 
+        if (_cachedSixelData is null)
+        {
+            UpdateSixelData ();
+        }
+
         // Get screen position for this view's viewport
         Point screenPos = ViewportToScreen ().Location;
 
@@ -256,19 +262,16 @@ public class ImageView : View, IDesignable
 
     private void UpdateSixelData ()
     {
-        SixelSupportResult? support = App?.Driver?.SixelSupport;
-
-        if (support is null)
+        if (!IsUsingSixel || App?.Driver?.SixelSupport is not { } support)
         {
             return;
         }
 
         // Use caller-provided encoder or create a default one
-        if (SixelEncoder is null)
-        {
-            SixelEncoder = new SixelEncoder ();
-            SixelEncoder.Quantizer.MaxColors = Math.Min (SixelEncoder.Quantizer.MaxColors, support.MaxPaletteColors);
-        }
+        SixelEncoder ??= new SixelEncoder ();
+
+        // Clamp MaxColors regardless of whether the encoder was provided
+        SixelEncoder.Quantizer.MaxColors = Math.Min (SixelEncoder.Quantizer.MaxColors, support.MaxPaletteColors);
 
         Rectangle targetRect = ViewportToScreenInPixels ();
 

@@ -293,7 +293,7 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
     }
 
     [Fact]
-    public async Task StartInputTaskAsync_DetectsSixelSupport_WhenTerminalResponds ()
+    public async Task StartInputTaskAsync_InitiatesSixelSupportDetection ()
     {
         // Arrange: inject a response containing "4" (sixel capability) in DAR,
         // followed by a sixel resolution response "[6;20;10t".
@@ -406,4 +406,3 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
         public void Dispose () { }
     }
 }
-

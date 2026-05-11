@@ -1,3 +1,4 @@
+using System.Linq;
 namespace Terminal.Gui.Views;
 
 public partial class Markdown
@@ -19,6 +20,8 @@ public partial class Markdown
         SetAttribute (fillAttr);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
 
+        _visibleSixelIds.Clear ();
+
         int startRow = Viewport.Y;
         int endRow = Math.Min (Viewport.Y + Viewport.Height, _renderedLines.Count);
 
@@ -26,6 +29,15 @@ public partial class Markdown
         {
             int drawRow = contentRow - Viewport.Y;
             DrawRenderedLine (_renderedLines [contentRow], contentRow, drawRow);
+        }
+
+        // Cleanup sixels that are no longer visible
+        var toRemove = _sixelRenderMap.Keys.Where (id => !_visibleSixelIds.Contains (id)).ToList ();
+        foreach (var id in toRemove)
+        {
+            _sixelRenderMap [id].SixelData = null;
+            _sixelRenderMap [id].IsDirty = false;
+            _sixelRenderMap.Remove (id);
         }
 
         // Return false so SubViews (copy buttons) still draw on top
@@ -288,7 +300,7 @@ public partial class Markdown
     private Attribute GetAttributeForSegment (StyledSegment segment) =>
         MarkdownAttributeHelper.GetAttributeForSegment (this, segment, SyntaxHighlighter, UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null);
 
-    private void TryQueueSixel (string imageSource, Point screenPosition)
+    private void TryQueueSixel (string imageSource, Point viewPosition)
     {
         if (!EnableSixelImages || Driver is null)
         {
@@ -300,13 +312,29 @@ public partial class Markdown
             return;
         }
 
-        var queueId = $"{imageSource}:{screenPosition.X}:{screenPosition.Y}";
+        var queueId = $"{imageSource}:{viewPosition.X}:{viewPosition.Y}";
 
-        if (!_queuedSixelIds.Add (queueId))
+        if (!_visibleSixelIds.Add (queueId))
         {
             return;
         }
 
-        Driver.GetSixels ().Enqueue (new SixelToRender { Id = queueId, ScreenPosition = ContentToScreen (screenPosition), SixelData = sixelData, AlwaysRender = true });
+        if (_sixelRenderMap.TryGetValue (queueId, out SixelToRender? render))
+        {
+            render.IsDirty = true;
+
+            return;
+        }
+
+        var newRender = new SixelToRender
+        {
+            Id = queueId,
+            ScreenPosition = ContentToScreen (viewPosition),
+            SixelData = sixelData,
+            AlwaysRender = false,
+            IsDirty = true
+        };
+        _sixelRenderMap [queueId] = newRender;
+        Driver.GetSixels ().Enqueue (newRender);
     }
 }
