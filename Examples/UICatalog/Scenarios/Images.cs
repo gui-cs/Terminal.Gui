@@ -152,6 +152,14 @@ public class Images : Scenario
         _win.Add (_tabSixel);
 
         _win.SubViewsLaidOut += Win_SubViewsLaidOut;
+        _win.Initialized += (_, _) =>
+        {
+            app.Driver?.SixelSupportChanged += (_, args) => UpdateSixelSupportState (args.NewValue);
+            if (app.Driver?.SixelSupport is { } support)
+            {
+                UpdateSixelSupportState (support);
+            }
+        };
         app.Run (_win);
         _win.Dispose ();
     }
@@ -160,13 +168,6 @@ public class Images : Scenario
 
     private void Win_SubViewsLaidOut (object sender, LayoutEventArgs e)
     {
-        // Use driver-level sixel support detection (detected during driver initialization)
-        _app?.Driver?.SixelSupportChanged += (_, args) => UpdateSixelSupportState (args.NewValue);
-        if (_app?.Driver?.SixelSupport is { } support)
-        {
-            UpdateSixelSupportState (support);
-        }
-
         if (_winSize == e.OldContentSize)
         {
             return;
