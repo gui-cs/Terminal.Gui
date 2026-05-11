@@ -3,7 +3,7 @@
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Bracketed Paste", "Logs bracketed-paste payloads delivered by the terminal")]
-[ScenarioCategory ("Input")]
+[ScenarioCategory ("Text and Formatting")]
 public sealed class BracketedPasteDemo : Scenario
 {
     public override void Main ()
@@ -18,13 +18,7 @@ public sealed class BracketedPasteDemo : Scenario
         };
         appWindow.AssignHotKeys = true;
 
-        Label hint = new ()
-        {
-            X = 0,
-            Y = 0,
-            Text = "Paste anything from your system clipboard. Pastes show up as a single delivery if "
-                   + "your terminal supports bracketed-paste mode (most modern terminals do)."
-        };
+        Label hint = CreateHintLabel ();
 
         TextField field = new ()
         {
@@ -40,20 +34,43 @@ public sealed class BracketedPasteDemo : Scenario
             Y = Pos.Bottom (field) + 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Text = "Application.Paste log:\n"
+            Text = "Application.Paste log (only bracketed paste events appear here):\n"
         };
 
-        var counter = 0;
+        int counter = 0;
 
         app.Paste += (_, args) =>
                      {
-                         counter++;
-                         log.Text += $"[{counter}] {args.Text.Length} chars: {Truncate (args.Text)}\n";
-                     };
+                          counter++;
+                          log.Text += $"{FormatPasteLogEntry (counter, args.Text)}\n";
+                      };
 
         appWindow.Add (hint, field, log);
 
         app.Run (appWindow);
+    }
+
+    public static Label CreateHintLabel ()
+    {
+        Label hint = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Auto (DimAutoStyle.Text),
+            Text = "Paste into the TextField below.\n"
+                   + "If Terminal.Gui detects bracketed paste, the paste is logged below as a single bracketed-paste event.\n"
+                   + "If text appears in the field but no new log entry is added, your terminal delivered it as normal input instead."
+        };
+
+        hint.TextFormatter.WordWrap = true;
+
+        return hint;
+    }
+
+    public static string FormatPasteLogEntry (int counter, string text)
+    {
+        return $"[{counter}] Bracketed paste event: {text.Length} chars: {Truncate (text)}";
     }
 
     private static string Truncate (string text)
