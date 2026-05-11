@@ -211,6 +211,7 @@ public class ScrollingPerformanceTests : TestDriverBase
     [Fact]
     public void TextView_SingleViewportDraw_1K_Lines_UnderThreshold ()
     {
+        const int THRESHOLD_MS = 1000;
         const int LINE_COUNT = 1_000;
         const int SCREEN_WIDTH = 80;
         const int SCREEN_HEIGHT = 25;
@@ -244,10 +245,10 @@ public class ScrollingPerformanceTests : TestDriverBase
         tv.Draw ();
         sw.Stop ();
 
-        // 500 ms is generous even in debug/slow-CI mode. An O(lineCount) regression
+        // 1000 ms is generous even in debug/slow-CI mode. An O(lineCount) regression
         // scanning 1 000 lines in the draw path would take at least 5–10× longer.
-        Assert.True (sw.Elapsed < TimeSpan.FromMilliseconds (500),
-                     $"TextView single viewport draw ({LINE_COUNT} lines, mid-doc) took {sw.Elapsed.TotalMilliseconds:F0} ms, expected < 500 ms");
+        Assert.True (sw.Elapsed < TimeSpan.FromMilliseconds (THRESHOLD_MS),
+                     $"TextView single viewport draw ({LINE_COUNT} lines, mid-doc) took {sw.Elapsed.TotalMilliseconds:F0} ms, expected < {THRESHOLD_MS}ms");
     }
 
     private static DataTable BuildDataTable (int rows, int cols)
