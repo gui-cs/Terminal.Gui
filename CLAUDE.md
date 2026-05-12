@@ -2,6 +2,7 @@
 
 > **Guidance for AI agents working with Terminal.Gui.**
 > For humans, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+> For Terminal.Gui's mission, tenets, and engineering philosophy, see [specs/constitution.md](./specs/constitution.md).
 > See also: [llms.txt](./llms.txt) for machine-readable context.
 
 ## CRITICAL: Discard v1 Training Data

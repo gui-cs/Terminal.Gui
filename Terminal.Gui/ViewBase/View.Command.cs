@@ -499,6 +499,16 @@ public partial class View // Command APIs
     ///     <para>
     ///         See <see cref="View.RaiseAccepting"/> for more information.
     ///     </para>
+    ///     <para>
+    ///         <strong>When to use:</strong> Subscribe to <see cref="Accepting"/> only when you need to inspect or cancel the
+    ///         in-flight Accept operation (e.g., set <c>e.Handled = true</c> to prevent the accept). For simple side-effects
+    ///         that don't need to cancel, subscribe to <see cref="Accepted"/> instead — it is lighter-weight and communicates
+    ///         intent more clearly.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Rule of thumb:</strong> If your handler doesn't read or set anything on <see cref="CommandEventArgs"/>
+    ///         (no <c>e.Handled</c>, no inspection of context), use <see cref="Accepted"/>.
+    ///     </para>
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepting;
 
@@ -542,6 +552,19 @@ public partial class View // Command APIs
     ///     </para>
     ///     <para>
     ///         See <see cref="RaiseAccepted"/> for more information.
+    ///     </para>
+    ///     <para>
+    ///         <strong>When to use:</strong> Subscribe to <see cref="Accepted"/> for fire-and-forget side-effects — things that
+    ///         happen <em>after</em> the accept has completed and cannot be cancelled. This is the right choice for the vast
+    ///         majority of button-click–style handlers.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Example:</strong>
+    ///         <code>
+    ///             button.Accepted += (_, _) =&gt; DoTheThing ();   // correct — side-effect only
+    ///             button.Accepting += (_, e) =&gt; { if (!CanProceed ()) e.Handled = true; }; // correct — cancels
+    ///             button.Accepting += (_, _) =&gt; DoTheThing (); // wrong — use Accepted instead
+    ///         </code>
     ///     </para>
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepted;
@@ -843,6 +866,18 @@ public partial class View // Command APIs
     ///     Set CommandEventArgs.Handled to <see langword="true"/> to indicate the event was handled and processing should
     ///     stop.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <strong>When to use:</strong> Subscribe to <see cref="Activating"/> only when you need to inspect or cancel the
+    ///         in-flight Activate operation (e.g., set <c>e.Handled = true</c> to prevent the state change). For simple
+    ///         side-effects that don't need to cancel, subscribe to <see cref="Activated"/> instead — it is lighter-weight and
+    ///         communicates intent more clearly.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Rule of thumb:</strong> If your handler doesn't read or set anything on <see cref="CommandEventArgs"/>
+    ///         (no <c>e.Handled</c>, no inspection of context), use <see cref="Activated"/>.
+    ///     </para>
+    /// </remarks>
     public event EventHandler<CommandEventArgs>? Activating;
 
     /// <summary>
@@ -913,6 +948,16 @@ public partial class View // Command APIs
     ///     Event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the
     ///     View to change state or preparing it for interaction.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="Activating"/>, this event cannot be cancelled. It is raised after the View has activated.
+    ///     </para>
+    ///     <para>
+    ///         <strong>When to use:</strong> Subscribe to <see cref="Activated"/> for fire-and-forget side-effects — things
+    ///         that happen <em>after</em> the activation has completed and cannot be cancelled. This is the right choice for
+    ///         the vast majority of state-change–reaction handlers.
+    ///     </para>
+    /// </remarks>
     public event EventHandler<EventArgs<ICommandContext?>>? Activated;
 
     #endregion Activate

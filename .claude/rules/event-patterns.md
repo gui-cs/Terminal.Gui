@@ -1,5 +1,26 @@
 # Event Patterns
 
+## When to Use `-ing` vs `-ed` Events
+
+Terminal.Gui exposes paired events — `Accepting`/`Accepted`, `Activating`/`Activated`, `ValueChanging`/`ValueChanged`, etc.
+
+**Rule:** Use `-ed` (past-tense) for side-effects. Use `-ing` (present-progressive) only when you need to inspect or cancel the in-flight operation.
+
+```csharp
+// ✅ Correct — fire-and-forget side-effect
+button.Accepted += (_, _) => DoTheThing ();
+
+// ✅ Correct — actually cancels
+button.Accepting += (_, e) => { if (!CanProceed ()) e.Handled = true; };
+
+// ❌ Wrong — handler ignores EventArgs; use Accepted instead
+button.Accepting += (_, _) => DoTheThing ();
+```
+
+If the handler body doesn't reference `e` at all (or ignores `e.Handled`, `e.Cancel`, and the candidate value), it belongs on the `-ed` event.
+
+The `-ing` event runs synchronously in the middle of the dispatch path; subscribing when you don't need to cancel adds unnecessary overhead and misleads readers.
+
 ## Lambda Parameters
 
 **Replace unused parameters with discards `_`:**
