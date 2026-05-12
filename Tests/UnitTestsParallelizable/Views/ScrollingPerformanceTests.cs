@@ -77,6 +77,7 @@ public class ScrollingPerformanceTests : TestDriverBase
     public void ListView_SingleViewportDraw_Mid_100K_Items_UnderThreshold ()
     {
         SkipIfNotLinux ();
+
         const int ITEM_COUNT = 100_000;
         const int SCREEN_WIDTH = 80;
         const int SCREEN_HEIGHT = 30;
@@ -125,6 +126,7 @@ public class ScrollingPerformanceTests : TestDriverBase
     public void TableView_LayoutAndDraw_10K_Rows_UnderThreshold ()
     {
         SkipIfNotLinux ();
+
         const int ROW_COUNT = 10_000;
         const int COL_COUNT = 10;
         const int SCREEN_WIDTH = 120;
@@ -167,6 +169,7 @@ public class ScrollingPerformanceTests : TestDriverBase
     public void TableView_SingleViewportDraw_Mid_10K_Rows_UnderThreshold ()
     {
         SkipIfNotLinux ();
+
         const int ROW_COUNT = 10_000;
         const int COL_COUNT = 10;
         const int SCREEN_WIDTH = 120;
@@ -217,6 +220,7 @@ public class ScrollingPerformanceTests : TestDriverBase
     public void TextView_SingleViewportDraw_1K_Lines_UnderThreshold ()
     {
         SkipIfNotLinux ();
+
         const int THRESHOLD_MS = 1000;
         const int LINE_COUNT = 1_000;
         const int SCREEN_WIDTH = 80;
