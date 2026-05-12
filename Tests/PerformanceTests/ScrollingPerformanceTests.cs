@@ -4,9 +4,8 @@ using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
 using System.Text;
-using UnitTests;
 
-namespace ViewsTests;
+namespace PerformanceTests;
 
 /// <summary>
 ///     Stopwatch-based smoke tests that catch catastrophic rendering regressions.
@@ -17,8 +16,9 @@ namespace ViewsTests;
 /// <remarks>
 ///     Each test measures the cost of a SINGLE viewport draw on a large document so that an
 ///     O(document-size) regression is immediately detectable without needing a full scroll loop.
-///     These are Layer 1 of the two-layer CI performance gate described in the GitHub issue.
-///     Layer 2 (BenchmarkDotNet baseline comparison) lives in the perf-gate CI workflow.
+///     These are Layer 1 of the two-layer CI performance gate.
+///     Layer 2 (BenchmarkDotNet baseline comparison) lives in Tests/Benchmarks/.
+///     This project runs exclusively on Linux via the perf-gate CI workflow.
 /// </remarks>
 [Trait ("Category", "Performance")]
 public class ScrollingPerformanceTests : TestDriverBase
@@ -34,8 +34,6 @@ public class ScrollingPerformanceTests : TestDriverBase
     [Fact]
     public void ListView_LayoutAndDraw_100K_Items_UnderThreshold ()
     {
-        SkipIfNotLinux ();
-
         const int ITEM_COUNT = 100_000;
         const int SCREEN_WIDTH = 80;
         const int SCREEN_HEIGHT = 30;
@@ -76,8 +74,6 @@ public class ScrollingPerformanceTests : TestDriverBase
     [Fact]
     public void ListView_SingleViewportDraw_Mid_100K_Items_UnderThreshold ()
     {
-        SkipIfNotLinux ();
-
         const int ITEM_COUNT = 100_000;
         const int SCREEN_WIDTH = 80;
         const int SCREEN_HEIGHT = 30;
@@ -125,8 +121,6 @@ public class ScrollingPerformanceTests : TestDriverBase
     [Fact]
     public void TableView_LayoutAndDraw_10K_Rows_UnderThreshold ()
     {
-        SkipIfNotLinux ();
-
         const int ROW_COUNT = 10_000;
         const int COL_COUNT = 10;
         const int SCREEN_WIDTH = 120;
@@ -168,8 +162,6 @@ public class ScrollingPerformanceTests : TestDriverBase
     [Fact]
     public void TableView_SingleViewportDraw_Mid_10K_Rows_UnderThreshold ()
     {
-        SkipIfNotLinux ();
-
         const int ROW_COUNT = 10_000;
         const int COL_COUNT = 10;
         const int SCREEN_WIDTH = 120;
@@ -219,8 +211,6 @@ public class ScrollingPerformanceTests : TestDriverBase
     [Fact]
     public void TextView_SingleViewportDraw_1K_Lines_UnderThreshold ()
     {
-        SkipIfNotLinux ();
-
         const int THRESHOLD_MS = 1000;
         const int LINE_COUNT = 1_000;
         const int SCREEN_WIDTH = 80;
@@ -261,6 +251,10 @@ public class ScrollingPerformanceTests : TestDriverBase
                      $"TextView single viewport draw ({LINE_COUNT} lines, mid-doc) took {sw.Elapsed.TotalMilliseconds:F0} ms, expected < {THRESHOLD_MS}ms");
     }
 
+    // ──────────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ──────────────────────────────────────────────────────────────────────────
+
     private static DataTable BuildDataTable (int rows, int cols)
     {
         DataTable dt = new ();
@@ -295,18 +289,6 @@ public class ScrollingPerformanceTests : TestDriverBase
         }
 
         return items;
-    }
-
-    // ──────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ──────────────────────────────────────────────────────────────────────────
-
-    private static void SkipIfNotLinux ()
-    {
-        if (!OperatingSystem.IsLinux ())
-        {
-            Assert.Skip ("Performance smoke tests only run on Linux.");
-        }
     }
 
     private static string BuildTextViewContent (int lineCount)

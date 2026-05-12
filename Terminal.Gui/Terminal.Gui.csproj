@@ -93,6 +93,7 @@
         <InternalsVisibleTo Include="UnitTests.Legacy" />
         <InternalsVisibleTo Include="UnitTests.NonParallelizable" />
         <InternalsVisibleTo Include="UnitTests.Parallelizable" />
+        <InternalsVisibleTo Include="PerformanceTests" />
         <InternalsVisibleTo Include="StressTests" />
         <InternalsVisibleTo Include="IntegrationTests" />
         <InternalsVisibleTo Include="TerminalGuiDesigner" />

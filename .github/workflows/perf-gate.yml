@@ -42,15 +42,14 @@ jobs:
         run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612
 
       - name: Build Tests (Debug — smoke tests run in Debug to match CI unit tests)
-        run: dotnet build Tests/UnitTestsParallelizable --no-restore -property:NoWarn=0618%3B0612
+        run: dotnet build Tests/PerformanceTests --no-restore -property:NoWarn=0618%3B0612
 
       - name: Run performance smoke tests (Layer 1 gate)
         id: smoke_tests
         run: |
           dotnet test \
-            --project Tests/UnitTestsParallelizable \
+            --project Tests/PerformanceTests \
             --no-build \
-            --filter-class "*ScrollingPerformanceTests" \
             --verbosity normal
 
       - name: Upload smoke test logs
