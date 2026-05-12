@@ -1,6 +1,8 @@
 # Contributing to Terminal.Gui
 
 > **📘 This document is the single source of truth for all contributors (humans and AI agents) to Terminal.Gui.**
+>
+> For Terminal.Gui's product mission, design tenets, and engineering philosophy, see **[specs/constitution.md](./specs/constitution.md)**.
 
 Welcome! This guide provides everything you need to know to contribute effectively to Terminal.Gui, including project structure, build instructions, coding conventions, testing requirements, and CI/CD workflows.
 
