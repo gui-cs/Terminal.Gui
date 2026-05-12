@@ -115,7 +115,6 @@ jobs:
           --project Tests/UnitTestsParallelizable \
           --no-build \
           --verbosity normal \
-          --filter-class- "*ScrollingPerformanceTests" \
           --diagnostic --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}
 
         echo "============================================"
