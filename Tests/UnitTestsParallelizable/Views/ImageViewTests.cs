@@ -686,6 +686,234 @@ public class ImageViewTests
 
     #endregion FitImageInViewportInPixels
 
+    #region FitImageInViewportCells
+
+    [Fact]
+    public void FitImageInViewportCells_ZeroSizeImage_ReturnsEmpty ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Size result = imageView.FitImageInViewportCells (new Size (0, 0));
+        Assert.Equal (Size.Empty, result);
+
+        result = imageView.FitImageInViewportCells (new Size (100, 0));
+        Assert.Equal (Size.Empty, result);
+
+        result = imageView.FitImageInViewportCells (new Size (0, 100));
+        Assert.Equal (Size.Empty, result);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_SquareImage_AccountsForCellAspectRatio ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        // Cell resolution 10x20: cell aspect ratio = 20/10 = 2.0
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Viewport: 10 cells wide x 5 cells tall
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // 100x100 pixel image:
+        // After aspect adjustment: imageSize = (100, 100/2.0) = (100, 50)
+        // widthScale = 10/100 = 0.1, heightScale = 5/50 = 0.1
+        // scale = 0.1, result = (100*0.1, 50*0.1) = (10, 5)
+        Size result = imageView.FitImageInViewportCells (new Size (100, 100));
+
+        Assert.Equal (10, result.Width);
+        Assert.Equal (5, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_WideImage_ConstrainedByWidth ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Viewport: 10 cells wide x 10 cells tall
+        ImageView imageView = new () { Width = 10, Height = 10, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // 200x100 pixel image:
+        // After aspect adjustment: imageSize = (200, 100/2.0) = (200, 50)
+        // widthScale = 10/200 = 0.05, heightScale = 10/50 = 0.2
+        // scale = 0.05, result = (200*0.05, 50*0.05) = (10, 2)
+        Size result = imageView.FitImageInViewportCells (new Size (200, 100));
+
+        Assert.Equal (10, result.Width);
+        Assert.Equal (2, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_TallImage_ConstrainedByHeight ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Viewport: 10 cells wide x 5 cells tall
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // 100x400 pixel image:
+        // After aspect adjustment: imageSize = (100, 400/2.0) = (100, 200)
+        // widthScale = 10/100 = 0.1, heightScale = 5/200 = 0.025
+        // scale = 0.025, result = (100*0.025, 200*0.025) = (2, 5)
+        Size result = imageView.FitImageInViewportCells (new Size (100, 400));
+
+        Assert.Equal (2, result.Width);
+        Assert.Equal (5, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_SmallImage_ScalesUp ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Viewport: 20 cells wide x 10 cells tall
+        ImageView imageView = new () { Width = 20, Height = 10, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // 10x20 pixel image:
+        // After aspect adjustment: imageSize = (10, 20/2.0) = (10, 10)
+        // widthScale = 20/10 = 2.0, heightScale = 10/10 = 1.0
+        // scale = 1.0, result = (10*1.0, 10*1.0) = (10, 10)
+        Size result = imageView.FitImageInViewportCells (new Size (10, 20));
+
+        Assert.Equal (10, result.Width);
+        Assert.Equal (10, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_NoDriver_UsesDefaultAspectRatio ()
+    {
+        // Without a driver, the fallback cell aspect ratio is 2.0
+        ImageView imageView = new () { Width = 10, Height = 5 };
+        View host = new () { Width = 20, Height = 20 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        // 100x100 pixel image:
+        // Default aspect ratio = 2.0 → imageSize = (100, 100/2.0) = (100, 50)
+        // widthScale = 10/100 = 0.1, heightScale = 5/50 = 0.1
+        // scale = 0.1, result = (100*0.1, 50*0.1) = (10, 5)
+        Size result = imageView.FitImageInViewportCells (new Size (100, 100));
+
+        Assert.Equal (10, result.Width);
+        Assert.Equal (5, result.Height);
+
+        host.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_DifferentResolution_AdjustsAspectRatio ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        // Cell resolution 8x16: cell aspect ratio = 16/8 = 2.0
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (8, 16) });
+
+        // Viewport: 10 cells wide x 5 cells tall
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // 80x80 pixel image:
+        // After aspect adjustment: imageSize = (80, 80/2.0) = (80, 40)
+        // widthScale = 10/80 = 0.125, heightScale = 5/40 = 0.125
+        // scale = 0.125, result = (80*0.125, 40*0.125) = (10, 5)
+        Size result = imageView.FitImageInViewportCells (new Size (80, 80));
+
+        Assert.Equal (10, result.Width);
+        Assert.Equal (5, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_VerySmallImage_ClampsToMinimumOne ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 40, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // 1x1 viewport = very small cell area
+        ImageView imageView = new () { Width = 1, Height = 1, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Even with a very wide image, result dimensions should be >= 1
+        Size result = imageView.FitImageInViewportCells (new Size (1000, 1));
+
+        Assert.True (result.Width >= 1);
+        Assert.True (result.Height >= 1);
+
+        runnable.Dispose ();
+    }
+
+    #endregion FitImageInViewportCells
+
     #region Helper Methods
 
     /// <summary>Creates a solid-color image of the specified dimensions.</summary>

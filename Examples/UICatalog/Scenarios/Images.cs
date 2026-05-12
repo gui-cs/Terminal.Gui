@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Text;
+﻿using System.Text;
 using ColorHelper;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;

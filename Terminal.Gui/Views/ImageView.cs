@@ -1,5 +1,3 @@
-using System.Buffers;
-using System.Collections.Generic;
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -30,6 +28,7 @@ public class ImageView : View, IDesignable
 {
     private Color [,]? _image;
     private Color [,]? _scaledImage;
+    private Size? _scaledImageCellSize;
     private SixelToRender? _sixelToRender;
     private string? _cachedSixelData;
 
@@ -53,6 +52,7 @@ public class ImageView : View, IDesignable
             _image = value;
             _scaledImage = null;
             _cachedSixelData = null;
+            _scaledImageCellSize = null;
             _attributeCache.Clear ();
             UpdateSixelData ();
             SetNeedsDraw ();
@@ -101,12 +101,7 @@ public class ImageView : View, IDesignable
     /// <returns>The screen coordinates of the Viewport in pixels.</returns>
     public Rectangle ViewportToScreenInPixels ()
     {
-        SixelSupportResult? support = App?.Driver?.SixelSupport;
-
-        if (support is null)
-        {
-            throw new InvalidOperationException (@"No sixel support available.");
-        }
+        SixelSupportResult? support = (App?.Driver?.SixelSupport) ?? throw new InvalidOperationException (@"No sixel support available.");
 
         int pixelsPerCellX = support.Resolution.Width;
         int pixelsPerCellY = support.Resolution.Height;
@@ -117,6 +112,40 @@ public class ImageView : View, IDesignable
         int targetHeightInPixels = SixelEncoder?.GetHeightInPixels (boundsRect.Height, pixelsPerCellY) ?? boundsRect.Height * pixelsPerCellY;
 
         return new Rectangle (boundsRect.X * pixelsPerCellX, boundsRect.Y * pixelsPerCellY, targetWidthInPixels, targetHeightInPixels);
+    }
+
+    /// <summary>
+    ///     Returns the size in cell terms of the given image resized to fit in the viewport.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This method accounts for the terminal's cell resolution and the viewport's
+    ///         size, returning the exact pixel dimensions and position required for
+    ///         fully cover the viewport without changing the images aspect ratio.
+    ///     </para>
+    /// </remarks>
+    /// <param name="imageSizeInPixels">The size of the image in pixels.</param>
+    /// <returns>The largest possible size of the image in cell terms that fits within the viewport.</returns>
+    public Size FitImageInViewportCells (Size imageSizeInPixels)
+    {
+        if (imageSizeInPixels.Width == 0 || imageSizeInPixels.Height == 0)
+        {
+            return Size.Empty;
+        }
+
+        // Account for the terminal cell aspect ratio
+        double cellAspectRatio = App?.Driver?.SixelSupport is { } support ? (double)support.Resolution.Height / support.Resolution.Width : 2.0;
+        Size imageSize = new (imageSizeInPixels.Width, (int)(imageSizeInPixels.Height / cellAspectRatio));
+
+        // Calculate aspect-ratio-preserving size
+        double widthScale = (double)Viewport.Width / imageSize.Width;
+        double heightScale = (double)Viewport.Height / imageSize.Height;
+        double scale = Math.Min (widthScale, heightScale);
+
+        int newWidth = Math.Max (1, (int)(imageSize.Width * scale));
+        int newHeight = Math.Max (1, (int)(imageSize.Height * scale));
+
+        return new Size (newWidth, newHeight);
     }
 
     /// <summary>
@@ -167,13 +196,42 @@ public class ImageView : View, IDesignable
         if (IsUsingSixel)
         {
             DrawSixel ();
+
+            if (_scaledImageCellSize is { } cellSize)
+            {
+                Rectangle viewport = ViewportToScreen ();
+                Rectangle dirtyRect = new (viewport.X, viewport.Y, Math.Min (viewport.Width, cellSize.Width), Math.Min (viewport.Height, cellSize.Height));
+                context?.AddDrawnRectangle (dirtyRect);
+
+                // Mark the content buffer for the area we will draw as not dirty.
+                // This will avoid redrawing the area of the screen that will
+                // eventually be overwritten by the sixel anyway.
+                if (ScreenContents is { } contents && Driver is { } driver)
+                {
+                    for (int y = dirtyRect.Y; y < dirtyRect.Bottom; y++)
+                    {
+                        for (int x = dirtyRect.X; x < dirtyRect.Right; x++)
+                        {
+                            if (x >= 0 && y >= 0 && x < driver.Cols && y < driver.Rows)
+                            {
+                                contents [y, x].IsDirty = false;
+                            }
+                        }
+                    }
+                }
+            }
         }
         else
         {
             DrawCellBased ();
-        }
 
-        context?.AddDrawnRectangle (ViewportToScreen ());
+            if (_scaledImageCellSize is { } cellSize)
+            {
+                Rectangle viewport = ViewportToScreen ();
+                Rectangle dirtyRect = new (viewport.X, viewport.Y, Math.Min (viewport.Width, cellSize.Width), Math.Min (viewport.Height, cellSize.Height));
+                context?.AddDrawnRectangle (dirtyRect);
+            }
+        }
 
         return true;
     }
@@ -192,21 +250,31 @@ public class ImageView : View, IDesignable
     /// </summary>
     private void DrawCellBased ()
     {
-        Color [,]? scaled = GetScaledImage (Viewport.Width, Viewport.Height);
-
-        if (scaled is null)
+        if (_image is null)
         {
             return;
         }
 
-        int drawWidth = Math.Min (Viewport.Width, scaled.GetLength (0));
-        int drawHeight = Math.Min (Viewport.Height, scaled.GetLength (1));
+        if (_scaledImage is null)
+        {
+            _scaledImage = GetScaledImage (_image, Viewport.Width, Viewport.Height);
+
+            if (_scaledImage is null)
+            {
+                return;
+            }
+
+            _scaledImageCellSize = new Size (_scaledImage.GetLength (0), _scaledImage.GetLength (1));
+        }
+
+        int drawWidth = Math.Min (Viewport.Width, _scaledImage.GetLength (0));
+        int drawHeight = Math.Min (Viewport.Height, _scaledImage.GetLength (1));
 
         for (int y = 0; y < drawHeight; y++)
         {
             for (int x = 0; x < drawWidth; x++)
             {
-                Color pixel = scaled [x, y];
+                Color pixel = _scaledImage [x, y];
 
                 if (!_attributeCache.TryGetValue (pixel, out Attribute attr))
                 {
@@ -262,7 +330,7 @@ public class ImageView : View, IDesignable
 
     private void UpdateSixelData ()
     {
-        if (!IsUsingSixel || App?.Driver?.SixelSupport is not { } support)
+        if (!IsUsingSixel || App?.Driver?.SixelSupport is not { } support || _image is null)
         {
             return;
         }
@@ -276,33 +344,35 @@ public class ImageView : View, IDesignable
         Rectangle targetRect = ViewportToScreenInPixels ();
 
         // Scale the image to the target pixel size while maintaining aspect ratio
-        Color [,]? scaled = GetScaledImage (targetRect.Width, targetRect.Height);
+        _scaledImage = GetScaledImage (_image, targetRect.Width, targetRect.Height);
+        _scaledImageCellSize = FitImageInViewportCells (new Size (_image.GetLength (0), _image.GetLength (1)));
 
-        if (scaled is null)
+        if (_scaledImage is null)
         {
             return;
         }
 
         // Encode sixel data
-        _cachedSixelData = SixelEncoder.EncodeSixel (scaled);
+        _cachedSixelData = SixelEncoder.EncodeSixel (_scaledImage);
     }
 
     /// <summary>
     ///     Scales the source image to the specified target dimensions using nearest-neighbor
     ///     interpolation while maintaining aspect ratio.
     /// </summary>
+    /// <param name="image">The source image to scale.</param>
     /// <param name="targetWidth">The target width in the appropriate unit (cells or pixels).</param>
     /// <param name="targetHeight">The target height in the appropriate unit (cells or pixels).</param>
     /// <returns>The scaled image, or <see langword="null"/> if the source image is null or the target size is invalid.</returns>
-    private Color [,]? GetScaledImage (int targetWidth, int targetHeight)
+    private static Color [,]? GetScaledImage (Color [,] image, int targetWidth, int targetHeight)
     {
-        if (_image is null || targetWidth <= 0 || targetHeight <= 0)
+        if (image is null || targetWidth <= 0 || targetHeight <= 0)
         {
             return null;
         }
 
-        int srcWidth = _image.GetLength (0);
-        int srcHeight = _image.GetLength (1);
+        int srcWidth = image.GetLength (0);
+        int srcHeight = image.GetLength (1);
 
         if (srcWidth == 0 || srcHeight == 0)
         {
@@ -318,19 +388,16 @@ public class ImageView : View, IDesignable
         int newHeight = Math.Max (1, (int)(srcHeight * scale));
 
         // We can start with the input image, maybe it's the correct size already
-        if (_scaledImage is null)
-        {
-            _scaledImage = _image;
-        }
+        Color [,] scaledImage = image;
 
         // Nearest-neighbor scale
-        if (_scaledImage is null || _scaledImage.GetLength (0) != newWidth || _scaledImage.GetLength (1) != newHeight)
+        if (scaledImage.GetLength (0) != newWidth || scaledImage.GetLength (1) != newHeight)
         {
-            _scaledImage = new Color [newWidth, newHeight];
-            ScaleNearestNeighbor (_image, _scaledImage);
+            scaledImage = new Color [newWidth, newHeight];
+            ScaleNearestNeighbor (image, scaledImage);
         }
 
-        return _scaledImage;
+        return scaledImage;
     }
 
     /// <summary>
