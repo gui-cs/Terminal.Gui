@@ -1093,9 +1093,12 @@ public class MenuBarTests : TestsAllDrivers
                     {
                         menuOpen = menuBar!.IsOpen ();
 
-                        if (a.Popovers!.GetActivePopover () is View popover)
+                        if (a.Popovers!.GetActivePopover () is PopoverMenu popoverMenu)
                         {
-                            popoverScreen = popover.FrameToScreen ();
+                            // Use the actual Menu content view's frame (not the full-screen
+                            // transparent wrapper) so the overlap is the region where the
+                            // menu popup genuinely draws its content.
+                            popoverScreen = popoverMenu.ContentView?.FrameToScreen () ?? Rectangle.Empty;
                         }
 
                         padScreen = subView!.Padding.GetOrCreateView ().FrameToScreen ();
