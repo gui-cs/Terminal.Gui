@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Globalization;
+using System.Text;
 using AppTestHelpers;
 using AppTestHelpers.XunitHelpers;
 
@@ -1016,5 +1017,126 @@ public class MenuBarTests : TestsAllDrivers
         Assert.Equal (1, actionFiredCount);
 
         c.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    /// <summary>
+    ///     Reproduces a bug where, when a peer view of a <see cref="MenuBar"/> has a <see cref="Padding"/>
+    ///     adornment whose <see cref="PaddingView"/> draws via <see cref="View.DrawingContent"/>, opening
+    ///     a <see cref="PopoverMenu"/> that overlaps the padding region leaves the padding's drawing
+    ///     visible — the popover's content fails to overdraw those cells.
+    /// </summary>
+    [Fact]
+    public void PopoverMenu_Overlapping_PaddingView_DrawingContent_Is_Not_Bled_Through ()
+    {
+        var d = "ansi";
+        MenuBar? menuBar = null;
+        View? subView = null;
+        IApplication? app = null;
+
+        AppTestHelper c = With.A<Window> (80, 25, d, _out)
+                              .Then (a =>
+                                     {
+                                         app = a;
+
+                                         menuBar = new MenuBar
+                                         {
+                                             Menus =
+                                             [
+                                                 new MenuBarItem ("_File",
+                                                                  [
+                                                                      new MenuItem { Title = "_New", HelpText = "Create new" }
+                                                                  ])
+                                             ]
+                                         };
+
+                                         subView = new ()
+                                         {
+                                             Id = "subView",
+                                             X = 0,
+                                             Y = 1,
+                                             Width = Dim.Fill (),
+                                             Height = 10
+                                         };
+
+                                         subView.Padding.Thickness = new (1, 0, 0, 0);
+
+                                         a.TopRunnableView!.Add (menuBar);
+                                         a.TopRunnableView!.Add (subView);
+
+                                         AdornmentView paddingView = subView.Padding.GetOrCreateView ();
+
+                                         paddingView.DrawingContent += (sender, _) =>
+                                                                       {
+                                                                           View pv = (View)sender!;
+
+                                                                           for (int row = 0; row < pv.Viewport.Height; row++)
+                                                                           {
+                                                                               pv.AddRune (0, row, new Rune ('P'));
+                                                                           }
+                                                                       };
+                                     });
+
+        c = c.WaitIteration ();
+
+        // Open the File menu via F10.
+        c = c.KeyDown (MenuBar.DefaultKey)
+             .WaitIteration ();
+
+        // Capture state on the UI thread, but defer assertions to avoid hanging the app loop.
+        Rectangle popoverScreen = Rectangle.Empty;
+        Rectangle padScreen = Rectangle.Empty;
+        Cell [,]? capturedContents = null;
+        var menuOpen = false;
+
+        c = c.Then (a =>
+                    {
+                        menuOpen = menuBar!.IsOpen ();
+
+                        if (a.Popovers!.GetActivePopover () is View popover)
+                        {
+                            popoverScreen = popover.FrameToScreen ();
+                        }
+
+                        padScreen = subView!.Padding.GetOrCreateView ().FrameToScreen ();
+
+                        // Snapshot the driver contents so we can inspect after Dispose.
+                        Cell [,]? contents = a.Driver!.Contents;
+
+                        if (contents is { })
+                        {
+                            int rows = contents.GetLength (0);
+                            int cols = contents.GetLength (1);
+                            capturedContents = new Cell [rows, cols];
+
+                            for (int r = 0; r < rows; r++)
+                            {
+                                for (int co = 0; co < cols; co++)
+                                {
+                                    capturedContents [r, co] = contents [r, co];
+                                }
+                            }
+                        }
+                    });
+
+        c.Dispose ();
+
+        Assert.True (menuOpen, "File menu should be open after F10.");
+        Assert.NotNull (capturedContents);
+        Assert.False (popoverScreen.IsEmpty, "Active popover should be present.");
+
+        Rectangle overlap = Rectangle.Intersect (popoverScreen, padScreen);
+
+        Assert.False (overlap.IsEmpty,
+                      $"Test setup invalid: popover {popoverScreen} does not overlap padding {padScreen}.");
+
+        // Inside the overlap, the popover must overdraw the padding — no 'P' should remain.
+        for (int row = overlap.Top; row < overlap.Bottom; row++)
+        {
+            for (int col = overlap.Left; col < overlap.Right; col++)
+            {
+                Assert.NotEqual ("P", capturedContents! [row, col].Grapheme);
+            }
+        }
     }
 }
