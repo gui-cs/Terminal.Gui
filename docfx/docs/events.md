@@ -42,6 +42,37 @@ Use this decision tree to choose the right pattern:
 | Simple notification (no cancel) | `EventHandler` | [Recipe 3](#recipe-3-simple-notification) |
 | Property notification (MVVM) | `INotifyPropertyChanged` | [Recipe 4](#recipe-4-mvvm-property-notification) |
 
+## When to Use `-ing` vs `-ed` Events
+
+Terminal.Gui exposes paired events on many surfaces — `Accepting`/`Accepted`, `Activating`/`Activated`, `ValueChanging`/`ValueChanged`, etc. Use this rule to choose:
+
+> **Use `-ed` (past-tense) events for side-effects. Use `-ing` (present-progressive) events only when you actually need to inspect or cancel the in-flight operation.**
+
+If your handler doesn't read or set anything on the `EventArgs` (no `e.Handled`, no `e.Cancel`, no inspection of the candidate value), you want the `-ed` event. The `-ing` event runs synchronously in the middle of the dispatch path and is heavier for both the framework and the reader of your code.
+
+### Concrete Examples
+
+```csharp
+// ✅ Correct — fire-and-forget side-effect belongs on the -ed event
+button.Accepted += (_, _) => DoTheThing ();
+
+// ✅ Correct — actually needs to cancel, so -ing is right
+button.Accepting += (_, e) => { if (!CanProceed ()) e.Handled = true; };
+
+// ❌ Wrong — handler ignores EventArgs; should use Accepted
+button.Accepting += (_, _) => DoTheThing ();
+```
+
+The same rule applies to every other paired event in the framework:
+
+| Use `-ed` (side-effect) | Use `-ing` (inspect / cancel) |
+|-------------------------|-------------------------------|
+| `Accepted` | `Accepting` |
+| `Activated` | `Activating` |
+| `ValueChanged` | `ValueChanging` |
+| `TextChanged` | `TextChanging` |
+| `TitleChanged` | `TitleChanging` |
+
 ## See Also
 
 * [Cancellable Work Pattern](cancellable-work-pattern.md) - Conceptual overview
