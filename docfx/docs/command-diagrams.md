@@ -130,3 +130,39 @@ flowchart TD
 - <xref:Terminal.Gui.Views.MenuBarItem> holds a <xref:Terminal.Gui.Views.PopoverMenu> (not a `SubMenu`). <xref:Terminal.Gui.Views.MenuItem> holds a `SubMenu` (a nested <xref:Terminal.Gui.Views.Menu>).
 - <xref:Terminal.Gui.Input.CommandBridge> connects non-containment boundaries (e.g., <xref:Terminal.Gui.Views.PopoverMenu> ↔ <xref:Terminal.Gui.Views.MenuBarItem>) so <xref:Terminal.Gui.ViewBase.View.Accepted>/<xref:Terminal.Gui.ViewBase.View.Activated> from the remote view re-enters the owner's full command pipeline with `Routing = Bridged`.
 - <xref:Terminal.Gui.Views.MenuBar> uses consume dispatch (<xref:Terminal.Gui.ViewBase.View.ConsumeDispatch> = true, <xref:Terminal.Gui.ViewBase.View.GetDispatchTarget*> → `Focused`) — inner activations are consumed and do not propagate to <xref:Terminal.Gui.Views.MenuBar>'s SuperView.
+
+### Level 4: Mouse Event Forwarding via CommandNotBound Bubbling
+
+This diagram shows how a child view can forward mouse-wheel events to an ancestor via the `CommandNotBound` → `TryBubbleUp` mechanism. The child adds a `MouseBinding` without an `AddCommand` handler, causing the command to bubble.
+
+```mermaid
+flowchart TD
+    input["Mouse wheel on Gutter (in Editor.Padding)"] --> mb["MouseBindings maps<br/>WheeledUp → Command.ScrollUp"]
+    mb --> invoke["Gutter.InvokeCommand(ScrollUp)"]
+    invoke --> lookup{"AddCommand handler<br/>exists for ScrollUp?"}
+
+    lookup --> |"no"| notbound["DefaultCommandNotBoundHandler"]
+    notbound --> raise["RaiseCommandNotBound:<br/> OnCommandNotBound (virtual)<br/> → CommandNotBound event"]
+    raise --> |"not handled"| bubble["TryBubbleUp"]
+
+    bubble --> check_sv{"SuperView is<br/>AdornmentView?"}
+    check_sv --> |"yes (Gutter in Padding)"| adorn_check{"Adornment.Parent<br/>.CommandsToBubbleUp<br/>contains ScrollUp?"}
+    adorn_check --> |"yes"| parent_invoke["Editor.InvokeCommand(ScrollUp)<br/>(Routing = BubblingUp)"]
+    parent_invoke --> editor_handler["Editor.ScrollVertical(-1)<br/>→ returns true"]
+
+    check_sv --> |"no (normal SubView)"| sv_check{"SuperView<br/>.CommandsToBubbleUp<br/>contains ScrollUp?"}
+    sv_check --> |"yes"| sv_invoke["SuperView.InvokeCommand(ScrollUp)<br/>(Routing = BubblingUp)"]
+    sv_check --> |"no"| willbubble{"CommandWillBubbleToAncestor?"}
+    willbubble --> |"yes"| ret_handled["return true (consumed)"]
+    willbubble --> |"no"| ret_null["return null (unhandled)"]
+
+    adorn_check --> |"no"| willbubble
+    raise --> |"handled (args.Handled = true)"| ret_true["return true (stop)"]
+    lookup --> |"yes"| exec["Execute handler directly"]
+```
+
+**Key Points:**
+- Adding a `MouseBinding` without a corresponding `AddCommand` handler is **intentional and idiomatic** — it declares that the command should bubble to an ancestor.
+- For views inside an <xref:Terminal.Gui.ViewBase.Adornment.AdornmentView> (Padding, Border, Margin), the bubble target is `Adornment.Parent` (the owning View), not `SuperView`.
+- <xref:Terminal.Gui.ViewBase.View.CommandWillBubbleToAncestor*> checks both the `SuperView` path and the `AdornmentView` path.
+- The <xref:Terminal.Gui.ViewBase.View.CommandNotBound> event can intercept and cancel bubbling by setting `args.Handled = true`.

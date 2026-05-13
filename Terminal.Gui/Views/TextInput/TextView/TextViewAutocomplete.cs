@@ -4,6 +4,7 @@ namespace Terminal.Gui.Views;
 ///     Renders an overlay on another view at a given point that allows selecting from a range of 'autocomplete'
 ///     options. An implementation on a TextView.
 /// </summary>
+[Obsolete ("TextViewAutocomplete is obsolete because TextView is superseded by gui-cs/Editor. See https://github.com/gui-cs/Editor.", error: false)]
 public class TextViewAutocomplete : PopupAutocomplete
 {
     /// <inheritdoc/>

@@ -360,6 +360,215 @@ public class OutputBaseTests
         Assert.True (secondStart < 0, "No OSC 8 start should appear on row 1");
     }
 
+    // Copilot - GPT-5.4
+    // Regression coverage for plain-text URL auto-linking used by TextView/Editor.
+    // If a previously auto-linked URL is overwritten by non-URL text, the redraw must
+    // explicitly clear hyperlink state before writing the replacement text.
+    [Fact]
+    public void Write_AutoDetectedUrl_ThenPlainText_EmitsOsc8CloseBeforeReplacement ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (24, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("plain replacement      ");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int replacementIdx = result.IndexOf ("plain replacement", StringComparison.Ordinal);
+        int endIdx = result.IndexOf (end, StringComparison.Ordinal);
+
+        Assert.DoesNotContain (start, result);
+        Assert.True (replacementIdx >= 0, "Replacement text was not emitted");
+        Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before replacement text");
+    }
+
+    // Copilot - GPT-5.4
+    // Regression coverage for deleting all text in the Editor scenario.
+    // Clearing a row that previously contained an auto-detected URL must emit an OSC 8
+    // close so terminals do not keep hyperlink metadata at the former URL location.
+    [Fact]
+    public void Write_AutoDetectedUrl_ThenSpaces_EmitsOsc8CloseBeforeClearingCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (24, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("                        ");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int replacementIdx = result.IndexOf ("                        ", StringComparison.Ordinal);
+        int endIdx = result.IndexOf (end, StringComparison.Ordinal);
+
+        // Assert
+        Assert.True (replacementIdx >= 0, "Replacement spaces were not emitted");
+        Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before replacement spaces");
+    }
+
+    // Claude - Opus 4.7
+    // Regression coverage for the char-vs-column mismatch in SyncAutoUrlsForRowCore.
+    // When a multi-codepoint grapheme (ZWJ emoji, base + combining mark) precedes a URL
+    // on the same row, the URL's char offset in the concatenated row text diverges from
+    // its column position. The fix builds a char-to-column map so the auto-URL metadata
+    // lands on the actual URL cells, not shifted by the extra char count.
+    [Fact]
+    public void Write_AutoDetectedUrl_AfterMultiCharGrapheme_LinkAlignsWithUrlColumns ()
+    {
+        // Arrange — combining acute (U+0301) appended to 'e' yields a 2-char grapheme
+        // occupying a single column. Without the fix, the URL would be tagged starting
+        // one column past where it actually renders.
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (40, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("é https://example.com");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+
+        int startIdx = result.IndexOf (start, StringComparison.Ordinal);
+
+        // Assert — the visible URL text must follow the OSC 8 start sequence with no
+        // characters between them. Search strictly after the start sequence so we don't
+        // match the URL embedded as the OSC parameter inside the start sequence itself.
+        Assert.True (startIdx >= 0, "OSC 8 start sequence was not emitted");
+
+        int afterStart = startIdx + start.Length;
+        int visibleUrlIdx = result.IndexOf ("https://example.com", afterStart, StringComparison.Ordinal);
+
+        Assert.Equal (afterStart, visibleUrlIdx);
+    }
+
+    // Claude - Opus 4.7
+    // Regression coverage for stale _rowsWithUrls tracking on resize. After a SetSize call
+    // the buffer's URL maps are wiped, so OutputBase must drop its row tracking too.
+    // Otherwise the next render emits a spurious OSC 8 close at the start of any row index
+    // that previously contained a URL.
+    [Fact]
+    public void Write_AfterResize_DoesNotEmitSpuriousOsc8Close ()
+    {
+        // Arrange — render a URL, then resize (which clears URL maps) and render plain text.
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (40, 2);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        // SetSize wipes URL state; row 0 used to have a URL.
+        buffer.SetSize (40, 2);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("plain text only");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        // Assert — no OSC 8 close should appear because row 0 no longer has any URL state
+        // and the buffer was reset between writes.
+        Assert.DoesNotContain (end, result);
+    }
+
+    // Claude - Opus 4.7
+    // After clearing URL state, GetCellUrl's null fast-path should be re-armed so subsequent
+    // cell lookups skip the lock entirely. This guards against the regression where
+    // ClearContents called .Clear() on the maps but left them allocated, defeating the
+    // fast-path for the lifetime of the buffer.
+    [Fact]
+    public void GetCellUrl_AfterUrlSetThenCleared_RestoresNullFastPath ()
+    {
+        // Arrange
+        OutputBufferImpl buffer = new () { Rows = 1, Cols = 10 };
+        buffer.SetSize (10, 1);
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("https://x");
+        buffer.CurrentUrl = null;
+
+        Assert.NotNull (buffer.GetCellUrl (0, 0));
+
+        // Act
+        buffer.ClearContents (true);
+
+        // Assert — second call should hit the null fast-path. We can't directly observe the
+        // lock skip, but we can verify state was wiped and the version counter advanced so
+        // OutputBase tracking is invalidated.
+        Assert.Null (buffer.GetCellUrl (0, 0));
+        Assert.True (buffer.UrlStateVersion > 0);
+    }
+
+    // Claude - Opus 4.7
+    // Regression coverage for _rowsWithUrls bookkeeping when the per-row flush happens entirely
+    // via WriteToConsole (i.e. the end-of-row Write path takes the empty-builder early-exit).
+    // Before the fix, the Add/Remove of the row index lived after the early-exit, so a row that
+    // lost its URL via overwrite but had clean trailing cells (causing the builder to flush
+    // mid-loop and end empty) kept a stale row-tracking entry — leading to a spurious row-start
+    // OSC 8 close on subsequent frames.
+    [Fact]
+    public void Write_RowLosesUrl_BuilderFlushedMidLoop_RemovesRowTracking ()
+    {
+        // Arrange — buffer with a URL on row 0, then overwrite the URL cells with non-URL
+        // content followed by clean cells (so the builder flushes mid-loop and the row exits
+        // with an empty builder, taking the early-exit).
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (40, 1);
+
+        // Frame 1: write URL covering cols 0-18, trailing space cells stay as ' '.
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        // Frame 2: overwrite the URL cells with Y characters. Cells 0-19 become dirty (19
+        // Y's plus the adjacent-dirty mark on cell 19). Cells 20-39 stay clean — they will
+        // trigger the WriteToConsole flush and leave the row with an empty builder.
+        buffer.Move (0, 0);
+        buffer.AddStr ("YYYYYYYYYYYYYYYYYYY");
+        output.Write (buffer);
+
+        // Frame 3: trivial change. With the fix, row 0 has been removed from _rowsWithUrls,
+        // so no OSC 8 close is emitted at the start of row 0. Without the fix, the stale
+        // entry causes a spurious OSC 8 close.
+        buffer.Move (0, 0);
+        buffer.AddStr ("X");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        // Assert — frame 3 must NOT emit an OSC 8 close because frame 2's row no longer
+        // has any URL state, and _rowsWithUrls must reflect that even when the early-exit
+        // path is taken.
+        Assert.DoesNotContain (end, result);
+    }
+
     // Copilot
     [Fact]
     public void ToAnsi_LegacyConsole_NoOsc8 ()
