@@ -3,6 +3,8 @@ namespace Terminal.Gui.Drivers;
 
 internal static class Osc8UrlLinker
 {
+    internal readonly record struct UrlRange (int Start, int Length, string Url);
+
     internal readonly struct Options
     {
         internal readonly string [] _allowedSchemes;
@@ -28,6 +30,11 @@ internal static class Osc8UrlLinker
     internal static StringBuilder WrapOsc8 (StringBuilder input)
     {
         return WrapOsc8 (input, _defaultOptions);
+    }
+
+    internal static List<UrlRange> FindUrls (string input)
+    {
+        return FindUrls (input, _defaultOptions);
     }
 
     internal static StringBuilder WrapOsc8 (StringBuilder input, Options options)
@@ -101,6 +108,76 @@ internal static class Osc8UrlLinker
         }
 
         return result;
+    }
+
+    private static List<UrlRange> FindUrls (string input, Options options)
+    {
+        List<UrlRange> ranges = [];
+        ReadOnlySpan<char> span = input.AsSpan ();
+        ReadOnlySpan<char> delimiter = "://".AsSpan ();
+        int i = 0;
+
+        while (i < span.Length)
+        {
+            int rel = span.Slice (i).IndexOf (delimiter, StringComparison.Ordinal);
+            if (rel < 0)
+            {
+                break;
+            }
+
+            int delimAt = i + rel;
+            int schemeEnd = delimAt;
+            int schemeStart = schemeEnd - 1;
+
+            while (schemeStart >= 0 && char.IsLetter (span [schemeStart]))
+            {
+                schemeStart--;
+            }
+
+            schemeStart++;
+
+            if (schemeStart < 0 || schemeStart >= schemeEnd)
+            {
+                i = delimAt + delimiter.Length;
+                continue;
+            }
+
+            ReadOnlySpan<char> scheme = span.Slice (schemeStart, schemeEnd - schemeStart);
+            if (!IsAllowedScheme (scheme, options))
+            {
+                i = delimAt + delimiter.Length;
+                continue;
+            }
+
+            int urlStart = schemeStart;
+            int j = delimAt + delimiter.Length;
+
+            while (j < span.Length && !IsUrlTerminator (span [j]))
+            {
+                j++;
+            }
+
+            int urlEnd = TrimTrailingPunctuation (span, urlStart, j);
+            if (urlEnd <= (delimAt + delimiter.Length))
+            {
+                i = j;
+                continue;
+            }
+
+            string candidate = span.Slice (urlStart, urlEnd - urlStart).ToString ();
+
+            Uri? _;
+            if (options._validateWithUri && !IsValidUrl (candidate, options, out _))
+            {
+                i = j;
+                continue;
+            }
+
+            ranges.Add (new (urlStart, urlEnd - urlStart, candidate));
+            i = j;
+        }
+
+        return ranges;
     }
 
     private static int ParseEscapeSequence (string text, int start, int len)
