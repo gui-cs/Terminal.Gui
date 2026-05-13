@@ -25,6 +25,8 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class TextViewEditor : View
 {
+    // Initialized to null! because the base View constructor calls the virtual Text setter
+    // (via SetupText) before this constructor body runs. The null guard in Text protects against this.
     private readonly Terminal.Gui.Editor.Editor _editor = null!;
 
     /// <summary>
