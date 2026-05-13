@@ -47,6 +47,7 @@
     <PackageVersion Include="ReportGenerator" Version="5.5.9" />
     <PackageVersion Include="coverlet.collector" Version="10.0.0" />
     <PackageVersion Include="GitVersion.MsBuild" Version="6.7.0" />
+    <PackageVersion Include="Terminal.Gui.Editor" Version="2.1.1-develop.75" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PackageVersion Include="Terminal.Gui" Version="2.0.0" />

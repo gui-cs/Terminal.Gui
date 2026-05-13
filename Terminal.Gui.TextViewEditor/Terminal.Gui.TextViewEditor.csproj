@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyName>Terminal.Gui.TextViewEditor</AssemblyName>
+        <TargetFramework>net10.0</TargetFramework>
+        <LangVersion>14</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Terminal.Gui.Views</RootNamespace>
+        <PackageId>Terminal.Gui.TextViewEditor</PackageId>
+        <Description>Wraps the Terminal.Gui.Editor view with a TextView-compatible API to ease porting.</Description>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+        <PackageReference Include="Terminal.Gui.Editor" />
+    </ItemGroup>
+</Project>
