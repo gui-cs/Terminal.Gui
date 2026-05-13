@@ -296,19 +296,41 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when a command that has not been bound is invoked.
+    ///     Called when a command that has not been bound (via <c>AddCommand</c>) is invoked on this View.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> and return <see langword="true"/> to indicate the event was
     ///     handled and processing should stop.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is part of the command bubbling pipeline. When a <see cref="MouseBindings"/> entry fires a command
+    ///         that has no <c>AddCommand</c> handler, this method is called. If the command is in an ancestor's
+    ///         <see cref="CommandsToBubbleUp"/> list, <see cref="TryBubbleUp"/> will forward it to that ancestor.
+    ///     </para>
+    ///     <para>
+    ///         Adding a <see cref="MouseBindings"/> entry without a corresponding <c>AddCommand</c> handler is
+    ///         intentional and idiomatic — it signals that the command should bubble to an ancestor.
+    ///     </para>
+    /// </remarks>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
     protected virtual bool OnCommandNotBound (CommandEventArgs args) => false;
 
     /// <summary>
-    ///     Cancelable event raised when a command that has not been bound is invoked.
+    ///     Cancelable event raised when a command that has not been bound (via <c>AddCommand</c>) is invoked.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> to indicate the event was handled and processing should
     ///     stop.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event fires as part of the command bubbling mechanism. A common use case is a SubView that binds
+    ///         mouse-wheel events to scroll commands (via <see cref="MouseBindings"/>) without adding a local handler.
+    ///         The unhandled command fires this event, and if not cancelled here, <see cref="TryBubbleUp"/> forwards
+    ///         the command to the nearest ancestor whose <see cref="CommandsToBubbleUp"/> includes it.
+    ///     </para>
+    ///     <para>
+    ///         See also: <see cref="CommandsToBubbleUp"/>, <see cref="TryBubbleUp"/>.
+    ///     </para>
+    /// </remarks>
     public event EventHandler<CommandEventArgs>? CommandNotBound;
 
     #region Accept
@@ -1256,17 +1278,32 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews
-    ///     or from SubViews within this View's adornments (Padding, Border).
+    ///     or from SubViews within this View's adornments (Padding, Border, Margin).
     ///     When a SubView raises a command that is not handled, and the command is in the SuperView's
     ///     <see cref="CommandsToBubbleUp"/> list, the command will be invoked on the SuperView.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         For SubViews inside an <see cref="AdornmentView"/> (e.g., a button in Padding or Border),
-    ///         the bubble target is <see cref="IAdornment.Parent"/> rather than <see cref="SuperView"/>.
+    ///         For SubViews inside an <see cref="AdornmentView"/> (e.g., a view in Padding or Border),
+    ///         the bubble target is <see cref="IAdornment.Parent"/> (the owning View) rather than
+    ///         <see cref="SuperView"/>. This means a view added to <c>editor.Padding</c> will bubble
+    ///         commands directly to <c>editor</c>, not to the <c>PaddingView</c>.
     ///     </para>
     ///     <para>
-    ///         e.g. to enable <see cref="Command.Activate"/> bubbling for hierarchical views:
+    ///         <b>Mouse-wheel forwarding pattern:</b> A SubView can add a <see cref="MouseBindings"/> entry
+    ///         (e.g., <c>MouseBindings.Add(MouseFlags.WheeledUp, Command.ScrollUp)</c>) without calling
+    ///         <c>AddCommand</c> for the command. The unhandled command will fire
+    ///         <see cref="CommandNotBound"/> and then bubble via <see cref="TryBubbleUp"/> to the nearest
+    ///         ancestor whose <see cref="CommandsToBubbleUp"/> contains it.
+    ///     </para>
+    ///     <para>
+    ///         Example — enable scroll command bubbling:
+    ///         <code>
+    ///             editor.CommandsToBubbleUp = [Command.ScrollUp, Command.ScrollDown];
+    ///         </code>
+    ///     </para>
+    ///     <para>
+    ///         Example — enable <see cref="Command.Activate"/> bubbling for hierarchical views:
     ///         <code>
     ///             menuBar.CommandsToBubbleUp = [Command.Activate];
     ///         </code>

@@ -604,6 +604,79 @@ Platform API ? InputProcessorImpl ? AnsiResponseParser ? MouseInterpreter ? Appl
 
 This ensures consistent mouse behavior across platforms while maintaining platform-specific optimizations.
 
+## Mouse Event Forwarding via Command Bubbling
+
+A common need is forwarding mouse-wheel events from a child view to an ancestor (e.g., a gutter subview inside a scrollable editor's Padding that should scroll the editor). Terminal.Gui supports this idiomatically via the **CommandNotBound bubbling** mechanism.
+
+### The Pattern
+
+1. **Child view**: Add a `MouseBinding` for the wheel event **without** calling `AddCommand` for that command.
+2. **Parent view**: Include the scroll commands in <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp>.
+3. **Result**: When the child receives the wheel event, the mouse binding fires the command. Because the child has no handler (`AddCommand` was not called), `DefaultCommandNotBoundHandler` runs → <xref:Terminal.Gui.ViewBase.View.TryBubbleUp*> finds the ancestor with the command in `CommandsToBubbleUp` → invokes it on the ancestor.
+
+### Example: Gutter Forwards Wheel to Editor
+
+```csharp
+// Parent (Editor) handles scroll commands and opts into bubbling
+public class Editor : View
+{
+    public Editor ()
+    {
+        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
+        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
+
+        // Allow scroll commands from SubViews/adornment SubViews to bubble here
+        CommandsToBubbleUp = [Command.ScrollUp, Command.ScrollDown];
+    }
+}
+
+// Child (Gutter) binds wheel events but does NOT add command handlers
+public class Gutter : View
+{
+    public Gutter ()
+    {
+        // Bind mouse wheel to scroll commands — no AddCommand needed.
+        // The unhandled command will bubble up to the nearest ancestor
+        // whose CommandsToBubbleUp includes it.
+        MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
+        MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
+    }
+}
+```
+
+### How It Works
+
+```
+Mouse wheel on Gutter
+  → MouseBindings maps WheeledUp → Command.ScrollUp
+  → Gutter.InvokeCommand(ScrollUp)
+  → No handler found (AddCommand was never called)
+  → DefaultCommandNotBoundHandler runs
+  → RaiseCommandNotBound → TryBubbleUp
+  → Finds ancestor (Editor) with Command.ScrollUp in CommandsToBubbleUp
+  → Editor.InvokeCommand(ScrollUp) → scrolls
+```
+
+### AdornmentView Special Case
+
+For views hosted inside an adornment (Padding, Border, or Margin), the bubble target is the **adornment's Parent** (the owning View), not the `SuperView`. This means a view added to `editor.Padding` will bubble commands directly to `editor`, skipping the `PaddingView` intermediary.
+
+```csharp
+// Gutter added to Editor's Padding — bubbles to Editor automatically
+editor.Padding.Add (gutter);
+```
+
+This is handled internally by <xref:Terminal.Gui.ViewBase.View.TryBubbleUp*> and <xref:Terminal.Gui.ViewBase.View.CommandWillBubbleToAncestor*>.
+
+### When to Use This Pattern
+
+* A SubView should forward wheel/scroll events to its container without handling them itself.
+* A view in Padding/Border needs to delegate commands to the owning View.
+* You want clean separation: the child declares *what* user gesture maps to *which* command, and the ancestor decides *how* to handle it.
+
+> [!TIP]
+> Adding a `MouseBinding` without a corresponding `AddCommand` handler is **intentional and idiomatic**. It signals that the command should bubble to an ancestor rather than being handled locally. See <xref:Terminal.Gui.ViewBase.View.CommandNotBound>.
+
 ## Best Practices
 
 * **Use Mouse Bindings and Commands** for simple interactions - integrates with keyboard bindings
