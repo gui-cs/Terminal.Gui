@@ -7,7 +7,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Notepad", "Multi-tab text editor using the Tabs control.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Tabs")]
-[ScenarioCategory ("TextView")]
+[ScenarioCategory ("TextViewEditor")]
 public class Notepad : Scenario
 {
     private IApplication? _app;
@@ -271,8 +271,8 @@ public class Notepad : Scenario
         }
 
         OpenedFile tab = new (this) { Title = tabName, File = fileInfo };
-        tab.CreateAndAddTextView (fileInfo);
-        tab.RegisterTextViewEvents ();
+        tab.CreateAndAddEditor (fileInfo);
+        tab.RegisterEditorEvents ();
 
         _focusedTabs.Add (tab);
         _focusedTabs.Value = tab;
@@ -344,7 +344,7 @@ public class Notepad : Scenario
     {
         if (_focusedTabs?.Value is OpenedFile tab)
         {
-            return tab.TextView?.Text.Length ?? 0;
+            return tab.Editor?.Text.Length ?? 0;
         }
 
         return 0;
@@ -360,7 +360,7 @@ public class Notepad : Scenario
 
         if (e.NewValue is OpenedFile tab)
         {
-            len = tab.TextView?.Text.Length ?? 0;
+            len = tab.Editor?.Text.Length ?? 0;
         }
 
         LenShortcut.Title = $"Len:{len}";
@@ -376,16 +376,16 @@ public class Notepad : Scenario
         public FileInfo? File { get; set; }
 
         /// <summary>Gets whether this tab is a pristine new document — never opened to a file and has no content.</summary>
-        public bool IsPristine => File is null && string.IsNullOrEmpty (TextView?.Text);
+        public bool IsPristine => File is null && string.IsNullOrEmpty (Editor?.Text);
 
-        public TextView? TextView { get; private set; }
+        public TextViewEditor? Editor { get; private set; }
 
         /// <summary>The text of the tab the last time it was saved.</summary>
         private string? _savedText;
 
-        public bool UnsavedChanges => TextView is { } && !string.Equals (_savedText, TextView.Text);
+        public bool UnsavedChanges => Editor is { } && !string.Equals (_savedText, Editor.Text);
 
-        public void CreateAndAddTextView (FileInfo? file)
+        public void CreateAndAddEditor (FileInfo? file)
         {
             var initialText = string.Empty;
 
@@ -394,25 +394,24 @@ public class Notepad : Scenario
                 initialText = System.IO.File.ReadAllText (file.FullName);
             }
 
-            TextView = new TextView
+            Editor = new TextViewEditor
             {
                 X = 0,
                 Y = 0,
                 Width = Dim.Fill (),
                 Height = Dim.Fill (),
-                Text = initialText,
-                TabKeyAddsTab = false
+                Text = initialText
             };
 
             _savedText = initialText;
 
-            Add (TextView);
+            Add (Editor);
         }
 
         /// <summary>Loads a file into an existing tab, replacing its content.</summary>
         public void LoadFile (FileInfo file)
         {
-            if (TextView is null)
+            if (Editor is null)
             {
                 return;
             }
@@ -426,49 +425,49 @@ public class Notepad : Scenario
 
             // Set _savedText first so the ContentsChanged handler sees matching text (not dirty).
             _savedText = text;
-            TextView.Text = text;
+            Editor.Text = text;
         }
 
-        public void RegisterTextViewEvents ()
+        public void RegisterEditorEvents ()
         {
-            if (TextView is null)
+            if (Editor is null)
             {
                 return;
             }
 
             // when user makes changes rename tab to indicate unsaved
-            TextView.ContentsChanged += (_, _) =>
-                                        {
-                                            // if current text doesn't match saved text
-                                            bool areDiff = UnsavedChanges;
+            Editor.ContentsChanged += (_, _) =>
+                                       {
+                                           // if current text doesn't match saved text
+                                           bool areDiff = UnsavedChanges;
 
-                                            if (areDiff)
-                                            {
-                                                if (!Title.EndsWith ('*'))
-                                                {
-                                                    Title = Title + "*";
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (Title.EndsWith ('*'))
-                                                {
-                                                    Title = Title.TrimEnd ('*');
-                                                }
-                                            }
+                                           if (areDiff)
+                                           {
+                                               if (!Title.EndsWith ('*'))
+                                               {
+                                                   Title = Title + "*";
+                                               }
+                                           }
+                                           else
+                                           {
+                                               if (Title.EndsWith ('*'))
+                                               {
+                                                   Title = Title.TrimEnd ('*');
+                                               }
+                                           }
 
-                                            notepad.LenShortcut?.Title = $"Len:{TextView.Text.Length}";
-                                        };
+                                           notepad.LenShortcut?.Title = $"Len:{Editor.Text.Length}";
+                                       };
         }
 
         internal void Save ()
         {
-            if (TextView is null || File is null || string.IsNullOrWhiteSpace (File.FullName))
+            if (Editor is null || File is null || string.IsNullOrWhiteSpace (File.FullName))
             {
                 return;
             }
 
-            string newText = TextView.Text;
+            string newText = Editor.Text;
 
             System.IO.File.WriteAllText (File.FullName, newText);
             _savedText = newText;
