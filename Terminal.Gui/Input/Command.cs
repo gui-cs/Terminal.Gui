@@ -214,6 +214,28 @@ public enum Command
     /// <summary>Unix emulation.</summary>
     UnixEmulation,
 
+    /// <summary>Inserts a tab character or spaces at the cursor or selection.</summary>
+    InsertTab,
+
+    /// <summary>Removes one level of indentation from the current line or selection.</summary>
+    Unindent,
+
+    #endregion
+
+    #region Search Commands
+
+    /// <summary>Opens or activates a find/search UI.</summary>
+    Find,
+
+    /// <summary>Finds the next match.</summary>
+    FindNext,
+
+    /// <summary>Finds the previous match.</summary>
+    FindPrevious,
+
+    /// <summary>Opens or activates a find-and-replace UI.</summary>
+    Replace,
+
     #endregion
 
     #region Tree Commands
