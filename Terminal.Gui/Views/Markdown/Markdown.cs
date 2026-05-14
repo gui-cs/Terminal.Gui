@@ -63,7 +63,8 @@ public partial class Markdown : View, IDesignable
     private readonly List<IntermediateBlock> _blocks = [];
     private readonly List<RenderedLine> _renderedLines = [];
     private readonly List<MarkdownLinkRegion> _linkRegions = [];
-    private readonly HashSet<string> _queuedSixelIds = [];
+    private readonly Dictionary<string, SixelToRender> _sixelRenderMap = [];
+    private readonly HashSet<string> _visibleSixelIds = [];
     private readonly Dictionary<string, int> _headingAnchors = new (StringComparer.OrdinalIgnoreCase);
     private readonly List<MarkdownCodeBlock> _codeBlockViews = [];
     private readonly List<MarkdownTable> _tableViews = [];
@@ -352,6 +353,9 @@ public partial class Markdown : View, IDesignable
         _blocks.Clear ();
         _renderedLines.Clear ();
         _linkRegions.Clear ();
+        foreach (var render in _sixelRenderMap.Values) { render.SixelData = null; }
+        _sixelRenderMap.Clear ();
+        _visibleSixelIds.Clear ();
         _activeLinkIndex = -1;
         _headingAnchors.Clear ();
         RemoveCodeBlockViews ();

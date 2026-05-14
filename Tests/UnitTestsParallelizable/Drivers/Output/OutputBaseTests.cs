@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace DriverTests.Output;
 
@@ -757,5 +757,288 @@ public class OutputBaseTests
         Assert.Equal ("https://two.com", buffer.GetCellUrl (0, 0));
         Assert.Equal ("https://two.com", buffer.GetCellUrl (1, 0));
         Assert.Equal ("https://two.com", buffer.GetCellUrl (2, 0));
+    }
+
+    [Fact]
+    public void Write_SkipsSixel_WhenIsDirtyIsFalse ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "SKIPPED-SIXEL",
+            ScreenPosition = new (0, 0),
+            IsDirty = false
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Act
+        output.Write (buffer);
+
+        // Assert: sixel data should NOT have been emitted
+        Assert.DoesNotContain ("SKIPPED-SIXEL", output.GetLastOutput ());
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void Write_ClearsIsDirty_AfterWritingSixel ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "DIRTY-SIXEL",
+            ScreenPosition = new (0, 0),
+            IsDirty = true
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Act
+        output.Write (buffer);
+
+        // Assert: sixel was emitted and IsDirty was cleared
+        Assert.Contains ("DIRTY-SIXEL", output.GetLastOutput ());
+        Assert.False (s.IsDirty);
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void Write_SecondFrame_SkipsSixel_WhenIsDirtyWasClearedByFirstFrame ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "ONCE-SIXEL",
+            ScreenPosition = new (0, 0),
+            IsDirty = true
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Frame 1: should emit
+        output.Write (buffer);
+        Assert.Contains ("ONCE-SIXEL", output.GetLastOutput ());
+        Assert.False (s.IsDirty);
+
+        // Frame 2: re-dirty the buffer so Write traverses rows, but sixel should be skipped
+        buffer.Move (0, 0);
+        buffer.AddStr ("X");
+        output.Write (buffer);
+        Assert.DoesNotContain ("ONCE-SIXEL", output.GetLastOutput ());
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void Write_AlwaysRender_BypassesIsDirtyCheck ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "ALWAYS-SIXEL",
+            ScreenPosition = new (0, 0),
+            IsDirty = false,
+            AlwaysRender = true
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Act
+        output.Write (buffer);
+
+        // Assert: sixel was emitted even though IsDirty was false
+        Assert.Contains ("ALWAYS-SIXEL", output.GetLastOutput ());
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void Write_AlwaysRender_EmitsEveryFrame ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "EVERY-FRAME",
+            ScreenPosition = new (0, 0),
+            IsDirty = false,
+            AlwaysRender = true
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Frame 1
+        output.Write (buffer);
+        Assert.Contains ("EVERY-FRAME", output.GetLastOutput ());
+
+        // Frame 2: re-dirty buffer so Write traverses, sixel should still emit
+        buffer.Move (0, 0);
+        buffer.AddStr ("Y");
+        output.Write (buffer);
+        Assert.Contains ("EVERY-FRAME", output.GetLastOutput ());
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void DriverImpl_SixelSupport_DefaultsToNull ()
+    {
+        // Arrange & Act
+        DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 new AnsiOutput (),
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        // Assert
+        Assert.Null (driver.SixelSupport);
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void DriverImpl_SetSixelSupport_RaisesSixelSupportChangedEvent ()
+    {
+        // Arrange
+        using DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 new AnsiOutput (),
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        SixelSupportResult firstResult = new ()
+        {
+            IsSupported = true,
+            MaxPaletteColors = 256,
+            SupportsTransparency = false
+        };
+
+        SixelSupportResult secondResult = new ()
+        {
+            IsSupported = true,
+            MaxPaletteColors = 512,
+            SupportsTransparency = true
+        };
+
+        List<ValueChangedEventArgs<SixelSupportResult?>> raisedArgs = [];
+
+        driver.SixelSupportChanged += (_, e) => raisedArgs.Add (e);
+
+        // Act 1: first call, old value should be null
+        driver.SetSixelSupport (firstResult);
+
+        // Assert 1
+        Assert.Single (raisedArgs);
+        Assert.Null (raisedArgs [0].OldValue);
+        Assert.Same (firstResult, raisedArgs [0].NewValue);
+
+        // Act 2: second call, old value should be firstResult
+        driver.SetSixelSupport (secondResult);
+
+        // Assert 2
+        Assert.Equal (2, raisedArgs.Count);
+        Assert.Same (firstResult, raisedArgs [1].OldValue);
+        Assert.Same (secondResult, raisedArgs [1].NewValue);
+    }
+
+    [Fact]
+    public void DriverImpl_SetSixelSupport_StoresResult ()
+    {
+        // Arrange
+        DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 new AnsiOutput (),
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        SixelSupportResult result = new ()
+        {
+            IsSupported = true,
+            MaxPaletteColors = 512,
+            SupportsTransparency = true
+        };
+
+        // Act
+        driver.SetSixelSupport (result);
+
+        // Assert
+        Assert.NotNull (driver.SixelSupport);
+        Assert.True (driver.SixelSupport!.IsSupported);
+        Assert.Equal (512, driver.SixelSupport.MaxPaletteColors);
+        Assert.True (driver.SixelSupport.SupportsTransparency);
+
+        driver.Dispose ();
     }
 }

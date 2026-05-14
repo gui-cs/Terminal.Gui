@@ -252,13 +252,14 @@ public abstract class OutputBase
         // Render queued sixel images
         foreach (SixelToRender s in GetSixels ())
         {
-            if (string.IsNullOrWhiteSpace (s.SixelData))
+            if (string.IsNullOrWhiteSpace (s.SixelData) || (!s.IsDirty && !s.AlwaysRender))
             {
                 continue;
             }
 
             SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
             Write (new StringBuilder (s.SixelData));
+            s.IsDirty = false;
         }
     }
 
