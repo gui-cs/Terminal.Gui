@@ -1,6 +1,6 @@
 {
-  "_comment": "Baseline benchmark results for the scrolling performance gate.",
-  "_howto": "Re-run 'dotnet run --project Tests/Benchmarks -c Release -- --filter \"*Scroll*\" -j short --exporters json' then update this file.",
+  "_comment": "Baseline benchmark results for the performance gate (Scrolling + Configuration).",
+  "_howto": "Re-run 'dotnet run --project Tests/Benchmarks -c Release -- --filter \"*Scroll*|*Config*|*Scheme*|*Theme*\" -j short --exporters json' then update this file.",
   "_version": "1",
   "benchmarks": [
     {
@@ -141,6 +141,108 @@
       "method": "PageDown_OneStep",
       "params": "Rows=1000",
       "meanNs": 300000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+
+    {
+      "type": "ConfigurationManagerLoadBenchmark",
+      "method": "LoadAndApply",
+      "params": "",
+      "meanNs": 5000000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Default",
+      "meanNs": 1000000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Dark",
+      "meanNs": 1000000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Light",
+      "meanNs": 1000000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=TurboPascal 5",
+      "meanNs": 1000000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Anders",
+      "meanNs": 1000000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Green Phosphor",
+      "meanNs": 1000000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Amber Phosphor",
+      "meanNs": 1000000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+
+    {
+      "type": "SchemeAttributeBenchmark",
+      "method": "GetNormal",
+      "params": "",
+      "meanNs": 50,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "SchemeAttributeBenchmark",
+      "method": "GetHotFocus",
+      "params": "",
+      "meanNs": 500,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "SchemeAttributeBenchmark",
+      "method": "GetCode",
+      "params": "",
+      "meanNs": 1000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+
+    {
+      "type": "SchemeSerializationBenchmark",
+      "method": "Serialize",
+      "params": "",
+      "meanNs": 5000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "SchemeSerializationBenchmark",
+      "method": "Deserialize",
+      "params": "",
+      "meanNs": 5000,
+      "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+    {
+      "type": "SchemeSerializationBenchmark",
+      "method": "RoundTrip",
+      "params": "",
+      "meanNs": 10000,
       "comment": "Placeholder — run actual benchmarks to set real baseline"
     }
   ]
