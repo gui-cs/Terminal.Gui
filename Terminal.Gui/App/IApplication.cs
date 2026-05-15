@@ -567,6 +567,11 @@ public interface IApplication : IDisposable
     IClipboard? Clipboard { get; internal set; }
 
     /// <summary>
+    ///     Gets the terminal status line or title-area output target for this application instance.
+    /// </summary>
+    StatusLine StatusLine { get; }
+
+    /// <summary>
     ///     Forces the use of the specified driver (<see cref="DriverRegistry.Names"/>). If not
     ///     specified, the driver is selected based on the platform.
     /// </summary>
@@ -576,6 +581,7 @@ public interface IApplication : IDisposable
     ///     Gets or sets how the application interacts with the terminal buffer.
     ///     <see cref="AppModel.FullScreen"/> uses the alternate screen buffer (default).
     ///     <see cref="AppModel.Inline"/> renders inline in the primary scrollback buffer.
+    ///     <see cref="AppModel.StatusLine"/> renders the top-level content into the terminal status line or title area.
     /// </summary>
     AppModel AppModel { get; set; }
 

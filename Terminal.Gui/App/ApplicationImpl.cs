@@ -17,6 +17,7 @@ internal partial class ApplicationImpl : IApplication
     internal ApplicationImpl (ITimeProvider timeProvider)
     {
         _timeProvider = timeProvider;
+        StatusLine = new StatusLine (() => Driver);
 
         // Initialize TimedEvents with the time provider for testable timing
         TimedEvents = new TimedEvents (timeProvider);
@@ -178,6 +179,9 @@ internal partial class ApplicationImpl : IApplication
 
     /// <inheritdoc/>
     public IClipboard? Clipboard { get => Driver?.Clipboard; set => Driver?.Clipboard = value; }
+
+    /// <inheritdoc/>
+    public StatusLine StatusLine { get; }
 
     #endregion Screen and Driver
 

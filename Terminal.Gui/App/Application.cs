@@ -227,7 +227,8 @@ public static partial class Application
     /// <summary>
     ///     Gets or sets the rendering mode for the application. When set to <see cref="App.AppModel.Inline"/>,
     ///     the application renders inline within the primary (scrollback) buffer instead of switching to
-    ///     the alternate screen buffer.
+    ///     the alternate screen buffer. When set to <see cref="App.AppModel.StatusLine"/>, the application
+    ///     renders its top-level content into the terminal status line or title area.
     /// </summary>
     /// <remarks>
     ///     <para>

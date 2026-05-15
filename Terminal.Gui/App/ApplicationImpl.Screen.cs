@@ -17,10 +17,23 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public Rectangle Screen
     {
-        get => _screen ?? Driver?.Screen ?? new Rectangle (new Point (0, 0), new Size (2048, 2048));
+        get
+        {
+            if (AppModel == AppModel.StatusLine && Driver is { } driver)
+            {
+                return new Rectangle (0, 0, driver.Screen.Width, 1);
+            }
+
+            return _screen ?? Driver?.Screen ?? new Rectangle (new Point (0, 0), new Size (2048, 2048));
+        }
         set
         {
-            if (AppModel == AppModel.Inline)
+            if (AppModel == AppModel.StatusLine)
+            {
+                _screen = null;
+                Driver?.SetScreenSize (value.Width, 1);
+            }
+            else if (AppModel == AppModel.Inline)
             {
                 // Inline mode: store the sub-rectangle independently.
                 // Resize the output buffer to match the inline region dimensions.
@@ -75,7 +88,11 @@ internal partial class ApplicationImpl
     {
         Size newSize = e.Size ?? Size.Empty;
 
-        if (AppModel == AppModel.Inline && _screen is { } screen)
+        if (AppModel == AppModel.StatusLine)
+        {
+            RaiseScreenChangedEvent (new Rectangle (0, 0, newSize.Width, 1));
+        }
+        else if (AppModel == AppModel.Inline && _screen is { } screen)
         {
             // On resize in inline mode, reset to row 0 and clear the screen.
             // The next LayoutAndDraw will re-size the inline region from scratch.

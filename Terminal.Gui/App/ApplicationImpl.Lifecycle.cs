@@ -76,6 +76,7 @@ internal partial class ApplicationImpl
 
         RaiseInitializedChanged (this, new EventArgs<bool> (true));
         SubscribeDriverEvents ();
+        StatusLine.Flush ();
 
         SynchronizationContext.SetSynchronizationContext (new SynchronizationContext ());
 
@@ -276,6 +277,7 @@ internal partial class ApplicationImpl
         Iteration = null;
         SessionBegun = null;
         SessionEnded = null;
+        StatusLine.Reset ();
         StopAfterFirstIteration = false;
         ClearScreenNextIteration = false;
 

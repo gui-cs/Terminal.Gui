@@ -82,7 +82,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
             outputBufferImpl.InlineMode = true;
         }
 
-        OutputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
+        Size outputSize = consoleOutput.GetSize ();
+        int outputHeight = App?.AppModel == AppModel.StatusLine ? 1 : outputSize.Height;
+        OutputBuffer.SetSize (outputSize.Width, outputHeight);
         SizeMonitor = componentFactory.CreateSizeMonitor (Output, OutputBuffer);
     }
 

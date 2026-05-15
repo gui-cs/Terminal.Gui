@@ -15,5 +15,11 @@ public enum AppModel
     ///     The application renders inline within the primary (scrollback) buffer, anchored
     ///     to the bottom of the visible terminal. No alternate screen buffer is used.
     /// </summary>
-    Inline
+    Inline,
+
+    /// <summary>
+    ///     The application renders its top-level content into the terminal status line.
+    ///     No alternate screen buffer or primary screen drawing is used.
+    /// </summary>
+    StatusLine
 }

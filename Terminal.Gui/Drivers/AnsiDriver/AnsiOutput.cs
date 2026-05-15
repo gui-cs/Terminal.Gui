@@ -137,7 +137,12 @@ public class AnsiOutput : OutputBase, IOutput
             }
 
             // Initialize terminal for ANSI output
-            if (AppModel == AppModel.Inline)
+            if (AppModel == AppModel.StatusLine)
+            {
+                // StatusLine mode renders only via OSC/status-line sequences and does not take over
+                // the alternate screen or primary screen buffer.
+            }
+            else if (AppModel == AppModel.Inline)
             {
                 // Inline mode: do NOT switch to alternate screen buffer.
                 // Stay in the primary (scrollback) buffer.
@@ -385,7 +390,11 @@ public class AnsiOutput : OutputBase, IOutput
             Write (EscSeqUtils.CSI_DisableMouseEvents);
             Write (EscSeqUtils.CSI_ResetAttributes);
 
-            if (AppModel == AppModel.Inline)
+            if (AppModel == AppModel.StatusLine)
+            {
+                // StatusLine mode did not alter the screen buffer, so there is no buffer to restore.
+            }
+            else if (AppModel == AppModel.Inline)
             {
                 // Inline mode: do NOT restore alternate buffer. Move cursor to just
                 // below the inline region so the shell prompt appears naturally.

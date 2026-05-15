@@ -91,6 +91,13 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public void Refresh ()
     {
+        if (AppModel == AppModel.StatusLine)
+        {
+            SetTerminalTitle (GetStatusLineText (_outputBuffer), 2);
+
+            return;
+        }
+
         // Hide cursor during rendering to prevent flicker
         Cursor cursor = _output.GetCursor ();
 
@@ -219,10 +226,14 @@ internal class DriverImpl : IDriver
         // Always update the output's knowledge of terminal size
         _output.SetSize (width, height);
 
-        // In inline mode, the output buffer is sized to App.Screen (the inline region),
-        // not the full terminal. Only resize the buffer in fullscreen mode.
-        if (AppModel != AppModel.Inline)
+        if (AppModel == AppModel.StatusLine)
         {
+            _outputBuffer.SetSize (width, 1);
+        }
+        else if (AppModel != AppModel.Inline)
+        {
+            // In inline mode, the output buffer is sized to App.Screen (the inline region),
+            // not the full terminal. Only resize the buffer in fullscreen mode.
             _outputBuffer.SetSize (width, height);
         }
 
@@ -442,6 +453,30 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
     public string ToAnsi () => _output.ToAnsi (_outputBuffer);
+
+    private static string GetStatusLineText (IOutputBuffer outputBuffer)
+    {
+        if (outputBuffer.Rows <= 0 || outputBuffer.Cols <= 0)
+        {
+            return string.Empty;
+        }
+
+        StringBuilder builder = new ();
+
+        for (int col = 0; col < outputBuffer.Cols; col++)
+        {
+            Cell cell = outputBuffer.Contents! [0, col];
+            string grapheme = cell.Grapheme;
+            builder.Append (grapheme);
+
+            if (grapheme.GetColumns () > 1 && col + 1 < outputBuffer.Cols)
+            {
+                col++;
+            }
+        }
+
+        return builder.ToString ().TrimEnd ();
+    }
 
     #endregion Drawing and Rendering
 

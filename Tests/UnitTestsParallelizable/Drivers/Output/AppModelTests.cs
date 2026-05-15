@@ -23,6 +23,13 @@ public class AppModelTests
     }
 
     [Fact]
+    public void AppModel_StatusLine_IsDefined ()
+    {
+        // Assert
+        Assert.True (Enum.IsDefined (typeof (AppModel), AppModel.StatusLine));
+    }
+
+    [Fact]
     public void AppModel_FullScreen_IsDefined ()
     {
         // Assert
