@@ -56,6 +56,28 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
         [MarkdownStyleRole.ThematicBreak] = [["meta.separator.markdown"], ["comment"]]
     };
 
+    internal static readonly (string ScopePrefix, VisualRole Role) [] TmScopeRoleMap =
+    [
+        ("keyword.operator", VisualRole.CodeOperator),
+        ("comment", VisualRole.CodeComment),
+        ("keyword", VisualRole.CodeKeyword),
+        ("string", VisualRole.CodeString),
+        ("constant.numeric", VisualRole.CodeNumber),
+        ("entity.name.type", VisualRole.CodeType),
+        ("support.type", VisualRole.CodeType),
+        ("storage.type", VisualRole.CodeType),
+        ("meta.preprocessor", VisualRole.CodePreprocessor),
+        ("entity.name.variable", VisualRole.CodeIdentifier),
+        ("variable", VisualRole.CodeIdentifier),
+        ("constant.language", VisualRole.CodeConstant),
+        ("constant.character", VisualRole.CodeConstant),
+        ("punctuation", VisualRole.CodePunctuation),
+        ("entity.name.function", VisualRole.CodeFunctionName),
+        ("support.function", VisualRole.CodeFunctionName),
+        ("entity.other.attribute-name", VisualRole.CodeAttribute),
+        ("meta.tag", VisualRole.CodeAttribute)
+    ];
+
     /// <summary>Initializes a new <see cref="TextMateSyntaxHighlighter"/> with the specified theme.</summary>
     /// <param name="theme">
     ///     The VS Code theme to use for colorization. Defaults to <see cref="ThemeName.DarkPlus"/>.
@@ -73,14 +95,14 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     {
         if (_nativeLibUnavailable)
         {
-            return [new StyledSegment (code, MarkdownStyleRole.CodeBlock)];
+            return [new StyledSegment (code, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)];
         }
 
         IGrammar? grammar = ResolveGrammar (language);
 
         if (grammar is null)
         {
-            return [new StyledSegment (code, MarkdownStyleRole.CodeBlock)];
+            return [new StyledSegment (code, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)];
         }
 
         ITokenizeLineResult result;
@@ -95,12 +117,11 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
             // Degrade gracefully to unstyled code blocks for the rest of this session.
             _nativeLibUnavailable = true;
 
-            return [new StyledSegment (code, MarkdownStyleRole.CodeBlock)];
+            return [new StyledSegment (code, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)];
         }
 
         _ruleStack = result.RuleStack;
 
-        Theme theme = _registry.GetTheme ();
         List<StyledSegment> segments = [];
 
         foreach (IToken token in result.Tokens)
@@ -114,13 +135,13 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
             }
 
             string text = code [startIndex..endIndex];
-            Attribute attr = ResolveAttribute (theme, token.Scopes);
-            segments.Add (new StyledSegment (text, MarkdownStyleRole.CodeBlock, attribute: attr));
+            VisualRole role = ResolveRoleForScopes (token.Scopes);
+            segments.Add (new StyledSegment (text, MarkdownStyleRole.CodeBlock, role: role));
         }
 
         if (segments.Count == 0)
         {
-            return [new StyledSegment (code, MarkdownStyleRole.CodeBlock)];
+            return [new StyledSegment (code, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)];
         }
 
         return segments;
@@ -136,9 +157,11 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// </summary>
     /// <param name="background">The terminal background color to evaluate.</param>
     /// <returns>A theme appropriate for the background luminance.</returns>
+    [Obsolete ("Syntax colors are resolved from ThemeManager.Theme via VisualRole.Code* roles.")]
     public static ThemeName GetThemeForBackground (Color background) => background.IsDarkColor () ? ThemeName.DarkPlus : ThemeName.LightPlus;
 
     /// <summary>Gets the <see cref="TextMateSharp.Grammars.ThemeName"/> that is currently active.</summary>
+    [Obsolete ("Syntax colors are resolved from ThemeManager.Theme via VisualRole.Code* roles.")]
     public ThemeName ThemeName { get; private set; }
 
     /// <inheritdoc/>
@@ -189,6 +212,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     ///     since theme changes may affect tokenization colors.
     /// </summary>
     /// <param name="theme">The new VS Code theme to use.</param>
+    [Obsolete ("Syntax colors are resolved from ThemeManager.Theme via VisualRole.Code* roles.")]
     public void SetTheme (ThemeName theme)
     {
         ThemeName = theme;
@@ -291,6 +315,19 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
         }
 
         return new Attribute (fg, _defaultBackground, style);
+    }
+
+    internal static VisualRole ResolveRoleForScopes (IEnumerable<string> scopes)
+    {
+        foreach ((string scopePrefix, VisualRole role) in TmScopeRoleMap)
+        {
+            if (scopes.Any (scope => scope.StartsWith (scopePrefix, StringComparison.Ordinal)))
+            {
+                return role;
+            }
+        }
+
+        return VisualRole.Code;
     }
 
     private IGrammar? ResolveGrammar (string? language)

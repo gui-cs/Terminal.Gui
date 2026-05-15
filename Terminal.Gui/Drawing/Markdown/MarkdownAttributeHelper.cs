@@ -28,6 +28,13 @@ internal static class MarkdownAttributeHelper
     /// <returns>A fully resolved <see cref="Attribute"/> ready for drawing.</returns>
     public static Attribute GetAttributeForSegment (View view, StyledSegment segment, ISyntaxHighlighter? highlighter = null, Color? themeBackground = null)
     {
+        if (segment.Role is { } role)
+        {
+            Attribute roleAttr = view.GetAttributeForRole (role);
+
+            return themeBackground is { } roleBg ? roleAttr with { Background = roleBg } : roleAttr;
+        }
+
         if (segment.Attribute is { } explicitAttr)
         {
             // When a caller-provided background override is present, apply it even to
@@ -80,7 +87,7 @@ internal static class MarkdownAttributeHelper
 
         foreach (InlineRun run in runs)
         {
-            segments.Add (new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource, run.Attribute));
+            segments.Add (new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource, run.Attribute, run.Role));
         }
 
         return segments;

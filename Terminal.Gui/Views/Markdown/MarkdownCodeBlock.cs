@@ -124,7 +124,7 @@ public class MarkdownCodeBlock : View, IDesignable
             else
             {
                 List<IReadOnlyList<StyledSegment>> segments = [];
-                segments.AddRange (value.Select (line => (IReadOnlyList<StyledSegment>)[new StyledSegment (line, MarkdownStyleRole.CodeBlock)]));
+                segments.AddRange (value.Select (line => (IReadOnlyList<StyledSegment>)[new StyledSegment (line, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)]));
 
                 _lines = segments;
             }

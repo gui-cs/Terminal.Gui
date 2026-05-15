@@ -129,4 +129,30 @@ public class SchemeCodeRoleTests
         Scheme scheme = new ();
         Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Code, out _));
     }
+
+    [Fact]
+    public void CodeToken_Roles_Derive_From_Code ()
+    {
+        // Copilot
+        Attribute codeAttr = new ("Green", "Yellow", TextStyle.Italic);
+        Scheme scheme = new () { Normal = new Attribute ("Red", "Blue"), Code = codeAttr };
+
+        foreach (VisualRole role in Enum.GetValues<VisualRole> ().Where (role => role > VisualRole.Code))
+        {
+            Assert.False (scheme.TryGetExplicitlySetAttributeForRole (role, out _));
+            Assert.Equal (codeAttr, scheme.GetAttributeForRole (role));
+        }
+    }
+
+    [Fact]
+    public void CodeToken_Role_Can_Be_Explicitly_Set ()
+    {
+        // Copilot
+        Attribute keywordAttr = new ("Cyan", "Black", TextStyle.Bold);
+        Scheme scheme = new () { Normal = new Attribute ("Red", "Blue"), CodeKeyword = keywordAttr };
+
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? retrieved));
+        Assert.Equal (keywordAttr, retrieved);
+        Assert.Equal (keywordAttr, scheme.GetAttributeForRole (VisualRole.CodeKeyword));
+    }
 }

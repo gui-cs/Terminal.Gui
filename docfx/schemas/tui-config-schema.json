@@ -452,6 +452,58 @@
         "ReadOnly": {
           "$ref": "#/definitions/attribute",
           "description": "Appearance for a read-only element."
+        },
+        "Code": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for preformatted or source code content."
+        },
+        "CodeComment": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code comments."
+        },
+        "CodeKeyword": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code keywords."
+        },
+        "CodeString": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code string literals."
+        },
+        "CodeNumber": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code numeric literals."
+        },
+        "CodeOperator": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code operators."
+        },
+        "CodeType": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code type names."
+        },
+        "CodePreprocessor": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code preprocessor directives."
+        },
+        "CodeIdentifier": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code identifiers."
+        },
+        "CodeConstant": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code constants."
+        },
+        "CodePunctuation": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code punctuation."
+        },
+        "CodeFunctionName": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code function names."
+        },
+        "CodeAttribute": {
+          "$ref": "#/definitions/attribute",
+          "description": "Appearance for source-code attributes."
         }
       },
       "required": [
