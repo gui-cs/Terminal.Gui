@@ -144,27 +144,34 @@ public partial class AppTestHelper : IDisposable
 
                                      if (App is { Initialized: true } app)
                                      {
-                                         IRunnable runnable = runnableBuilder ();
+                                         IRunnable? runnable = null;
 
-                                         runnable.IsRunningChanged += (_, e) =>
-                                                                      {
-                                                                          if (!e.Value)
-                                                                          {
-                                                                              Finished = true;
-                                                                          }
-                                                                      };
-
-                                         CancellationToken helperCancellationToken = _ansiInput.ExternalCancellationTokenSource!.Token;
-                                         await app.RunAsync (runnable, helperCancellationToken);
-
-                                         if (runnable is View runnableView)
+                                         try
                                          {
-                                             runnableView.Dispose ();
-                                         }
+                                             runnable = runnableBuilder ();
 
-                                         //Logging.Trace ("Application.Run completed");
-                                         app.Dispose ();
-                                         _runCancellationTokenSource.Cancel ();
+                                             runnable.IsRunningChanged += (_, e) =>
+                                                                          {
+                                                                              if (!e.Value)
+                                                                              {
+                                                                                  Finished = true;
+                                                                              }
+                                                                          };
+
+                                             CancellationToken helperCancellationToken = _ansiInput.ExternalCancellationTokenSource!.Token;
+                                             await app.RunAsync (runnable, helperCancellationToken);
+                                         }
+                                         finally
+                                         {
+                                             if (runnable is View runnableView)
+                                             {
+                                                 runnableView.Dispose ();
+                                             }
+
+                                             //Logging.Trace ("Application.Run completed");
+                                             app.Dispose ();
+                                             _runCancellationTokenSource.Cancel ();
+                                         }
                                      }
                                  }
                                  catch (OperationCanceledException)
@@ -431,6 +438,17 @@ public partial class AppTestHelper : IDisposable
 
                            writer?.WriteLine (text);
                        });
+
+    /// <summary>
+    ///     Cancels the linked token observed by the running application.
+    /// </summary>
+    /// <returns></returns>
+    public AppTestHelper CancelRun ()
+    {
+        _ansiInput.ExternalCancellationTokenSource?.Cancel ();
+
+        return this;
+    }
 
     /// <summary>
     ///     Stops the application and waits for the background thread to exit.

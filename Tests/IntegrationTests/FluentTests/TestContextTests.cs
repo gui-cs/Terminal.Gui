@@ -101,19 +101,15 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
-    public void RunAsync_Timeout_Stops_Application ()
+    public void RunAsync_Cancellation_After_Boot_Stops_Application ()
     {
         // Copilot
-        using AppTestHelper helper = With.A<Window> (
-            40,
-            10,
-            DriverRegistry.Names.ANSI,
-            _out,
-            TimeSpan.FromMilliseconds (50));
+        using AppTestHelper helper = With.A<Window> (40, 10, DriverRegistry.Names.ANSI, _out);
+        helper.CancelRun ();
 
         Assert.True (
             SpinWait.SpinUntil (() => helper.Finished, TimeSpan.FromSeconds (5)),
-            "AppTestHelper did not finish after timeout cancellation.");
+            "AppTestHelper did not finish after cancellation.");
     }
 
     [Fact]
