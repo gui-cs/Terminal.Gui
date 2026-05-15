@@ -13,14 +13,26 @@ public static class With
     /// <param name="height"></param>
     /// <param name="driverName"></param>
     /// <param name="logWriter"></param>
+    /// <param name="timeout"></param>
     /// <returns></returns>
-    public static AppTestHelper A<T> (int width, int height, string driverName, TextWriter? logWriter = null) where T : IRunnable, new()
+    public static AppTestHelper A<T> (
+        int width,
+        int height,
+        string driverName,
+        TextWriter? logWriter = null,
+        TimeSpan? timeout = null
+    ) where T : IRunnable, new ()
     {
-        return new (() => new T ()
-        {
-            //Id = $"{typeof (T).Name}"
-        }, width, height,
-        driverName, logWriter, Timeout);
+        return new (
+                    () => new T ()
+                    {
+                        //Id = $"{typeof (T).Name}"
+                    },
+                    width,
+                    height,
+                    driverName,
+                    logWriter,
+                    timeout ?? Timeout);
     }
 
     /// <summary>
@@ -31,11 +43,20 @@ public static class With
     /// <param name="height"></param>
     /// <param name="driverName"></param>
     /// <param name="logWriter"></param>
+    /// <param name="timeout"></param>
     /// <returns></returns>
-    public static AppTestHelper A (Func<IRunnable> runnableFactory, int width, int height, string driverName, TextWriter? logWriter = null)
+    public static AppTestHelper A (
+        Func<IRunnable> runnableFactory,
+        int width,
+        int height,
+        string driverName,
+        TextWriter? logWriter = null,
+        TimeSpan? timeout = null
+    )
     {
-        return new (runnableFactory, width, height, driverName, logWriter, Timeout);
+        return new (runnableFactory, width, height, driverName, logWriter, timeout ?? Timeout);
     }
+
     /// <summary>
     ///     The global timeout to allow for any given application to run for before shutting down.
     /// </summary>
