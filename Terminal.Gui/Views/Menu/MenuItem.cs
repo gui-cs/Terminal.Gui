@@ -148,6 +148,19 @@ public class MenuItem : Shortcut, IValue
     public object GetValue () => Title;
 
     /// <inheritdoc/>
+    public bool TrySetValueFromString (string input)
+    {
+        if (input is null)
+        {
+            return false;
+        }
+
+        Title = input;
+
+        return true;
+    }
+
+    /// <inheritdoc/>
     event EventHandler<ValueChangedEventArgs<object?>>? IValue.ValueChangedUntyped
     {
         add

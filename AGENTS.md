@@ -353,6 +353,32 @@ See `.claude/cookbook/` for common UI patterns:
 |ViewArrangement|Enum|Movable,Resizable,Overlapped
 ```
 
+### IValue<T> Pattern (Critical)
+
+All typed views expose their data through `IValue<T>.Value`. Do not guess property-specific names such as `.Date`, `.Time`, or `.Color`.
+
+| View | IValue<T> |
+|------|-----------|
+| TextField | `IValue<string>` |
+| NumericUpDown<T> | `IValue<T>` |
+| DatePicker | `IValue<DateTime>` |
+| TimeEditor | `IValue<TimeSpan>` |
+| ColorPicker | `IValue<Color?>` |
+| AttributePicker | `IValue<Attribute?>` |
+| CheckBox | `IValue<CheckState>` |
+| OptionSelector | `IValue<int?>` |
+| FlagSelector | `IValue<int?>` |
+
+Implementing `IValue<T>` requires `ValueChanging`, `ValueChanged`, and `ValueChangedUntyped`.
+
+### RunnableWrapper<TView, TResult>
+
+- Wraps a `View` as a runnable with typed results.
+- Clears wrapper `KeyBindings` and `MouseBindings` so the wrapped view handles input.
+- Does not add OK/Cancel buttons (unlike `Prompt`).
+- Sets `CommandsToBubbleUp = [Command.Accept]`.
+- On accept, it extracts results via `ResultExtractor` if provided; otherwise via `IValue<TResult>.Value` when available.
+
 ### Terminal.Gui.Views (180+ types)
 ```
 [Core Controls]
@@ -364,7 +390,7 @@ See `.claude/cookbook/` for common UI patterns:
 |DropDownList|Class|Dropdown,Source,SelectedItem
 |ProgressBar|Class|Fraction,BidirectionalMarquee
 |ScrollBar|Class|Position,Size,Orientation
-|NumericUpDown<T>|Class|Value,Increment,Min,Max
+|NumericUpDown<T>|Class|Value,Increment
 
 [Containers]
 |Window|Class|Top-level,Title,MenuBar support
@@ -390,7 +416,7 @@ See `.claude/cookbook/` for common UI patterns:
 
 [File Dialogs]
 |FileDialog|Class|Base,Path,AllowedFileTypes
-|OpenDialog|Class|OpenFile,AllowsMultipleSelection
+|OpenDialog|Class|FilePaths,AllowsMultipleSelection,Canceled,OpenMode
 |SaveDialog|Class|SaveFile,FileName
 
 [Specialized]
@@ -428,6 +454,10 @@ See `.claude/cookbook/` for common UI patterns:
 |Region|Class|Clipping,Union,Intersect,Exclude
 |Gradient|Class|Colors[],Spectrum
 ```
+
+**Gotchas**
+- `Terminal.Gui.Drawing.Attribute` can conflict with `System.Attribute` with implicit usings. Use `using TgAttribute = Terminal.Gui.Drawing.Attribute;` or fully qualify.
+- `Color.TryParse (string, out Color?)` is nullable out. `Color.TryParse (string?, IFormatProvider?, out Color)` is non-nullable out.
 
 ### Terminal.Gui.Drivers (80+ types)
 ```
@@ -473,7 +503,6 @@ See `.claude/cookbook/` for common UI patterns:
 |IFileOperations|Interface|GetFiles,GetDirectories,Exists
 |FileSystemTreeBuilder|Class|Build file trees
 ```
-
 
 
 

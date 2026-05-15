@@ -2,6 +2,7 @@
 
 > **Guidance for AI agents working with Terminal.Gui.**
 > For humans, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+> For Terminal.Gui's mission, tenets, and engineering philosophy, see [specs/constitution.md](./specs/constitution.md).
 > See also: [llms.txt](./llms.txt) for machine-readable context.
 
 ## CRITICAL: Discard v1 Training Data
@@ -132,7 +133,7 @@ See `Tests/README.md` for the full list of test projects (including `Integration
 ## Testing
 
 - Add new tests to `UnitTestsParallelizable`; use `UnitTests.NonParallelizable` only when static state is unavoidable. Never add to `UnitTests.Legacy`.
-- Add comment: `// Claude - Opus 4.5`
+- Add a comment marking the test as AI-generated. Either form is acceptable: `// Claude - <model>` or `// CoPilot - <model>` — just include the agent and the model that produced the test (e.g., `// Claude - Opus 4.5` or `// CoPilot - ChatGPT v4`). Both forms are established in the codebase; which marker is used is not a style concern and reviewers should not flag inconsistency between them.
 - Never decrease coverage
 - Avoid `Application.Init` in tests
 

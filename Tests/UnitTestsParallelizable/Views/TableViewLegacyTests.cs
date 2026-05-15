@@ -212,7 +212,7 @@ public class TableViewLegacyTests : TestDriverBase
         tableView.Table = new DataTableSource (dt);
         tableView.SetSelection (selectedCol, tableView.Value?.SelectedCell.Y ?? 0, false);
 
-        Assert.Equal (expectedRow, tableView.CollectionNavigator.GetNextMatchingItem (0, "3".ToCharArray () [0]));
+        Assert.Equal (expectedRow, tableView.CollectionNavigator!.GetNextMatchingItem (0, "3".ToCharArray () [0]));
     }
 
     [Fact]

@@ -23,6 +23,21 @@ public class KeyBindingsTests
         Assert.Contains (Command.Left, resultCommands);
     }
 
+    // Claude - Opus 4.7
+    [Fact]
+    public void Add_PreservesKeyOnTheBinding ()
+    {
+        KeyBindings bindings = new ();
+        Key f1 = new (KeyCode.F1);
+
+        bindings.Add (f1, Command.Accept);
+        bool found = bindings.TryGet (f1, out KeyBinding binding);
+
+        Assert.True (found);
+        Assert.Equal (f1, binding.Key);
+        Assert.Contains (Command.Accept, binding.Commands);
+    }
+
     [Fact]
     public void Add_Invalid_Key_Throws ()
     {

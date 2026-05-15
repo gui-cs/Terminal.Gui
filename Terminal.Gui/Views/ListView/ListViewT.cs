@@ -122,6 +122,23 @@ public class ListView<T> : ListView, IValue<T>
     /// </remarks>
     object? IValue.GetValue () => Value;
 
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Resolves the diamond between <see cref="ListView"/>'s <c>IValue&lt;int?&gt;</c> and
+    ///     this view's <c>IValue&lt;T&gt;</c> by parsing into <typeparamref name="T"/>.
+    /// </remarks>
+    bool IValue.TrySetValueFromString (string input)
+    {
+        if (!IValueParser.TryParseValue (input, out T? parsed))
+        {
+            return false;
+        }
+
+        Value = parsed;
+
+        return true;
+    }
+
     /// <summary>
     ///     Gets or sets the currently selected object.
     ///     This is a convenience property that is an alias for <see cref="Value"/>.

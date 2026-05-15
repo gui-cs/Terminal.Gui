@@ -182,7 +182,7 @@ public class ColorPickerTests
         cp.Draw (); // Draw is needed to update TrianglePosition
 
         // Click at the end of the Red bar
-        cp.Focused!.RaiseMouseEvent (new Mouse
+        cp.Focused!.NewMouseEvent (new Mouse
         {
             Flags = MouseFlags.LeftButtonPressed, Position = new Point (19, 0) // Assuming 0-based indexing
         });
@@ -213,7 +213,7 @@ public class ColorPickerTests
         cp.Draw (); // Draw is needed to update TrianglePosition
 
         // Click beyond the bar
-        cp.Focused!.RaiseMouseEvent (new Mouse
+        cp.Focused!.NewMouseEvent (new Mouse
         {
             Flags = MouseFlags.LeftButtonPressed, Position = new Point (21, 0) // Beyond the bar
         });
@@ -243,33 +243,17 @@ public class ColorPickerTests
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
-        // Click on Green bar
+        // Click on Green bar (press then release to complete the click cycle and release grab)
         cp.App!.Mouse.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new Point (0, 1) });
-
-        //cp.SubViews.OfType<GBar> ()
-        //  .Single ()
-        //  .OnMouseEvent (
-        //                 new ()
-        //                 {
-        //                     Flags = MouseFlags.LeftButtonPressed,
-        //                     Position = new (0, 1)
-        //                 });
+        cp.App!.Mouse.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new Point (0, 1) });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
         Assert.IsAssignableFrom<GBar> (cp.Focused);
 
-        // Click on Blue bar
+        // Click on Blue bar (press then release to complete the click cycle and release grab)
         cp.App!.Mouse.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, ScreenPosition = new Point (0, 2) });
-
-        //cp.SubViews.OfType<BBar> ()
-        //  .Single ()
-        //  .OnMouseEvent (
-        //                 new ()
-        //                 {
-        //                     Flags = MouseFlags.LeftButtonPressed,
-        //                     Position = new (0, 2)
-        //                 });
+        cp.App!.Mouse.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased, ScreenPosition = new Point (0, 2) });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
@@ -494,13 +478,16 @@ public class ColorPickerTests
         Assert.Same (hex, cp.Focused);
 
         hex.Text = "";
-        name.Text = "";
 
         Assert.Empty (hex.Text);
-        Assert.Empty (name.Text);
+
+        // Name field shows "Black" initially (from SelectedColor = Color.Black)
+        Assert.Equal ("Black", name.Text);
 
         cp.App!.Keyboard.RaiseKeyDownEvent ('#');
-        Assert.Empty (name.Text);
+
+        // Name stays at "Black" while typing hex (no update until leave/accept)
+        Assert.Equal ("Black", name.Text);
 
         //7FFFD4
 
@@ -510,7 +497,7 @@ public class ColorPickerTests
         cp.App!.Keyboard.RaiseKeyDownEvent ('F');
         cp.App!.Keyboard.RaiseKeyDownEvent ('F');
         cp.App!.Keyboard.RaiseKeyDownEvent ('D');
-        Assert.Empty (name.Text);
+        Assert.Equal ("Black", name.Text);
 
         cp.App!.Keyboard.RaiseKeyDownEvent ('4');
 
@@ -548,13 +535,16 @@ public class ColorPickerTests
         Assert.Same (hex, cp.Focused);
 
         hex.Text = "";
-        name.Text = "";
 
         Assert.Empty (hex.Text);
-        Assert.Empty (name.Text);
+
+        // Name field shows "Black" initially (from SelectedColor = Color.Black)
+        Assert.Equal ("Black", name.Text);
 
         cp.App!.Keyboard.RaiseKeyDownEvent ('#');
-        Assert.Empty (name.Text);
+
+        // Name stays at "Black" while typing hex (no update until leave/accept)
+        Assert.Equal ("Black", name.Text);
 
         //7FFFD4
 
@@ -564,7 +554,7 @@ public class ColorPickerTests
         cp.App!.Keyboard.RaiseKeyDownEvent ('F');
         cp.App!.Keyboard.RaiseKeyDownEvent ('F');
         cp.App!.Keyboard.RaiseKeyDownEvent ('D');
-        Assert.Empty (name.Text);
+        Assert.Equal ("Black", name.Text);
 
         cp.App!.Keyboard.RaiseKeyDownEvent ('4');
 
@@ -700,14 +690,14 @@ public class ColorPickerTests
 
         Assert.IsAssignableFrom<IColorBar> (cp.Focused);
 
-        cp.Focused!.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (3, 0) });
+        cp.Focused!.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (3, 0) });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
         Assert.Equal (3, r.TrianglePosition);
         Assert.Equal ("#0F0000", hex.Text);
 
-        cp.Focused.RaiseMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (4, 0) });
+        cp.Focused.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (4, 0) });
 
         cp.Draw (); // Draw is needed to update TrianglePosition
 
@@ -868,8 +858,9 @@ public class ColorPickerTests
     }
 
     [Fact]
-    public void TabCompleteColorName ()
+    public void DropDownListColorName_SelectsColor ()
     {
+        // Copilot
         ColorPicker cp = GetColorPicker (ColorModel.RGB, true, true);
 
         cp.Draw (); // Draw is needed to update TrianglePosition
@@ -880,38 +871,16 @@ public class ColorPickerTests
         TextField name = GetTextField (cp, ColorPickerPart.ColorName);
         TextField hex = GetTextField (cp, ColorPickerPart.Hex);
 
-        name.SetFocus ();
+        // Verify the name field is a DropDownList
+        Assert.IsType<DropDownList> (name);
 
-        Assert.True (name.HasFocus);
-        Assert.Same (name, cp.Focused);
+        // Initial color is Black
+        Assert.Equal ("Black", name.Text);
 
-        name.Text = "";
-        Assert.Empty (name.Text);
+        // Directly set the text on the DropDownList to simulate selecting "Aqua"
+        name.Text = "Aqua";
 
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.A);
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.Q);
-
-        Assert.Equal ("aq", name.Text);
-
-        // Auto complete the color name
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.Tab);
-
-        // Match cyan alternative name
-        Assert.Equal ("Aqua", name.Text);
-
-        Assert.True (name.HasFocus);
-
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.Tab);
-
-        // Resolves to cyan color
-        Assert.Equal ("Aqua", name.Text);
-
-        // Tab out of the text field
-        cp.App!.Keyboard.RaiseKeyDownEvent (Key.Tab);
-
-        Assert.False (name.HasFocus);
-        Assert.NotSame (name, cp.Focused);
-
+        // The color should now be Aqua (#00FFFF)
         Assert.Equal ("#00FFFF", hex.Text);
 
         cp.App?.Dispose ();
@@ -1112,6 +1081,83 @@ public class ColorPickerTests
 
         Assert.Equal (Color.Red, receivedOld);
         Assert.Equal (Color.Blue, receivedNew);
+    }
+
+    #endregion
+
+    #region ColorBar Mouse Binding Tests (issue #5143)
+
+    // Copilot
+
+    [Fact]
+    public void ColorBar_MousePress_UpdatesValue ()
+    {
+        // Regression: pressing on a bar must still update its value after the
+        // value-update logic was moved from OnMouseEvent to Command.Activate.
+        ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
+        cp.Draw ();
+
+        ColorBar r = GetColorBar (cp, ColorPickerPart.Bar1);
+        Assert.Equal (0, r.Value);
+
+        // Position 10 is inside the bar (bar starts at X=2 for "R:" label, width 18).
+        r.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (10, 0) });
+
+        Assert.True (r.Value > 0, "Value must increase when pressing inside the bar.");
+
+        cp.App?.Dispose ();
+    }
+
+    [Fact]
+    public void ColorBar_MouseEvent_CanBeCancelled ()
+    {
+        // Subscribing to MouseEvent and setting Handled=true must prevent the value
+        // update. Previously the update happened in OnMouseEvent before the event was
+        // raised, making cancellation impossible.
+        ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
+        cp.Draw ();
+
+        ColorBar r = GetColorBar (cp, ColorPickerPart.Bar1);
+        Assert.Equal (0, r.Value);
+
+        r.MouseEvent += (_, e) => { e.Handled = true; };
+
+        r.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (10, 0) });
+
+        Assert.Equal (0, r.Value);
+
+        cp.App?.Dispose ();
+    }
+
+    [Fact]
+    public void ColorBar_Drag_BoundedToOriginatingBar ()
+    {
+        // Dragging the mouse from one bar into another bar must not alter the second
+        // bar's value. GrabMouse in Command.Activate (not OnMouseEvent) ensures all subsequent
+        // drag events are routed to the bar where the press originated.
+        ColorPicker cp = GetColorPicker (ColorModel.RGB, false);
+        cp.Draw ();
+
+        ColorBar g = GetColorBar (cp, ColorPickerPart.Bar2);
+        Assert.Equal (0, g.Value);
+
+        // Press on the Red bar row (Y=0 in screen coords).
+        cp.App!.Mouse.RaiseMouseEvent (new Mouse
+        {
+            Flags = MouseFlags.LeftButtonPressed,
+            ScreenPosition = new Point (10, 0)
+        });
+
+        // Drag into the Green bar row (Y=1) – grab in Command.Activate must route events to Red bar only.
+        cp.App!.Mouse.RaiseMouseEvent (new Mouse
+        {
+            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport,
+            ScreenPosition = new Point (10, 1)
+        });
+
+        Assert.Equal (0, g.Value);
+
+        cp.App?.Dispose ();
     }
 
     #endregion

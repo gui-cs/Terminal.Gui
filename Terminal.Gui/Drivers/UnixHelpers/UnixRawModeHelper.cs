@@ -20,11 +20,26 @@ namespace Terminal.Gui.Drivers;
 ///     </list>
 ///     This allows the application to receive raw keyboard input and process all keys,
 ///     including control sequences and special keys as ANSI escape sequences.
+///     <para>
+///         The primary restore path is an explicit call to <see cref="Dispose"/> (or
+///         <see cref="Restore"/>). To guarantee the terminal is restored when the process
+///         exits without disposing the helper, <see cref="TryEnable"/> also registers an
+///         <see cref="AppDomain.ProcessExit"/> hook that calls <see cref="Restore"/>. See
+///         issue #5164. A <see cref="Console.CancelKeyPress"/> handler is registered as a
+///         best-effort safety net, but disabling ISIG means a keyboard Ctrl+C is delivered
+///         as a 0x03 byte rather than SIGINT, so that handler is unlikely to fire while
+///         raw mode is active; it still helps for externally-delivered SIGINT/CTRL_C events
+///         and for hosts that do not disable ISIG.
+///     </para>
 /// </remarks>
 internal sealed class UnixRawModeHelper : IDisposable
 {
     private Termios _originalTermios;
+    private bool _haveSavedTermios;
     private bool _disposed;
+    private int _termiosFd = -1;
+    private EventHandler? _processExitHandler;
+    private ConsoleCancelEventHandler? _cancelKeyHandler;
 
     /// <summary>
     ///     Gets whether raw mode was successfully enabled.
@@ -50,8 +65,22 @@ internal sealed class UnixRawModeHelper : IDisposable
 
         try
         {
+            // Use the controlling terminal input fd: when stdin is redirected (e.g. `myapp | jq`)
+            // this is /dev/tty rather than STDIN_FILENO, so termios settings still apply to the
+            // real terminal device.
+            int fd = TerminalDevice.InputFd;
+
+            if (fd < 0)
+            {
+                Logging.Warning ("No terminal input device available. Cannot enable raw mode.");
+
+                return false;
+            }
+
+            _termiosFd = fd;
+
             // Get current terminal attributes
-            int result = tcgetattr (STDIN_FILENO, out _originalTermios);
+            int result = tcgetattr (_termiosFd, out _originalTermios);
 
             if (result != 0)
             {
@@ -60,6 +89,11 @@ internal sealed class UnixRawModeHelper : IDisposable
 
                 return false;
             }
+
+            // Mark that _originalTermios contains a valid snapshot. Without this guard,
+            // a later Restore() (after a TryEnable failure path or before any successful
+            // call) could write uninitialized struct contents back to the terminal.
+            _haveSavedTermios = true;
 
             // Create modified attributes for raw mode
             Termios raw = _originalTermios;
@@ -80,7 +114,7 @@ internal sealed class UnixRawModeHelper : IDisposable
             }
 
             // Apply raw mode settings
-            result = tcsetattr (STDIN_FILENO, TCSANOW, ref raw);
+            result = tcsetattr (_termiosFd, TCSANOW, ref raw);
 
             if (result != 0)
             {
@@ -91,6 +125,11 @@ internal sealed class UnixRawModeHelper : IDisposable
             }
 
             IsRawModeEnabled = true;
+
+            // Wire safety nets so the terminal is restored even if the input thread
+            // crashes or the process exits without going through Dispose().
+            HookProcessExit ();
+
             Logging.Information ("Unix raw mode enabled successfully.");
 
             return true;
@@ -111,16 +150,34 @@ internal sealed class UnixRawModeHelper : IDisposable
     /// <summary>
     ///     Restores the terminal to its original state.
     /// </summary>
+    /// <remarks>
+    ///     A no-op if raw mode was never successfully enabled, if the original
+    ///     <c>termios</c> snapshot was never captured, or if the helper has already
+    ///     been disposed. This guard prevents writing an uninitialized
+    ///     <c>termios</c> struct back to the terminal after a failed
+    ///     <see cref="TryEnable"/>.
+    /// </remarks>
     public void Restore ()
     {
-        if (!IsRawModeEnabled || _disposed)
+        if (_disposed || !_haveSavedTermios || !IsRawModeEnabled)
         {
             return;
         }
 
         try
         {
-            tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
+            int result = tcsetattr (_termiosFd, TCSANOW, ref _originalTermios);
+
+            if (result != 0)
+            {
+                int errno = Marshal.GetLastWin32Error ();
+                Logging.Warning ($"tcsetattr failed during restore (errno={errno}). Terminal may still be in raw mode.");
+
+                // Leave IsRawModeEnabled set to true so callers know the terminal was not
+                // successfully restored.
+                return;
+            }
+
             IsRawModeEnabled = false;
             Logging.Information ("Unix terminal settings restored.");
         }
@@ -138,8 +195,69 @@ internal sealed class UnixRawModeHelper : IDisposable
             return;
         }
 
+        UnhookProcessExit ();
         Restore ();
         _disposed = true;
+    }
+
+    private void HookProcessExit ()
+    {
+        if (_processExitHandler is not null)
+        {
+            return;
+        }
+
+        _processExitHandler = (_, _) => Restore ();
+        AppDomain.CurrentDomain.ProcessExit += _processExitHandler;
+
+        try
+        {
+            // Belt-and-braces: most Unix raw-mode entry disables ISIG, so Ctrl+C produces a
+            // literal 0x03 byte on stdin rather than a SIGINT, meaning this handler is unlikely
+            // to fire from a keyboard Ctrl+C while raw mode is active. It still helps for
+            // externally-delivered SIGINT/CTRL_C events and for hosts that do not disable ISIG.
+            // The primary safety net is the AppDomain.ProcessExit hook.
+            _cancelKeyHandler = (_, _) => Restore ();
+            Console.CancelKeyPress += _cancelKeyHandler;
+        }
+        catch (Exception ex)
+        {
+            // Console.CancelKeyPress may throw on some hosts (e.g. when stdin is
+            // redirected in unusual ways). The ProcessExit hook is still in place.
+            Logging.Warning ($"Could not hook Console.CancelKeyPress: {ex.Message}");
+            _cancelKeyHandler = null;
+        }
+    }
+
+    private void UnhookProcessExit ()
+    {
+        if (_processExitHandler is not null)
+        {
+            try
+            {
+                AppDomain.CurrentDomain.ProcessExit -= _processExitHandler;
+            }
+            catch
+            {
+                // Ignore: nothing useful we can do here.
+            }
+
+            _processExitHandler = null;
+        }
+
+        if (_cancelKeyHandler is not null)
+        {
+            try
+            {
+                Console.CancelKeyPress -= _cancelKeyHandler;
+            }
+            catch
+            {
+                // Ignore: nothing useful we can do here.
+            }
+
+            _cancelKeyHandler = null;
+        }
     }
 
     #region P/Invoke Declarations

@@ -43,6 +43,7 @@
 /// </remarks>
 public class Button : View, IDesignable, IAcceptTarget
 {
+    private readonly TextFormatter _interiorTextFormatter = new ();
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
@@ -70,6 +71,10 @@ public class Button : View, IDesignable, IAcceptTarget
         _rightBracket = Glyphs.RightBracket;
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
+
+        _interiorTextFormatter.Alignment = Alignment.Center;
+        _interiorTextFormatter.VerticalAlignment = Alignment.Center;
+        _interiorTextFormatter.HotKeySpecifier = HotKeySpecifier;
 
         Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
@@ -167,13 +172,18 @@ public class Button : View, IDesignable, IAcceptTarget
     {
         base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
+        _interiorTextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
     /// <inheritdoc/>
     public override string Text { get => Title; set => base.Text = Title = value; }
 
     /// <inheritdoc/>
-    public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set => _interiorTextFormatter.HotKeySpecifier = TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
+    }
 
     /// <inheritdoc/>
     public bool IsDefault
@@ -208,26 +218,113 @@ public class Button : View, IDesignable, IAcceptTarget
     protected override void UpdateTextFormatterText ()
     {
         base.UpdateTextFormatterText ();
+        TextFormatter.Text = GetDecoratedText ();
+    }
 
-        if (NoDecorations)
+    /// <inheritdoc/>
+    protected override bool OnDrawingText (DrawContext? context)
+    {
+        if (NoDecorations || Driver is null)
         {
-            TextFormatter.Text = Text;
+            return base.OnDrawingText (context);
         }
-        else if (IsDefault)
+
+        Rectangle drawRect = new (ContentToScreen (Point.Empty), GetContentSize ());
+
+        if (drawRect.Width < 2 || drawRect.Height < 1)
         {
-            TextFormatter.Text = $"{_leftBracket}{_leftDefault} {Text} {_rightDefault}{_rightBracket}";
+            return base.OnDrawingText (context);
         }
-        else
+
+        Rectangle interiorRect = new (drawRect.X + 1, drawRect.Y, drawRect.Width - 2, drawRect.Height);
+        Attribute normalAttr = HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal);
+        Attribute hotAttr = HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
+        string interiorText = GetInteriorText ();
+
+        // Mirror all TextFormatter settings onto _interiorTextFormatter. Guard each assignment
+        // so NeedsFormat is not set when a value is unchanged.
+        if (_interiorTextFormatter.Text != interiorText)
         {
-            if (NoPadding)
-            {
-                TextFormatter.Text = $"{_leftBracket}{Text}{_rightBracket}";
-            }
-            else
-            {
-                TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
-            }
+            _interiorTextFormatter.Text = interiorText;
         }
+
+        if (_interiorTextFormatter.Alignment != TextAlignment)
+        {
+            _interiorTextFormatter.Alignment = TextAlignment;
+        }
+
+        if (_interiorTextFormatter.VerticalAlignment != VerticalTextAlignment)
+        {
+            _interiorTextFormatter.VerticalAlignment = VerticalTextAlignment;
+        }
+
+        if (_interiorTextFormatter.Direction != TextDirection)
+        {
+            _interiorTextFormatter.Direction = TextDirection;
+        }
+
+        if (_interiorTextFormatter.PreserveTrailingSpaces != PreserveTrailingSpaces)
+        {
+            _interiorTextFormatter.PreserveTrailingSpaces = PreserveTrailingSpaces;
+        }
+
+        if (_interiorTextFormatter.MultiLine != TextFormatter.MultiLine)
+        {
+            _interiorTextFormatter.MultiLine = TextFormatter.MultiLine;
+        }
+
+        if (_interiorTextFormatter.WordWrap != TextFormatter.WordWrap)
+        {
+            _interiorTextFormatter.WordWrap = TextFormatter.WordWrap;
+        }
+
+        if (_interiorTextFormatter.TabWidth != TextFormatter.TabWidth)
+        {
+            _interiorTextFormatter.TabWidth = TextFormatter.TabWidth;
+        }
+
+        if (_interiorTextFormatter.PreserveTabs != TextFormatter.PreserveTabs)
+        {
+            _interiorTextFormatter.PreserveTabs = TextFormatter.PreserveTabs;
+        }
+
+        if (_interiorTextFormatter.ConstrainToWidth != interiorRect.Width)
+        {
+            _interiorTextFormatter.ConstrainToWidth = interiorRect.Width;
+        }
+
+        if (_interiorTextFormatter.ConstrainToHeight != interiorRect.Height)
+        {
+            _interiorTextFormatter.ConstrainToHeight = interiorRect.Height;
+        }
+
+        Region? interiorDrawRegion = (interiorRect.Width > 0 && !string.IsNullOrEmpty (interiorText))
+            ? _interiorTextFormatter.GetDrawRegion (interiorRect)
+            : null;
+
+        context?.AddDrawnRegion (new Region (drawRect));
+
+        int delimiterRow = GetDelimiterRow (drawRect, interiorDrawRegion);
+
+        // Fill the entire content area with the focus/normal attribute to ensure continuous
+        // highlight across all rows and across the bracket columns.
+        Driver.SetAttribute (normalAttr);
+        Driver.FillRect (drawRect);
+
+        Driver.Move (drawRect.X, delimiterRow);
+        Driver.AddRune (_leftBracket);
+
+        Driver.Move (drawRect.X + drawRect.Width - 1, delimiterRow);
+        Driver.AddRune (_rightBracket);
+
+        if (interiorDrawRegion is not null)
+        {
+            _interiorTextFormatter.Draw (Driver, interiorRect, normalAttr, hotAttr, Rectangle.Empty);
+        }
+
+        SetSubViewNeedsDrawDownHierarchy ();
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -236,5 +333,52 @@ public class Button : View, IDesignable, IAcceptTarget
         Title = "_Button";
 
         return true;
+    }
+
+    // GetDecoratedText (called by UpdateTextFormatterText for Dim.Auto sizing) and GetInteriorText
+    // (called by OnDrawingText for rendering) must remain in sync when modifying button text formatting.
+    private string GetDecoratedText ()
+    {
+        if (NoDecorations)
+        {
+            return Text;
+        }
+
+        return $"{_leftBracket}{GetInteriorText ()}{_rightBracket}";
+    }
+
+    private string GetInteriorText ()
+    {
+        if (IsDefault)
+        {
+            return $"{_leftDefault} {Text} {_rightDefault}";
+        }
+
+        if (NoPadding)
+        {
+            return Text;
+        }
+
+        return $" {Text} ";
+    }
+
+    private int GetDelimiterRow (Rectangle drawRect, Region? interiorDrawRegion)
+    {
+        if (interiorDrawRegion is not null)
+        {
+            Rectangle interiorBounds = interiorDrawRegion.GetBounds ();
+
+            if (!interiorBounds.IsEmpty)
+            {
+                return interiorBounds.Y;
+            }
+        }
+
+        return VerticalTextAlignment switch
+        {
+            Alignment.End => drawRect.Y + drawRect.Height - 1,
+            Alignment.Center => drawRect.Y + (drawRect.Height - 1) / 2,
+            _ => drawRect.Y
+        };
     }
 }

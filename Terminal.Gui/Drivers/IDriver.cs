@@ -128,6 +128,19 @@ public interface IDriver : IDisposable
 
     #region Color Support
 
+    /// <summary>
+    ///     Gets the terminal's sixel support capabilities, detected during driver initialization.
+    /// </summary>
+    /// <remarks>
+    ///     <see langword="null"/> if detection has not been performed.
+    /// </remarks>
+    SixelSupportResult? SixelSupport { get; }
+
+    /// <summary>
+    ///     Raised when <see cref="SixelSupport"/> changes (e.g. after terminal color detection completes).
+    /// </summary>
+    event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
+
     /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
     bool SupportsTrueColor { get; }
 

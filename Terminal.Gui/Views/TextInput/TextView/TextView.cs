@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///         <listheader>
 ///             <term>Key</term> <description>Action</description>
 ///         </listheader>
+
 ///         <item>
 ///             <term>Left, Ctrl+B</term> <description>Moves the editing point left.</description>
 ///         </item>
@@ -95,6 +96,9 @@ namespace Terminal.Gui.Views;
 ///         </item>
 ///     </list>
 /// </remarks>
+[Obsolete ("TextView is superseded by gui-cs/Editor's EditorView, which provides a rope-backed document model, "
+           + "cell-aware rendering, multi-caret editing, undo, syntax highlighting, folding, find/replace, and soft wrap. "
+           + "See https://github.com/gui-cs/Editor for details.", error: false)]
 public partial class TextView : View, IDesignable
 {
     /// <summary>

@@ -161,6 +161,8 @@ public partial class TableView
         {
             int headerHeight = GetHeaderHeightIfAny ();
             int headerHeightVisible = CurrentHeaderHeightVisible ();
+            int leftOuterBorderWidth = ShouldRenderFirstOuterVerticalLine () ? 1 : 0;
+            int rightOuterBorderWidth = ShouldRenderLastOuterVerticalLine () ? 1 : 0;
             contentSize.Height += headerHeight + Table?.Rows ?? 0;
 
             if (Style.ShowHorizontalBottomLine)
@@ -200,8 +202,7 @@ public partial class TableView
                     reservedFromIndex [i] = minWidths [i] + separator + reservedFromIndex [i + 1];
                 }
 
-                //right border
-                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+                contentSize.Width += leftOuterBorderWidth;
 
                 var startRow = 0;
                 int rowsToRender = Table.Rows;
@@ -238,7 +239,7 @@ public partial class TableView
                     if (isVeryLast)
                     {
                         //remaining space for last column
-                        int remainingSpace = Viewport.Width - contentSize.Width - (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
+                        int remainingSpace = Viewport.Width - contentSize.Width - rightOuterBorderWidth;
 
                         if (Style.ExpandLastColumn && colWidth < remainingSpace)
                         {
@@ -250,8 +251,7 @@ public partial class TableView
                         // Reserve at least the header width for each subsequent visible column so that a wide
                         // column does not consume all viewport space and push later columns off-screen.
                         int reservedForRemaining = reservedFromIndex [columnIndex + 1];
-                        int borderWidth = Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
-                        int availableForThisCol = Viewport.Width - contentSize.Width - reservedForRemaining - borderWidth - 1; // -1 for this column's separator
+                        int availableForThisCol = Viewport.Width - contentSize.Width - reservedForRemaining - rightOuterBorderWidth - 1; // -1 for this column's separator
 
                         // Don't shrink below this column's own minimum (header width or configured minimum)
                         int thisColMin = minWidths [columnIndex];
@@ -275,8 +275,7 @@ public partial class TableView
                     columnIndex++;
                 }
 
-                // for left border
-                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+                contentSize.Width += rightOuterBorderWidth;
             }
             else
             {
@@ -348,5 +347,25 @@ public partial class TableView
         }
 
         return min;
+    }
+
+    private bool ShouldRenderFirstOuterVerticalLine ()
+    {
+        if (!Style.ShowVerticalCellLineForFirstColumn)
+        {
+            return false;
+        }
+
+        return Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines;
+    }
+
+    private bool ShouldRenderLastOuterVerticalLine ()
+    {
+        if (!Style.ShowVerticalCellLineForLastColumn)
+        {
+            return false;
+        }
+
+        return Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines;
     }
 }

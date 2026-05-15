@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using System.Text;
 using JetBrains.Annotations;
 using UnitTests;
 
@@ -201,6 +202,326 @@ public class MarkdownViewTests (ITestOutputHelper output)
         window.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void Mouse_Click_On_Link_In_Table_Cell_Raises_LinkClicked ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [select](https://example.com) | Pick one item |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        window.Add (markdownView);
+
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // The table is a SubView of the Markdown view. Find it.
+        MarkdownTable? tableView = null;
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable t)
+            {
+                tableView = t;
+
+                break;
+            }
+        }
+
+        Assert.NotNull (tableView);
+
+        // Click on the link text in the first body row, first column.
+        // Table layout: row 0 = top border, row 1 = header, row 2 = separator, row 3 = body row.
+        // Column layout: col 0 starts after left border (x=1), with 1 char padding = x=2.
+        tableView.NewMouseEvent (new Mouse { Position = new Point (2, 3), Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.Equal ("https://example.com", clickedUrl);
+
+        window.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Tab_Navigation_Cycles_Through_Table_Links ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = new ();
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Find the table SubView
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+        Assert.True (tableView.CanFocus);
+
+        // Give focus to the table
+        tableView.SetFocus ();
+
+        // Activate to check first focused link
+        tableView.InvokeCommand (Command.Accept);
+
+        // Advance focus forward
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+
+        // Should have activated two distinct links
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Contains ("https://a.com", activatedUrls);
+        Assert.Contains ("https://b.com", activatedUrls);
+
+        window.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Enter_Activates_Focused_Table_Link ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | info |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        // Focus the table — the first link becomes active
+        tableView.SetFocus ();
+
+        // Simulate Enter key via Command.Accept
+        tableView.InvokeCommand (Command.Accept);
+
+        Assert.Equal ("https://a.com", clickedUrl);
+
+        window.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void ShiftTab_Navigation_Cycles_Backwards_Through_Table_Links ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = new ();
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        // Focus the table — first link (alpha) becomes active on focus gain
+        tableView.SetFocus ();
+
+        // Advance forward to second link (beta)
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+        Assert.Single (activatedUrls);
+        Assert.Equal ("https://b.com", activatedUrls [0]);
+
+        // Navigate backward — should go back to first link (alpha)
+        markdownView.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Equal ("https://a.com", activatedUrls [1]);
+
+        window.Dispose ();
+    }
+
+    // Copilot - Opus 4.6 - verify Issue 1: anchor links in tables should scroll to heading
+    [Fact]
+    public void Anchor_Link_In_Table_Scrolls_To_Heading ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        // Create markdown with a heading and a table containing an anchor link to it.
+        // The heading must be far enough below the table that scrolling is needed.
+        string markdown = """
+                          | Name | Link |
+                          |------|------|
+                          | jump | [go](#target) |
+
+                          Line 1
+
+                          Line 2
+
+                          Line 3
+
+                          Line 4
+
+                          Line 5
+
+                          Line 6
+
+                          Line 7
+
+                          Line 8
+
+                          Line 9
+
+                          ## Target
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 10 };
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Viewport should start at top
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // Find the table and activate the anchor link
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        tableView.SetFocus ();
+        tableView.InvokeCommand (Command.Accept);
+
+        // The anchor link should have been reported
+        Assert.Equal ("#target", clickedUrl);
+
+        // The viewport should have scrolled down to the heading
+        Assert.True (markdownView.Viewport.Y > 0, "Viewport should have scrolled to the anchor target");
+
+        window.Dispose ();
+    }
+
+    // Copilot - Opus 4.6 - verify Issue 2: duplicate URLs in different cells create separate navigable entries
+    [Fact]
+    public void Duplicate_Urls_In_Different_Cells_Are_Separately_Navigable ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        // Two cells in different rows with the same URL — should be independently navigable
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [link](https://same.com) | info |
+                          | [link](https://same.com) | info |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = [];
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+        Assert.True (tableView.CanFocus);
+
+        // Focus the table — first link becomes active
+        tableView.SetFocus ();
+        tableView.InvokeCommand (Command.Accept);
+
+        // Advance to second link (same URL but different cell)
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+
+        // Both activations should have fired — proving they are independently navigable
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Equal ("https://same.com", activatedUrls [0]);
+        Assert.Equal ("https://same.com", activatedUrls [1]);
+
+        window.Dispose ();
+    }
+
     [Fact]
     public void Image_Fallback_Text_Renders ()
     {
@@ -382,11 +703,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Style_TaskDone_Renders_Strikethrough ()
+    public void Style_TaskDone_Renders_Checked_Glyph_With_Strikethrough ()
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- [x] D");
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• [x] " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + $"• {Glyphs.CheckStateChecked} " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
                                            output,
                                            app.Driver);
 
@@ -395,11 +716,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Style_TaskTodo_Renders_Bold ()
+    public void Style_TaskTodo_Renders_Unchecked_Glyph_With_Bold ()
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- [ ] T");
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• [ ] T" + @"\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + $"• {Glyphs.CheckStateUnChecked} T" + @"\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -1765,4 +2086,282 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    // Copilot - regression test: GetContentHeight should not overestimate when content includes tables
+    [Fact]
+    public void GetContentHeight_Does_Not_Overestimate_With_Tables ()
+    {
+        // Wide cells that WILL wrap at 80 columns but fit single-line at 120
+        string md = """
+                    # Before
+
+                    | Column A | Column B with a long header name | Column C also has a longish header | Column D |
+                    |----------|----------------------------------|-------------------------------------|----------|
+                    | Row 1 A  | This cell has content that is definitely long enough to wrap when columns are narrow at 80 | Another cell with enough text to cause wrapping at narrow widths | Value D1 |
+                    | Row 2 A  | More long content in column B that should wrap around when the available width is restricted | Cell C2 also has substantial text that would need multiple lines | Value D2 |
+                    | Row 3 A  | Third row with plenty of descriptive text to demonstrate the wrapping | Third row C column with lots of text content | Value D3 |
+                    | Row 4 A  | Fourth row B column content that is quite verbose and will cause word wrap | Fourth row C with more text | Value D4 |
+                    | Row 5 A  | Fifth row B demonstrating word wrap behavior at different terminal widths | Fifth row C also long enough to wrap | Value D5 |
+
+                    # After
+                    """;
+
+        // At wide width (120), table cells don't wrap → fewer placeholder lines needed
+        Terminal.Gui.Views.Markdown mv120 = new () { Width = 120, Height = 50, Text = md };
+
+        View host120 = new () { Width = 120, Height = 50 };
+        host120.Add (mv120);
+        host120.BeginInit ();
+        host120.EndInit ();
+        host120.Layout ();
+
+        int contentHeight120 = mv120.GetContentSize ().Height;
+
+        // At narrow width (80), table cells wrap → more placeholder lines needed
+        Terminal.Gui.Views.Markdown mv80 = new () { Width = 80, Height = 50, Text = md };
+
+        View host80 = new () { Width = 80, Height = 50 };
+        host80.Add (mv80);
+        host80.BeginInit ();
+        host80.EndInit ();
+        host80.Layout ();
+
+        int contentHeight80 = mv80.GetContentSize ().Height;
+
+        // Content height at 120 cols should be LESS than at 80 cols because table rows
+        // don't wrap at wider widths. Before the fix, Frame.Height was stale from the
+        // initial Recalculate(80) in the TableData setter, causing overestimation.
+        Assert.True (
+            contentHeight120 < contentHeight80,
+            $"Content height at 120 cols ({contentHeight120}) should be less than at 80 cols ({contentHeight80}) since table rows don't wrap at wider widths");
+
+        host120.Dispose ();
+        host80.Dispose ();
+    }
+
+    // Copilot - regression test: table height accounts for content width expansion from long code lines
+    [Fact]
+    public void GetContentHeight_Table_With_Wide_Code_Block_Does_Not_Overestimate ()
+    {
+        // When a long unwrapped code line makes contentWidth > viewportWidth, the table
+        // (which uses Dim.Fill) renders at the wider content width and may need fewer
+        // wrapped rows. The content height must reflect the table at its actual render width.
+        string longCodeLine = new ('x', 150);
+
+        string mdWithCode = $"""
+                             # Title
+
+                             | Column A | Column B with a fairly long header | Column C header |
+                             |----------|-------------------------------------|-----------------|
+                             | Row 1 A  | This cell has content that is long enough to wrap when rendered at 80 columns width | Cell C1 value |
+                             | Row 2 A  | More long content in column B that should wrap around when available width is 80 cols | Cell C2 value |
+                             | Row 3 A  | Third row with plenty of descriptive text to demonstrate the wrapping at narrow width | Cell C3 value |
+                             | Row 4 A  | Fourth row B column content that is quite verbose and will cause word wrapping to occur | Cell C4 value |
+                             | Row 5 A  | Fifth row B demonstrating word wrap behavior at narrow terminal widths but not at wide | Cell C5 value |
+
+                             ```
+                             {longCodeLine}
+                             ```
+
+                             # End
+                             """;
+
+        string mdNoCode = """
+                          # Title
+
+                          | Column A | Column B with a fairly long header | Column C header |
+                          |----------|-------------------------------------|-----------------|
+                          | Row 1 A  | This cell has content that is long enough to wrap when rendered at 80 columns width | Cell C1 value |
+                          | Row 2 A  | More long content in column B that should wrap around when available width is 80 cols | Cell C2 value |
+                          | Row 3 A  | Third row with plenty of descriptive text to demonstrate the wrapping at narrow width | Cell C3 value |
+                          | Row 4 A  | Fourth row B column content that is quite verbose and will cause word wrapping to occur | Cell C4 value |
+                          | Row 5 A  | Fifth row B demonstrating word wrap behavior at narrow terminal widths but not at wide | Cell C5 value |
+
+                          # End
+                          """;
+
+        // Both at 80 col viewport
+        Terminal.Gui.Views.Markdown mvCode = new () { Width = 80, Height = 50, Text = mdWithCode };
+        View hostCode = new () { Width = 80, Height = 50 };
+        hostCode.Add (mvCode);
+        hostCode.BeginInit ();
+        hostCode.EndInit ();
+        hostCode.Layout ();
+
+        Terminal.Gui.Views.Markdown mvNoCode = new () { Width = 80, Height = 50, Text = mdNoCode };
+        View hostNoCode = new () { Width = 80, Height = 50 };
+        hostNoCode.Add (mvNoCode);
+        hostNoCode.BeginInit ();
+        hostNoCode.EndInit ();
+        hostNoCode.Layout ();
+
+        int heightWithCode = mvCode.GetContentSize ().Height;
+        int heightNoCode = mvNoCode.GetContentSize ().Height;
+        int contentWidthWithCode = mvCode.GetContentSize ().Width;
+
+        // Precondition: the code line expands content width beyond viewport
+        Assert.True (contentWidthWithCode > 80, "Code line should expand content width beyond viewport");
+
+        // The version with the code block has the table rendered at the wider content width
+        // (less wrapping needed), so the table is shorter. The code block adds a few lines,
+        // but the table savings should partially or fully offset that.
+        // Key assertion: heightWithCode must be LESS than heightNoCode + code_block_lines.
+        // If the bug exists (table placeholder uses viewport width), heightWithCode =
+        //   heightNoCode + code_block_lines (table not re-sized, just code added).
+        // If the fix works, heightWithCode < heightNoCode + code_block_lines
+        //   (table shrinks because it renders wider).
+
+        // The code block adds 1 rendered line of content. Count actual code block lines.
+        int codeBlockRenderedLines = mvCode.SubViews
+                                           .OfType<MarkdownCodeBlock> ()
+                                           .Sum (v => v.Frame.Height);
+
+        // With the fix: table is shorter at content width, so total is less than naive sum
+        Assert.True (
+            heightWithCode < heightNoCode + codeBlockRenderedLines,
+            $"Content height with code ({heightWithCode}) should be less than no-code height ({heightNoCode}) + code lines ({codeBlockRenderedLines}) = {heightNoCode + codeBlockRenderedLines}, because the wider content width makes the table shorter");
+
+        hostCode.Dispose ();
+        hostNoCode.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_False_Text_HotKeySpecifier_SetsFocus_Next ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = false,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+        View nextView = new () { CanFocus = true };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+        Assert.True (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_False_LeftButtonClicked_SetsFocus_Next ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            X = 0,
+            Y = 1,
+            Width = 20,
+            Height = 1,
+            CanFocus = false,
+            Text = "_Markdown"
+        };
+        View nextView = new ()
+        {
+            X = Pos.Right (markdown),
+            Y = Pos.Top (markdown),
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+        Assert.True (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = markdown.Frame.Location, Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.False (markdown.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_True_Text_HotKeySpecifier_SetsFocus_OnMarkdown ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = true,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+        View nextView = new () { CanFocus = true };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (otherView.HasFocus);
+        Assert.True (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_False_Text_HotKeySpecifier_NoNextPeer_DoesNotFocusMarkdown ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = false,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (markdown);
+
+        Assert.Equal (Key.M, markdown.HotKey);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (markdown.HasFocus);
+    }
 }

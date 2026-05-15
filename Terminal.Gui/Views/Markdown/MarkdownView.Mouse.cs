@@ -43,6 +43,11 @@ public partial class Markdown
 
         AddCommand (Command.Accept, () => ActivateCurrentLink ());
 
+        // Selection and clipboard commands
+        AddCommand (Command.SelectAll, () => SelectAll ());
+        AddCommand (Command.Copy, () => Copy ());
+        AddCommand (Command.Context, () => ShowContextMenu ());
+
         // Apply default key bindings (maps CursorUp→Up, CursorDown→Down, etc.)
         ApplyKeyBindings (DefaultKeyBindings, DefaultKeyBindings);
 
@@ -51,14 +56,71 @@ public partial class Markdown
         MouseBindings.ReplaceCommands (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.ScrollRight);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.ScrollLeft);
+
+        // The base class binds LeftButtonReleased → Activate; remove that so Activate
+        // fires only on LeftButtonClicked (not twice per click which would clear selection).
+        // Also remove the base class Ctrl+LeftButtonReleased → Context binding so that
+        // Ctrl+Click can follow links without triggering the context menu popover.
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+
+        // Right-click is handled directly in OnMouseEvent so that the view can be focused
+        // and the context menu created before trying to show it, even when not yet focused.
+
+        // Press anchors the drag-selection; drag extends it — both routed through OnActivated.
+        MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport, Command.Activate);
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnMouseEvent (Mouse mouse)
+    {
+        // Right-click: focus the view first (which creates ContextMenu) then show the menu at
+        // the click's screen position. Handled here rather than via a Command binding so that
+        // focus and menu creation are guaranteed even when the view is not yet focused.
+        if (mouse.Flags.FastHasFlags (MouseFlags.RightButtonClicked))
+        {
+            if (!HasFocus && CanFocus)
+            {
+                SetFocus ();
+            }
+
+            ShowContextMenu (mouse.ScreenPosition);
+
+            return true;
+        }
+
+        if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
+        {
+            return false;
+        }
+
+        App?.Mouse.UngrabMouse ();
+
+        return false;
     }
 
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        if (!newHasFocus)
+        if (newHasFocus)
         {
+            CreateContextMenu ();
+
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Add (ContextMenu.Key, Command.Context);
+            }
+        }
+        else
+        {
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Remove (ContextMenu.Key);
+            }
+
+            DisposeContextMenu ();
             _activeLinkIndex = -1;
             SetNeedsDraw ();
         }
@@ -119,30 +181,92 @@ public partial class Markdown
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
-        // Only process mouse clicks — keyboard activation is handled via Command.Accept
-        if (ctx?.Binding is not MouseBinding { MouseEvent.Position: { } pos })
+        // Only process mouse input — keyboard activation is handled via Command.Accept
+        if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse, MouseEvent.Position: { } pos })
         {
             return;
         }
+
+        // Button-down: anchor the drag-selection start
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed) && !mouse.Flags.HasFlag (MouseFlags.PositionReport))
+        {
+            int contentX = Viewport.X + pos.X;
+            int contentY = Math.Min (Viewport.Y + pos.Y, Math.Max (_renderedLines.Count - 1, 0));
+            _selectionAnchor = new Point (contentX, contentY);
+            _selectionCurrent = _selectionAnchor;
+            _isDragging = false;
+
+            if (App is { } && !App.Mouse.IsGrabbed (this))
+            {
+                App.Mouse.GrabMouse (this);
+            }
+
+            if (!HasFocus && CanFocus)
+            {
+                SetFocus ();
+            }
+
+            return;
+        }
+
+        // Drag: extend selection and auto-scroll when the pointer leaves the viewport.
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
+        {
+            // Auto-scroll: if the pointer has left the top or bottom edge, scroll one line
+            // in that direction so the user can extend the selection beyond the visible area.
+            if (pos.Y < 0)
+            {
+                ScrollVertical (-1);
+            }
+            else if (pos.Y >= Viewport.Height)
+            {
+                ScrollVertical (1);
+            }
+
+            // Clamp both axes to the actual content bounds to prevent negative indices or
+            // indices beyond the last rendered line (possible when the mouse is grabbed and
+            // moves outside the view's frame).
+            int maxLine = Math.Max (_renderedLines.Count - 1, 0);
+            int contentX = Math.Max (Viewport.X + pos.X, 0);
+            int contentY = Math.Clamp (Viewport.Y + pos.Y, 0, maxLine);
+            _selectionCurrent = new Point (contentX, contentY);
+            _isDragging = true;
+            _isSelecting = true;
+            SetNeedsDraw ();
+
+            return;
+        }
+
+        // LeftButtonClicked: a drag ended — the click fires after release, but the user was
+        // selecting text, so don't activate a link.
+        if (_isDragging)
+        {
+            _isDragging = false;
+
+            return;
+        }
+
+        // Plain click clears any existing text selection.
+        ClearSelection ();
 
         if (!HasFocus && CanFocus)
         {
             SetFocus ();
         }
 
-        int contentX = Viewport.X + pos.X;
-        int contentY = Viewport.Y + pos.Y;
+        int clickX = Viewport.X + pos.X;
+        int clickY = Viewport.Y + pos.Y;
 
         for (var i = 0; i < _linkRegions.Count; i++)
         {
             MarkdownLinkRegion region = _linkRegions [i];
 
-            if (region.Line != contentY)
+            if (region.Line != clickY)
             {
                 continue;
             }
 
-            if (contentX < region.StartX || contentX >= region.EndXExclusive)
+            if (clickX < region.StartX || clickX >= region.EndXExclusive)
             {
                 continue;
             }
@@ -152,6 +276,28 @@ public partial class Markdown
 
             return;
         }
+    }
+
+    /// <summary>
+    ///     Returns the URL of the link region at content coordinates (<paramref name="contentX"/>,
+    ///     <paramref name="contentY"/>), or <see langword="null"/> if no link covers that position.
+    /// </summary>
+    private string? FindLinkUrlAt (int contentX, int contentY)
+    {
+        foreach (MarkdownLinkRegion region in _linkRegions)
+        {
+            if (region.Line != contentY)
+            {
+                continue;
+            }
+
+            if (contentX >= region.StartX && contentX < region.EndXExclusive)
+            {
+                return region.Url;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

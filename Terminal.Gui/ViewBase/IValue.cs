@@ -27,6 +27,30 @@ public interface IValue
     ///     Raised when <see cref="IValue{TValue}.Value"/> has changed, providing the value as an un-typed object.
     /// </summary>
     event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Attempts to set <see cref="IValue{TValue}.Value"/> by parsing the supplied string.
+    /// </summary>
+    /// <param name="input">The string representation of the value to set.</param>
+    /// <returns>
+    ///     <see langword="true"/> if <paramref name="input"/> was successfully parsed and assigned;
+    ///     <see langword="false"/> if the value type cannot be parsed from a string or parsing failed.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         The default implementation supports:
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item><description><see cref="string"/> values (assigned directly).</description></item>
+    ///         <item><description>Any type implementing <see cref="IParsable{TSelf}"/> (e.g. <see cref="int"/>, <see cref="double"/>, <see cref="System.DateTime"/>, <see cref="System.DateOnly"/>, <see cref="System.TimeOnly"/>, <see cref="System.TimeSpan"/>, <see cref="Terminal.Gui.Drawing.Color"/>).</description></item>
+    ///         <item><description><see cref="System.Nullable{T}"/> wrappers around any of the above.</description></item>
+    ///         <item><description><see cref="System.Enum"/> types (case-insensitive).</description></item>
+    ///     </list>
+    ///     <para>
+    ///         Views may override this method to provide custom parsing logic.
+    ///     </para>
+    /// </remarks>
+    bool TrySetValueFromString (string input);
 }
 
 /// <summary>
@@ -71,4 +95,22 @@ public interface IValue<TValue> : IValue
 
     /// <inheritdoc/>
     object? IValue.GetValue () => Value;
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     The default implementation handles <see cref="string"/>, types implementing
+    ///     <see cref="IParsable{TSelf}"/>, <see cref="System.Enum"/> types, and <see cref="System.Nullable{T}"/>
+    ///     wrappers around any of those. Views with bespoke parsing should override this method.
+    /// </remarks>
+    bool IValue.TrySetValueFromString (string input)
+    {
+        if (!IValueParser.TryParseValue (input, out TValue? parsed))
+        {
+            return false;
+        }
+
+        Value = parsed;
+
+        return true;
+    }
 }

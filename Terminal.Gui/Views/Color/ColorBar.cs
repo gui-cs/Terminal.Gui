@@ -26,6 +26,29 @@ internal abstract class ColorBar : View, IColorBar
         AddCommand (Command.LeftStart, _ => SetZero ());
         AddCommand (Command.RightEnd, _ => SetMax ());
 
+        // Override Activate to handle mouse-press and drag. When triggered by a left-button press
+        // (initial click or drag), extract the position from the MouseBinding context, update
+        // Value, set focus, and grab the mouse so subsequent drag events are routed to this bar
+        // exclusively. Grabbing here (rather than in OnMouseEvent) ensures that if a consumer
+        // cancels the event by setting e.Handled=true in MouseEvent, the press command is never
+        // reached and no grab occurs.
+        AddCommand (
+                    Command.Activate,
+                    ctx =>
+                    {
+                        if (ctx?.Binding is MouseBinding { MouseEvent: { } mouse }
+                            && mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
+                        {
+                            UpdateValueFromMousePosition (mouse);
+                            SetFocus ();
+                            App?.Mouse.GrabMouse (this);
+
+                            return true;
+                        }
+
+                        return DefaultActivateHandler (ctx);
+                    });
+
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
@@ -33,6 +56,17 @@ internal abstract class ColorBar : View, IColorBar
         KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
         MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+
+        // Remove the base LeftButtonReleased → Activate binding so that releasing the mouse
+        // does not fire DefaultActivateHandler (Activating/Activated). UngrabMouse is still
+        // called from OnMouseEvent on release, so the grab lifecycle is unaffected.
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+
+        // Bind press and drag to Activate so external code can fully suppress mouse interaction
+        // by removing these two bindings (e.g. TerminalGuiDesigner editor mode). When both are
+        // absent no value update, focus change, grab, or drag routing occurs.
+        MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport, Command.Activate);
     }
 
     /// <summary>
@@ -123,19 +157,24 @@ internal abstract class ColorBar : View, IColorBar
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
+        // Release the grab on button-up so drag events stop routing exclusively to this bar.
+        // The grab itself is established in the Command.Activate handler so that cancelling the
+        // MouseEvent (e.Handled = true) prevents both the value update and the grab.
+        if (mouse.IsReleased && App?.Mouse.IsGrabbed (this) == true)
         {
-            if (mouse.Position!.Value.X >= _barStartsAt)
-            {
-                double v = MaxValue * ((double)mouse.Position!.Value.X - _barStartsAt) / (_barWidth - 1);
-                Value = Math.Clamp ((int)v, 0, MaxValue);
-            }
-            SetFocus ();
-
-            // Do not mark as handled to allow Activating to be raised
+            App.Mouse.UngrabMouse ();
         }
 
-        return mouse.Handled;
+        return false;
+    }
+
+    private void UpdateValueFromMousePosition (Mouse mouse)
+    {
+        if (mouse.Position is { } pos && pos.X >= _barStartsAt)
+        {
+            double v = MaxValue * ((double)pos.X - _barStartsAt) / (_barWidth - 1);
+            Value = Math.Clamp ((int)v, 0, MaxValue);
+        }
     }
 
     /// <summary>

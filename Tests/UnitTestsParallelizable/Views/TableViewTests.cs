@@ -253,6 +253,54 @@ public class TableViewTests : TestDriverBase
         Assert.Equal (2, tableView.Value!.SelectedCell.Y);
     }
 
+    // Claude - Opus 4.7
+    // Regression: setting CollectionNavigator to null disables type-to-search and lets printable keys bubble
+    [Fact]
+    public void CollectionNavigator_Null_DisablesTypeToSearch_KeyNotConsumed ()
+    {
+        var dt = new DataTable ();
+        dt.Columns.Add ("blah");
+        dt.Rows.Add ("apricot");
+        dt.Rows.Add ("bat");
+        dt.Rows.Add ("candle");
+
+        TableView tableView = new () { Table = new DataTableSource (dt), CollectionNavigator = null };
+        tableView.HasFocus = true;
+
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
+
+        // Key.B would normally jump to "bat" (row 1) — with navigator disabled, selection must not move
+        // and the key event must not be consumed (returns false so it can bubble to the SuperView).
+        bool consumed = tableView.NewKeyDownEvent (Key.B);
+
+        Assert.False (consumed);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
+    }
+
+    // Claude - Opus 4.7
+    // Regression: with CollectionNavigator = null, HotKey path must not throw
+    [Fact]
+    public void CollectionNavigator_Null_HotKey_DoesNotThrow ()
+    {
+        var dt = new DataTable ();
+        dt.Columns.Add ("blah");
+        dt.Rows.Add ("apricot");
+        dt.Rows.Add ("bat");
+
+        TableView tableView = new ()
+        {
+            Table = new DataTableSource (dt),
+            CollectionNavigator = null,
+            HotKey = Key.B
+        };
+        tableView.HasFocus = true;
+
+        Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.B));
+
+        Assert.Null (ex);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
+    }
+
     // Copilot
     // Behavior: Space toggles multi-selection via ToggleExtend command
     [Fact]
@@ -1057,6 +1105,355 @@ public class TableViewTests : TestDriverBase
         // Both headers should use the global header scheme
         Assert.Equal (globalHeaderScheme.Normal, contents [0, nameCol].Attribute);
         Assert.Equal (globalHeaderScheme.Normal, contents [0, valueCol].Attribute);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void HeaderSeparatorLines_DoNotUseFocusAttribute_WhenTableHasFocus ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = true;
+        tableView.Style.ShowVerticalHeaderLines = true;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("test", "123");
+        tableView.Table = new DataTableSource (dt);
+
+        // Simulate focus so headers render with Focus attribute
+        tableView.HasFocus = true;
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        Cell [,] contents = driver.Contents!;
+
+        // Find the separator column (│) between the two headers on row 0
+        var separatorCol = -1;
+
+        for (var c = 1; c < 39; c++)
+        {
+            if (contents [0, c].Grapheme == Glyphs.VLine.ToString ())
+            {
+                separatorCol = c;
+
+                break;
+            }
+        }
+
+        Assert.True (separatorCol >= 0, "Expected to find a vertical separator '│' between headers");
+
+        // The separator should use Normal attribute, not Focus
+        Scheme viewScheme = tableView.GetScheme ();
+        Attribute normalAttr = viewScheme.Normal;
+        Attribute focusAttr = viewScheme.Focus;
+
+        Attribute? separatorAttribute = contents [0, separatorCol].Attribute;
+
+        // The separator must NOT use focus colors
+        Assert.NotEqual (focusAttr, separatorAttribute);
+
+        // The separator should use normal attribute
+        Assert.Equal (normalAttr, separatorAttribute);
+
+        // Also verify that actual header text DOES use focus attribute
+        var nameCol = -1;
+
+        for (var c = 0; c < 40; c++)
+        {
+            if (contents [0, c].Grapheme == "N")
+            {
+                nameCol = c;
+
+                break;
+            }
+        }
+
+        Assert.True (nameCol >= 0, "Expected to find 'N' from 'Name' header");
+        Assert.Equal (focusAttr, contents [0, nameCol].Attribute);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void ShowVerticalCellLines_CanHideOuterBorders_AndPreserveInnerSeparators ()
+    {
+        IDriver driver = CreateTestDriver (20, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 20, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = true;
+        tableView.Style.ShowVerticalHeaderLines = true;
+        tableView.Style.ExpandLastColumn = false;
+        tableView.Style.ShowVerticalCellLineForFirstColumn = false;
+        tableView.Style.ShowVerticalCellLineForLastColumn = false;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("A", "B");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        Cell [,] contents = driver.Contents!;
+        TableView.ColumnToRender [] columns = GetColumnsToRender (tableView);
+
+        Assert.Equal (2, columns.Length);
+
+        int leftBorderCol = 0;
+        int innerSeparatorCol = columns [1].X - 1;
+        int rightBorderCol = columns [1].X + columns [1].Width - 1;
+
+        Assert.NotEqual (Glyphs.VLine.ToString (), contents [0, leftBorderCol].Grapheme);
+        Assert.Equal (Glyphs.VLine.ToString (), contents [0, innerSeparatorCol].Grapheme);
+        Assert.NotEqual (Glyphs.VLine.ToString (), contents [0, rightBorderCol].Grapheme);
+
+        Assert.NotEqual (Glyphs.VLine.ToString (), contents [1, leftBorderCol].Grapheme);
+        Assert.Equal (Glyphs.VLine.ToString (), contents [1, innerSeparatorCol].Grapheme);
+        Assert.NotEqual (Glyphs.VLine.ToString (), contents [1, rightBorderCol].Grapheme);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/5126
+    // Clicking outside the row area of a TableView (e.g. below the last row) must
+    // not raise the Activating event.
+    [Fact]
+    public void Click_OutsideRows_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+        tableView.Table = BuildTable (2, 2);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // Construct a left-click well below the last data row. With a 2-row table,
+        // y=9 is past the rows so ScreenToCell returns null.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (1, 9),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void CalculateContentSize_HidingOuterVerticalCellLines_ReclaimsBothOuterColumns ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("A", "B");
+
+        using TableView tableViewWithOuterBorders = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 20, 5)
+        };
+        tableViewWithOuterBorders.BeginInit ();
+        tableViewWithOuterBorders.EndInit ();
+        tableViewWithOuterBorders.Style.ShowHeaders = true;
+        tableViewWithOuterBorders.Style.ShowVerticalCellLines = true;
+        tableViewWithOuterBorders.Style.ShowVerticalHeaderLines = true;
+        tableViewWithOuterBorders.Style.ExpandLastColumn = false;
+        tableViewWithOuterBorders.RefreshContentSize ();
+
+        using TableView tableViewWithoutOuterBorders = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 20, 5)
+        };
+        tableViewWithoutOuterBorders.BeginInit ();
+        tableViewWithoutOuterBorders.EndInit ();
+        tableViewWithoutOuterBorders.Style.ShowHeaders = true;
+        tableViewWithoutOuterBorders.Style.ShowVerticalCellLines = true;
+        tableViewWithoutOuterBorders.Style.ShowVerticalHeaderLines = true;
+        tableViewWithoutOuterBorders.Style.ExpandLastColumn = false;
+        tableViewWithoutOuterBorders.Style.ShowVerticalCellLineForFirstColumn = false;
+        tableViewWithoutOuterBorders.Style.ShowVerticalCellLineForLastColumn = false;
+        tableViewWithoutOuterBorders.RefreshContentSize ();
+
+        Assert.Equal (tableViewWithOuterBorders.GetContentSize ().Width - 2, tableViewWithoutOuterBorders.GetContentSize ().Width);
+    }
+
+    // Claude - Opus 4.7
+    // Companion to Click_OutsideRows_DoesNotRaise_Activating: clicking on a real
+    // cell still raises Activating as before.
+    [Fact]
+    public void Click_OnRow_Raises_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+        tableView.Table = BuildTable (2, 2);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // y=3 lands on the first data row. The default header style consumes 3 lines
+        // (overline + header text + underline), so y=0..2 is header and y=3 is the
+        // first data row.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (1, 3),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (1, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Click in horizontal whitespace (right of the last rendered column) must not
+    // raise Activating. Disable ExpandLastColumn so the last column doesn't fill
+    // the viewport and there is real whitespace to the right.
+    [Fact]
+    public void Click_RightOfLastColumn_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 40, 10) };
+        tableView.Style.ExpandLastColumn = false;
+        tableView.Table = BuildTable (2, 2);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // BuildTable column "Col0" / "Col1" rendered with values like "R0C0" gives
+        // narrow columns. With ExpandLastColumn=false and viewport width 40, x=35 is
+        // well past the right edge of the last rendered column.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (35, 3),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Click on the column header area must not raise Activating — the click
+    // doesn't correspond to a data cell.
+    [Fact]
+    public void Click_OnHeader_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+        tableView.Table = BuildTable (2, 2);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // The header occupies y=0..2 (overline + header text + underline). y=1 is
+        // the header text line.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (1, 1),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Click on a TableView with no Table set must not raise Activating.
+    [Fact]
+    public void Click_EmptyTable_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+
+        // Intentionally no Table assigned.
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (5, 5),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Click on a Table that has zero rows (header rendered but no data) must not
+    // raise Activating regardless of where in the data area the user clicks.
+    [Fact]
+    public void Click_TableWithZeroRows_DoesNotRaise_Activating ()
+    {
+        TableView tableView = new () { Viewport = new Rectangle (0, 0, 25, 10) };
+        tableView.Table = BuildTable (2, 0);
+
+        var activatingFired = 0;
+        tableView.Activating += (_, _) => activatingFired++;
+
+        // y=3 is just past the header, in what would be the first data row if any
+        // existed. With zero rows, ScreenToCell must return null.
+        Mouse mouseEvent = new ()
+        {
+            Position = new Point (1, 3),
+            Flags = MouseFlags.LeftButtonClicked
+        };
+
+        MouseBinding binding = new ([Command.Activate], mouseEvent);
+
+        tableView.InvokeCommand (Command.Activate, binding);
+
+        Assert.Equal (0, activatingFired);
 
         tableView.Dispose ();
     }

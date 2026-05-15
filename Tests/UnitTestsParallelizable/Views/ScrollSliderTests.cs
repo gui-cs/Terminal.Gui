@@ -1010,4 +1010,150 @@ public class ScrollSliderTests (ITestOutputHelper output) : TestDriverBase
 
         _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output, driver);
     }
+
+    // Copilot - IValue<int> tests
+
+    [Fact]
+    public void Value_Gets_And_Sets_Position ()
+    {
+        ScrollSlider slider = new () { VisibleContentSize = 100, Size = 10 };
+        Assert.Equal (0, slider.Value);
+
+        slider.Value = 5;
+        Assert.Equal (5, slider.Value);
+        Assert.Equal (5, slider.Position);
+
+        slider.Position = 10;
+        Assert.Equal (10, slider.Value);
+        Assert.Equal (10, slider.Position);
+
+        slider.Dispose ();
+    }
+
+    [Fact]
+    public void ValueChanging_Event_Is_Raised ()
+    {
+        ScrollSlider slider = new () { VisibleContentSize = 100, Size = 10 };
+        var eventRaised = false;
+        int oldValue = -1;
+        int newValue = -1;
+
+        slider.ValueChanging += (_, e) =>
+                                {
+                                    eventRaised = true;
+                                    oldValue = e.CurrentValue;
+                                    newValue = e.NewValue;
+                                };
+
+        slider.Value = 5;
+
+        Assert.True (eventRaised);
+        Assert.Equal (0, oldValue);
+        Assert.Equal (5, newValue);
+
+        slider.Dispose ();
+    }
+
+    [Fact]
+    public void ValueChanging_Can_Cancel_Change ()
+    {
+        ScrollSlider slider = new () { VisibleContentSize = 100, Size = 10 };
+
+        slider.ValueChanging += (_, e) => e.Handled = true;
+
+        slider.Value = 5;
+
+        Assert.Equal (0, slider.Value);
+
+        slider.Dispose ();
+    }
+
+    [Fact]
+    public void ValueChanged_Event_Is_Raised ()
+    {
+        ScrollSlider slider = new () { VisibleContentSize = 100, Size = 10 };
+        var eventRaised = false;
+        int oldValue = -1;
+        int newValue = -1;
+
+        slider.ValueChanged += (_, e) =>
+                               {
+                                   eventRaised = true;
+                                   oldValue = e.OldValue;
+                                   newValue = e.NewValue;
+                               };
+
+        slider.Value = 5;
+
+        Assert.True (eventRaised);
+        Assert.Equal (0, oldValue);
+        Assert.Equal (5, newValue);
+
+        slider.Dispose ();
+    }
+
+    [Fact]
+    public void ValueChangedUntyped_Event_Is_Raised ()
+    {
+        ScrollSlider slider = new () { VisibleContentSize = 100, Size = 10 };
+        var eventRaised = false;
+        object? oldValue = null;
+        object? newValue = null;
+
+        slider.ValueChangedUntyped += (_, e) =>
+                                      {
+                                          eventRaised = true;
+                                          oldValue = e.OldValue;
+                                          newValue = e.NewValue;
+                                      };
+
+        slider.Value = 5;
+
+        Assert.True (eventRaised);
+        Assert.Equal (0, oldValue);
+        Assert.Equal (5, newValue);
+
+        slider.Dispose ();
+    }
+
+    [Fact]
+    public void GetValue_Returns_Boxed_Position ()
+    {
+        ScrollSlider slider = new () { VisibleContentSize = 100, Size = 10 };
+        slider.Value = 7;
+
+        IValue ivalue = slider;
+        Assert.Equal (7, ivalue.GetValue ());
+
+        slider.Dispose ();
+    }
+
+    [Fact]
+    public void TrySetValueFromString_Sets_Position ()
+    {
+        ScrollSlider slider = new () { VisibleContentSize = 100, Size = 10 };
+
+        IValue ivalue = slider;
+        bool result = ivalue.TrySetValueFromString ("5");
+
+        Assert.True (result);
+        Assert.Equal (5, slider.Position);
+        Assert.Equal (5, slider.Value);
+
+        slider.Dispose ();
+    }
+
+    [Fact]
+    public void TrySetValueFromString_Returns_False_For_Invalid_Input ()
+    {
+        ScrollSlider slider = new () { VisibleContentSize = 100, Size = 10 };
+
+        IValue ivalue = slider;
+        bool result = ivalue.TrySetValueFromString ("not-a-number");
+
+        Assert.False (result);
+        Assert.Equal (0, slider.Value);
+
+        slider.Dispose ();
+    }
 }

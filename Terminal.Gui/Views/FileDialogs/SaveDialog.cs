@@ -25,7 +25,7 @@ public class SaveDialog : FileDialog
     ///     <see cref="SaveDialog"/>.
     /// </summary>
     /// <value>The name of the file.</value>
-    public string? FileName => (this as IRunnable).Result is null || Result == CancelButtonIndex ? null : Path;
+    public string? FileName => Result is null ? null : Path;
 
     /// <summary>Gets the default title for the <see cref="SaveDialog"/>.</summary>
     /// <returns></returns>

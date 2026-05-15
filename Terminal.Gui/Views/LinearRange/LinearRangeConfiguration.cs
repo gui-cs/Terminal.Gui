@@ -1,6 +1,6 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>All <see cref="LinearRange{T}"/> configuration are grouped in this class.</summary>
+/// <summary>All <see cref="LinearRangeViewBase{TOption,TValue}"/> configuration is grouped in this class.</summary>
 internal class LinearRangeConfiguration
 {
     internal bool _allowEmpty;
@@ -14,6 +14,6 @@ internal class LinearRangeConfiguration
     internal bool _showLegendsAbbr;
     internal Orientation _linearRangeOrientation = Orientation.Horizontal;
     internal int _startSpacing;
-    internal LinearRangeType _type = LinearRangeType.Single;
+    internal LinearRangeRenderMode _renderMode = LinearRangeRenderMode.Single;
     internal bool _useMinimumSize;
 }
