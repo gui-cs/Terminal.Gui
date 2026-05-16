@@ -237,23 +237,77 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         // Force opaque
         accentBg = new Color (accentBg.R, accentBg.G, accentBg.B, 255);
 
-        return new Scheme
+        Scheme accentScheme = new ()
         {
-            Normal = new Attribute (resolvedFg, accentBg),
-            Code = baseScheme.GetAttributeForRole (VisualRole.Code, defaultTerminalColors),
-            CodeComment = baseScheme.GetAttributeForRole (VisualRole.CodeComment, defaultTerminalColors),
-            CodeKeyword = baseScheme.GetAttributeForRole (VisualRole.CodeKeyword, defaultTerminalColors),
-            CodeString = baseScheme.GetAttributeForRole (VisualRole.CodeString, defaultTerminalColors),
-            CodeNumber = baseScheme.GetAttributeForRole (VisualRole.CodeNumber, defaultTerminalColors),
-            CodeOperator = baseScheme.GetAttributeForRole (VisualRole.CodeOperator, defaultTerminalColors),
-            CodeType = baseScheme.GetAttributeForRole (VisualRole.CodeType, defaultTerminalColors),
-            CodePreprocessor = baseScheme.GetAttributeForRole (VisualRole.CodePreprocessor, defaultTerminalColors),
-            CodeIdentifier = baseScheme.GetAttributeForRole (VisualRole.CodeIdentifier, defaultTerminalColors),
-            CodeConstant = baseScheme.GetAttributeForRole (VisualRole.CodeConstant, defaultTerminalColors),
-            CodePunctuation = baseScheme.GetAttributeForRole (VisualRole.CodePunctuation, defaultTerminalColors),
-            CodeFunctionName = baseScheme.GetAttributeForRole (VisualRole.CodeFunctionName, defaultTerminalColors),
-            CodeAttribute = baseScheme.GetAttributeForRole (VisualRole.CodeAttribute, defaultTerminalColors)
+            Normal = new Attribute (resolvedFg, accentBg)
         };
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.Code, out Attribute? code))
+        {
+            accentScheme.Code = code;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeComment, out Attribute? codeComment))
+        {
+            accentScheme.CodeComment = codeComment;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? codeKeyword))
+        {
+            accentScheme.CodeKeyword = codeKeyword;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeString, out Attribute? codeString))
+        {
+            accentScheme.CodeString = codeString;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeNumber, out Attribute? codeNumber))
+        {
+            accentScheme.CodeNumber = codeNumber;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeOperator, out Attribute? codeOperator))
+        {
+            accentScheme.CodeOperator = codeOperator;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeType, out Attribute? codeType))
+        {
+            accentScheme.CodeType = codeType;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodePreprocessor, out Attribute? codePreprocessor))
+        {
+            accentScheme.CodePreprocessor = codePreprocessor;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeIdentifier, out Attribute? codeIdentifier))
+        {
+            accentScheme.CodeIdentifier = codeIdentifier;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeConstant, out Attribute? codeConstant))
+        {
+            accentScheme.CodeConstant = codeConstant;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodePunctuation, out Attribute? codePunctuation))
+        {
+            accentScheme.CodePunctuation = codePunctuation;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeFunctionName, out Attribute? codeFunctionName))
+        {
+            accentScheme.CodeFunctionName = codeFunctionName;
+        }
+
+        if (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeAttribute, out Attribute? codeAttribute))
+        {
+            accentScheme.CodeAttribute = codeAttribute;
+        }
+
+        return accentScheme;
     }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>
