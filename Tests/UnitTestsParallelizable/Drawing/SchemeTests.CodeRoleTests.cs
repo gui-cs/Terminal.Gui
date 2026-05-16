@@ -165,4 +165,17 @@ public class SchemeCodeRoleTests
         Assert.True (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? keyword));
         Assert.NotEqual (baseScheme.Code.Foreground, keyword!.Value.Foreground);
     }
+
+    [Fact]
+    public void DeriveAccent_Preserves_Base_CodeToken_Colors ()
+    {
+        // Copilot
+        Attribute terminalDefault = new (Color.White, Color.Black);
+        Scheme baseScheme = Scheme.GetHardCodedSchemes () ["Base"];
+
+        Scheme accent = Scheme.DeriveAccent (baseScheme, terminalDefault);
+
+        Assert.True (accent.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? keyword));
+        Assert.Equal (baseScheme.CodeKeyword.Foreground, keyword!.Value.Foreground);
+    }
 }
