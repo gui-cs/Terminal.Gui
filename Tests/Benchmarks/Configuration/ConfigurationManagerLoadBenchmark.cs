@@ -18,20 +18,16 @@ namespace Terminal.Gui.Benchmarks.Configuration;
 [BenchmarkCategory ("Configuration")]
 public class ConfigurationManagerLoadBenchmark
 {
-    /// <summary>Resets ConfigurationManager to a clean state before each iteration.</summary>
-    [IterationSetup]
-    public void IterationSetup ()
-    {
-        ConfigurationManager.Disable (true);
-    }
-
     /// <summary>
     ///     Loads the embedded library configuration from scratch and applies it.
     ///     Captures the full deserialize + merge + apply path.
+    ///     Calls <see cref="ConfigurationManager.Disable"/> first so every invocation
+    ///     is a true cold start (<see cref="ConfigurationManager.Enable"/> short-circuits when already enabled).
     /// </summary>
     [Benchmark]
     public void LoadAndApply ()
     {
+        ConfigurationManager.Disable (true);
         ConfigurationManager.Enable (ConfigLocations.LibraryResources);
         ConfigurationManager.Apply ();
     }

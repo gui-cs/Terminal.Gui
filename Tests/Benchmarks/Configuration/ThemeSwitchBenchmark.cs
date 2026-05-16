@@ -46,21 +46,18 @@ public class ThemeSwitchBenchmark
         ConfigurationManager.Enable (ConfigLocations.LibraryResources);
     }
 
-    /// <summary>Resets the theme to Default before each iteration for a stable starting point.</summary>
-    [IterationSetup]
-    public void IterationSetup ()
-    {
-        ThemeManager.Theme = ThemeManager.DEFAULT_THEME_NAME;
-        ConfigurationManager.Apply ();
-    }
-
     /// <summary>
     ///     Switches the active theme and applies the change.
     ///     This is the user-facing hot path when cycling themes via a <see cref="Views.Shortcut"/>.
+    ///     Resets to <see cref="ThemeManager.DEFAULT_THEME_NAME"/> before each switch so every
+    ///     invocation performs a real theme change (not a redundant reapply).
     /// </summary>
     [Benchmark]
     public void SwitchTheme ()
     {
+        ThemeManager.Theme = ThemeManager.DEFAULT_THEME_NAME;
+        ConfigurationManager.Apply ();
+
         ThemeManager.Theme = ThemeName;
         ConfigurationManager.Apply ();
     }
