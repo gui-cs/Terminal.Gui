@@ -5,6 +5,36 @@ namespace ViewsTests;
 public class CodeTests
 {
     [Fact]
+    public void EnableForDesign_Shows_All_Code_Roles ()
+    {
+        // Copilot
+        Code code = new ();
+        ((IDesignable)code).EnableForDesign ();
+
+        Assert.NotNull (code.SyntaxHighlighter);
+        Assert.NotNull (code.Language);
+
+        code.SyntaxHighlighter!.ResetState ();
+        HashSet<VisualRole> roles = [];
+
+        foreach (string line in code.Text.ReplaceLineEndings ("\n").Split ('\n'))
+        {
+            foreach (StyledSegment segment in code.SyntaxHighlighter.Highlight (line, code.Language))
+            {
+                if (segment.Role is { } role)
+                {
+                    roles.Add (role);
+                }
+            }
+        }
+
+        foreach (VisualRole role in Enum.GetValues<VisualRole> ().Where (role => role >= VisualRole.Code))
+        {
+            Assert.Contains (role, roles);
+        }
+    }
+
+    [Fact]
     public void Text_Set_Renders_Highlighted_Role ()
     {
         using IApplication app = Application.Create ();
