@@ -3,11 +3,6 @@ namespace Terminal.Gui.Views;
 /// <summary>A read-only view that renders syntax-highlighted source code.</summary>
 public class Code : View, IDesignable
 {
-    private string _text = string.Empty;
-    private IReadOnlyList<IReadOnlyList<StyledSegment>> _lines = [];
-    private string? _language;
-    private ISyntaxHighlighter? _syntaxHighlighter = new TextMateSyntaxHighlighter ();
-
     /// <summary>Initializes a new instance of the <see cref="Code"/> class.</summary>
     public Code ()
     {
@@ -20,15 +15,15 @@ public class Code : View, IDesignable
     /// <summary>Gets or sets the source text to render.</summary>
     public override string Text
     {
-        get => _text;
+        get => base.Text;
         set
         {
-            if (_text == value)
+            if (base.Text == value)
             {
                 return;
             }
 
-            _text = value ?? string.Empty;
+            base.Text = value;
             UpdateStyledLines ();
         }
     }
@@ -36,15 +31,15 @@ public class Code : View, IDesignable
     /// <summary>Gets or sets the language hint used for syntax highlighting.</summary>
     public string? Language
     {
-        get => _language;
+        get;
         set
         {
-            if (_language == value)
+            if (field == value)
             {
                 return;
             }
 
-            _language = value;
+            field = value;
             UpdateStyledLines ();
         }
     }
@@ -52,39 +47,38 @@ public class Code : View, IDesignable
     /// <summary>Gets or sets the syntax highlighter used to tokenize <see cref="Text"/>.</summary>
     public ISyntaxHighlighter? SyntaxHighlighter
     {
-        get => _syntaxHighlighter;
+        get;
         set
         {
-            if (ReferenceEquals (_syntaxHighlighter, value))
+            if (ReferenceEquals (field, value))
             {
                 return;
             }
 
-            _syntaxHighlighter = value;
+            field = value;
             UpdateStyledLines ();
         }
-    }
+    } = new TextMateSyntaxHighlighter ();
+
+    private IReadOnlyList<IReadOnlyList<StyledSegment>> _lines = [];
 
     private void UpdateStyledLines ()
     {
-        string [] lines = _text.ReplaceLineEndings ("\n").Split ('\n');
+        string [] lines = base.Text.ReplaceLineEndings ("\n").Split ('\n');
         List<IReadOnlyList<StyledSegment>> styledLines = [];
 
-        if (_syntaxHighlighter is { } highlighter && !string.IsNullOrEmpty (_language))
+        if (SyntaxHighlighter is { } highlighter && !string.IsNullOrEmpty (Language))
         {
             highlighter.ResetState ();
 
-            foreach (string line in lines)
-            {
-                styledLines.Add (highlighter.Highlight (line, _language));
-            }
+            styledLines.AddRange (lines.Select (line => highlighter.Highlight (line, Language)));
         }
         else
         {
-            foreach (string line in lines)
-            {
-                styledLines.Add ([new StyledSegment (line, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)]);
-            }
+            styledLines.AddRange (lines.Select (line => (IReadOnlyList<StyledSegment>)
+                                                [
+                                                    new StyledSegment (line, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)
+                                                ]));
         }
 
         _lines = styledLines;
@@ -123,7 +117,7 @@ public class Code : View, IDesignable
 
     private void DrawLine (IReadOnlyList<StyledSegment> segments, int y)
     {
-        int x = 0;
+        var x = 0;
 
         foreach (StyledSegment segment in segments)
         {
@@ -152,6 +146,7 @@ public class Code : View, IDesignable
     bool IDesignable.EnableForDesign ()
     {
         Language = "cs";
+
         Text = """
                using IApplication app = Application.Create ().Init ();
                app.Run<MyWindow> ();

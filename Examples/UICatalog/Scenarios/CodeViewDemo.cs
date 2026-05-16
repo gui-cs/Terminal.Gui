@@ -28,10 +28,10 @@ public sealed class CodeViewDemo : Scenario
                   </person>
                   """,
         ["md"] = """
-                # Code view
+                 # Code view
 
-                `VisualRole.CodeKeyword` follows the active theme.
-                """
+                 `VisualRole.CodeKeyword` follows the active theme.
+                 """
     };
 
     /// <inheritdoc/>
@@ -42,11 +42,9 @@ public sealed class CodeViewDemo : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Runnable window = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Runnable window = new ();
+        window.Title = GetQuitKeyAndName ();
+        window.BorderStyle = LineStyle.None;
 
         string [] languages = ["cs", "json", "xml", "md"];
 

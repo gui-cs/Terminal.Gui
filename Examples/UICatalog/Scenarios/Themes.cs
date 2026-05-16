@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System.Collections.ObjectModel;
+
 // ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
@@ -236,23 +237,14 @@ public sealed class Themes : Scenario
 
     private static FrameView CreateCodeRolesPanel ()
     {
-        FrameView panel = new ()
-        {
-            Title = "Code roles",
-            BorderStyle = LineStyle.Rounded,
-            Height = Dim.Auto ()
-        };
+        FrameView panel = new () { Title = "Code roles", BorderStyle = LineStyle.Rounded, Height = Dim.Auto () };
         panel.Border.Thickness = new Thickness (0, 1, 0, 0);
 
         VisualRoleViewer? previous = null;
 
         foreach (VisualRole role in Enum.GetValues<VisualRole> ().Where (role => role >= VisualRole.Code))
         {
-            VisualRoleViewer roleViewer = new ()
-            {
-                Role = role,
-                SchemeName = "Base"
-            };
+            VisualRoleViewer roleViewer = new () { Role = role, SchemeName = "Base" };
 
             if (previous is { })
             {
