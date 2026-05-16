@@ -32,7 +32,7 @@ internal static class MarkdownAttributeHelper
         {
             Attribute roleAttr = view.GetAttributeForRole (role);
 
-            return themeBackground is { } roleBg ? roleAttr with { Background = roleBg } : roleAttr;
+            return ResolveRoleAttribute (view, role, roleAttr, themeBackground);
         }
 
         if (segment.Attribute is { } explicitAttr)
@@ -76,6 +76,35 @@ internal static class MarkdownAttributeHelper
                    _ => baseAttr
                };
     }
+
+    private static Attribute ResolveRoleAttribute (View view, VisualRole role, Attribute roleAttr, Color? themeBackground)
+    {
+        if (themeBackground is { } roleBg)
+        {
+            return roleAttr with { Background = roleBg };
+        }
+
+        if (!IsCodeTokenRole (role) || roleAttr.Background != Color.None)
+        {
+            return roleAttr;
+        }
+
+        return roleAttr with { Background = view.GetAttributeForRole (VisualRole.Code).Background };
+    }
+
+    private static bool IsCodeTokenRole (VisualRole role) =>
+        role is VisualRole.CodeComment
+             or VisualRole.CodeKeyword
+             or VisualRole.CodeString
+             or VisualRole.CodeNumber
+             or VisualRole.CodeOperator
+             or VisualRole.CodeType
+             or VisualRole.CodePreprocessor
+             or VisualRole.CodeIdentifier
+             or VisualRole.CodeConstant
+             or VisualRole.CodePunctuation
+             or VisualRole.CodeFunctionName
+             or VisualRole.CodeAttribute;
 
     /// <summary>
     ///     Converts a list of <see cref="InlineRun"/> (from parsing) into

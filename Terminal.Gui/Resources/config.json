@@ -56,7 +56,20 @@
               "Normal": {
                 "Foreground": "Yellow",
                 "Background": "Blue"
-              }
+              },
+              "Code": { "Foreground": "Yellow", "Background": "Blue", "Style": "None" },
+              "CodeComment": { "Foreground": "LightGray", "Background": "None", "Style": "None" },
+              "CodeKeyword": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeString": { "Foreground": "LightCyan", "Background": "None", "Style": "None" },
+              "CodeNumber": { "Foreground": "LightGreen", "Background": "None", "Style": "None" },
+              "CodeOperator": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeType": { "Foreground": "Magenta", "Background": "None", "Style": "None" },
+              "CodePreprocessor": { "Foreground": "BrightRed", "Background": "None", "Style": "None" },
+              "CodeIdentifier": { "Foreground": "Yellow", "Background": "None", "Style": "None" },
+              "CodeConstant": { "Foreground": "LightGreen", "Background": "None", "Style": "None" },
+              "CodePunctuation": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeFunctionName": { "Foreground": "LightYellow", "Background": "None", "Style": "None" },
+              "CodeAttribute": { "Foreground": "LightCyan", "Background": "None", "Style": "None" }
             }
           },
           {
@@ -129,7 +142,20 @@
               "Normal": {
                 "Foreground": "White",
                 "Background": "DarkBlue"
-              }
+              },
+              "Code": { "Foreground": "White", "Background": "DarkBlue", "Style": "None" },
+              "CodeComment": { "Foreground": "#8fbc8f", "Background": "None", "Style": "None" },
+              "CodeKeyword": { "Foreground": "#87cefa", "Background": "None", "Style": "None" },
+              "CodeString": { "Foreground": "#f0e68c", "Background": "None", "Style": "None" },
+              "CodeNumber": { "Foreground": "#98fb98", "Background": "None", "Style": "None" },
+              "CodeOperator": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeType": { "Foreground": "#40e0d0", "Background": "None", "Style": "None" },
+              "CodePreprocessor": { "Foreground": "#dda0dd", "Background": "None", "Style": "None" },
+              "CodeIdentifier": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeConstant": { "Foreground": "#87cefa", "Background": "None", "Style": "None" },
+              "CodePunctuation": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeFunctionName": { "Foreground": "#fffacd", "Background": "None", "Style": "None" },
+              "CodeAttribute": { "Foreground": "#add8e6", "Background": "None", "Style": "None" }
             }
           },
           {
@@ -283,6 +309,7 @@
                 "Background": "None",
                 "Style": "Italic"
               },
+              "Code": { "Foreground": "LightGray", "Background": "Onyx", "Style": "None" },
               "CodeComment": { "Foreground": "#6a9955", "Background": "None", "Style": "None" },
               "CodeKeyword": { "Foreground": "#569cd6", "Background": "None", "Style": "None" },
               "CodeString": { "Foreground": "#ce9178", "Background": "None", "Style": "None" },
@@ -580,6 +607,7 @@
                 "Background": "None",
                 "Style": "Italic"
               },
+              "Code": { "Foreground": "Black", "Background": "WhiteSmoke", "Style": "None" },
               "CodeComment": { "Foreground": "#008000", "Background": "None", "Style": "None" },
               "CodeKeyword": { "Foreground": "#0000ff", "Background": "None", "Style": "None" },
               "CodeString": { "Foreground": "#a31515", "Background": "None", "Style": "None" },
@@ -823,7 +851,20 @@
                 "Foreground": "GreenPhosphor",
                 "Background": "Charcoal",
                 "Style": "Faint"
-              }
+              },
+              "Code": { "Foreground": "GreenPhosphor", "Background": "Charcoal", "Style": "None" },
+              "CodeComment": { "Foreground": "#7cff7c", "Background": "None", "Style": "None" },
+              "CodeKeyword": { "Foreground": "#b6ffb6", "Background": "None", "Style": "None" },
+              "CodeString": { "Foreground": "#9cff9c", "Background": "None", "Style": "None" },
+              "CodeNumber": { "Foreground": "#ccffcc", "Background": "None", "Style": "None" },
+              "CodeOperator": { "Foreground": "GreenPhosphor", "Background": "None", "Style": "None" },
+              "CodeType": { "Foreground": "#80ffd4", "Background": "None", "Style": "None" },
+              "CodePreprocessor": { "Foreground": "#d0ffd0", "Background": "None", "Style": "None" },
+              "CodeIdentifier": { "Foreground": "GreenPhosphor", "Background": "None", "Style": "None" },
+              "CodeConstant": { "Foreground": "#b6ffb6", "Background": "None", "Style": "None" },
+              "CodePunctuation": { "Foreground": "GreenPhosphor", "Background": "None", "Style": "None" },
+              "CodeFunctionName": { "Foreground": "#e0ffe0", "Background": "None", "Style": "None" },
+              "CodeAttribute": { "Foreground": "#80ffd4", "Background": "None", "Style": "None" }
             }
           },
           {
@@ -980,7 +1021,20 @@
                 "Foreground": "AmberPhosphor",
                 "Background": "Charcoal",
                 "Style": "Faint"
-              }
+              },
+              "Code": { "Foreground": "AmberPhosphor", "Background": "Charcoal", "Style": "None" },
+              "CodeComment": { "Foreground": "#d08a00", "Background": "None", "Style": "None" },
+              "CodeKeyword": { "Foreground": "#ffd166", "Background": "None", "Style": "None" },
+              "CodeString": { "Foreground": "#ffb000", "Background": "None", "Style": "None" },
+              "CodeNumber": { "Foreground": "#ffe08a", "Background": "None", "Style": "None" },
+              "CodeOperator": { "Foreground": "AmberPhosphor", "Background": "None", "Style": "None" },
+              "CodeType": { "Foreground": "#ffc04d", "Background": "None", "Style": "None" },
+              "CodePreprocessor": { "Foreground": "#ff9f1c", "Background": "None", "Style": "None" },
+              "CodeIdentifier": { "Foreground": "AmberPhosphor", "Background": "None", "Style": "None" },
+              "CodeConstant": { "Foreground": "#ffd166", "Background": "None", "Style": "None" },
+              "CodePunctuation": { "Foreground": "AmberPhosphor", "Background": "None", "Style": "None" },
+              "CodeFunctionName": { "Foreground": "#fff0a6", "Background": "None", "Style": "None" },
+              "CodeAttribute": { "Foreground": "#ffc04d", "Background": "None", "Style": "None" }
             }
           },
           {
