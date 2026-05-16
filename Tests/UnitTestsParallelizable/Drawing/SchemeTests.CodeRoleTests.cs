@@ -155,4 +155,14 @@ public class SchemeCodeRoleTests
         Assert.Equal (keywordAttr, retrieved);
         Assert.Equal (keywordAttr, scheme.GetAttributeForRole (VisualRole.CodeKeyword));
     }
+
+    [Fact]
+    public void HardCoded_Base_Has_Default_CodeToken_Colors ()
+    {
+        // Copilot
+        Scheme baseScheme = Scheme.GetHardCodedSchemes () ["Base"];
+
+        Assert.True (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? keyword));
+        Assert.NotEqual (baseScheme.Code.Foreground, keyword!.Value.Foreground);
+    }
 }

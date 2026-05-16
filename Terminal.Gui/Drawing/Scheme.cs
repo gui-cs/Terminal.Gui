@@ -188,7 +188,24 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                                                                             CreateAccent ())
                                                       ]);
 
-        Scheme CreateBase () => new () { Normal = new Attribute (Color.None, Color.None) };
+        Scheme CreateBase () => new ()
+        {
+            Normal = new Attribute (Color.None, Color.None),
+            CodeComment = CreateCodeAttribute ("#6a9955"),
+            CodeKeyword = CreateCodeAttribute ("#569cd6"),
+            CodeString = CreateCodeAttribute ("#ce9178"),
+            CodeNumber = CreateCodeAttribute ("#b5cea8"),
+            CodeOperator = CreateCodeAttribute ("#d4d4d4"),
+            CodeType = CreateCodeAttribute ("#4ec9b0"),
+            CodePreprocessor = CreateCodeAttribute ("#c586c0"),
+            CodeIdentifier = CreateCodeAttribute ("#9cdcfe"),
+            CodeConstant = CreateCodeAttribute ("#569cd6"),
+            CodePunctuation = CreateCodeAttribute ("#d4d4d4"),
+            CodeFunctionName = CreateCodeAttribute ("#dcdcaa"),
+            CodeAttribute = CreateCodeAttribute ("#9cdcfe")
+        };
+
+        Attribute CreateCodeAttribute (string foreground) => new (foreground, "None");
 
         Scheme CreateError () => new () { Normal = new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack) };
 
