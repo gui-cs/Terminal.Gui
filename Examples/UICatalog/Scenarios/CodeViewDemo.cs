@@ -76,7 +76,7 @@ public sealed class CodeViewDemo : Scenario
         Code code = new ()
         {
             X = 0,
-            Y = Pos.Bottom (languageSelector) + 1,
+            Y = Pos.Bottom (themeSelector) + 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             BorderStyle = LineStyle.Rounded,
