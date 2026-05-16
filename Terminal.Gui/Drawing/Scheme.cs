@@ -237,7 +237,23 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         // Force opaque
         accentBg = new Color (accentBg.R, accentBg.G, accentBg.B, 255);
 
-        return new Scheme { Normal = new Attribute (resolvedFg, accentBg) };
+        return new Scheme
+        {
+            Normal = new Attribute (resolvedFg, accentBg),
+            Code = baseScheme.GetAttributeForRole (VisualRole.Code, defaultTerminalColors),
+            CodeComment = baseScheme.GetAttributeForRole (VisualRole.CodeComment, defaultTerminalColors),
+            CodeKeyword = baseScheme.GetAttributeForRole (VisualRole.CodeKeyword, defaultTerminalColors),
+            CodeString = baseScheme.GetAttributeForRole (VisualRole.CodeString, defaultTerminalColors),
+            CodeNumber = baseScheme.GetAttributeForRole (VisualRole.CodeNumber, defaultTerminalColors),
+            CodeOperator = baseScheme.GetAttributeForRole (VisualRole.CodeOperator, defaultTerminalColors),
+            CodeType = baseScheme.GetAttributeForRole (VisualRole.CodeType, defaultTerminalColors),
+            CodePreprocessor = baseScheme.GetAttributeForRole (VisualRole.CodePreprocessor, defaultTerminalColors),
+            CodeIdentifier = baseScheme.GetAttributeForRole (VisualRole.CodeIdentifier, defaultTerminalColors),
+            CodeConstant = baseScheme.GetAttributeForRole (VisualRole.CodeConstant, defaultTerminalColors),
+            CodePunctuation = baseScheme.GetAttributeForRole (VisualRole.CodePunctuation, defaultTerminalColors),
+            CodeFunctionName = baseScheme.GetAttributeForRole (VisualRole.CodeFunctionName, defaultTerminalColors),
+            CodeAttribute = baseScheme.GetAttributeForRole (VisualRole.CodeAttribute, defaultTerminalColors)
+        };
     }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>
