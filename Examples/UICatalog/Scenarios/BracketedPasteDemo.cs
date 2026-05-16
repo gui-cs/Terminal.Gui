@@ -25,7 +25,7 @@ public sealed class BracketedPasteDemo : Scenario
             X = 0,
             Y = Pos.Bottom (hint) + 1,
             Width = Dim.Fill (),
-            Title = "Paste into the focused TextField — the default OnPasted inserts the text."
+            Title = "Paste into the focused TextField — the default Command.Paste handler inserts the text."
         };
 
         Label log = new ()

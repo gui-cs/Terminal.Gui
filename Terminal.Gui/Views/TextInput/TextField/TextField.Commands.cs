@@ -85,7 +85,9 @@ public partial class TextField
         AddCommand (Command.DisableOverwrite, () => SetOverwrite (false));
         AddCommand (Command.Copy, () => Copy ());
         AddCommand (Command.Cut, () => Cut ());
-        AddCommand (Command.Paste, () => Paste ());
+
+        // Command.Paste uses the default View base handler — sanitization via OnSanitizingPaste,
+        // insertion via OnPaste. No explicit AddCommand needed.
         AddCommand (Command.SelectAll, () => SelectAll ());
         AddCommand (Command.DeleteAll, () => DeleteAll ());
         AddCommand (Command.Context, () => ShowContextMenu (true));
@@ -150,35 +152,13 @@ public partial class TextField
         return true;
     }
 
-    /// <summary>Paste the selected text from the clipboard.</summary>
-    public bool Paste ()
-    {
-        if (ReadOnly)
-        {
-            return true;
-        }
-
-        string? cbTxt = App?.Clipboard?.GetClipboardData ().Split ("\n") [0];
-
-        if (string.IsNullOrEmpty (cbTxt))
-        {
-            return false;
-        }
-
-        SetSelectedStartSelectedLength ();
-        int selStart = _selectionStart == -1 ? InsertionPoint : _selectionStart;
-
-        Text = StringExtensions.ToString (_text.GetRange (0, selStart))
-               + cbTxt
-               + StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
-
-        _insertionPoint = Math.Min (selStart + GraphemeHelper.GetGraphemeCount (cbTxt), _text.Count);
-        ClearAllSelection ();
-        SetNeedsDraw ();
-        Adjust ();
-
-        return true;
-    }
+    /// <summary>Paste the clipboard contents into the text field at the cursor / selection.</summary>
+    /// <remarks>
+    ///     Routes through <see cref="Command.Paste"/> with a <see langword="null"/> payload, so the
+    ///     default <see cref="View"/> handler reads from <see cref="IApplication.Clipboard"/>,
+    ///     sanitizes via <see cref="OnSanitizingPaste"/>, and inserts via <see cref="OnPaste"/>.
+    /// </remarks>
+    public bool Paste () => InvokeCommand (Command.Paste) is true;
 
     /// <summary>Redoes the latest changes.</summary>
     public bool Redo ()

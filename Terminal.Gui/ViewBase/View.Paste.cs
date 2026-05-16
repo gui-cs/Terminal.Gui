@@ -1,68 +1,129 @@
+using System.Text;
+
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Paste APIs
 {
     /// <summary>
-    ///     Called when bracketed-paste content is dispatched to this view (typically the focused
-    ///     view). Raises the cancellable <see cref="OnPasted"/> / <see cref="Pasted"/> events; if the
-    ///     paste is not handled, it bubbles up to <see cref="SuperView"/>.
+    ///     Default handler for <see cref="Command.Paste"/>. Resolves the paste payload (from
+    ///     <see cref="ICommandContext.Value"/> when bracketed paste delivered one, otherwise from
+    ///     <see cref="IApplication.Clipboard"/>), sanitizes it via <see cref="OnSanitizingPaste"/>,
+    ///     raises the cancellable <see cref="Pasting"/> event, calls <see cref="OnPaste"/> to insert
+    ///     the text, then raises <see cref="Pasted"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Override <see cref="OnPasted"/> in a subclass to provide default paste behavior (for
-    ///         example, <see cref="TextField"/> inserts the pasted text). Subscribe to <see cref="Pasted"/>
-    ///         to handle pastes externally.
+    ///         Plain <see cref="View"/> instances return <see langword="false"/> from
+    ///         <see cref="OnPaste"/> by default. Subclasses that accept text (for example
+    ///         <see cref="TextField"/> and <see cref="TextView"/>) override
+    ///         <see cref="OnPaste"/> to perform the insertion.
     ///     </para>
     ///     <para>
-    ///         Pastes are only delivered through this method on terminals that support bracketed paste
-    ///         mode. On terminals that do not, pasted text is delivered character-by-character through
-    ///         the normal keyboard pipeline.
+    ///         Bracketed-paste payloads carry the raw bytes delivered by the terminal between
+    ///         <c>ESC[200~</c> and <c>ESC[201~</c>. Keyboard-driven pastes (<c>Ctrl+V</c>) have no
+    ///         payload and fall through to the clipboard. Both paths share this handler, so any
+    ///         sanitization or event subscription works for both.
     ///     </para>
     /// </remarks>
-    /// <param name="args">Carries the pasted text and a cancellation flag.</param>
-    /// <returns><see langword="true"/> if the paste was handled.</returns>
-    public bool NewPasteEvent (PasteEventArgs args)
+    /// <returns>
+    ///     <see langword="true"/> if the paste was consumed (sanitized text inserted, or cancelled
+    ///     by a subscriber); <see langword="false"/> if nothing was pasted.
+    /// </returns>
+    private bool? DefaultPasteHandler (ICommandContext? ctx)
     {
         if (!Enabled)
         {
             return false;
         }
 
-        if (OnPasted (args) || args.Handled)
+        string? payload = ctx?.Value as string ?? App?.Clipboard?.GetClipboardData ();
+
+        if (string.IsNullOrEmpty (payload))
+        {
+            return false;
+        }
+
+        string sanitized = OnSanitizingPaste (payload);
+
+        if (string.IsNullOrEmpty (sanitized))
+        {
+            return false;
+        }
+
+        PastingEventArgs pasting = new (sanitized);
+        Pasting?.Invoke (this, pasting);
+
+        if (pasting.Handled)
         {
             return true;
         }
 
-        Pasted?.Invoke (this, args);
-
-        if (args.Handled)
+        if (string.IsNullOrEmpty (pasting.Text))
         {
-            return true;
+            return false;
         }
 
-        // Bubble to SuperView so a container can provide default paste handling for its children.
-        if (SuperView is { } superView)
+        if (!OnPaste (pasting.Text))
         {
-            return superView.NewPasteEvent (args);
+            return false;
         }
 
-        return false;
+        Pasted?.Invoke (this, new (pasting.Text));
+
+        return true;
     }
 
     /// <summary>
-    ///     Called before the <see cref="Pasted"/> event is raised. Override to provide default paste
-    ///     handling (for example, inserting the pasted text into a text-input view). Set
-    ///     <see cref="System.ComponentModel.HandledEventArgs.Handled"/> on <paramref name="args"/> or
-    ///     return <see langword="true"/> to stop further processing.
+    ///     Override to filter or transform raw paste payloads before they are inserted into the
+    ///     view. The default implementation strips C0/C1 control characters (including ESC) but
+    ///     preserves tab, line feed, and carriage return — matching Windows Terminal's
+    ///     <c>FilterStringForPaste</c> baseline.
     /// </summary>
-    /// <param name="args">Carries the pasted text.</param>
-    /// <returns><see langword="true"/> if the paste was handled.</returns>
-    protected virtual bool OnPasted (PasteEventArgs args) => false;
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="TextField"/> overrides this to take only the first line and drop tab/CR/LF.
+    ///         <see cref="TextView"/> overrides this to normalize <c>\r\n</c> / <c>\r</c> to <c>\n</c>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="raw">The raw payload, either from the terminal or the clipboard.</param>
+    /// <returns>The sanitized text that will be passed to <see cref="OnPaste"/>.</returns>
+    protected virtual string OnSanitizingPaste (string raw) => StripControlCharsExceptTabAndNewline (raw);
 
     /// <summary>
-    ///     Raised when bracketed-paste content is delivered to this view. Set
-    ///     <see cref="System.ComponentModel.HandledEventArgs.Handled"/> to <see langword="true"/> to
-    ///     stop the paste from being processed further (including bubbling to the SuperView).
+    ///     Override to insert sanitized paste text into the view. The default returns
+    ///     <see langword="false"/> because a plain <see cref="View"/> has no text model. Text-input
+    ///     views (<see cref="TextField"/>, <see cref="TextView"/>) override this to perform the
+    ///     insertion.
     /// </summary>
-    public event EventHandler<PasteEventArgs>? Pasted;
+    /// <param name="text">The sanitized text to insert. Never <see langword="null"/> or empty.</param>
+    /// <returns><see langword="true"/> if the view consumed the paste.</returns>
+    protected virtual bool OnPaste (string text) => false;
+
+    /// <summary>
+    ///     Raised by the default <see cref="Command.Paste"/> handler after sanitization but before
+    ///     insertion. Subscribers may rewrite <see cref="PastingEventArgs.Text"/> or set
+    ///     <see cref="System.ComponentModel.HandledEventArgs.Handled"/> to cancel.
+    /// </summary>
+    public event EventHandler<PastingEventArgs>? Pasting;
+
+    /// <summary>
+    ///     Raised by the default <see cref="Command.Paste"/> handler after <see cref="OnPaste"/>
+    ///     consumes a paste. Observation only — the text has already been inserted.
+    /// </summary>
+    public event EventHandler<PastedEventArgs>? Pasted;
+
+    private static string StripControlCharsExceptTabAndNewline (string text)
+    {
+        StringBuilder sb = new (text.Length);
+
+        foreach (char c in text)
+        {
+            if (c == '\t' || c == '\n' || c == '\r' || (c >= 0x20 && c < 0x7F) || c >= 0xA0)
+            {
+                sb.Append (c);
+            }
+        }
+
+        return sb.ToString ();
+    }
 }

@@ -40,36 +40,17 @@ public partial class TextField
     }
 
     /// <inheritdoc/>
-    protected override bool OnPasted (PasteEventArgs args)
+    /// <remarks>
+    ///     TextField is single-line — keep only the first line of the paste and drop C0/C1 control
+    ///     characters (except tab, which TextField accepts as a literal). Matches Windows Terminal's
+    ///     <c>FilterStringForPaste</c> behavior for single-line targets and mirrors the existing
+    ///     clipboard-paste command.
+    /// </remarks>
+    protected override string OnSanitizingPaste (string raw)
     {
-        if (ReadOnly || string.IsNullOrEmpty (args.Text))
-        {
-            return false;
-        }
+        int newline = raw.IndexOfAny (['\r', '\n']);
+        string firstLine = newline >= 0 ? raw [..newline] : raw;
 
-        // TextField is single-line — take only the first line of the paste and drop control
-        // characters. This mirrors the existing clipboard-Paste command (see TextField.Commands.cs)
-        // and matches Windows Terminal's FilterStringForPaste behavior for single-line targets.
-        string sanitized = SanitizeSingleLinePaste (args.Text);
-
-        if (sanitized.Length == 0)
-        {
-            return false;
-        }
-
-        InsertText (sanitized, false);
-        args.Handled = true;
-
-        return true;
-    }
-
-    private static string SanitizeSingleLinePaste (string text)
-    {
-        int newline = text.IndexOfAny (['\r', '\n']);
-        string firstLine = newline >= 0 ? text [..newline] : text;
-
-        // Strip C0/C1 control chars (including ESC). Keep tabs since the existing TextField
-        // accepts a literal tab in its text. DEL (0x7F) is dropped.
         StringBuilder sb = new (firstLine.Length);
 
         foreach (char c in firstLine)
@@ -81,6 +62,35 @@ public partial class TextField
         }
 
         return sb.ToString ();
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Returns <see langword="true"/> even when <see cref="ReadOnly"/> so that <c>Ctrl+V</c>
+    ///     does not bubble to a parent view that might also bind paste. The
+    ///     <see cref="View.Pasted"/> event still fires in that case; subscribers that care should
+    ///     check <see cref="ReadOnly"/>.
+    /// </remarks>
+    protected override bool OnPaste (string text)
+    {
+        if (ReadOnly)
+        {
+            return true;
+        }
+
+        SetSelectedStartSelectedLength ();
+        int selStart = _selectionStart == -1 ? InsertionPoint : _selectionStart;
+
+        Text = StringExtensions.ToString (_text.GetRange (0, selStart))
+               + text
+               + StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
+
+        _insertionPoint = Math.Min (selStart + GraphemeHelper.GetGraphemeCount (text), _text.Count);
+        ClearAllSelection ();
+        SetNeedsDraw ();
+        Adjust ();
+
+        return true;
     }
 
     /// <summary>Raises the <see cref="TextChanging"/> event, enabling canceling the change or adjusting the text.</summary>

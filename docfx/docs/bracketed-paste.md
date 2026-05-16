@@ -4,29 +4,90 @@ Terminal.Gui supports the ANSI [bracketed paste mode](https://invisible-island.n
 
 Bracketed paste mode is enabled automatically by the driver when the application initializes and disabled on shutdown. Applications do not need to opt in.
 
+## Architecture: bracketed paste shares the `Command.Paste` pipeline
+
+Bracketed paste and keyboard-driven paste (`Ctrl+V`) route through the same command pipeline:
+
+```
+driver bytes  ──►  AnsiResponseParser ──►  IApplication.Paste (event, raw payload)
+                                       │
+                                       ▼
+                              focused view.InvokeCommand (Command.Paste, ctx.WithValue (payload))
+                                       │
+                                       ▼
+              ┌─────────────────  default Command.Paste handler  ─────────────────┐
+              │  payload = ctx.Value as string  ??  App.Clipboard.GetClipboardData()│
+              │  sanitized = OnSanitizingPaste (payload)                            │
+              │  raise  Pasting  (cancellable, mutable Text)                        │
+              │  if not cancelled:  consumed = OnPaste (sanitized)                  │
+              │  if consumed:  raise  Pasted                                        │
+              └─────────────────────────────────────────────────────────────────────┘
+```
+
+The same handler serves both bracketed paste (payload travels via `CommandContext.Values`) and keyboard `Ctrl+V` (no payload → clipboard fallback). Bubbling, cancellation, and command routing come from the existing `View.InvokeCommand` machinery — there is no parallel paste dispatch path.
+
 ## Receiving paste events
 
-Subscribe to <xref:Terminal.Gui.App.IApplication.Paste> to receive paste payloads at the application level:
+There are three places to hook in, in order of dispatch:
+
+### 1. `Application.Paste` — raw, app-wide
 
 ```csharp
-app.Paste += (sender, args) =>
+app.Paste += (_, args) =>
               {
                   myLog.AppendLine ($"Pasted {args.Text.Length} characters");
                   // Set args.Handled = true to stop further dispatch.
               };
 ```
 
-The <xref:Terminal.Gui.Input.PasteEventArgs.Text> property contains the raw text the terminal delivered between the start and end markers. The bracketing markers themselves are stripped by the parser.
+Subscribers see the raw terminal-delivered payload before any sanitization. Cancelling here prevents the paste from reaching any view.
 
-If the application event is not handled, the paste is dispatched to the focused view via <xref:Terminal.Gui.ViewBase.View.NewPasteEvent(Terminal.Gui.Input.PasteEventArgs)>. Views can override <xref:Terminal.Gui.ViewBase.View.OnPasted(Terminal.Gui.Input.PasteEventArgs)> to provide default paste handling, or subscribe to the <xref:Terminal.Gui.ViewBase.View.Pasted> event. Unhandled pastes bubble up to the SuperView.
+### 2. `View.Pasting` — sanitized, cancellable, mutable
+
+```csharp
+field.Pasting += (_, args) =>
+                  {
+                      // args.Text is already sanitized. Rewrite it, or cancel.
+                      args.Text = args.Text.Trim ();
+                      // args.Handled = true   // cancel insertion
+                  };
+```
+
+Raised after the default handler resolves the payload and calls `OnSanitizingPaste`. Subscribers may rewrite `args.Text` to alter what gets inserted, or set `Handled` to cancel.
+
+### 3. `View.Pasted` — observation only
+
+```csharp
+field.Pasted += (_, args) => log.AppendLine ($"Inserted: {args.Text}");
+```
+
+Raised after `OnPaste` has consumed the paste.
+
+## Customizing paste behavior in a custom view
+
+The default `View` declines pastes (its `OnPaste` returns `false`). Text-input views override two virtual methods:
+
+```csharp
+protected override string OnSanitizingPaste (string raw)
+{
+    // Return the text you want inserted. Strip controls, normalize line
+    // endings, etc. Default implementation strips C0/C1 controls except \t \n \r.
+}
+
+protected override bool OnPaste (string sanitized)
+{
+    // Insert the sanitized text. Return true if you consumed the paste.
+}
+```
 
 ## Default behavior in TextField / TextView
 
-`TextField` is a single-line control. When it receives a paste it takes the first line only (splitting on `\r` or `\n`) and strips C0 / C1 control characters except tab. This matches the behavior of the existing clipboard-paste command.
+| View        | `OnSanitizingPaste`                                                          | `OnPaste`                                  |
+|-------------|------------------------------------------------------------------------------|--------------------------------------------|
+| `TextField` | First line only, strip C0/C1 controls (tab kept).                            | Insert at cursor; respects `ReadOnly`.     |
+| `TextView`  | Normalize `\r` and `\r\n` to `\n`; strip C0/C1 controls except tab/newline. | Insert (multi-line aware); respects `ReadOnly`. |
 
-`TextView` is multi-line. It accepts the full payload, normalizing `\r` and `\r\n` into logical line breaks in the text model, and strips C0 / C1 control characters except tab and newline. This mirrors [Windows Terminal's `FilterStringForPaste`](https://github.com/microsoft/terminal/blob/main/src/types/utils.cpp).
-
-To pass the raw payload through unmodified, subscribe to <xref:Terminal.Gui.ViewBase.View.Pasted> instead of relying on the default `OnPasted` — the event is raised after the virtual method, so a subscriber that sets `Handled = true` after the default insertion will only stop further bubbling, not undo the insertion. To override the default, subclass the view and override `OnPasted`.
+`TextField`'s "first line only" matches the legacy clipboard `Paste` command. `TextView`'s line-ending normalization mirrors [Windows Terminal's `FilterStringForPaste`](https://github.com/microsoft/terminal/blob/main/src/types/utils.cpp).
 
 ## Terminals without bracketed paste support
 
@@ -40,7 +101,7 @@ If the terminal sends `ESC[200~` but the matching `ESC[201~` is dropped (broken 
 
 Terminal.Gui trusts the *terminal* to sanitize the paste payload. Terminals such as xterm, Windows Terminal, Alacritty, and kitty already strip dangerous control sequences from the clipboard before bracketing — see [`xterm` `allowPasteControls`](https://invisible-island.net/xterm/xterm-paste64.html), [Windows Terminal `FilterStringForPaste`](https://github.com/microsoft/terminal/blob/main/src/types/utils.cpp), and [Alacritty's pre-bracket filter](https://github.com/alacritty/alacritty/blob/master/alacritty/src/event.rs).
 
-For defense in depth, Terminal.Gui's default `OnPasted` implementations on `TextField` and `TextView` strip C0 / C1 control characters before inserting. Applications that consume the raw `Application.Paste` event are responsible for their own sanitization.
+For defense in depth, the default `View.OnSanitizingPaste` strips C0/C1 control characters before inserting. `TextField` and `TextView` apply additional view-specific sanitization. Applications that consume the raw `Application.Paste` event are responsible for their own sanitization.
 
 ## Disabling bracketed paste
 
@@ -48,8 +109,13 @@ To opt out, intercept the driver setup and skip the enable sequence. The relevan
 
 ## Related
 
-- <xref:Terminal.Gui.App.IApplication.Paste> — application-level event
-- <xref:Terminal.Gui.ViewBase.View.Pasted> — view-level event
-- <xref:Terminal.Gui.ViewBase.View.OnPasted(Terminal.Gui.Input.PasteEventArgs)> — view virtual method
-- <xref:Terminal.Gui.Input.PasteEventArgs> — event arguments
+- <xref:Terminal.Gui.App.IApplication.Paste> — application-level event (raw payload)
+- <xref:Terminal.Gui.ViewBase.View.Pasting> — cancellable view event, mutable `Text`
+- <xref:Terminal.Gui.ViewBase.View.Pasted> — view event after insertion
+- <xref:Terminal.Gui.ViewBase.View.OnSanitizingPaste(System.String)> — view virtual hook for filtering
+- <xref:Terminal.Gui.ViewBase.View.OnPaste(System.String)> — view virtual hook for insertion
+- <xref:Terminal.Gui.Input.Command.Paste> — the canonical paste command
+- <xref:Terminal.Gui.Input.PasteEventArgs> — `IApplication.Paste` arguments
+- <xref:Terminal.Gui.Input.PastingEventArgs> — `View.Pasting` arguments
+- <xref:Terminal.Gui.Input.PastedEventArgs> — `View.Pasted` arguments
 - <xref:Terminal.Gui.Drivers.EscSeqUtils.CSI_EnableBracketedPaste> / <xref:Terminal.Gui.Drivers.EscSeqUtils.CSI_DisableBracketedPaste> — driver-level constants

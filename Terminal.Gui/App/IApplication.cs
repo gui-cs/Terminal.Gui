@@ -687,8 +687,12 @@ public interface IApplication : IDisposable
     event EventHandler<PasteEventArgs>? Paste;
 
     /// <summary>
-    ///     Raises the <see cref="Paste"/> event with <paramref name="text"/>, then dispatches the paste
-    ///     to the focused view via <see cref="View.NewPasteEvent"/> if not already handled.
+    ///     Raises the <see cref="Paste"/> event with <paramref name="text"/>, then dispatches the
+    ///     paste to the focused view by invoking <see cref="Command.Paste"/> with the payload in
+    ///     <see cref="CommandContext.Values"/> if not already handled. The default
+    ///     <see cref="Command.Paste"/> handler on <see cref="View"/> sanitizes the payload, raises
+    ///     <see cref="View.Pasting"/> and <see cref="View.Pasted"/>, and delegates insertion to the
+    ///     focused view's <see cref="View.OnPaste"/> override.
     /// </summary>
     /// <param name="text">The pasted content with bracketing markers stripped.</param>
     /// <returns><see langword="true"/> if the paste was handled.</returns>

@@ -253,42 +253,24 @@ public partial class TextView
     }
 
     /// <inheritdoc/>
-    protected override bool OnPasted (PasteEventArgs args)
+    /// <remarks>
+    ///     Normalizes line endings (CR and CRLF → LF) so the text model sees a single newline form,
+    ///     and strips C0/C1 control chars except tab and newline. Mirrors Windows Terminal's
+    ///     <c>FilterStringForPaste</c>.
+    /// </remarks>
+    protected override string OnSanitizingPaste (string raw)
     {
-        if (_isReadOnly || string.IsNullOrEmpty (args.Text))
+        StringBuilder sb = new (raw.Length);
+
+        for (var i = 0; i < raw.Length; i++)
         {
-            return false;
-        }
-
-        // Normalize newlines (terminals send \r for paste line breaks, some send \r\n) and strip
-        // C0/C1 control chars except tab/newline. Mirrors Windows Terminal's FilterStringForPaste.
-        string sanitized = SanitizeMultiLinePaste (args.Text);
-
-        if (sanitized.Length == 0)
-        {
-            return false;
-        }
-
-        InsertText (sanitized);
-        args.Handled = true;
-
-        return true;
-    }
-
-    private static string SanitizeMultiLinePaste (string text)
-    {
-        StringBuilder sb = new (text.Length);
-
-        for (var i = 0; i < text.Length; i++)
-        {
-            char c = text [i];
+            char c = raw [i];
 
             if (c == '\r')
             {
-                // Collapse CR and CRLF into LF so the text model sees a single newline form.
                 sb.Append ('\n');
 
-                if (i + 1 < text.Length && text [i + 1] == '\n')
+                if (i + 1 < raw.Length && raw [i + 1] == '\n')
                 {
                     i++;
                 }
@@ -303,6 +285,63 @@ public partial class TextView
         }
 
         return sb.ToString ();
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Returns <see langword="true"/> even when <see cref="ReadOnly"/> so that <c>Ctrl+V</c>
+    ///     does not bubble to a parent view that might also bind paste. The
+    ///     <see cref="View.Pasted"/> event still fires in that case; subscribers that care should
+    ///     check <see cref="ReadOnly"/>.
+    /// </remarks>
+    protected override bool OnPaste (string text)
+    {
+        if (_isReadOnly)
+        {
+            return true;
+        }
+
+        ResetColumnTrack ();
+        SetWrapModel ();
+
+        // Preserves the legacy clipboard "Copy without selection → Paste inserts as new line above"
+        // behavior. _copyWithoutSelection is set only by this view's own Copy() command, so
+        // bracketed paste (which has no preceding Copy) naturally skips this branch.
+        if (_copyWithoutSelection && text.FirstOrDefault (x => x is '\n' or '\r') == 0)
+        {
+            List<Cell> runeList = Cell.ToCellList (text);
+            List<Cell> currentLine = GetCurrentLine ();
+            _historyText.Add ([[.. currentLine]], InsertionPoint);
+            List<List<Cell>> addedLine = [[.. currentLine], runeList];
+            _historyText.Add ([.. addedLine], InsertionPoint, TextEditingLineStatus.Added);
+            _model.AddLine (CurrentRow, runeList);
+            SetNeedsDraw ();
+            CurrentRow++;
+            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+
+            OnContentsChanged ();
+        }
+        else
+        {
+            if (IsSelecting)
+            {
+                ClearRegion ();
+            }
+
+            _copyWithoutSelection = false;
+            InsertAllText (text, true);
+
+            if (IsSelecting)
+            {
+                _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Original);
+            }
+        }
+
+        UpdateWrapModel ();
+        IsSelecting = false;
+        DoNeededAction ();
+
+        return true;
     }
 
     /// <summary>Replaces all the text based on the match case.</summary>

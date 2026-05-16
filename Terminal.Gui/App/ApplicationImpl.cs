@@ -256,7 +256,15 @@ internal partial class ApplicationImpl : IApplication
             return false;
         }
 
-        return focused.NewPasteEvent (args);
+        // Dispatch through Command.Paste so the bracketed-paste payload uses the same pipeline
+        // (sanitization, Pasting/Pasted events, bubbling) as keyboard-driven paste. The payload
+        // travels via CommandContext.Values; the default handler picks it up from ctx.Value.
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (focused), binding: null)
+        {
+            Routing = CommandRouting.BubblingUp
+        };
+
+        return focused.InvokeCommand (Command.Paste, ctx.WithValue (args.Text)) is true;
     }
 
     #endregion Input (Mouse/Keyboard)
