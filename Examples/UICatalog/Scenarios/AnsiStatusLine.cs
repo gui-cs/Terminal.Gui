@@ -68,7 +68,7 @@ public sealed class AnsiStatusLine : Scenario
         {
             X = 1,
             Y = Pos.Bottom (updateButton) + 2,
-            Text = "Run the \"ANSI StatusLine Only\" scenario to see an entire app render there."
+            Text = "Run Examples/AnsiStatusLineOnly to see an entire app render there."
         };
         appWindow.Add (statusLineOnlyHint);
 
