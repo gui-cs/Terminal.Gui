@@ -84,6 +84,49 @@ public class AppendAutocompleteTests : TestDriverBase
     }
 
     [Fact]
+    public void ProcessKey_End_ReturnsFalse_WhenSuggestionExists ()
+    {
+        // Copilot - End should not be consumed by AppendAutocomplete.
+        // This lets TextField's normal End command move the cursor.
+        // Arrange: focused text field with "f" at end and suggestion "fish"
+        TextField tf = new () { Text = "f" };
+        tf.SetFocus ();
+        tf.MoveEnd ();
+
+        AppendAutocomplete ac = new (tf);
+        ((SingleWordSuggestionGenerator)ac.SuggestionGenerator).AllSuggestions = ["fish"];
+
+        AutocompleteContext context = new ([new Cell (Grapheme: "f")], cursorPosition: 1);
+        ac.GenerateSuggestions (context);
+
+        Assert.NotEmpty (ac.Suggestions);
+
+        // Act
+        bool result = ac.ProcessKey (Key.End);
+
+        // Assert: End was not consumed by autocomplete
+        Assert.False (result);
+        Assert.Equal ("f", tf.Text);
+        Assert.NotEmpty (ac.Suggestions);
+    }
+
+    [Fact]
+    public void ProcessKey_End_ReturnsFalse_WhenNoSuggestions ()
+    {
+        // Copilot - End key should NOT consume the event when no suggestion is showing,
+        // allowing the normal MoveEnd command to run.
+        // Arrange: text field without suggestions
+        TextField tf = new () { Text = "f" };
+        AppendAutocomplete ac = new (tf);
+
+        // Act
+        bool result = ac.ProcessKey (Key.End);
+
+        // Assert: End was not consumed
+        Assert.False (result);
+    }
+
+    [Fact]
     public void AcceptSelectionIfAny_AcceptsSuggestionWhenFocused ()
     {
         // Arrange: focused text field with "f" at end and suggestion "fish"
