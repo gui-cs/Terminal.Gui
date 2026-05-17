@@ -290,9 +290,7 @@ public partial class TextView
     /// <inheritdoc/>
     /// <remarks>
     ///     Returns <see langword="true"/> even when <see cref="ReadOnly"/> so that <c>Ctrl+V</c>
-    ///     does not bubble to a parent view that might also bind paste. The
-    ///     <see cref="View.Pasted"/> event still fires in that case; subscribers that care should
-    ///     check <see cref="ReadOnly"/>.
+    ///     does not bubble to a parent view that might also bind paste.
     /// </remarks>
     protected override bool OnPaste (string text)
     {
@@ -307,7 +305,7 @@ public partial class TextView
         // Preserves the legacy clipboard "Copy without selection → Paste inserts as new line above"
         // behavior. _copyWithoutSelection is set only by this view's own Copy() command, so
         // bracketed paste (which has no preceding Copy) naturally skips this branch.
-        if (_copyWithoutSelection && text.FirstOrDefault (x => x is '\n' or '\r') == 0)
+        if (!CurrentPasteUsesPayload && _copyWithoutSelection && text.FirstOrDefault (x => x is '\n' or '\r') == 0)
         {
             List<Cell> runeList = Cell.ToCellList (text);
             List<Cell> currentLine = GetCurrentLine ();
@@ -343,6 +341,9 @@ public partial class TextView
 
         return true;
     }
+
+    /// <inheritdoc/>
+    protected override bool ShouldRaisePastedEvent (string text) => !_isReadOnly;
 
     /// <summary>Replaces all the text based on the match case.</summary>
     /// <param name="textToFind">The text to find.</param>

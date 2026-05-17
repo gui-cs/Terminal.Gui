@@ -688,11 +688,12 @@ public interface IApplication : IDisposable
 
     /// <summary>
     ///     Raises the <see cref="Paste"/> event with <paramref name="text"/>, then dispatches the
-    ///     paste to the focused view by invoking <see cref="Command.Paste"/> with the payload in
-    ///     <see cref="CommandContext.Values"/> if not already handled. The default
+    ///     paste to the focused view by invoking <see cref="Command.Paste"/> with a dedicated
+    ///     command-context paste payload if not already handled. The default
     ///     <see cref="Command.Paste"/> handler on <see cref="View"/> sanitizes the payload, raises
-    ///     <see cref="View.Pasting"/> and <see cref="View.Pasted"/>, and delegates insertion to the
-    ///     focused view's <see cref="View.OnPaste"/> override.
+    ///     <see cref="View.Pasting"/>, and delegates insertion to the focused view's
+    ///     <see cref="View.OnPaste"/> override. If the focused view consumes the paste and reports
+    ///     a final-text segment for the pasted range, the handler raises <see cref="View.Pasted"/>.
     /// </summary>
     /// <param name="text">The pasted content with bracketing markers stripped.</param>
     /// <returns><see langword="true"/> if the paste was handled.</returns>

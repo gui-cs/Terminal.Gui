@@ -10,7 +10,7 @@ public class ViewPasteTests
             Routing = CommandRouting.BubblingUp
         };
 
-        return view.InvokeCommand (Command.Paste, ctx.WithValue (payload));
+        return view.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload (payload)));
     }
 
     [Fact]
@@ -108,6 +108,19 @@ public class ViewPasteTests
     }
 
     [Fact]
+    public void TextField_Paste_ReadOnly_DoesNotRaisePasted ()
+    {
+        TextField field = new () { Text = "abc", ReadOnly = true };
+        var pastedFired = false;
+        field.Pasted += (_, _) => pastedFired = true;
+
+        bool? handled = InvokePaste (field, "XYZ");
+
+        Assert.True (handled);
+        Assert.False (pastedFired);
+    }
+
+    [Fact]
     public void TextField_Paste_TakesFirstLineOnly ()
     {
         TextField field = new () { Text = string.Empty };
@@ -167,6 +180,19 @@ public class ViewPasteTests
     }
 
     [Fact]
+    public void TextView_Paste_ReadOnly_DoesNotRaisePasted ()
+    {
+        TextView textView = new () { Text = "abc", ReadOnly = true };
+        var pastedFired = false;
+        textView.Pasted += (_, _) => pastedFired = true;
+
+        bool? handled = InvokePaste (textView, "XYZ");
+
+        Assert.True (handled);
+        Assert.False (pastedFired);
+    }
+
+    [Fact]
     public void TextView_Paste_NormalizesCarriageReturnsToLogicalLineBreaks ()
     {
         TextView textView = new () { Text = string.Empty };
@@ -190,6 +216,20 @@ public class ViewPasteTests
     }
 
     [Fact]
+    public void TextView_BracketedPaste_Ignores_CopyWithoutSelection_Mode ()
+    {
+        TextView textView = new () { Text = "abc" };
+        textView.MoveEnd ();
+
+        Assert.True (textView.Copy ());
+
+        bool? handled = InvokePaste (textView, "Z");
+
+        Assert.True (handled);
+        Assert.Equal ("abcZ", textView.Text);
+    }
+
+    [Fact]
     public void EmptyPayload_DoesNotRaisePastingOrPasted ()
     {
         TextField field = new () { Text = string.Empty };
@@ -202,5 +242,46 @@ public class ViewPasteTests
 
         Assert.False (handled);
         Assert.False (anyFired);
+    }
+
+    [Fact]
+    public void ApplicationPaste_Handled_DoesNotDispatchToFocusedView ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        using Runnable runnable = new ();
+        TextField field = new () { Text = string.Empty };
+        var anyFired = false;
+        field.Pasting += (_, _) => anyFired = true;
+        field.Pasted += (_, _) => anyFired = true;
+        runnable.Add (field);
+        app.Begin (runnable);
+        field.SetFocus ();
+        app.Paste += (_, args) => args.Handled = true;
+
+        bool handled = app.RaisePasteEvent ("hello");
+
+        Assert.True (handled);
+        Assert.Equal (string.Empty, field.Text);
+        Assert.False (anyFired);
+    }
+
+    [Fact]
+    public void MenuInitiatedPaste_UsesClipboardText_NotMenuTitle ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
+        using Runnable runnable = new ();
+        TextView textView = new () { Text = string.Empty, Width = 20, Height = 5 };
+        runnable.Add (textView);
+        app.Begin (runnable);
+        app.Driver.Clipboard.SetClipboardData ("Hello ");
+        MenuItem menuItem = new (textView, Command.Paste);
+
+        bool? handled = menuItem.InvokeCommand (Command.Activate);
+
+        Assert.False (handled);
+        Assert.Equal ("Hello ", textView.Text);
     }
 }

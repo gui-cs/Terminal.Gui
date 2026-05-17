@@ -12,19 +12,19 @@ Bracketed paste and keyboard-driven paste (`Ctrl+V`) route through the same comm
 driver bytes  ──►  AnsiResponseParser ──►  IApplication.Paste (event, raw payload)
                                        │
                                        ▼
-                              focused view.InvokeCommand (Command.Paste, ctx.WithValue (payload))
+                              focused view.InvokeCommand (Command.Paste, ctx.WithValue (PastePayload (payload)))
                                        │
                                        ▼
               ┌─────────────────  default Command.Paste handler  ─────────────────┐
-              │  payload = ctx.Value as string  ??  App.Clipboard.GetClipboardData()│
+              │  payload = ctx.Value is PastePayload p ? p.Text : clipboard        │
               │  sanitized = OnSanitizingPaste (payload)                            │
               │  raise  Pasting  (cancellable, mutable Text)                        │
               │  if not cancelled:  consumed = OnPaste (sanitized)                  │
-              │  if consumed:  raise  Pasted                                        │
+              │  if inserted:  raise  Pasted                                        │
               └─────────────────────────────────────────────────────────────────────┘
 ```
 
-The same handler serves both bracketed paste (payload travels via `CommandContext.Values`) and keyboard `Ctrl+V` (no payload → clipboard fallback). Bubbling, cancellation, and command routing come from the existing `View.InvokeCommand` machinery — there is no parallel paste dispatch path.
+The same handler serves both bracketed paste (payload travels in a dedicated command-context paste payload) and keyboard `Ctrl+V` (no payload → clipboard fallback). There is no parallel paste dispatch path.
 
 ## Receiving paste events
 
@@ -84,7 +84,7 @@ protected override bool OnPaste (string sanitized)
 
 | View        | `OnSanitizingPaste`                                                          | `OnPaste`                                  |
 |-------------|------------------------------------------------------------------------------|--------------------------------------------|
-| `TextField` | First line only, strip C0/C1 controls (tab kept).                            | Insert at cursor; respects `ReadOnly`.     |
+| `TextField` | First line only, strip C0/C1 controls (including tab).                      | Insert at cursor; respects `ReadOnly`.     |
 | `TextView`  | Normalize `\r` and `\r\n` to `\n`; strip C0/C1 controls except tab/newline. | Insert (multi-line aware); respects `ReadOnly`. |
 
 `TextField`'s "first line only" matches the legacy clipboard `Paste` command. `TextView`'s line-ending normalization mirrors [Windows Terminal's `FilterStringForPaste`](https://github.com/microsoft/terminal/blob/main/src/types/utils.cpp).

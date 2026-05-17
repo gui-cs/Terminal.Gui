@@ -8,10 +8,13 @@ namespace Terminal.Gui.Input;
 public class PastedEventArgs : EventArgs
 {
     /// <summary>Initializes a new <see cref="PastedEventArgs"/>.</summary>
-    /// <param name="text">The text that was inserted into the view.</param>
+    /// <param name="text">The final-text segment corresponding to the pasted range.</param>
     public PastedEventArgs (string text) { Text = text; }
 
-    /// <summary>The text that was inserted into the view (post-sanitization, post-<see cref="View.Pasting"/>).</summary>
+    /// <summary>
+    ///     The final-text segment corresponding to the pasted range (post-sanitization,
+    ///     post-<see cref="View.Pasting"/>).
+    /// </summary>
     public string Text { get; }
 
     /// <inheritdoc/>

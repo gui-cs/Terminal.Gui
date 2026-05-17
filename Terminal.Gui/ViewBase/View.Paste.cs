@@ -4,12 +4,14 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class View // Paste APIs
 {
+    private protected bool CurrentPasteUsesPayload { get; private set; }
+
     /// <summary>
-    ///     Default handler for <see cref="Command.Paste"/>. Resolves the paste payload (from
-    ///     <see cref="ICommandContext.Value"/> when bracketed paste delivered one, otherwise from
+    ///     Default handler for <see cref="Command.Paste"/>. Resolves the paste payload (from a
+    ///     dedicated <see cref="PastePayload"/> when bracketed paste delivered one, otherwise from
     ///     <see cref="IApplication.Clipboard"/>), sanitizes it via <see cref="OnSanitizingPaste"/>,
     ///     raises the cancellable <see cref="Pasting"/> event, calls <see cref="OnPaste"/> to insert
-    ///     the text, then raises <see cref="Pasted"/>.
+    ///     the text, then raises <see cref="Pasted"/> if insertion actually occurred.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -36,7 +38,9 @@ public partial class View // Paste APIs
             return false;
         }
 
-        string? payload = ctx?.Value as string ?? App?.Clipboard?.GetClipboardData ();
+        PastePayload? pastePayload = ctx?.Value is PastePayload value ? value : null;
+        bool usesPayload = pastePayload is { };
+        string? payload = usesPayload ? pastePayload.Value.Text : App?.Clipboard?.GetClipboardData ();
 
         if (string.IsNullOrEmpty (payload))
         {
@@ -63,14 +67,28 @@ public partial class View // Paste APIs
             return false;
         }
 
-        if (!OnPaste (pasting.Text))
+        CurrentPasteUsesPayload = usesPayload;
+
+        try
         {
-            return false;
+            if (!OnPaste (pasting.Text))
+            {
+                return false;
+            }
+
+            string? pastedText = GetPastedEventText (pasting.Text);
+
+            if (ShouldRaisePastedEvent (pasting.Text) && !string.IsNullOrEmpty (pastedText))
+            {
+                Pasted?.Invoke (this, new (pastedText));
+            }
+
+            return true;
         }
-
-        Pasted?.Invoke (this, new (pasting.Text));
-
-        return true;
+        finally
+        {
+            CurrentPasteUsesPayload = false;
+        }
     }
 
     /// <summary>
@@ -100,6 +118,34 @@ public partial class View // Paste APIs
     protected virtual bool OnPaste (string text) => false;
 
     /// <summary>
+    ///     Override to suppress <see cref="Pasted"/> when <see cref="OnPaste"/> consumes a paste
+    ///     without inserting the text.
+    /// </summary>
+    /// <param name="text">The sanitized text passed to <see cref="OnPaste"/>.</param>
+    /// <returns>
+    ///     <see langword="true"/> to raise <see cref="Pasted"/>; <see langword="false"/> when the
+    ///     paste was consumed without insertion.
+    /// </returns>
+    protected virtual bool ShouldRaisePastedEvent (string text) => true;
+
+    /// <summary>
+    ///     Override to provide the text for <see cref="Pasted"/> after <see cref="OnPaste"/> has run.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The default returns the sanitized text passed into <see cref="OnPaste"/>.
+    ///         Views that rewrite or partially reject the paste during insertion can override this to
+    ///         report the segment of final view text that corresponds to the pasted range.
+    ///     </para>
+    /// </remarks>
+    /// <param name="text">The sanitized text passed to <see cref="OnPaste"/>.</param>
+    /// <returns>
+    ///     The text to expose through <see cref="Pasted"/>; return <see langword="null"/> to suppress
+    ///     the event.
+    /// </returns>
+    protected virtual string? GetPastedEventText (string text) => text;
+
+    /// <summary>
     ///     Raised by the default <see cref="Command.Paste"/> handler after sanitization but before
     ///     insertion. Subscribers may rewrite <see cref="PastingEventArgs.Text"/> or set
     ///     <see cref="System.ComponentModel.HandledEventArgs.Handled"/> to cancel.
@@ -108,7 +154,8 @@ public partial class View // Paste APIs
 
     /// <summary>
     ///     Raised by the default <see cref="Command.Paste"/> handler after <see cref="OnPaste"/>
-    ///     consumes a paste. Observation only — the text has already been inserted.
+    ///     consumes a paste and the view reports that the text was inserted. Observation only — the
+    ///     text has already been inserted.
     /// </summary>
     public event EventHandler<PastedEventArgs>? Pasted;
 

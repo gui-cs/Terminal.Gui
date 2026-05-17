@@ -20,6 +20,20 @@ public class AnsiBracketedPasteTests
     }
 
     [Fact]
+    public void Paste_FullSequence_RaisesEventOutsideParserLock ()
+    {
+        object lockState = typeof (AnsiResponseParserBase)
+                           .GetField ("_lockState", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+                           .GetValue (_parser)!;
+        bool? lockHeld = null;
+        _parser.Paste += (_, _) => lockHeld = Monitor.IsEntered (lockState);
+
+        _parser.ProcessInput ($"{EscSeqUtils.CSI_BracketedPasteStart}hello world{EscSeqUtils.CSI_BracketedPasteEnd}");
+
+        Assert.False (lockHeld);
+    }
+
+    [Fact]
     public void Paste_SurroundedByNormalInput_OnlyPastedTextIsDelivered ()
     {
         string? captured = null;
