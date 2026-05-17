@@ -170,6 +170,57 @@ public class FileDialogResultTests
         Assert.False (tableView.Style.ShowVerticalCellLineForLastColumn);
     }
 
+    [Fact]
+    public void FileDialog_PathField_End_MovesInsertionPointToEnd ()
+    {
+        // Copilot
+        MockFileSystem fs = new ();
+        fs.AddDirectory ("/testdir");
+        using FileDialog fd = new TestableFileDialog (fs);
+
+        FieldInfo? tbPathField = typeof (FileDialog).GetField ("_tbPath", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull (tbPathField);
+
+        TextField tbPath = Assert.IsType<TextField> (tbPathField!.GetValue (fd));
+        tbPath.Text = "/testdir/example.txt";
+
+        tbPath.NewKeyDownEvent (Key.Home);
+        Assert.Equal (0, tbPath.InsertionPoint);
+
+        tbPath.NewKeyDownEvent (Key.End);
+        Assert.Equal (tbPath.Text.Length, tbPath.InsertionPoint);
+    }
+
+    [Theory]
+    [InlineData ('"')]
+    [InlineData ('<')]
+    [InlineData ('>')]
+    [InlineData ('|')]
+    [InlineData ('*')]
+    [InlineData ('?')]
+    public void FileDialog_PathField_BadChars_AreSuppressed (char badChar)
+    {
+        // Copilot
+        MockFileSystem fs = new ();
+        fs.AddDirectory ("/testdir");
+        using FileDialog fd = new TestableFileDialog (fs);
+
+        FieldInfo? tbPathField = typeof (FileDialog).GetField ("_tbPath", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull (tbPathField);
+
+        TextField tbPath = Assert.IsType<TextField> (tbPathField!.GetValue (fd));
+        tbPath.Text = "/testdir/";
+        tbPath.MoveEnd ();
+
+        int insertionPointBefore = tbPath.InsertionPoint;
+        string textBefore = tbPath.Text;
+
+        tbPath.NewKeyDownEvent (new Key (badChar));
+
+        Assert.Equal (textBefore, tbPath.Text);
+        Assert.Equal (insertionPointBefore, tbPath.InsertionPoint);
+    }
+
     /// <summary>Testable subclass that exposes the internal file-system constructor.</summary>
     private sealed class TestableFileDialog : FileDialog
     {
