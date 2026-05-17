@@ -58,23 +58,23 @@ public class TextMateSyntaxHighlighterTests
     }
 
     [Fact]
-    public void Highlight_CSharp_Keyword_Has_Explicit_Attribute ()
+    public void Highlight_CSharp_Keyword_Has_CodeKeyword_Role ()
     {
         TextMateSyntaxHighlighter highlighter = new ();
         IReadOnlyList<StyledSegment> segments = highlighter.Highlight ("using System;", "csharp");
 
-        // At least one segment should have an explicit Attribute (non-null)
-        Assert.Contains (segments, s => s.Attribute is { });
+        // Copilot
+        Assert.Contains (segments, s => s is { Text: "using", Role: VisualRole.CodeKeyword });
     }
 
     [Fact]
-    public void Highlight_CSharp_All_Segments_Have_Attributes ()
+    public void Highlight_CSharp_All_Segments_Have_Roles ()
     {
         TextMateSyntaxHighlighter highlighter = new ();
         IReadOnlyList<StyledSegment> segments = highlighter.Highlight ("int x = 42;", "csharp");
 
-        // Every segment should carry an explicit Attribute from theme resolution
-        Assert.All (segments, s => Assert.NotNull (s.Attribute));
+        // Copilot
+        Assert.All (segments, s => Assert.NotNull (s.Role));
     }
 
     [Fact]
@@ -166,7 +166,7 @@ public class TextMateSyntaxHighlighterTests
     // --- Theme switching ---
 
     [Fact]
-    public void SetTheme_Changes_Colors ()
+    public void SetTheme_Does_Not_Change_Roles ()
     {
         TextMateSyntaxHighlighter highlighter = new ();
         IReadOnlyList<StyledSegment> darkSegments = highlighter.Highlight ("var x = 1;", "csharp");
@@ -175,21 +175,8 @@ public class TextMateSyntaxHighlighterTests
         highlighter.ResetState ();
         IReadOnlyList<StyledSegment> lightSegments = highlighter.Highlight ("var x = 1;", "csharp");
 
-        // Dark and light themes should produce different foreground colors for at least some tokens
-        var anyDifferent = false;
-
-        for (var i = 0; i < Math.Min (darkSegments.Count, lightSegments.Count); i++)
-        {
-            if (darkSegments [i].Attribute?.Foreground == lightSegments [i].Attribute?.Foreground)
-            {
-                continue;
-            }
-            anyDifferent = true;
-
-            break;
-        }
-
-        Assert.True (anyDifferent, "Dark and Light themes should produce different colors");
+        // Copilot
+        Assert.Equal (darkSegments.Select (segment => segment.Role), lightSegments.Select (segment => segment.Role));
     }
 
     // --- Multiple languages ---
@@ -388,5 +375,31 @@ public class TextMateSyntaxHighlighterTests
 
         highlighter.SetTheme (ThemeName.SolarizedLight);
         Assert.Equal (ThemeName.SolarizedLight, highlighter.ThemeName);
+    }
+
+    [Theory]
+    [InlineData ("comment.line", VisualRole.CodeComment)]
+    [InlineData ("keyword.control", VisualRole.CodeKeyword)]
+    [InlineData ("string.quoted", VisualRole.CodeString)]
+    [InlineData ("constant.numeric", VisualRole.CodeNumber)]
+    [InlineData ("keyword.operator", VisualRole.CodeOperator)]
+    [InlineData ("entity.name.type", VisualRole.CodeType)]
+    [InlineData ("support.type", VisualRole.CodeType)]
+    [InlineData ("storage.type", VisualRole.CodeType)]
+    [InlineData ("meta.preprocessor", VisualRole.CodePreprocessor)]
+    [InlineData ("variable.other", VisualRole.CodeIdentifier)]
+    [InlineData ("entity.name.variable", VisualRole.CodeIdentifier)]
+    [InlineData ("constant.language", VisualRole.CodeConstant)]
+    [InlineData ("constant.character", VisualRole.CodeConstant)]
+    [InlineData ("punctuation.separator", VisualRole.CodePunctuation)]
+    [InlineData ("entity.name.function", VisualRole.CodeFunctionName)]
+    [InlineData ("support.function", VisualRole.CodeFunctionName)]
+    [InlineData ("entity.other.attribute-name", VisualRole.CodeAttribute)]
+    [InlineData ("meta.tag", VisualRole.CodeAttribute)]
+    public void ResolveRoleForScopes_Maps_TextMate_Scopes (string scope, VisualRole expected)
+    {
+        // Copilot
+        VisualRole actual = TextMateSyntaxHighlighter.ResolveRoleForScopes ([scope]);
+        Assert.Equal (expected, actual);
     }
 }

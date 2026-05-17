@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System.Collections.ObjectModel;
+
 // ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
@@ -51,6 +52,29 @@ public sealed class Themes : Scenario
             Height = Dim.Auto ()
         };
         defaultAttributeView.Border.Thickness = new Thickness (0, 1, 0, 0);
+
+        FrameView codeRolesPanel = CreateCodeRolesPanel ();
+        codeRolesPanel.Y = Pos.Bottom (defaultAttributeView);
+        codeRolesPanel.Width = Dim.Width (themeOptionSelector);
+
+        Markdown codeRolesMarkdown = new ()
+        {
+            Title = "Code Fence",
+            BorderStyle = LineStyle.Rounded,
+            Y = Pos.Bottom (codeRolesPanel),
+            Width = Dim.Width (themeOptionSelector),
+            Height = 8,
+            SyntaxHighlighter = new TextMateSyntaxHighlighter (),
+            Text = """
+                   ```cs
+                   public sealed class Demo
+                   {
+                       string Text => "theme";
+                   }
+                   ```
+                   """
+        };
+        codeRolesMarkdown.Border.Thickness = new Thickness (0, 1, 0, 0);
 
         themeOptionSelector.ValueChanged += (sender, args) =>
                                             {
@@ -129,7 +153,15 @@ public sealed class Themes : Scenario
                                          viewPropertiesEditor.ViewToEdit = _view;
                                      };
 
-        appWindow.Add (themeOptionSelector, defaultAttributeView, themeViewer, allViewsCheckBox, viewListView, viewPropertiesEditor, viewFrame);
+        appWindow.Add (themeOptionSelector,
+                       defaultAttributeView,
+                       codeRolesPanel,
+                       codeRolesMarkdown,
+                       themeViewer,
+                       allViewsCheckBox,
+                       viewListView,
+                       viewPropertiesEditor,
+                       viewFrame);
 
         viewListView.SelectedItem = 0;
 
@@ -201,6 +233,29 @@ public sealed class Themes : Scenario
         types.Add (typeof (View));
 
         return types;
+    }
+
+    private static FrameView CreateCodeRolesPanel ()
+    {
+        FrameView panel = new () { Title = "Code roles", BorderStyle = LineStyle.Rounded, Height = Dim.Auto () };
+        panel.Border.Thickness = new Thickness (0, 1, 0, 0);
+
+        VisualRoleViewer? previous = null;
+
+        foreach (VisualRole role in Enum.GetValues<VisualRole> ().Where (role => role >= VisualRole.Code))
+        {
+            VisualRoleViewer roleViewer = new () { Role = role, SchemeName = "Base" };
+
+            if (previous is { })
+            {
+                roleViewer.Y = Pos.Bottom (previous);
+            }
+
+            panel.Add (roleViewer);
+            previous = roleViewer;
+        }
+
+        return panel;
     }
 
     private View? CreateView (Type type)

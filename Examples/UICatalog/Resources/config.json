@@ -50,7 +50,20 @@
               "Disabled": {
                 "Foreground": "BrightGreen",
                 "Background": "Gray"
-              }
+              },
+              "Code": { "Foreground": "Black", "Background": "#FFFF00", "Style": "None" },
+              "CodeComment": { "Foreground": "#008000", "Background": "None", "Style": "None" },
+              "CodeKeyword": { "Foreground": "#FF0000", "Background": "None", "Style": "None" },
+              "CodeString": { "Foreground": "#0000CC", "Background": "None", "Style": "None" },
+              "CodeNumber": { "Foreground": "#800080", "Background": "None", "Style": "None" },
+              "CodeOperator": { "Foreground": "Black", "Background": "None", "Style": "None" },
+              "CodeType": { "Foreground": "#C00000", "Background": "None", "Style": "None" },
+              "CodePreprocessor": { "Foreground": "#008000", "Background": "None", "Style": "None" },
+              "CodeIdentifier": { "Foreground": "Black", "Background": "None", "Style": "None" },
+              "CodeConstant": { "Foreground": "#800080", "Background": "None", "Style": "None" },
+              "CodePunctuation": { "Foreground": "Black", "Background": "None", "Style": "None" },
+              "CodeFunctionName": { "Foreground": "#0000CC", "Background": "None", "Style": "None" },
+              "CodeAttribute": { "Foreground": "#008000", "Background": "None", "Style": "None" }
             }
           },
           {
@@ -213,7 +226,20 @@
               "Disabled": {
                 "Foreground": "BrightGreen",
                 "Background": "Gray"
-              }
+              },
+              "Code": { "Foreground": "White", "Background": "Green", "Style": "None" },
+              "CodeComment": { "Foreground": "LightGray", "Background": "None", "Style": "None" },
+              "CodeKeyword": { "Foreground": "Yellow", "Background": "None", "Style": "None" },
+              "CodeString": { "Foreground": "LightCyan", "Background": "None", "Style": "None" },
+              "CodeNumber": { "Foreground": "LightYellow", "Background": "None", "Style": "None" },
+              "CodeOperator": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeType": { "Foreground": "Cyan", "Background": "None", "Style": "None" },
+              "CodePreprocessor": { "Foreground": "BrightRed", "Background": "None", "Style": "None" },
+              "CodeIdentifier": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeConstant": { "Foreground": "Yellow", "Background": "None", "Style": "None" },
+              "CodePunctuation": { "Foreground": "White", "Background": "None", "Style": "None" },
+              "CodeFunctionName": { "Foreground": "LightCyan", "Background": "None", "Style": "None" },
+              "CodeAttribute": { "Foreground": "LightGray", "Background": "None", "Style": "None" }
             }
           },
           {

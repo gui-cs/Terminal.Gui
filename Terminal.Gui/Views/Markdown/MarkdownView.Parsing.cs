@@ -535,7 +535,7 @@ public partial class Markdown
     {
         if (codeLines.Count == 0)
         {
-            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock)], false, isCodeBlock: true, language: language));
+            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock, role: VisualRole.Code)], false, isCodeBlock: true, language: language));
 
             return;
         }
@@ -548,7 +548,7 @@ public partial class Markdown
 
             if (SyntaxHighlighter is null)
             {
-                runs = [new InlineRun (line, MarkdownStyleRole.CodeBlock)];
+                runs = [new InlineRun (line, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)];
             }
             else
             {
@@ -556,10 +556,11 @@ public partial class Markdown
                 List<InlineRun> converted = [];
 
                 converted.AddRange (highlighted.Select (segment => new InlineRun (segment.Text,
-                                                                                  segment.StyleRole,
-                                                                                  segment.Url,
-                                                                                  segment.ImageSource,
-                                                                                  segment.Attribute)));
+                                                                                   segment.StyleRole,
+                                                                                   segment.Url,
+                                                                                   segment.ImageSource,
+                                                                                   segment.Attribute,
+                                                                                   segment.Role)));
 
                 runs = converted;
             }
