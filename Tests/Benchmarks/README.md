@@ -154,7 +154,7 @@ Measures serialize/deserialize of a representative `Base` `Scheme` via `JsonSeri
 ### Run all configuration benchmarks
 
 ```bash
-dotnet run --project Tests/Benchmarks -c Release -- --filter '*Config*|*Scheme*|*Theme*'
+dotnet run --project Tests/Benchmarks -c Release -- --filter '*Config*' '*Scheme*' '*Theme*'
 ```
 
 ## Adding New Benchmarks
@@ -200,7 +200,7 @@ After a deliberate performance change, re-run the focused scrolling benchmarks, 
 
 ```bash
 # Run ShortRun and export JSON results
-dotnet run --project Tests/Benchmarks -c Release -- --filter '*Scroll*|*Config*|*Scheme*|*Theme*' -j short --exporters json
+dotnet run --project Tests/Benchmarks -c Release -- --filter '*Scroll*' '*Config*' '*Scheme*' '*Theme*' -j short --exporters json
 
 # Inspect the JSON output in BenchmarkDotNet.Artifacts/ and update baseline.json
 ```
