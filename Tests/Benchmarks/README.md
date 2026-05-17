@@ -126,6 +126,37 @@ Minimal `View` subclass with a large `ContentSize` and no rendering logic. Isola
 dotnet run --project Tests/Benchmarks -c Release -- --filter '*Scroll*'
 ```
 
+## Configuration Benchmarks
+
+The `Configuration/` directory contains benchmarks for the configuration, theming, and scheme subsystems.
+
+### ConfigurationManagerLoadBenchmark
+
+Measures the cold-start cost of `ConfigurationManager.Disable(true)` → `Enable(ConfigLocations.LibraryResources)` → `Apply()`. This is the app-startup hot path covering embedded-config load, deserialization, and apply.
+
+### ThemeSwitchBenchmark
+
+Measures `ThemeManager.Theme = "X"; ConfigurationManager.Apply()` against the embedded configuration. Parametric over all built-in theme names (`Default`, `Dark`, `Light`, `TurboPascal 5`, `Anders`, `Green Phosphor`, `Amber Phosphor`).
+
+### SchemeAttributeBenchmark
+
+Measures `Scheme.GetAttributeForRole(VisualRole)` for roles at different depths of the derivation chain:
+- **GetNormal**: Explicitly-set role — the fastest path
+- **GetHotFocus**: Derived from `Focus` (which itself derives from `Normal`)
+- **GetCode**: Deepest derivation path (`Code` → `Editable` → `Normal`)
+
+No `ConfigurationManager` required; operates on a standalone `Scheme` instance.
+
+### SchemeSerializationBenchmark
+
+Measures serialize/deserialize of a representative `Base` `Scheme` via `JsonSerializer` + `SchemeJsonConverter`. Catches regressions in JSON code paths when future PRs add fields to `Scheme`.
+
+### Run all configuration benchmarks
+
+```bash
+dotnet run --project Tests/Benchmarks -c Release -- --filter '*Config*' '*Scheme*' '*Theme*'
+```
+
 ## Adding New Benchmarks
 
 1. Create a new class in an appropriate subdirectory (e.g., `Layout/`, `Text/`, `ViewBase/`, `Scrolling/`)
@@ -157,7 +188,7 @@ This detects if a draw function accidentally iterates the entire document instea
 
 The `.github/workflows/perf-gate.yml` workflow runs on every push to `main` / `develop` (not PRs) and:
 
-1. Runs the `*Scroll*` benchmarks with `--job short` (~30–60 s total)
+1. Runs the `*Scroll*`, `*Config*`, `*Scheme*`, and `*Theme*` benchmarks with `--job short` (~30–60 s total)
 2. Compares results to `Tests/Benchmarks/baseline.json`
 3. **Fails** if any benchmark exceeds **3×** the baseline
 4. **Celebrates** 🎉 if any benchmark drops below **0.8×** the baseline
@@ -169,7 +200,7 @@ After a deliberate performance change, re-run the focused scrolling benchmarks, 
 
 ```bash
 # Run ShortRun and export JSON results
-dotnet run --project Tests/Benchmarks -c Release -- --filter '*Scroll*' -j short --exporters json
+dotnet run --project Tests/Benchmarks -c Release -- --filter '*Scroll*' '*Config*' '*Scheme*' '*Theme*' -j short --exporters json
 
 # Inspect the JSON output in BenchmarkDotNet.Artifacts/ and update baseline.json
 ```

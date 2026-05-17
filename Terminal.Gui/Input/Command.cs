@@ -358,4 +358,24 @@ public enum Command
     Edit,
 
     #endregion
+
+    #region Multi-Caret Commands
+
+    /// <summary>
+    ///     Adds an additional caret one line above the topmost caret (multi-caret editing),
+    ///     preserving the sticky visual column. Mirrors VS Code's
+    ///     <c>editor.action.insertCursorAbove</c>. Views that support multi-caret bind this
+    ///     through <see cref="View.KeyBindings"/> or their configurable default key bindings.
+    /// </summary>
+    InsertCaretAbove,
+
+    /// <summary>
+    ///     Adds an additional caret one line below the bottommost caret (multi-caret editing),
+    ///     preserving the sticky visual column. Mirrors VS Code's
+    ///     <c>editor.action.insertCursorBelow</c>. Views that support multi-caret bind this
+    ///     through <see cref="View.KeyBindings"/> or their configurable default key bindings.
+    /// </summary>
+    InsertCaretBelow,
+
+    #endregion
 }

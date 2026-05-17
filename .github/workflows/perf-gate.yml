@@ -1,4 +1,4 @@
-name: Scrolling Performance Gate
+name: Performance Gate
 
 on:
   push:
@@ -63,7 +63,7 @@ jobs:
           retention-days: 7
 
   perf-benchmarks:
-    name: Scrolling Benchmarks (Linux, ShortRun)
+    name: Benchmarks (Linux, ShortRun)
     runs-on: ubuntu-latest
     # Only run on pushes to develop/main, not on every PR (slow and not blocking).
     if: github.event_name == 'push'
@@ -89,7 +89,7 @@ jobs:
       - name: Build Release
         run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612
 
-      - name: Run scrolling benchmarks (ShortRun ≈ 30–60 s)
+      - name: Run benchmarks (ShortRun ≈ 30–60 s)
         id: run_benchmarks
         run: |
           dotnet run \
@@ -97,7 +97,7 @@ jobs:
             --configuration Release \
             --no-build \
             -- \
-            --filter '*Scroll*' \
+            --filter '*Scroll*' '*Config*' '*Scheme*' '*Theme*' \
             --job short \
             --exporters json \
             --artifacts ./BenchmarkResults
@@ -172,7 +172,7 @@ jobs:
               )
 
           # --- Write step summary ---
-          summary = "## 📊 Scrolling Benchmark Comparison\n\n"
+          summary = "## 📊 Benchmark Comparison\n\n"
           summary += "| Benchmark | Baseline | Current | Ratio |\n"
           summary += "|-----------|----------|---------|-------|\n"
           summary += "\n".join(rows) + "\n\n"

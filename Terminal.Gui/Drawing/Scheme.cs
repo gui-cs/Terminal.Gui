@@ -188,7 +188,24 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                                                                             CreateAccent ())
                                                       ]);
 
-        Scheme CreateBase () => new () { Normal = new Attribute (Color.None, Color.None) };
+        Scheme CreateBase () => new ()
+        {
+            Normal = new Attribute (Color.None, Color.None),
+            CodeComment = CreateCodeAttribute ("#6a9955"),
+            CodeKeyword = CreateCodeAttribute ("#569cd6"),
+            CodeString = CreateCodeAttribute ("#ce9178"),
+            CodeNumber = CreateCodeAttribute ("#b5cea8"),
+            CodeOperator = CreateCodeAttribute ("#d4d4d4"),
+            CodeType = CreateCodeAttribute ("#4ec9b0"),
+            CodePreprocessor = CreateCodeAttribute ("#c586c0"),
+            CodeIdentifier = CreateCodeAttribute ("#9cdcfe"),
+            CodeConstant = CreateCodeAttribute ("#569cd6"),
+            CodePunctuation = CreateCodeAttribute ("#d4d4d4"),
+            CodeFunctionName = CreateCodeAttribute ("#dcdcaa"),
+            CodeAttribute = CreateCodeAttribute ("#9cdcfe")
+        };
+
+        Attribute CreateCodeAttribute (string foreground) => new (foreground, "None");
 
         Scheme CreateError () => new () { Normal = new Attribute (StandardColor.IndianRed, StandardColor.RaisinBlack) };
 
@@ -220,7 +237,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         // Force opaque
         accentBg = new Color (accentBg.R, accentBg.G, accentBg.B, 255);
 
-        return new Scheme { Normal = new Attribute (resolvedFg, accentBg) };
+        return new Scheme (baseScheme, new Attribute (resolvedFg, accentBg));
     }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>
@@ -244,6 +261,37 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         _readOnly = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out Attribute? readOnly) ? readOnly : null;
         _disabled = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out Attribute? disabled) ? disabled : null;
         _code = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Code, out Attribute? code) ? code : null;
+        _codeComment = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeComment, out Attribute? codeComment) ? codeComment : null;
+        _codeKeyword = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? codeKeyword) ? codeKeyword : null;
+        _codeString = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeString, out Attribute? codeString) ? codeString : null;
+        _codeNumber = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeNumber, out Attribute? codeNumber) ? codeNumber : null;
+        _codeOperator = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeOperator, out Attribute? codeOperator) ? codeOperator : null;
+        _codeType = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeType, out Attribute? codeType) ? codeType : null;
+        _codePreprocessor = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodePreprocessor, out Attribute? codePreprocessor) ? codePreprocessor : null;
+        _codeIdentifier = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeIdentifier, out Attribute? codeIdentifier) ? codeIdentifier : null;
+        _codeConstant = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeConstant, out Attribute? codeConstant) ? codeConstant : null;
+        _codePunctuation = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodePunctuation, out Attribute? codePunctuation) ? codePunctuation : null;
+        _codeFunctionName = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeFunctionName, out Attribute? codeFunctionName) ? codeFunctionName : null;
+        _codeAttribute = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeAttribute, out Attribute? codeAttribute) ? codeAttribute : null;
+    }
+
+    private Scheme (Scheme baseScheme, Attribute normal)
+    {
+        Normal = normal;
+
+        _code = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.Code, out Attribute? code) ? code : null;
+        _codeComment = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeComment, out Attribute? codeComment) ? codeComment : null;
+        _codeKeyword = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? codeKeyword) ? codeKeyword : null;
+        _codeString = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeString, out Attribute? codeString) ? codeString : null;
+        _codeNumber = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeNumber, out Attribute? codeNumber) ? codeNumber : null;
+        _codeOperator = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeOperator, out Attribute? codeOperator) ? codeOperator : null;
+        _codeType = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeType, out Attribute? codeType) ? codeType : null;
+        _codePreprocessor = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodePreprocessor, out Attribute? codePreprocessor) ? codePreprocessor : null;
+        _codeIdentifier = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeIdentifier, out Attribute? codeIdentifier) ? codeIdentifier : null;
+        _codeConstant = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeConstant, out Attribute? codeConstant) ? codeConstant : null;
+        _codePunctuation = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodePunctuation, out Attribute? codePunctuation) ? codePunctuation : null;
+        _codeFunctionName = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeFunctionName, out Attribute? codeFunctionName) ? codeFunctionName : null;
+        _codeAttribute = baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeAttribute, out Attribute? codeAttribute) ? codeAttribute : null;
     }
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="attribute"/>.</summary>
@@ -294,6 +342,18 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                         VisualRole.ReadOnly => _readOnly,
                         VisualRole.Disabled => _disabled,
                         VisualRole.Code => _code,
+                        VisualRole.CodeComment => _codeComment,
+                        VisualRole.CodeKeyword => _codeKeyword,
+                        VisualRole.CodeString => _codeString,
+                        VisualRole.CodeNumber => _codeNumber,
+                        VisualRole.CodeOperator => _codeOperator,
+                        VisualRole.CodeType => _codeType,
+                        VisualRole.CodePreprocessor => _codePreprocessor,
+                        VisualRole.CodeIdentifier => _codeIdentifier,
+                        VisualRole.CodeConstant => _codeConstant,
+                        VisualRole.CodePunctuation => _codePunctuation,
+                        VisualRole.CodeFunctionName => _codeFunctionName,
+                        VisualRole.CodeAttribute => _codeAttribute,
                         _ => null
                     };
 
@@ -401,6 +461,24 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
 
                 result = editable with { Background = editable.Background.GetDimmerColor (0.2, isDark), Style = editable.Style | TextStyle.Bold };
+
+                break;
+            }
+
+            case VisualRole.CodeComment:
+            case VisualRole.CodeKeyword:
+            case VisualRole.CodeString:
+            case VisualRole.CodeNumber:
+            case VisualRole.CodeOperator:
+            case VisualRole.CodeType:
+            case VisualRole.CodePreprocessor:
+            case VisualRole.CodeIdentifier:
+            case VisualRole.CodeConstant:
+            case VisualRole.CodePunctuation:
+            case VisualRole.CodeFunctionName:
+            case VisualRole.CodeAttribute:
+            {
+                result = GetAttributeForRoleCore (VisualRole.Code, stack, defaultTerminalColors);
 
                 break;
             }
@@ -614,6 +692,67 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     /// </summary>
     public Attribute Code { get => GetAttributeForRoleProperty (_code, VisualRole.Code); init => _code = SetAttributeForRoleProperty (value, VisualRole.Code); }
 
+
+    private readonly Attribute? _codeComment;
+
+    /// <summary>The visual role for source-code comments.</summary>
+    public Attribute CodeComment { get => GetAttributeForRoleProperty (_codeComment, VisualRole.CodeComment); init => _codeComment = SetAttributeForRoleProperty (value, VisualRole.CodeComment); }
+
+    private readonly Attribute? _codeKeyword;
+
+    /// <summary>The visual role for source-code keywords.</summary>
+    public Attribute CodeKeyword { get => GetAttributeForRoleProperty (_codeKeyword, VisualRole.CodeKeyword); init => _codeKeyword = SetAttributeForRoleProperty (value, VisualRole.CodeKeyword); }
+
+    private readonly Attribute? _codeString;
+
+    /// <summary>The visual role for source-code string literals.</summary>
+    public Attribute CodeString { get => GetAttributeForRoleProperty (_codeString, VisualRole.CodeString); init => _codeString = SetAttributeForRoleProperty (value, VisualRole.CodeString); }
+
+    private readonly Attribute? _codeNumber;
+
+    /// <summary>The visual role for source-code numeric literals.</summary>
+    public Attribute CodeNumber { get => GetAttributeForRoleProperty (_codeNumber, VisualRole.CodeNumber); init => _codeNumber = SetAttributeForRoleProperty (value, VisualRole.CodeNumber); }
+
+    private readonly Attribute? _codeOperator;
+
+    /// <summary>The visual role for source-code operators.</summary>
+    public Attribute CodeOperator { get => GetAttributeForRoleProperty (_codeOperator, VisualRole.CodeOperator); init => _codeOperator = SetAttributeForRoleProperty (value, VisualRole.CodeOperator); }
+
+    private readonly Attribute? _codeType;
+
+    /// <summary>The visual role for source-code type names.</summary>
+    public Attribute CodeType { get => GetAttributeForRoleProperty (_codeType, VisualRole.CodeType); init => _codeType = SetAttributeForRoleProperty (value, VisualRole.CodeType); }
+
+    private readonly Attribute? _codePreprocessor;
+
+    /// <summary>The visual role for source-code preprocessor directives.</summary>
+    public Attribute CodePreprocessor { get => GetAttributeForRoleProperty (_codePreprocessor, VisualRole.CodePreprocessor); init => _codePreprocessor = SetAttributeForRoleProperty (value, VisualRole.CodePreprocessor); }
+
+    private readonly Attribute? _codeIdentifier;
+
+    /// <summary>The visual role for source-code identifiers.</summary>
+    public Attribute CodeIdentifier { get => GetAttributeForRoleProperty (_codeIdentifier, VisualRole.CodeIdentifier); init => _codeIdentifier = SetAttributeForRoleProperty (value, VisualRole.CodeIdentifier); }
+
+    private readonly Attribute? _codeConstant;
+
+    /// <summary>The visual role for source-code constants.</summary>
+    public Attribute CodeConstant { get => GetAttributeForRoleProperty (_codeConstant, VisualRole.CodeConstant); init => _codeConstant = SetAttributeForRoleProperty (value, VisualRole.CodeConstant); }
+
+    private readonly Attribute? _codePunctuation;
+
+    /// <summary>The visual role for source-code punctuation.</summary>
+    public Attribute CodePunctuation { get => GetAttributeForRoleProperty (_codePunctuation, VisualRole.CodePunctuation); init => _codePunctuation = SetAttributeForRoleProperty (value, VisualRole.CodePunctuation); }
+
+    private readonly Attribute? _codeFunctionName;
+
+    /// <summary>The visual role for source-code function names.</summary>
+    public Attribute CodeFunctionName { get => GetAttributeForRoleProperty (_codeFunctionName, VisualRole.CodeFunctionName); init => _codeFunctionName = SetAttributeForRoleProperty (value, VisualRole.CodeFunctionName); }
+
+    private readonly Attribute? _codeAttribute;
+
+    /// <summary>The visual role for source-code attributes.</summary>
+    public Attribute CodeAttribute { get => GetAttributeForRoleProperty (_codeAttribute, VisualRole.CodeAttribute); init => _codeAttribute = SetAttributeForRoleProperty (value, VisualRole.CodeAttribute); }
+
     /// <inheritdoc/>
     public virtual bool Equals (Scheme? other) =>
         other is { }
@@ -627,18 +766,35 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         && EqualityComparer<Attribute>.Default.Equals (Editable, other.Editable)
         && EqualityComparer<Attribute>.Default.Equals (ReadOnly, other.ReadOnly)
         && EqualityComparer<Attribute>.Default.Equals (Disabled, other.Disabled)
-        && EqualityComparer<Attribute>.Default.Equals (Code, other.Code);
+        && EqualityComparer<Attribute>.Default.Equals (Code, other.Code)
+        && EqualityComparer<Attribute>.Default.Equals (CodeComment, other.CodeComment)
+        && EqualityComparer<Attribute>.Default.Equals (CodeKeyword, other.CodeKeyword)
+        && EqualityComparer<Attribute>.Default.Equals (CodeString, other.CodeString)
+        && EqualityComparer<Attribute>.Default.Equals (CodeNumber, other.CodeNumber)
+        && EqualityComparer<Attribute>.Default.Equals (CodeOperator, other.CodeOperator)
+        && EqualityComparer<Attribute>.Default.Equals (CodeType, other.CodeType)
+        && EqualityComparer<Attribute>.Default.Equals (CodePreprocessor, other.CodePreprocessor)
+        && EqualityComparer<Attribute>.Default.Equals (CodeIdentifier, other.CodeIdentifier)
+        && EqualityComparer<Attribute>.Default.Equals (CodeConstant, other.CodeConstant)
+        && EqualityComparer<Attribute>.Default.Equals (CodePunctuation, other.CodePunctuation)
+        && EqualityComparer<Attribute>.Default.Equals (CodeFunctionName, other.CodeFunctionName)
+        && EqualityComparer<Attribute>.Default.Equals (CodeAttribute, other.CodeAttribute);
 
     /// <inheritdoc/>
     public override int GetHashCode () =>
         HashCode.Combine (HashCode.Combine (Normal, HotNormal, Focus, HotFocus, Active, HotActive, Highlight, Editable),
-                          HashCode.Combine (ReadOnly, Disabled, Code));
+                          HashCode.Combine (ReadOnly, Disabled, Code, CodeComment, CodeKeyword, CodeString, CodeNumber, CodeOperator),
+                          HashCode.Combine (CodeType, CodePreprocessor, CodeIdentifier, CodeConstant, CodePunctuation, CodeFunctionName, CodeAttribute));
 
     /// <inheritdoc/>
     public override string ToString () =>
         $"Normal: {Normal}; HotNormal: {HotNormal}; Focus: {Focus}; HotFocus: {HotFocus}; "
         + $"Active: {Active}; HotActive: {HotActive}; Highlight: {Highlight}; Editable: {Editable}; "
-        + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}; Code: {Code}";
+        + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}; Code: {Code}; "
+        + $"CodeComment: {CodeComment}; CodeKeyword: {CodeKeyword}; CodeString: {CodeString}; CodeNumber: {CodeNumber}; "
+        + $"CodeOperator: {CodeOperator}; CodeType: {CodeType}; CodePreprocessor: {CodePreprocessor}; "
+        + $"CodeIdentifier: {CodeIdentifier}; CodeConstant: {CodeConstant}; CodePunctuation: {CodePunctuation}; "
+        + $"CodeFunctionName: {CodeFunctionName}; CodeAttribute: {CodeAttribute}";
 
     /// <summary>
     ///     Resolves <see cref="Color.None"/> to a concrete color for use in color math (brighten, dim, invert).
