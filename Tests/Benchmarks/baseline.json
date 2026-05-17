@@ -1,6 +1,6 @@
 {
-  "_comment": "Baseline benchmark results for the scrolling performance gate.",
-  "_howto": "Re-run 'dotnet run --project Tests/Benchmarks -c Release -- --filter \"*Scroll*\" -j short --exporters json' then update this file.",
+  "_comment": "Baseline benchmark results for the performance gate (Scrolling + Configuration). Configuration baselines captured on GitHub Actions ubuntu-latest (AMD EPYC 7763, .NET 10.0.5, ShortRun in-process).",
+  "_howto": "Re-run 'dotnet run --project Tests/Benchmarks -c Release -- --filter \"*Scroll*\" \"*Config*\" \"*Scheme*\" \"*Theme*\" --job short --exporters json' then update this file.",
   "_version": "1",
   "benchmarks": [
     {
@@ -142,6 +142,100 @@
       "params": "Rows=1000",
       "meanNs": 300000,
       "comment": "Placeholder — run actual benchmarks to set real baseline"
+    },
+
+    {
+      "type": "ConfigurationManagerLoadBenchmark",
+      "method": "LoadAndApply",
+      "params": "",
+      "meanNs": 3185090
+    },
+
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=8-Bit",
+      "meanNs": 800655
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Amber Phosphor",
+      "meanNs": 754357
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Anders",
+      "meanNs": 749432
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Dark",
+      "meanNs": 752071
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Default",
+      "meanNs": 809240
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Green Phosphor",
+      "meanNs": 750257
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=Light",
+      "meanNs": 753552
+    },
+    {
+      "type": "ThemeSwitchBenchmark",
+      "method": "SwitchTheme",
+      "params": "ThemeName=TurboPascal 5",
+      "meanNs": 746073
+    },
+
+    {
+      "type": "SchemeAttributeBenchmark",
+      "method": "GetNormal",
+      "params": "",
+      "meanNs": 36
+    },
+    {
+      "type": "SchemeAttributeBenchmark",
+      "method": "GetHotFocus",
+      "params": "",
+      "meanNs": 92
+    },
+    {
+      "type": "SchemeAttributeBenchmark",
+      "method": "GetCode",
+      "params": "",
+      "meanNs": 438
+    },
+
+    {
+      "type": "SchemeSerializationBenchmark",
+      "method": "Serialize",
+      "params": "",
+      "meanNs": 360
+    },
+    {
+      "type": "SchemeSerializationBenchmark",
+      "method": "Deserialize",
+      "params": "",
+      "meanNs": 1084
+    },
+    {
+      "type": "SchemeSerializationBenchmark",
+      "method": "RoundTrip",
+      "params": "",
+      "meanNs": 1600
     }
   ]
 }
