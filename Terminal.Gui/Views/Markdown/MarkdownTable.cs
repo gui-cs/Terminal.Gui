@@ -747,7 +747,7 @@ public sealed class MarkdownTable : View, IDesignable
                         hardChunk = firstGrapheme;
                     }
 
-                    currentLine.Add (new StyledSegment (hardChunk, segment.StyleRole, segment.Url, segment.ImageSource));
+                    currentLine.Add (new StyledSegment (hardChunk, segment.StyleRole, segment.Url, segment.ImageSource, segment.Attribute, segment.Role));
                     lines.Add (currentLine);
                     currentLine = [];
                     currentWidth = 0;
@@ -758,7 +758,7 @@ public sealed class MarkdownTable : View, IDesignable
                     continue;
                 }
 
-                currentLine.Add (new StyledSegment (chunk, segment.StyleRole, segment.Url, segment.ImageSource));
+                currentLine.Add (new StyledSegment (chunk, segment.StyleRole, segment.Url, segment.ImageSource, segment.Attribute, segment.Role));
                 currentWidth += chunkWidth;
             }
         }

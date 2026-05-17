@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
@@ -221,33 +221,31 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
             kittyKeyboardDetector.Detect (result =>
                                           {
-                                               if (!result.IsSupported)
-                                               {
-                                                   if (_inputProcessor is AnsiInputProcessor unsupportedAnsiInputProcessor)
-                                                   {
-                                                       unsupportedAnsiInputProcessor.SetKittyKeyboardEnabled (false);
-                                                   }
+                                              if (!result.IsSupported)
+                                              {
+                                                  if (_inputProcessor is AnsiInputProcessor unsupportedAnsiInputProcessor)
+                                                  {
+                                                      unsupportedAnsiInputProcessor.SetKittyKeyboardEnabled (false);
+                                                  }
 
-                                                   Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
+                                                  Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
 
-                                                   return;
-                                               }
+                                                  return;
+                                              }
 
-                                               // Kitty is supported. Store the capabilities and set the flags we care about.
-                                               _driver?.SetKittyKeyboardCapabilities (result);
+                                              // Kitty is supported. Store the capabilities and set the flags we care about.
+                                              _driver?.SetKittyKeyboardCapabilities (result);
 
-                                               if (_inputProcessor is AnsiInputProcessor supportedAnsiInputProcessor)
-                                               {
-                                                   supportedAnsiInputProcessor.SetKittyKeyboardEnabled (true);
-                                               }
+                                              if (_inputProcessor is AnsiInputProcessor supportedAnsiInputProcessor)
+                                              {
+                                                  supportedAnsiInputProcessor.SetKittyKeyboardEnabled (true);
+                                              }
 
-                                               kittyKeyboardDetector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
+                                              kittyKeyboardDetector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
 
                                               Trace.Lifecycle (app?.MainThreadId?.ToString (),
                                                                "KittyKeyboard",
-                                                               $"Requested kitty keyboard flags {
-                                                                   EscSeqUtils.KittyKeyboardRequestedFlags
-                                                               }; awaiting confirmation");
+                                                               $"Requested kitty keyboard flags {EscSeqUtils.KittyKeyboardRequestedFlags}; awaiting confirmation");
                                           });
         }
         catch (Exception ex)
@@ -259,6 +257,27 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             QueueDeviceAttributesProbe (startupGate);
         }
+
+        // Detect sixel support via DAR query.
+        // Follows the same async callback pattern as TerminalColorDetector above.
+        if (!_driver.IsLegacyConsole)
+        {
+            try
+            {
+                SixelSupportDetector sixelDetector = new (_driver);
+
+                sixelDetector.Detect (result =>
+                                      {
+                                          _driver.SetSixelSupport (result);
+                                          Logging.Trace ($"app: Sixel support: {result.IsSupported}, Resolution: {result.Resolution}");
+                                      });
+            }
+            catch (Exception ex)
+            {
+                Logging.Warning ($"Sixel support detection failed: {ex.Message}");
+            }
+        }
+
 
         _startupSemaphore.Release ();
         Trace.Lifecycle (app?.MainThreadId.ToString (), "Driver", $"_input: {_input}, _output: {_output}");

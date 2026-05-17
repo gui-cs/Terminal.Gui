@@ -36,7 +36,7 @@ namespace Terminal.Gui.Views;
 ///         </item>
 ///         <item>
 ///             <term>Shift+F10 / Right-click</term>
-///             <description>Opens a context menu with <b>Select All</b> and <b>Copy</b> items.</description>
+///             <description>Opens a context menu with <b>Select All</b> and <b>Copy</b> items. Right-clicking on a hyperlink also adds a <b>Copy Link</b> item that copies the URL to the clipboard.</description>
 ///         </item>
 ///     </list>
 ///     <para>Default mouse bindings:</para>
@@ -63,7 +63,8 @@ public partial class Markdown : View, IDesignable
     private readonly List<IntermediateBlock> _blocks = [];
     private readonly List<RenderedLine> _renderedLines = [];
     private readonly List<MarkdownLinkRegion> _linkRegions = [];
-    private readonly HashSet<string> _queuedSixelIds = [];
+    private readonly Dictionary<string, SixelToRender> _sixelRenderMap = [];
+    private readonly HashSet<string> _visibleSixelIds = [];
     private readonly Dictionary<string, int> _headingAnchors = new (StringComparer.OrdinalIgnoreCase);
     private readonly List<MarkdownCodeBlock> _codeBlockViews = [];
     private readonly List<MarkdownTable> _tableViews = [];
@@ -74,6 +75,7 @@ public partial class Markdown : View, IDesignable
     private int _layoutWidth = -1;
     private int _maxLineWidth;
     private int _activeLinkIndex = -1;
+    private string? _contextMenuLinkUrl;
     private bool _inLayout;
     private bool _scrollToTopPending;
     private int _externalContentWidth;
@@ -351,6 +353,9 @@ public partial class Markdown : View, IDesignable
         _blocks.Clear ();
         _renderedLines.Clear ();
         _linkRegions.Clear ();
+        foreach (var render in _sixelRenderMap.Values) { render.SixelData = null; }
+        _sixelRenderMap.Clear ();
+        _visibleSixelIds.Clear ();
         _activeLinkIndex = -1;
         _headingAnchors.Clear ();
         RemoveCodeBlockViews ();

@@ -66,5 +66,41 @@ public enum VisualRole
     ///     The visual role for preformatted or source code content (e.g., <see cref="MarkdownCodeBlock"/>, inline code).
     ///     If not explicitly set, derived from <see cref="Editable"/> with a dimmed background and bold style.
     /// </summary>
-    Code
+    Code,
+
+    /// <summary>The visual role for source-code comments.</summary>
+    CodeComment,
+
+    /// <summary>The visual role for source-code keywords.</summary>
+    CodeKeyword,
+
+    /// <summary>The visual role for source-code string literals.</summary>
+    CodeString,
+
+    /// <summary>The visual role for source-code numeric literals.</summary>
+    CodeNumber,
+
+    /// <summary>The visual role for source-code operators.</summary>
+    CodeOperator,
+
+    /// <summary>The visual role for source-code type names.</summary>
+    CodeType,
+
+    /// <summary>The visual role for source-code preprocessor directives.</summary>
+    CodePreprocessor,
+
+    /// <summary>The visual role for source-code identifiers.</summary>
+    CodeIdentifier,
+
+    /// <summary>The visual role for source-code constants.</summary>
+    CodeConstant,
+
+    /// <summary>The visual role for source-code punctuation.</summary>
+    CodePunctuation,
+
+    /// <summary>The visual role for source-code function names.</summary>
+    CodeFunctionName,
+
+    /// <summary>The visual role for source-code attributes.</summary>
+    CodeAttribute
 }

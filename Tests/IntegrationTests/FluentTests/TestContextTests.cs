@@ -99,6 +99,36 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
         // No actual assertions are needed — if no exceptions are thrown, it's working
     }
 
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void RunAsync_Cancellation_After_Boot_Stops_Application ()
+    {
+        // Copilot
+        using AppTestHelper helper = With.A<Window> (40, 10, DriverRegistry.Names.ANSI, _out);
+        helper.CancelRun ();
+
+        Assert.True (
+            SpinWait.SpinUntil (() => helper.Finished, TimeSpan.FromSeconds (5)),
+            "AppTestHelper did not finish after cancellation.");
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void Then_Exception_HardStops_Without_Hanging ()
+    {
+        // Copilot
+        using AppTestHelper helper = With.A<Window> (40, 10, DriverRegistry.Names.ANSI, _out);
+        InvalidOperationException expectedException = new ("Expected test failure");
+
+        InvalidOperationException exception = Assert.Throws<InvalidOperationException> (
+            () => helper.Then (_ => throw expectedException));
+
+        Assert.Same (expectedException, exception);
+        Assert.True (
+            SpinWait.SpinUntil (() => helper.Finished, TimeSpan.FromSeconds (5)),
+            "AppTestHelper did not finish after action failure.");
+    }
+
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void With_Without_Stop_Still_Cleans_Up (string d)

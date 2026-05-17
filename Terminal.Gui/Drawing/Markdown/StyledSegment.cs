@@ -17,13 +17,21 @@ public sealed class StyledSegment
     ///     for rendering, bypassing the <see cref="StyleRole"/>-based resolution in
     ///     <see cref="MarkdownAttributeHelper.GetAttributeForSegment"/>.
     /// </param>
-    public StyledSegment (string text, MarkdownStyleRole styleRole, string? url = null, string? imageSource = null, Attribute? attribute = null)
+    /// <param name="role">Optional token-level <see cref="VisualRole"/> used for source-code rendering.</param>
+    public StyledSegment (
+        string text,
+        MarkdownStyleRole styleRole,
+        string? url = null,
+        string? imageSource = null,
+        Attribute? attribute = null,
+        VisualRole? role = null)
     {
         Text = text;
         StyleRole = styleRole;
         Url = url;
         ImageSource = imageSource;
         Attribute = attribute;
+        Role = role;
     }
 
     /// <summary>Gets the display text of this segment.</summary>
@@ -47,4 +55,10 @@ public sealed class StyledSegment
     ///     bypassing the normal <see cref="MarkdownStyleRole"/>-based resolution.
     /// </remarks>
     public Attribute? Attribute { get; }
+
+    /// <summary>
+    ///     Gets the token-level <see cref="VisualRole"/> for this segment, or <see langword="null"/>
+    ///     if the role should be resolved from <see cref="StyleRole"/>.
+    /// </summary>
+    public VisualRole? Role { get; }
 }

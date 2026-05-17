@@ -214,6 +214,28 @@ public enum Command
     /// <summary>Unix emulation.</summary>
     UnixEmulation,
 
+    /// <summary>Inserts a tab character or spaces at the cursor or selection.</summary>
+    InsertTab,
+
+    /// <summary>Removes one level of indentation from the current line or selection.</summary>
+    Unindent,
+
+    #endregion
+
+    #region Search Commands
+
+    /// <summary>Opens or activates a find/search UI.</summary>
+    Find,
+
+    /// <summary>Finds the next match.</summary>
+    FindNext,
+
+    /// <summary>Finds the previous match.</summary>
+    FindPrevious,
+
+    /// <summary>Opens or activates a find-and-replace UI.</summary>
+    Replace,
+
     #endregion
 
     #region Tree Commands
@@ -334,6 +356,26 @@ public enum Command
     ///     Invokes a user interface for editing or configuring something.
     /// </summary>
     Edit,
+
+    #endregion
+
+    #region Multi-Caret Commands
+
+    /// <summary>
+    ///     Adds an additional caret one line above the topmost caret (multi-caret editing),
+    ///     preserving the sticky visual column. Mirrors VS Code's
+    ///     <c>editor.action.insertCursorAbove</c>. Views that support multi-caret bind this
+    ///     through <see cref="View.KeyBindings"/> or their configurable default key bindings.
+    /// </summary>
+    InsertCaretAbove,
+
+    /// <summary>
+    ///     Adds an additional caret one line below the bottommost caret (multi-caret editing),
+    ///     preserving the sticky visual column. Mirrors VS Code's
+    ///     <c>editor.action.insertCursorBelow</c>. Views that support multi-caret bind this
+    ///     through <see cref="View.KeyBindings"/> or their configurable default key bindings.
+    /// </summary>
+    InsertCaretBelow,
 
     #endregion
 }

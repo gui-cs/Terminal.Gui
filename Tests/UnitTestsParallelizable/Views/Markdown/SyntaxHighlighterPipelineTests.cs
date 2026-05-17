@@ -341,6 +341,25 @@ public class SyntaxHighlighterPipelineTests
     }
 
     [Fact]
+    public void MarkdownAttributeHelper_CodeToken_Uses_Code_Background ()
+    {
+        // Copilot
+        Terminal.Gui.Views.Markdown mv = new ();
+        mv.SetScheme (new Scheme
+        {
+            Normal = new Attribute (Color.White, Color.Black),
+            Code = new Attribute (new Color (StandardColor.LightGray), new Color (StandardColor.DarkBlue)),
+            CodeKeyword = new Attribute (Color.Cyan, Color.None)
+        });
+
+        StyledSegment segment = new ("public", MarkdownStyleRole.CodeBlock, role: VisualRole.CodeKeyword);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment);
+
+        Assert.Equal (Color.Cyan, result.Foreground);
+        Assert.Equal (new Color (StandardColor.DarkBlue), result.Background);
+    }
+
+    [Fact]
     public void MarkdownAttributeHelper_No_ThemeBackground_Uses_View_Background ()
     {
         Terminal.Gui.Views.Markdown mv = new ();

@@ -59,7 +59,10 @@ public partial class Markdown
 
         // The base class binds LeftButtonReleased → Activate; remove that so Activate
         // fires only on LeftButtonClicked (not twice per click which would clear selection).
+        // Also remove the base class Ctrl+LeftButtonReleased → Context binding so that
+        // Ctrl+Click can follow links without triggering the context menu popover.
         MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
 
         // Right-click is handled directly in OnMouseEvent so that the view can be focused
@@ -273,6 +276,28 @@ public partial class Markdown
 
             return;
         }
+    }
+
+    /// <summary>
+    ///     Returns the URL of the link region at content coordinates (<paramref name="contentX"/>,
+    ///     <paramref name="contentY"/>), or <see langword="null"/> if no link covers that position.
+    /// </summary>
+    private string? FindLinkUrlAt (int contentX, int contentY)
+    {
+        foreach (MarkdownLinkRegion region in _linkRegions)
+        {
+            if (region.Line != contentY)
+            {
+                continue;
+            }
+
+            if (contentX >= region.StartX && contentX < region.EndXExclusive)
+            {
+                return region.Url;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
