@@ -30,12 +30,17 @@ public partial class ListView
             // Can move down by one.
             newItem = SelectedItem.Value + 1;
         }
-        else if (SelectedItem >= Viewport.Y + Viewport.Height)
+        else if (Viewport.Height > 0 && SelectedItem >= Viewport.Y + Viewport.Height)
         {
             // Just scroll viewport
             Viewport = Viewport with { Y = Source.Count - Viewport.Height };
 
             return true;
+        }
+        else if (TabStop == TabBehavior.NoStop)
+        {
+            // Wrap to top
+            newItem = 0;
         }
         else
         {
@@ -220,6 +225,11 @@ public partial class ListView
             Viewport = Viewport with { Y = SelectedItem.Value };
 
             return true;
+        }
+        else if (TabStop == TabBehavior.NoStop)
+        {
+            // Wrap to bottom
+            newItem = Source.Count - 1;
         }
         else
         {
