@@ -593,6 +593,33 @@ hree - lon",
         matchNone.Verify (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ()), Times.Never ());
     }
 
+    // Copilot
+    [Fact]
+    public void KeystrokeNavigator_SetNull_DisablesKeystrokeNavigation ()
+    {
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
+        ListView lv = new () { Source = new ListWrapper<string> (source) };
+
+        lv.SetFocus ();
+
+        // Verify keystroke navigation works by default
+        Assert.NotNull (lv.KeystrokeNavigator);
+        Assert.True (lv.NewKeyDownEvent (Key.B));
+        Assert.Equal (2, lv.SelectedItem); // "bat"
+
+        // Disable keystroke navigation
+        lv.KeystrokeNavigator = null;
+
+        // Reset selection
+        lv.SelectedItem = 0;
+
+        // Typing should no longer navigate — key events are not consumed
+        Assert.False (lv.NewKeyDownEvent (Key.C));
+        Assert.Equal (0, lv.SelectedItem); // unchanged
+        Assert.False (lv.NewKeyDownEvent (Key.A));
+        Assert.Equal (0, lv.SelectedItem); // unchanged
+    }
+
     [Fact]
     public void ListViewCollectionNavigatorMatcher_OverrideMatching ()
     {
