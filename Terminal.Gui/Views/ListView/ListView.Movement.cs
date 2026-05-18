@@ -9,6 +9,13 @@ public partial class ListView
     ///     clears any existing multi-selection.
     /// </param>
     /// <returns><see langword="true"/> if the selection was moved.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         When the selection is already at the last item and <see cref="View.TabStop"/> is
+    ///         <see cref="TabBehavior.NoStop"/>, the selection wraps around to the first item.
+    ///         Otherwise the method returns <see langword="false"/> without changing the selection.
+    ///     </para>
+    /// </remarks>
     public bool MoveDown (bool extend = false)
     {
         if (Source is null || Source.Count == 0)
@@ -194,6 +201,13 @@ public partial class ListView
     ///     clears any existing multi-selection.
     /// </param>
     /// <returns><see langword="true"/> if the selection was moved.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         When the selection is already at the first item and <see cref="View.TabStop"/> is
+    ///         <see cref="TabBehavior.NoStop"/>, the selection wraps around to the last item.
+    ///         Otherwise the method returns <see langword="false"/> without changing the selection.
+    ///     </para>
+    /// </remarks>
     public bool MoveUp (bool extend = false)
     {
         if (Source is null || Source.Count == 0)
