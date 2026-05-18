@@ -582,7 +582,7 @@ hree - lon",
 
         matchNone.Setup (m => m.IsCompatibleKey (It.IsAny<Key> ())).Returns (false);
 
-        lv.KeystrokeNavigator.Matcher = matchNone.Object;
+        lv.KeystrokeNavigator?.Matcher = matchNone.Object;
 
         // Keys are ignored because IsCompatibleKey returned false i.e. don't use these keys for navigation
         Assert.False (lv.NewKeyDownEvent (Key.B));
@@ -607,7 +607,7 @@ hree - lon",
         matchNone.Setup (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ()))
                  .Returns ((string s, object key) => s.StartsWith ('B') && key?.ToString () == "candle");
 
-        lv.KeystrokeNavigator.Matcher = matchNone.Object;
+        lv.KeystrokeNavigator?.Matcher = matchNone.Object;
 
         // Keys are consumed during navigation
         Assert.True (lv.NewKeyDownEvent (Key.B));

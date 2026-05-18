@@ -214,7 +214,7 @@ public class CollectionNavigatorTester : Scenario
 
         _listView.SetSource (_items);
 
-        _listView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"ListView: {e.SearchString}"; };
+        _listView.KeystrokeNavigator?.SearchStringChanged += (_, e) => { label.Text = $"ListView: {e.SearchString}"; };
     }
 
     private void CreateTreeView ()

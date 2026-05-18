@@ -58,7 +58,8 @@ namespace Terminal.Gui.Views;
 ///             <term>Home / End</term> <description>Moves to the first or last item.</description>
 ///         </item>
 ///         <item>
-///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///             <term>Shift+&lt;movement&gt;</term>
+///             <description>Extends the selection in the given direction.</description>
 ///         </item>
 ///         <item>
 ///             <term>Ctrl+A</term> <description>Selects all items.</description>
@@ -76,7 +77,8 @@ namespace Terminal.Gui.Views;
 ///             <term>Click</term> <description>Activates (selects) the clicked item.</description>
 ///         </item>
 ///         <item>
-///             <term>Double-Click</term> <description>Accepts the clicked item (<see cref="Command.Accept"/>).</description>
+///             <term>Double-Click</term>
+///             <description>Accepts the clicked item (<see cref="Command.Accept"/>).</description>
 ///         </item>
 ///         <item>
 ///             <term>Wheel Up / Down</term> <description>Scrolls the list.</description>
@@ -94,6 +96,22 @@ public partial class ListView : View, IDesignable, IValue<int?>
         CanFocus = true;
 
         SetupBindingsAndCommands ();
+    }
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item 3", "List Item Quattro", "Last List Item"]);
+        Source = source;
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        Source?.Dispose ();
+        base.Dispose (disposing);
     }
 
     #region IListDataSource
@@ -166,7 +184,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
             {
                 field.CollectionChanged += SourceOnCollectionChanged;
                 SetContentSize (new Size (EffectiveMaxItemLength, field?.Count ?? Viewport.Height));
-                KeystrokeNavigator.Collection = field?.ToList ();
+                KeystrokeNavigator?.Collection = field?.ToList ();
             }
 
             SelectedItem = null;
@@ -242,9 +260,11 @@ public partial class ListView : View, IDesignable, IValue<int?>
 
     /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
-    ///     user types.
+    ///     user types. The default implementation is a <see cref="CollectionNavigator"/> that uses the string representation
+    ///     of the items in the
+    ///     collection. Set this property to null to disable keystroke navigation.
     /// </summary>
-    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator ();
+    public IListCollectionNavigator? KeystrokeNavigator { get; set; } = new CollectionNavigator ();
 
     /// <inheritdoc/>
     protected override bool OnKeyDown (Key key)
@@ -257,7 +277,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
         }
 
         // Enable user to find & select an item by typing text
-        if (!KeystrokeNavigator.Matcher.IsCompatibleKey (key))
+        if (KeystrokeNavigator is null || !KeystrokeNavigator.Matcher.IsCompatibleKey (key))
         {
             return false;
         }
@@ -277,20 +297,4 @@ public partial class ListView : View, IDesignable, IValue<int?>
     }
 
     #endregion Keystroke Navigation
-
-    /// <inheritdoc/>
-    public bool EnableForDesign ()
-    {
-        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item 3", "List Item Quattro", "Last List Item"]);
-        Source = source;
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        Source?.Dispose ();
-        base.Dispose (disposing);
-    }
 }

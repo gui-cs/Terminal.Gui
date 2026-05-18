@@ -181,15 +181,19 @@ public sealed class UICatalogRunnable : Runnable
         {
             List<View> menuItems = [];
 
-            _force16ColorsMenuItemCb = new CheckBox { Title = "Force _16 Colors", Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked };
+            _force16ColorsMenuItemCb = new CheckBox { Title = "Force _16 Colors", Value = Driver is { Force16Colors: true } ? CheckState.Checked : CheckState.UnChecked };
 
             menuItems.Add (new MenuItem
             {
                 CommandView = _force16ColorsMenuItemCb,
                 Action = () =>
                          {
+                             if (Driver is null)
+                             {
+                                 return;
+                             }
                              Driver.Force16Colors = !Driver.Force16Colors;
-                             _force16ColorsShortcutCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                             _force16ColorsShortcutCb?.Value = Driver is { Force16Colors: true } ? CheckState.Checked : CheckState.UnChecked;
                              SetNeedsDraw ();
                          }
             });
@@ -818,7 +822,7 @@ public sealed class UICatalogRunnable : Runnable
 
         _force16ColorsShortcutCb = new CheckBox
         {
-            Title = "16 color mode", Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked, CanFocus = true
+            Title = "16 color mode", Value = Driver is { Force16Colors: true } ? CheckState.Checked : CheckState.UnChecked, CanFocus = true
         };
 
         Shortcut force16ColorsShortcut = new ()
@@ -830,6 +834,10 @@ public sealed class UICatalogRunnable : Runnable
             Key = GetFirstUnboundFKey ([statusBarShortcut.Key]),
             Action = () =>
                      {
+                         if (Driver is null)
+                         {
+                             return;
+                         }
                          Driver.Force16Colors = !Driver.Force16Colors;
                          _force16ColorsMenuItemCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                          SetNeedsDraw ();
@@ -877,7 +885,7 @@ public sealed class UICatalogRunnable : Runnable
         _shQuit?.Key = Application.GetDefaultKey (Command.Quit);
 
         _disableMouseCb?.Value = App?.Mouse.IsMouseDisabled == true ? CheckState.Checked : CheckState.UnChecked;
-        _force16ColorsShortcutCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+        _force16ColorsShortcutCb?.Value = Driver is { Force16Colors: true } ? CheckState.Checked : CheckState.UnChecked;
 
         App?.TopRunnableView?.SetNeedsDraw ();
     }
