@@ -620,6 +620,24 @@ hree - lon",
         Assert.Equal (0, lv.SelectedItem); // unchanged
     }
 
+    // Copilot
+    [Fact]
+    public void KeystrokeNavigator_ReassignAfterSource_SyncsCollection ()
+    {
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
+        ListView lv = new () { Source = new ListWrapper<string> (source) };
+
+        lv.SetFocus ();
+
+        // Disable then re-enable with a fresh navigator
+        lv.KeystrokeNavigator = null;
+        lv.KeystrokeNavigator = new CollectionNavigator ();
+
+        // The new navigator should have been synced with Source automatically
+        Assert.True (lv.NewKeyDownEvent (Key.C));
+        Assert.Equal (5, lv.SelectedItem); // "candle"
+    }
+
     [Fact]
     public void ListViewCollectionNavigatorMatcher_OverrideMatching ()
     {

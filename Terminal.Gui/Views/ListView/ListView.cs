@@ -258,13 +258,30 @@ public partial class ListView : View, IDesignable, IValue<int?>
 
     #region Keystroke Navigation
 
+    private IListCollectionNavigator? _keystrokeNavigator = new CollectionNavigator ();
+
     /// <summary>
-    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
-    ///     user types. The default implementation is a <see cref="CollectionNavigator"/> that uses the string representation
-    ///     of the items in the
-    ///     collection. Set this property to null to disable keystroke navigation.
+    ///     Gets or sets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as
+    ///     the user types. The default implementation is a <see cref="CollectionNavigator"/> that uses the string
+    ///     representation of the items in the collection. Set to <see langword="null"/> to disable keystroke navigation.
     /// </summary>
-    public IListCollectionNavigator? KeystrokeNavigator { get; set; } = new CollectionNavigator ();
+    /// <remarks>
+    ///     When a new navigator is assigned, its <see cref="IListCollectionNavigator.Collection"/> is automatically
+    ///     synchronized with the current <see cref="Source"/>.
+    /// </remarks>
+    public IListCollectionNavigator? KeystrokeNavigator
+    {
+        get => _keystrokeNavigator;
+        set
+        {
+            _keystrokeNavigator = value;
+
+            if (_keystrokeNavigator is { } && Source is { })
+            {
+                _keystrokeNavigator.Collection = Source.ToList ();
+            }
+        }
+    }
 
     /// <inheritdoc/>
     protected override bool OnKeyDown (Key key)
