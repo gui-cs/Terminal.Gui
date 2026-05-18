@@ -1076,14 +1076,14 @@ Five ",
 
         // Press Space+Shift again - cannot move down further
         // In radio button mode, item should toggle: marked → unmarked
-        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.False (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // Still at item 2
         Assert.False (lv.Source.IsMarked (0));
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2)); // Toggled off
 
         // Press key combo again - should toggle back to marked
-        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.False (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // Still at item 2
         Assert.False (lv.Source.IsMarked (0));
         Assert.False (lv.Source.IsMarked (1));
@@ -1137,14 +1137,14 @@ Five ",
         Assert.False (lv.Source.IsMarked (2));
 
         // Press key combo again
-        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.False (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // cannot move down any further
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
         Assert.True (lv.Source.IsMarked (2)); // but can toggle marked
 
         // Press key combo again 
-        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.False (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // cannot move down any further
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
@@ -3129,4 +3129,80 @@ Five ",
     }
 
     #endregion RowRender RowAttribute Override
+
+    #region Movement Cycling
+
+    // Copilot
+    [Fact]
+    public void MoveDown_AtBottom_WhenTabStopIsNoStop_WrapsToTop ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Source = new ListWrapper<string> (source), TabStop = TabBehavior.NoStop };
+        lv.SetFocus ();
+
+        // Move to last item
+        Assert.True (lv.MoveDown ()); // selects 0
+        Assert.True (lv.MoveDown ()); // selects 1
+        Assert.True (lv.MoveDown ()); // selects 2
+        Assert.Equal (2, lv.SelectedItem);
+
+        // Should wrap to top
+        Assert.True (lv.MoveDown ());
+        Assert.Equal (0, lv.SelectedItem);
+    }
+
+    // Copilot
+    [Fact]
+    public void MoveDown_AtBottom_WhenTabStopIsNotNoStop_ReturnsFalse ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Source = new ListWrapper<string> (source), TabStop = TabBehavior.TabStop };
+        lv.SetFocus ();
+
+        // Move to last item
+        Assert.True (lv.MoveDown ()); // selects 0
+        Assert.True (lv.MoveDown ()); // selects 1
+        Assert.True (lv.MoveDown ()); // selects 2
+        Assert.Equal (2, lv.SelectedItem);
+
+        // Should NOT wrap — returns false
+        Assert.False (lv.MoveDown ());
+        Assert.Equal (2, lv.SelectedItem);
+    }
+
+    // Copilot
+    [Fact]
+    public void MoveUp_AtTop_WhenTabStopIsNoStop_WrapsToBottom ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Frame = new Rectangle (0, 0, 10, 20), Source = new ListWrapper<string> (source), TabStop = TabBehavior.NoStop };
+        lv.SetFocus ();
+
+        // Select first item
+        Assert.True (lv.MoveDown ());
+        Assert.Equal (0, lv.SelectedItem);
+
+        // Should wrap to bottom
+        Assert.True (lv.MoveUp ());
+        Assert.Equal (2, lv.SelectedItem);
+    }
+
+    // Copilot
+    [Fact]
+    public void MoveUp_AtTop_WhenTabStopIsNotNoStop_ReturnsFalse ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Frame = new Rectangle (0, 0, 10, 20), Source = new ListWrapper<string> (source), TabStop = TabBehavior.TabStop };
+        lv.SetFocus ();
+
+        // Select first item
+        Assert.True (lv.MoveDown ());
+        Assert.Equal (0, lv.SelectedItem);
+
+        // Should NOT wrap — returns false
+        Assert.False (lv.MoveUp ());
+        Assert.Equal (0, lv.SelectedItem);
+    }
+
+    #endregion Movement Cycling
 }
