@@ -4,10 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata (
-                      "Collection Navigator",
-                      "Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator)."
-                  )]
+[ScenarioMetadata ("Collection Navigator", "Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator).")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ListView")]
 [ScenarioCategory ("TreeView")]
@@ -15,8 +12,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public class CollectionNavigatorTester : Scenario
 {
-    private ObservableCollection<string> _items = new (
-                                                       [
+    private ObservableCollection<string> _items = new ([
                                                            "a",
                                                            "b",
                                                            "bb",
@@ -70,8 +66,7 @@ public class CollectionNavigatorTester : Scenario
                                                            "q",
                                                            "quit",
                                                            "quitter"
-                                                       ]
-                                                      );
+                                                       ]);
 
     private Window? _top;
     private ListView? _listView;
@@ -85,102 +80,46 @@ public class CollectionNavigatorTester : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window top = new ()
-        {
-            SchemeName = "Base"
-        };
+        using Window top = new ();
+        top.SchemeName = "Base";
         _top = top;
 
         // MenuBar
         MenuBar menu = new ();
 
-        _allowMarkingCheckBox = new ()
-        {
-            Title = "Allow _Marking"
-        };
+        _allowMarkingCheckBox = new CheckBox { Title = "Allow _Marking" };
 
         _allowMarkingCheckBox.ValueChanged += (_, _) =>
-                                                     {
-                                                         if (_listView is not null)
-                                                         {
-                                                             _listView.ShowMarks = _allowMarkingCheckBox.Value == CheckState.Checked;
-                                                         }
+                                              {
+                                                  _listView?.ShowMarks = _allowMarkingCheckBox.Value == CheckState.Checked;
 
-                                                         if (_allowMultiSelectionCheckBox is not null)
-                                                         {
-                                                             _allowMultiSelectionCheckBox.Enabled = _allowMarkingCheckBox.Value == CheckState.Checked;
-                                                         }
-                                                     };
+                                                  _allowMultiSelectionCheckBox?.Enabled = _allowMarkingCheckBox.Value == CheckState.Checked;
+                                              };
 
-        _allowMultiSelectionCheckBox = new ()
-        {
-            Title = "Allow Multi _Selection",
-            Enabled = false
-        };
+        _allowMultiSelectionCheckBox = new CheckBox { Title = "Allow Multi _Selection", Enabled = false };
 
-        _allowMultiSelectionCheckBox.ValueChanged += (_, _) =>
-                                                            {
-                                                                if (_listView is not null)
-                                                                {
-                                                                    _listView.MarkMultiple =
-                                                                        _allowMultiSelectionCheckBox.Value == CheckState.Checked;
-                                                                }
-                                                            };
+        _allowMultiSelectionCheckBox.ValueChanged += (_, _) => { _listView?.MarkMultiple = _allowMultiSelectionCheckBox.Value == CheckState.Checked; };
 
-        menu.Add (
-                  new MenuBarItem (
-                                   "_Configure",
+        menu.Add (new MenuBarItem ("_Configure",
                                    [
-                                       new MenuItem
-                                       {
-                                           CommandView = _allowMarkingCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _allowMultiSelectionCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = Strings.cmdQuit,
-                                           Key = Application.GetDefaultKey (Command.Quit),
-                                           Action = Quit
-                                       }
-                                   ]
-                                  )
-                 );
+                                       new MenuItem { CommandView = _allowMarkingCheckBox },
+                                       new MenuItem { CommandView = _allowMultiSelectionCheckBox },
+                                       new MenuItem { Title = Strings.cmdQuit, Key = Application.GetDefaultKey (Command.Quit), Action = Quit }
+                                   ]));
 
-        menu.Add (
-                  new MenuBarItem (
-                                   Strings.cmdQuit,
-                                   [
-                                       new MenuItem
-                                       {
-                                           Title = Strings.cmdQuit,
-                                           Key = Application.GetDefaultKey (Command.Quit),
-                                           Action = Quit
-                                       }
-                                   ]
-                                  )
-                 );
+        menu.Add (new MenuBarItem (Strings.cmdQuit, [new MenuItem { Title = Strings.cmdQuit, Key = Application.GetDefaultKey (Command.Quit), Action = Quit }]));
 
         top.Add (menu);
 
-        _items = new (_items.OrderBy (i => i, StringComparer.OrdinalIgnoreCase));
+        _items = new ObservableCollection<string> (_items.OrderBy (i => i, StringComparer.OrdinalIgnoreCase));
 
         CreateListView ();
 
-        Line vsep = new ()
-        {
-            Orientation = Orientation.Vertical,
-            X = Pos.Right (_listView!),
-            Y = 1,
-            Height = Dim.Fill ()
-        };
+        Line vsep = new () { Orientation = Orientation.Vertical, X = Pos.Right (_listView!), Y = 1, Height = Dim.Fill () };
         top.Add (vsep);
         CreateTreeView ();
 
         app.Run (top);
-        top.Dispose ();
     }
 
     private void CreateListView ()
@@ -201,7 +140,7 @@ public class CollectionNavigatorTester : Scenario
         };
         _top.Add (label);
 
-        _listView = new ()
+        _listView = new ListView
         {
             X = 0,
             Y = Pos.Bottom (label),
@@ -214,7 +153,7 @@ public class CollectionNavigatorTester : Scenario
 
         _listView.SetSource (_items);
 
-        _listView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"ListView: {e.SearchString}"; };
+        _listView.KeystrokeNavigator?.SearchStringChanged += (_, e) => { label.Text = $"ListView: {e.SearchString}"; };
     }
 
     private void CreateTreeView ()
@@ -235,29 +174,15 @@ public class CollectionNavigatorTester : Scenario
         };
         _top.Add (label);
 
-        _treeView = new TreeView
-        {
-            X = Pos.Right (_listView) + 1,
-            Y = Pos.Bottom (label),
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        _treeView = new TreeView { X = Pos.Right (_listView) + 1, Y = Pos.Bottom (label), Width = Dim.Fill (), Height = Dim.Fill () };
         _treeView.Style.HighlightModelTextOnly = true;
         _top.Add (_treeView);
 
-        TreeNode root = new () { Text = "IsLetterOrDigit examples" };
+        TreeNode root = new () { Text = "IsLetterOrDigit examples", Children = _items.Where (i => char.IsLetterOrDigit (i [0])).Select (i => new TreeNode { Text = i }).Cast<ITreeNode> ().ToList () };
 
-        root.Children = _items.Where (i => char.IsLetterOrDigit (i [0]))
-                              .Select (i => new TreeNode () { Text = i })
-                              .Cast<ITreeNode> ()
-                              .ToList ();
         _treeView.AddObject (root);
-        root = new () { Text = "Non-IsLetterOrDigit examples" };
+        root = new TreeNode { Text = "Non-IsLetterOrDigit examples", Children = _items.Where (i => !char.IsLetterOrDigit (i [0])).Select (i => new TreeNode { Text = i }).Cast<ITreeNode> ().ToList () };
 
-        root.Children = _items.Where (i => !char.IsLetterOrDigit (i [0]))
-                              .Select (i => new TreeNode () { Text = i })
-                              .Cast<ITreeNode> ()
-                              .ToList ();
         _treeView.AddObject (root);
         _treeView.ExpandAll ();
         _treeView.GoToFirst ();
@@ -265,5 +190,5 @@ public class CollectionNavigatorTester : Scenario
         _treeView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"TreeView: {e.SearchString}"; };
     }
 
-    private void Quit () { _top?.RequestStop (); }
+    private void Quit () => _top?.RequestStop ();
 }
