@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Text;
 using System.Text.RegularExpressions;
+using Terminal.Gui.Editor;
 
 // ReSharper disable AccessToModifiedClosure
 
@@ -75,127 +76,73 @@ public class TextInputControls : Scenario
 
         win.Add (textField2);
 
-        // TextView is a rich (as in functionality, not formatting) text editing control
-        label = new Label { Text = "  T_extView:", Y = Pos.Bottom (label) + 1 };
+        // EditorView is a rope-backed multi-line text editor from Terminal.Gui.Editor
+        label = new Label { Text = "    E_ditor:", Y = Pos.Bottom (label) + 1 };
         win.Add (label);
 
-        TextView textView = new ()
+        EditorView editorView = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Percent (50) - 1,
             Height = Dim.Percent (10),
-            ScrollBars = true
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar
         };
-        SingleWordSuggestionGenerator textViewAppendSingleWordGenerator = new ();
-        textView.Autocomplete.SuggestionGenerator = textViewAppendSingleWordGenerator;
-        textView.DrawingContent += TextViewDrawContent;
 
-        // This shows how to enable autocomplete in TextView.
-        void TextViewDrawContent (object? sender, DrawEventArgs e) =>
-            textViewAppendSingleWordGenerator.AllSuggestions = Regex.Matches (textView.Text, "\\w+").Select (s => s.Value).Distinct ().ToList ();
+        // TODO: EditorView does not yet expose an autocomplete API. Add when available.
 
-        win.Add (textView);
+        win.Add (editorView);
 
-        Label labelMirroringTextView = new ()
+        Label labelMirroringEditorView = new ()
         {
-            X = Pos.Right (textView) + 1,
-            Y = Pos.Top (textView),
+            X = Pos.Right (editorView) + 1,
+            Y = Pos.Top (editorView),
             Width = Dim.Fill (1) - 1,
-            Height = Dim.Height (textView) - 1,
+            Height = Dim.Height (editorView) - 1,
             Enabled = false
         };
-        win.Add (labelMirroringTextView);
+        win.Add (labelMirroringEditorView);
 
-        // Use ContentChanged to detect if the user has typed something in a TextView.
-        // The TextChanged property is only fired if the TextView.Text property is
-        // explicitly set
-        textView.ContentsChanged += (_, _) => { labelMirroringTextView.Text = textView.Text; };
-        textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
+        // Use ContentsChanged to detect if the user has typed something in EditorView.
+        editorView.ContentsChanged += (_, _) => { labelMirroringEditorView.Text = editorView.Text; };
+        editorView.Text = "EditorView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
 
         CheckBox chxReadOnly = new ()
         {
-            X = Pos.Left (textView), Y = Pos.Bottom (textView), Value = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
+            X = Pos.Left (editorView), Y = Pos.Bottom (editorView), Value = editorView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
         };
-        chxReadOnly.ValueChanging += (_, args) => textView.ReadOnly = args.NewValue == CheckState.Checked;
+        chxReadOnly.ValueChanging += (_, args) => editorView.ReadOnly = args.NewValue == CheckState.Checked;
         win.Add (chxReadOnly);
-
-        // By default, TextView is a multi-line control. It can be forced to single-line mode.
-        CheckBox chxMultiline = new ()
-        {
-            X = Pos.Right (chxReadOnly) + 2,
-            Y = Pos.Bottom (textView),
-            Value = textView.Multiline ? CheckState.Checked : CheckState.UnChecked,
-            Text = "_Multiline"
-        };
-        win.Add (chxMultiline);
 
         CheckBox chxWordWrap = new ()
         {
-            X = Pos.Right (chxMultiline) + 2,
-            Y = Pos.Top (chxMultiline),
-            Value = textView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
+            X = Pos.Right (chxReadOnly) + 2,
+            Y = Pos.Top (chxReadOnly),
+            Value = editorView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.ValueChanging += (_, e) => textView.WordWrap = e.NewValue == CheckState.Checked;
+        chxWordWrap.ValueChanging += (_, e) => editorView.WordWrap = e.NewValue == CheckState.Checked;
         win.Add (chxWordWrap);
-
-        // TextView captures Tabs (so users can enter /t into text) by default;
-        // This means using Tab to navigate doesn't work by default. This shows
-        // how to turn tab capture off.
-        CheckBox chxCaptureTabs = new ()
-        {
-            X = Pos.Right (chxWordWrap) + 2,
-            Y = Pos.Top (chxWordWrap),
-            Value = textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked,
-            Text = "Tab Ke_y Adds Tab"
-        };
-
-        chxMultiline.ValueChanging += (_, e) =>
-                                      {
-                                          textView.Multiline = e.NewValue == CheckState.Checked;
-
-                                          if (!textView.Multiline && chxWordWrap.Value == CheckState.Checked)
-                                          {
-                                              chxWordWrap.Value = CheckState.UnChecked;
-                                          }
-
-                                          if (!textView.Multiline && chxCaptureTabs.Value == CheckState.Checked)
-                                          {
-                                              chxCaptureTabs.Value = CheckState.UnChecked;
-                                          }
-                                      };
-
-        Key? keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
-        Key? keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
-
-        chxCaptureTabs.ValueChanging += (_, e) =>
-                                        {
-                                            textView.TabKeyAddsTab = e.NewValue == CheckState.Checked;
-
-                                            // TODO: This should be in TextView.TabKeyAddsTab_set
-                                            if (e.NewValue == CheckState.Checked)
-                                            {
-                                                textView.KeyBindings.Add (keyTab!, Command.NextTabStop);
-                                                textView.KeyBindings.Add (keyBackTab!, Command.PreviousTabStop);
-                                            }
-                                            else
-                                            {
-                                                textView.KeyBindings.Remove (keyTab!);
-                                                textView.KeyBindings.Remove (keyBackTab!);
-                                            }
-                                        };
-        win.Add (chxCaptureTabs);
 
         CheckBox scrollBars = new ()
         {
-            X = Pos.Left (textView),
-            Y = Pos.Bottom (chxCaptureTabs),
+            X = Pos.Right (chxWordWrap) + 2,
+            Y = Pos.Top (chxWordWrap),
             Title = "_ScrollBars",
-            Value = textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked
+            Value = CheckState.Checked
         };
 
-        scrollBars.ValueChanged += (_, _) => { textView.ScrollBars = scrollBars.Value == CheckState.Checked; };
+        scrollBars.ValueChanged += (_, _) =>
+                                   {
+                                       if (scrollBars.Value == CheckState.Checked)
+                                       {
+                                           editorView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar;
+                                       }
+                                       else
+                                       {
+                                           editorView.ViewportSettings &= ~(ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar);
+                                       }
+                                   };
 
         win.Add (scrollBars);
 
