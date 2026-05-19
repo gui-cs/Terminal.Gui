@@ -13,7 +13,8 @@ public partial class AppTestHelper
     ///         Captures the screen via <c>IDriver.ToAnsi ()</c> — the exact escape-sequence stream
     ///         the driver would write to recreate it (truecolor, bold, reverse, blink, layout),
     ///         excluding the terminal cursor (a separate, non-deterministic <c>SetCursor</c>, so
-    ///         snapshots stay stable). The recorded <c>.ans</c> file <i>is</i> the look:
+    ///         snapshots stay stable). Row separators are normalized to <c>\n</c> so the same
+    ///         golden compares on every platform. The recorded <c>.ans</c> file <i>is</i> the look:
     ///         <c>cat &lt;file&gt;.ans</c> in a truecolor terminal reproduces the screen exactly.
     ///     </para>
     ///     <para>
@@ -42,7 +43,7 @@ public partial class AppTestHelper
                            plain = app.Driver?.ToString ();
                        });
 
-        ansi ??= string.Empty;
+        ansi = NormalizeAnsiLineEndings (ansi ?? string.Empty);
 
         string dir = SnapshotDirectory (callerFile);
         Directory.CreateDirectory (dir);
@@ -60,7 +61,7 @@ public partial class AppTestHelper
             return this;
         }
 
-        string expected = File.ReadAllText (path);
+        string expected = NormalizeAnsiLineEndings (File.ReadAllText (path));
 
         if (string.Equals (expected, ansi, StringComparison.Ordinal))
         {
@@ -106,4 +107,6 @@ public partial class AppTestHelper
 
         return Path.Combine (sourceDir, "__snapshots__");
     }
+
+    private static string NormalizeAnsiLineEndings (string ansi) => ansi.Replace ("\r\n", "\n").Replace ("\r", "\n");
 }

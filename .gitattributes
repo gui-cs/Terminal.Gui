@@ -8,7 +8,7 @@
 *.sh text eol=lf
 *.ps1 text eol=lf
 
-# ANSI snapshot goldens: raw escape-sequence streams with CRLF row breaks.
+# ANSI snapshot goldens: raw escape-sequence streams with LF row breaks.
 # Must NOT be EOL-normalized or the byte-exact compare + `cat` fidelity breaks.
 *.ans binary
 
