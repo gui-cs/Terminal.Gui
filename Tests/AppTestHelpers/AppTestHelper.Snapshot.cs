@@ -71,7 +71,7 @@ public partial class AppTestHelper
         string actualPath = path + ".actual";
         File.WriteAllText (actualPath, ansi, new UTF8Encoding (false));
 
-        throw new AnsiSnapshotException (
+        AnsiSnapshotException exception = new (
             $"""
              ANSI snapshot '{name}' did not match {path}.
 
@@ -86,6 +86,10 @@ public partial class AppTestHelper
              If this change is intended, accept it by re-running with UPDATE_SNAPSHOTS=1
              (or copy the .actual over the .ans).
              """);
+
+        Stop ();
+
+        throw exception;
     }
 
     private static string SnapshotDirectory (string callerFile)
