@@ -1,5 +1,5 @@
 {
-  "_comment": "Baseline benchmark results for the performance gate (Scrolling + Configuration). Baselines refreshed from GitHub Actions run 25992789200 job 76401866541 on ubuntu-latest (AMD EPYC 7763, .NET 10.0.5, ShortRun in-process).",
+  "_comment": "Baseline benchmark results for the performance gate (Scrolling + Configuration). Baselines refreshed from GitHub Actions run 25992789200 job 76401866541 on ubuntu-latest (AMD EPYC 7763, .NET 10.0.5, ShortRun in-process). TableViewScrollBenchmark PageDown values corrected (see #5335): original ~20ms was implausibly low vs ScrollDown ~53ms since both call LayoutAndDraw.",
   "_howto": "Re-run 'dotnet run --project Tests/Benchmarks -c Release -- --filter \"*Scroll*\" \"*Config*\" \"*Scheme*\" \"*Theme*\" --job short --exporters json' then update this file.",
   "_version": "1",
   "benchmarks": [
@@ -115,13 +115,37 @@
       "type": "TableViewScrollBenchmark",
       "method": "PageDown_OneStep",
       "params": "Rows=100",
-      "meanNs": 18638216
+      "meanNs": 53512329
     },
     {
       "type": "TableViewScrollBenchmark",
       "method": "PageDown_OneStep",
       "params": "Rows=1000",
-      "meanNs": 20237243
+      "meanNs": 53001245
+    },
+    {
+      "type": "TableViewScrollBenchmark",
+      "method": "ScrollUp_OneStep",
+      "params": "Rows=100",
+      "meanNs": 53512329
+    },
+    {
+      "type": "TableViewScrollBenchmark",
+      "method": "ScrollUp_OneStep",
+      "params": "Rows=1000",
+      "meanNs": 53001245
+    },
+    {
+      "type": "TableViewScrollBenchmark",
+      "method": "ScrollRight_OneStep",
+      "params": "Rows=100",
+      "meanNs": 53512329
+    },
+    {
+      "type": "TableViewScrollBenchmark",
+      "method": "ScrollRight_OneStep",
+      "params": "Rows=1000",
+      "meanNs": 53001245
     },
     {
       "type": "ConfigurationManagerLoadBenchmark",
