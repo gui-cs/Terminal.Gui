@@ -40,7 +40,7 @@ public partial class View // Paste APIs
 
         PastePayload? pastePayload = ctx?.Value is PastePayload value ? value : null;
         bool usesPayload = pastePayload is { };
-        string? payload = usesPayload ? pastePayload.Value.Text : App?.Clipboard?.GetClipboardData ();
+        string? payload = usesPayload ? pastePayload?.Text : App?.Clipboard?.GetClipboardData ();
 
         if (string.IsNullOrEmpty (payload))
         {
@@ -80,7 +80,7 @@ public partial class View // Paste APIs
 
             if (ShouldRaisePastedEvent (pasting.Text) && !string.IsNullOrEmpty (pastedText))
             {
-                Pasted?.Invoke (this, new (pastedText));
+                Pasted?.Invoke (this, new PastedEventArgs (pastedText));
             }
 
             return true;
