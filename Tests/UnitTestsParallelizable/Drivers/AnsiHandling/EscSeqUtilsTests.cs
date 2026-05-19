@@ -22,6 +22,12 @@ public class EscSeqUtilsTests
         Assert.Equal ("\x1b[?1003l\x1b[?1015l\u001b[?1006l", EscSeqUtils.CSI_DisableMouseEvents);
         Assert.Equal ($"{EscSeqUtils.CSI}6n", EscSeqUtils.CSI_RequestCursorPositionReport.Request);
         Assert.Equal ("R", EscSeqUtils.CSI_RequestCursorPositionReport.Terminator);
+
+        // Claude - Opus 4.7
+        Assert.Equal ("\x1b[?2004h", EscSeqUtils.CSI_EnableBracketedPaste);
+        Assert.Equal ("\x1b[?2004l", EscSeqUtils.CSI_DisableBracketedPaste);
+        Assert.Equal ("\x1b[200~", EscSeqUtils.CSI_BracketedPasteStart);
+        Assert.Equal ("\x1b[201~", EscSeqUtils.CSI_BracketedPasteEnd);
     }
 
     [Fact]

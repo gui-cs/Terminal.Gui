@@ -103,4 +103,25 @@ public interface IInputProcessor
     event EventHandler<string>? AnsiSequenceSwallowed;
 
     #endregion
+
+    #region Paste Events
+
+    /// <summary>
+    ///     Event raised when bracketed paste content is delivered. The string contains the raw pasted
+    ///     text with the ANSI bracketing markers stripped.
+    /// </summary>
+    /// <remarks>
+    ///     Bracketed paste mode must be enabled by the driver (typically by writing
+    ///     <see cref="EscSeqUtils.CSI_EnableBracketedPaste"/> at startup). On terminals that do not
+    ///     support bracketed paste, pasted text is delivered as ordinary key events instead.
+    /// </remarks>
+    event EventHandler<string>? Paste;
+
+    /// <summary>
+    ///     Raises the <see cref="Paste"/> event. For unit tests and driver implementations.
+    /// </summary>
+    /// <param name="text">The pasted content with bracketing markers stripped.</param>
+    void RaisePasteEvent (string text);
+
+    #endregion
 }

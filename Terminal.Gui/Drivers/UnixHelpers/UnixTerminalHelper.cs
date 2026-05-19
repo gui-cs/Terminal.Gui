@@ -107,7 +107,8 @@ internal static class UnixTerminalHelper
 
         try
         {
-            // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
+            // Disable bracketed paste and mouse events while suspended.
+            output.Write (EscSeqUtils.CSI_DisableBracketedPaste);
             output.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
             // Check if we have a real console first
@@ -154,8 +155,9 @@ internal static class UnixTerminalHelper
         }
         finally
         {
-            // Enable mouse events to allow mouse events to be sent to the application when it is resumed.
+            // Re-enable mouse events and bracketed paste after resume.
             output.Write (EscSeqUtils.CSI_EnableMouseEvents);
+            output.Write (EscSeqUtils.CSI_EnableBracketedPaste);
         }
     }
 

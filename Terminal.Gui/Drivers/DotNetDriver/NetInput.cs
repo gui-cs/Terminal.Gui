@@ -56,6 +56,9 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
             // Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)
             // Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
+
+            // Mode 2004 - Bracketed paste mode. Pastes are wrapped in ESC[200~ ... ESC[201~.
+            Console.Out.Write (EscSeqUtils.CSI_EnableBracketedPaste);
             Console.TreatControlCAsInput = true;
         }
         catch
@@ -73,7 +76,8 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
 
         try
         {
-            // Disable mouse events first
+            // Disable bracketed paste and mouse events first
+            Console.Out.Write (EscSeqUtils.CSI_DisableBracketedPaste);
             Console.Out.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
             //Disable alternative screen buffer.

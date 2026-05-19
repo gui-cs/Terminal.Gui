@@ -70,6 +70,7 @@ internal class DriverImpl : IDriver
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.SyntheticMouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
+        _inputProcessor.Paste += (s, e) => Paste?.Invoke (s, e);
         _outputBuffer = outputBuffer;
         _output = output;
         _ansiRequestScheduler = ansiRequestScheduler;
@@ -484,6 +485,9 @@ internal class DriverImpl : IDriver
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
+
+    /// <summary>Event fired when a bracketed paste is received from the terminal.</summary>
+    public event EventHandler<string>? Paste;
 
     #endregion Input Events
 

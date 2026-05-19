@@ -145,6 +145,7 @@ public class AnsiOutput : OutputBase, IOutput
 
                 // TODO: Move Input related CSI sequences to AnsiInput
                 Write (EscSeqUtils.CSI_EnableMouseEvents);
+                Write (EscSeqUtils.CSI_EnableBracketedPaste);
             }
             else
             {
@@ -156,6 +157,7 @@ public class AnsiOutput : OutputBase, IOutput
 
                 // TODO: Move Input related CSI sequences to AnsiInput
                 Write (EscSeqUtils.CSI_EnableMouseEvents);
+                Write (EscSeqUtils.CSI_EnableBracketedPaste);
             }
 
             // Flush to ensure all sequences are sent
@@ -382,6 +384,7 @@ public class AnsiOutput : OutputBase, IOutput
             }
 
             // Restore terminal state: disable mouse, reset attributes, show cursor
+            Write (EscSeqUtils.CSI_DisableBracketedPaste);
             Write (EscSeqUtils.CSI_DisableMouseEvents);
             Write (EscSeqUtils.CSI_ResetAttributes);
 

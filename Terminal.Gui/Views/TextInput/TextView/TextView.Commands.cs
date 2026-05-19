@@ -97,7 +97,9 @@ public partial class TextView
         AddCommand (Command.SelectAll, () => ProcessSelectAll ());
         AddCommand (Command.CutToEndOfLine, () => CutToEndOfLine ());
         AddCommand (Command.CutToStartOfLine, () => CutToStartOfLine ());
-        AddCommand (Command.Paste, () => ProcessPaste ());
+
+        // Command.Paste uses the default View base handler — sanitization via OnSanitizingPaste,
+        // insertion via OnPaste. ProcessPaste's column-track reset happens inside OnPaste.
         AddCommand (Command.Copy, () => ProcessCopy ());
         AddCommand (Command.Cut, () => ProcessCut ());
         AddCommand (Command.DeleteCharLeft, () => ProcessDeleteCharLeft ());
@@ -225,52 +227,12 @@ public partial class TextView
     }
 
     /// <summary>Paste the clipboard contents into the current selected position.</summary>
-    public bool Paste ()
-    {
-        if (_isReadOnly)
-        {
-            return true;
-        }
-
-        SetWrapModel ();
-        string? contents = App?.Clipboard?.GetClipboardData ();
-
-        if (_copyWithoutSelection && contents!.FirstOrDefault (x => x is '\n' or '\r') == 0)
-        {
-            List<Cell> runeList = contents is null ? [] : Cell.ToCellList (contents);
-            List<Cell> currentLine = GetCurrentLine ();
-            _historyText.Add ([[.. currentLine]], InsertionPoint);
-            List<List<Cell>> addedLine = [[.. currentLine], runeList];
-            _historyText.Add ([.. addedLine], InsertionPoint, TextEditingLineStatus.Added);
-            _model.AddLine (CurrentRow, runeList);
-            SetNeedsDraw ();
-            CurrentRow++;
-            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
-
-            OnContentsChanged ();
-        }
-        else
-        {
-            if (IsSelecting)
-            {
-                ClearRegion ();
-            }
-
-            _copyWithoutSelection = false;
-            InsertAllText (contents!, true);
-
-            if (IsSelecting)
-            {
-                _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Original);
-            }
-        }
-
-        UpdateWrapModel ();
-        IsSelecting = false;
-        DoNeededAction ();
-
-        return true;
-    }
+    /// <remarks>
+    ///     Routes through <see cref="Command.Paste"/> with a <see langword="null"/> payload, so the
+    ///     default <see cref="View"/> handler reads from <see cref="IApplication.Clipboard"/>,
+    ///     sanitizes via <see cref="OnSanitizingPaste"/>, and inserts via <see cref="OnPaste"/>.
+    /// </remarks>
+    public bool Paste () => InvokeCommand (Command.Paste) is true;
 
     private void AppendClipboard (string text) => App?.Clipboard?.SetClipboardData (App?.Clipboard?.GetClipboardData () + text);
 
@@ -918,18 +880,6 @@ public partial class TextView
         StopSelecting ();
 
         return KillWordRight ();
-    }
-
-    private bool ProcessPaste ()
-    {
-        ResetColumnTrack ();
-
-        if (_isReadOnly)
-        {
-            return true;
-        }
-
-        return Paste ();
     }
 
     private bool ProcessEnterKey (ICommandContext? commandContext)
