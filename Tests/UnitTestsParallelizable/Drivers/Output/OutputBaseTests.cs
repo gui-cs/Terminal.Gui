@@ -17,8 +17,9 @@ public class OutputBaseTests
         buffer.AddStr ("A");
         string ansi = output.ToAnsi (buffer);
 
-        // Assert: single grapheme plus newline (BuildAnsiForRegion appends a newline per row)
-        Assert.Contains ("A" + Environment.NewLine, ansi);
+        // Assert: single grapheme plus a fixed '\n' row break. ToAnsi is platform-independent
+        // by contract — it must NOT emit Environment.NewLine.
+        Assert.Contains ("A\n", ansi);
     }
 
     [Theory]
@@ -72,8 +73,9 @@ public class OutputBaseTests
             Assert.DoesNotContain ('\u001b', ansi);
         }
 
-        // Grapheme and newline should always be present
-        Assert.Contains ("X" + Environment.NewLine, ansi);
+        // Grapheme and a fixed '\n' row break should always be present (ToAnsi is portable;
+        // it must NOT emit Environment.NewLine).
+        Assert.Contains ("X\n", ansi);
 
         driver.Dispose ();
     }
