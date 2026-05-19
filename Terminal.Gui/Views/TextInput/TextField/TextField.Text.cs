@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 public partial class TextField
 {
     private CultureInfo _currentCulture;
+    private string? _lastPastedText;
 
     /// <summary>Raised before <see cref="Text"/> changes. The change can be canceled the text adjusted.</summary>
     public event EventHandler<ResultEventArgs<string>>? TextChanging;
@@ -37,6 +38,262 @@ public partial class TextField
             Key key = TextModel.CreateKeyFromGrapheme (grapheme);
             InsertText (key, useOldCursorPos);
         }
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     TextField is single-line — keep only the first line of the paste and drop C0/C1 control
+    ///     characters, including tab. This matches what <see cref="Text"/> can actually accept and
+    ///     keeps <see cref="View.Pasting"/> aligned with the text that will be inserted.
+    /// </remarks>
+    protected override string OnSanitizingPaste (string raw)
+    {
+        int newline = raw.IndexOfAny (['\r', '\n']);
+        string firstLine = newline >= 0 ? raw [..newline] : raw;
+
+        StringBuilder sb = new (firstLine.Length);
+
+        foreach (char c in firstLine)
+        {
+            if ((c >= 0x20 && c < 0x7F) || c >= 0xA0)
+            {
+                sb.Append (c);
+            }
+        }
+
+        return sb.ToString ();
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Returns <see langword="true"/> even when <see cref="ReadOnly"/> so that <c>Ctrl+V</c>
+    ///     does not bubble to a parent view that might also bind paste.
+    /// </remarks>
+    protected override bool OnPaste (string text)
+    {
+        _lastPastedText = null;
+
+        if (ReadOnly)
+        {
+            return true;
+        }
+
+        SetSelectedStartSelectedLength ();
+        int selStart = _selectionStart == -1 ? InsertionPoint : _selectionStart;
+        int selectedLength = SelectedLength;
+        List<string> oldText = [.. _text];
+        string oldTextString = StringExtensions.ToString (oldText);
+        List<string> pastedText = text.ToStringList ();
+        List<string> proposedText = [.. oldText.GetRange (0, selStart),
+                                     .. pastedText,
+                                     .. oldText.GetRange (selStart + selectedLength, oldText.Count - (selStart + selectedLength))];
+
+        Text = StringExtensions.ToString (proposedText);
+        bool proposedEqualsFinal = AreEqual (proposedText, _text);
+
+        if (oldTextString == Text && !proposedEqualsFinal)
+        {
+            return true;
+        }
+
+        GetActualPastedText (text, proposedText, selStart, pastedText.Count, _text, out string actualPastedText, out int insertionPoint);
+
+        if (string.IsNullOrEmpty (actualPastedText))
+        {
+            _insertionPoint = insertionPoint;
+            ClearAllSelection ();
+            SetNeedsDraw ();
+            Adjust ();
+
+            return true;
+        }
+
+        _lastPastedText = actualPastedText;
+        _insertionPoint = insertionPoint;
+        ClearAllSelection ();
+        SetNeedsDraw ();
+        Adjust ();
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override bool ShouldRaisePastedEvent (string text) => !ReadOnly && !string.IsNullOrEmpty (_lastPastedText);
+
+    /// <inheritdoc/>
+    protected override string? GetPastedEventText (string text) => _lastPastedText;
+
+    private static void GetActualPastedText (string text, List<string> proposedText, int pasteStart, int pastedLength, List<string> finalText, out string actualPastedText, out int insertionPoint)
+    {
+        if (AreEqual (proposedText, finalText))
+        {
+            actualPastedText = text;
+            insertionPoint = Math.Min (pasteStart + pastedLength, finalText.Count);
+
+            return;
+        }
+
+        if (proposedText.Count == finalText.Count)
+        {
+            int actualPastedLength = Math.Min (pastedLength, finalText.Count - pasteStart);
+            actualPastedText = actualPastedLength > 0
+                                   ? StringExtensions.ToString (finalText.GetRange (pasteStart, actualPastedLength))
+                                   : string.Empty;
+            insertionPoint = Math.Min (pasteStart + actualPastedLength, finalText.Count);
+
+            return;
+        }
+
+        actualPastedText = GetActualPastedTextFromEditOperations (proposedText, pasteStart, pastedLength, finalText, out insertionPoint);
+    }
+
+    private static string GetActualPastedTextFromEditOperations (List<string> proposedText, int pasteStart, int pastedLength, List<string> finalText, out int insertionPoint)
+    {
+        List<PasteEditOperation> operations = BuildPasteEditOperations (proposedText, finalText);
+        int pasteEnd = pasteStart + pastedLength;
+        int proposedIndex = 0;
+        int finalIndex = 0;
+        int pastedStart = -1;
+        int pastedEnd = -1;
+        int boundaryAfterPaste = -1;
+
+        foreach (PasteEditOperation operation in operations)
+        {
+            if (ConsumesFinal (operation)
+                && IsWithinPasteRange (operation, proposedIndex, pasteStart, pasteEnd))
+            {
+                if (pastedStart == -1)
+                {
+                    pastedStart = finalIndex;
+                }
+
+                pastedEnd = finalIndex + 1;
+            }
+
+            if (ConsumesProposed (operation))
+            {
+                proposedIndex++;
+
+                if (proposedIndex == pasteEnd)
+                {
+                    boundaryAfterPaste = finalIndex + (ConsumesFinal (operation) ? 1 : 0);
+                }
+            }
+            if (ConsumesFinal (operation))
+            {
+                finalIndex++;
+            }
+        }
+
+        insertionPoint = boundaryAfterPaste == -1 ? finalIndex : boundaryAfterPaste;
+
+        if (pastedStart == -1 || pastedEnd == -1 || pastedEnd <= pastedStart)
+        {
+            return string.Empty;
+        }
+
+        return StringExtensions.ToString (finalText.GetRange (pastedStart, pastedEnd - pastedStart));
+    }
+
+    private static List<PasteEditOperation> BuildPasteEditOperations (List<string> proposedText, List<string> finalText)
+    {
+        int [,] costs = new int [proposedText.Count + 1, finalText.Count + 1];
+
+        for (int i = 0; i <= proposedText.Count; i++)
+        {
+            costs [i, 0] = i;
+        }
+
+        for (int j = 0; j <= finalText.Count; j++)
+        {
+            costs [0, j] = j;
+        }
+
+        for (int i = 1; i <= proposedText.Count; i++)
+        {
+            for (int j = 1; j <= finalText.Count; j++)
+            {
+                int substitutionCost = costs [i - 1, j - 1] + (proposedText [i - 1] == finalText [j - 1] ? 0 : 1);
+                int insertionCost = costs [i, j - 1] + 1;
+                int deletionCost = costs [i - 1, j] + 1;
+
+                costs [i, j] = Math.Min (substitutionCost, Math.Min (insertionCost, deletionCost));
+            }
+        }
+
+        List<PasteEditOperation> operations = [];
+        int proposedIndex = proposedText.Count;
+        int finalIndex = finalText.Count;
+
+        while (proposedIndex > 0 || finalIndex > 0)
+        {
+            if (proposedIndex > 0
+                && finalIndex > 0
+                && costs [proposedIndex, finalIndex]
+                == costs [proposedIndex - 1, finalIndex - 1]
+                + (proposedText [proposedIndex - 1] == finalText [finalIndex - 1] ? 0 : 1))
+            {
+                operations.Add (PasteEditOperation.Substitute);
+                proposedIndex--;
+                finalIndex--;
+
+                continue;
+            }
+
+            if (finalIndex > 0 && costs [proposedIndex, finalIndex] == costs [proposedIndex, finalIndex - 1] + 1)
+            {
+                operations.Add (PasteEditOperation.Insert);
+                finalIndex--;
+
+                continue;
+            }
+
+            operations.Add (PasteEditOperation.Delete);
+            proposedIndex--;
+        }
+
+        operations.Reverse ();
+
+        return operations;
+    }
+
+    private enum PasteEditOperation
+    {
+        Insert,
+        Delete,
+        Substitute
+    }
+
+    private static bool AreEqual (List<string> first, List<string> second)
+    {
+        if (first.Count != second.Count)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < first.Count; i++)
+        {
+            if (first [i] != second [i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static bool ConsumesFinal (PasteEditOperation operation) => operation is PasteEditOperation.Insert or PasteEditOperation.Substitute;
+
+    private static bool ConsumesProposed (PasteEditOperation operation) => operation is PasteEditOperation.Delete or PasteEditOperation.Substitute;
+
+    private static bool IsWithinPasteRange (PasteEditOperation operation, int proposedIndex, int pasteStart, int pasteEnd)
+    {
+        if (operation == PasteEditOperation.Insert)
+        {
+            return proposedIndex > pasteStart && proposedIndex < pasteEnd;
+        }
+
+        return proposedIndex >= pasteStart && proposedIndex < pasteEnd;
     }
 
     /// <summary>Raises the <see cref="TextChanging"/> event, enabling canceling the change or adjusting the text.</summary>

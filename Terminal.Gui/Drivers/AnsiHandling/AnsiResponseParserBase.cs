@@ -20,6 +20,27 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     internal const int MaxHeldLength = 8 * 1024;
 
     /// <summary>
+    ///     Maximum number of characters allowed in a single bracketed-paste payload. Pastes larger
+    ///     than this are truncated and the truncated content is delivered immediately. Any remaining
+    ///     bytes from the same paste are discarded until the matching <c>ESC[201~</c> end marker
+    ///     arrives so tail bytes cannot leak into normal input processing. Guards against unbounded
+    ///     memory growth from a missing or stripped end marker.
+    /// </summary>
+    internal const int MaxBracketedPasteLength = 1 * 1024 * 1024;
+
+    /// <summary>
+    ///     Buffer accumulating pasted text while the parser is in
+    ///     <see cref="AnsiResponseParserState.InBracketedPaste"/>.
+    /// </summary>
+    private readonly StringBuilder _pasteBuffer = new ();
+
+    /// <summary>
+    ///     Trailing characters of <see cref="_pasteBuffer"/> that may form the start of the
+    ///     <c>ESC[201~</c> end marker. Tracked so the marker bytes are not delivered as paste content.
+    /// </summary>
+    private int _pasteEndMatchLength;
+
+    /// <summary>
     ///     Tracks whether the parser is currently inside an OSC (Operating System Command) sequence.
     ///     OSC responses can be terminated by ST (ESC \) which requires special handling because
     ///     ESC normally starts a new sequence in the parser.
@@ -73,18 +94,25 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     /// </summary>
     public DateTime StateChangedAt { get; private set; }
 
+    /// <summary>
+    ///     Timestamp when the parser last received a byte belonging to the current bracketed paste.
+    ///     Used to detect idle paste sessions without treating an active slow paste as stale.
+    /// </summary>
+    internal DateTime LastBracketedPasteInputAt { get; private set; }
+
     #endregion
 
     #region Constructor and State Management
 
     protected void ResetState ()
     {
-        State = AnsiResponseParserState.Normal;
-        _inOscSequence = false;
-        _oscExpectingBackslash = false;
-
         lock (_lockState)
         {
+            State = AnsiResponseParserState.Normal;
+            _inOscSequence = false;
+            _oscExpectingBackslash = false;
+            _pasteBuffer.Clear ();
+            _pasteEndMatchLength = 0;
             _heldContent.ClearHeld ();
         }
     }
@@ -106,13 +134,26 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     /// <param name="inputLength">The total number of elements in the input collection.</param>
     protected void ProcessInputBase (Func<int, char> getCharAtIndex, Func<int, object> getObjectAtIndex, Action<object> appendOutput, int inputLength)
     {
+        List<string> pendingPastes = [];
+
         lock (_lockState)
         {
-            ProcessInputBaseImpl (getCharAtIndex, getObjectAtIndex, appendOutput, inputLength);
+            ProcessInputBaseImpl (getCharAtIndex, getObjectAtIndex, appendOutput, inputLength, pendingPastes);
+        }
+
+        foreach (string text in pendingPastes)
+        {
+            Paste?.Invoke (this, text);
         }
     }
 
-    private void ProcessInputBaseImpl (Func<int, char> getCharAtIndex, Func<int, object> getObjectAtIndex, Action<object> appendOutput, int inputLength)
+    private void ProcessInputBaseImpl (
+        Func<int, char> getCharAtIndex,
+        Func<int, object> getObjectAtIndex,
+        Action<object> appendOutput,
+        int inputLength,
+        List<string> pendingPastes
+    )
     {
         var index = 0; // Tracks position in the input string
 
@@ -166,6 +207,23 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
                         ReleaseHeld (appendOutput);
                         appendOutput (currentObj); // Add current character
                     }
+
+                    break;
+
+                case AnsiResponseParserState.InBracketedPaste:
+                    NoteBracketedPasteActivity ();
+                    AppendToPaste (currentChar, pendingPastes);
+
+                    if (_pasteBuffer.Length >= MaxBracketedPasteLength)
+                    {
+                        FlushPaste (AnsiResponseParserState.DiscardingBracketedPasteRemainder, pendingPastes);
+                    }
+
+                    break;
+
+                case AnsiResponseParserState.DiscardingBracketedPasteRemainder:
+                    NoteBracketedPasteActivity ();
+                    DiscardBracketedPasteRemainder (currentChar);
 
                     break;
 
@@ -335,6 +393,20 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         lock (_lockState)
         {
             string cur = _heldContent.HeldToString ();
+
+            // Bracketed paste start (ESC[200~). Switch into paste-collecting mode and discard
+            // the marker. Subsequent input is accumulated as paste content until the matching
+            // end marker (ESC[201~) is seen — see ProcessInputBaseImpl InBracketedPaste case.
+            if (cur == EscSeqUtils.CSI_BracketedPasteStart)
+            {
+                _heldContent.ClearHeld ();
+                _pasteBuffer.Clear ();
+                _pasteEndMatchLength = 0;
+                State = AnsiResponseParserState.InBracketedPaste;
+                NoteBracketedPasteActivity ();
+
+                return false;
+            }
 
             if (HandleMouse && IsMouse (cur))
             {
@@ -632,6 +704,131 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
         {
             Keyboard?.Invoke (this, k);
         }
+    }
+
+    #endregion
+
+    #region Bracketed Paste Handling
+
+    /// <summary>
+    ///     Event raised when a complete bracketed paste sequence is detected. The string carries the
+    ///     pasted content with the bracketing markers (<c>ESC[200~</c> / <c>ESC[201~</c>) stripped.
+    /// </summary>
+    /// <remarks>
+    ///     Bracketed paste mode must be enabled by writing <see cref="EscSeqUtils.CSI_EnableBracketedPaste"/>
+    ///     to the terminal. Without it, terminals deliver pasted text as raw input characters which are
+    ///     indistinguishable from typing.
+    /// </remarks>
+    public event EventHandler<string>? Paste;
+
+    private void AppendToPaste (char c, List<string> pendingPastes)
+    {
+        _pasteBuffer.Append (c);
+
+        if (!AdvanceBracketedPasteEndMatch (c))
+        {
+            return;
+        }
+
+        // Full end marker matched — strip its characters from the buffer and dispatch.
+        _pasteBuffer.Length -= EscSeqUtils.CSI_BracketedPasteEnd.Length;
+        FlushPaste (AnsiResponseParserState.Normal, pendingPastes);
+    }
+
+    private void DiscardBracketedPasteRemainder (char c)
+    {
+        if (!AdvanceBracketedPasteEndMatch (c))
+        {
+            return;
+        }
+
+        _pasteEndMatchLength = 0;
+        State = AnsiResponseParserState.Normal;
+    }
+
+    private bool AdvanceBracketedPasteEndMatch (char c)
+    {
+        // Track an in-flight suffix match against ESC[201~ so we can strip or discard the marker
+        // without scanning the whole buffer on every character.
+        string endMarker = EscSeqUtils.CSI_BracketedPasteEnd;
+
+        if (_pasteEndMatchLength < endMarker.Length && c == endMarker [_pasteEndMatchLength])
+        {
+            _pasteEndMatchLength++;
+        }
+        else
+        {
+            // Mismatch: ESC[201~ has no repeated prefix, so the only restart is at a fresh ESC.
+            _pasteEndMatchLength = c == ESCAPE ? 1 : 0;
+        }
+
+        return _pasteEndMatchLength == endMarker.Length;
+    }
+
+    private string DrainPasteBuffer (AnsiResponseParserState nextState)
+    {
+        if (nextState == AnsiResponseParserState.DiscardingBracketedPasteRemainder && _pasteEndMatchLength > 0)
+        {
+            _pasteBuffer.Length -= _pasteEndMatchLength;
+        }
+
+        string text = _pasteBuffer.ToString ();
+        _pasteBuffer.Clear ();
+
+        if (nextState != AnsiResponseParserState.DiscardingBracketedPasteRemainder)
+        {
+            _pasteEndMatchLength = 0;
+        }
+
+        State = nextState;
+
+        return text;
+    }
+
+    private void FlushPaste (AnsiResponseParserState nextState, List<string> pendingPastes)
+    {
+        string text = DrainPasteBuffer (nextState);
+        pendingPastes.Add (text);
+    }
+
+    private void NoteBracketedPasteActivity () => LastBracketedPasteInputAt = _timeProvider.Now;
+
+    /// <summary>
+    ///     Flushes any in-flight bracketed-paste buffer as a <see cref="Paste"/> event and returns the
+    ///     parser to <see cref="AnsiResponseParserState.Normal"/>. Called by the input processor when
+    ///     the paste has been idle too long, so a terminal that drops the <c>ESC[201~</c> end marker
+    ///     does not strand pasted content forever.
+    /// </summary>
+    /// <returns>
+    ///     <see langword="true"/> if the parser was reset from a bracketed-paste state;
+    ///     <see langword="false"/> if the parser was not in a bracketed-paste state.
+    /// </returns>
+    internal bool FlushStaleBracketedPaste ()
+    {
+        string? text = null;
+
+        lock (_lockState)
+        {
+            if (State == AnsiResponseParserState.InBracketedPaste)
+            {
+                text = DrainPasteBuffer (AnsiResponseParserState.Normal);
+            }
+            else if (State == AnsiResponseParserState.DiscardingBracketedPasteRemainder)
+            {
+                ResetState ();
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        if (text is { })
+        {
+            Paste?.Invoke (this, text);
+        }
+
+        return true;
     }
 
     #endregion

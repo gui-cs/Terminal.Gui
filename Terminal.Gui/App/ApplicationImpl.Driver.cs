@@ -197,6 +197,7 @@ internal partial class ApplicationImpl
         Driver.KeyDown += Driver_KeyDown;
         Driver.KeyUp += Driver_KeyUp;
         Driver.MouseEvent += Driver_MouseEvent;
+        Driver.Paste += Driver_Paste;
     }
 
     private void Driver_KeyDown (object? sender, Key e) => Keyboard.RaiseKeyDownEvent (e);
@@ -204,4 +205,6 @@ internal partial class ApplicationImpl
     private void Driver_KeyUp (object? sender, Key e) => Keyboard.RaiseKeyUpEvent (e);
 
     private void Driver_MouseEvent (object? sender, Mouse e) => Mouse.RaiseMouseEvent (e);
+
+    private void Driver_Paste (object? sender, string e) => RaisePasteEvent (e);
 }

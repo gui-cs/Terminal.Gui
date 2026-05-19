@@ -230,6 +230,41 @@ internal partial class ApplicationImpl : IApplication
         set => _mouse = value ?? throw new ArgumentNullException (nameof (value));
     }
 
+    /// <inheritdoc/>
+    public event EventHandler<PasteEventArgs>? Paste;
+
+    /// <inheritdoc/>
+    public bool RaisePasteEvent (string text)
+    {
+        PasteEventArgs args = new (text);
+
+        Paste?.Invoke (this, args);
+
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        // Route only to the focused view — paste data is text destined for a text-input control,
+        // and silently dispatching to a non-text container would either drop the paste or surprise
+        // the user. Apps that want to handle pastes without a focused view should subscribe to
+        // Application.Paste and set Handled.
+        View? focused = Navigation?.GetFocused ();
+
+        if (focused is null)
+        {
+            return false;
+        }
+
+        // Dispatch through Command.Paste so bracketed paste shares the same paste handler
+        // (sanitization, Pasting/Pasted events, insertion) as keyboard-driven paste. Use a
+        // dedicated payload object so the handler does not mistake unrelated string-valued command
+        // context entries for pasted text.
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (focused), binding: null);
+
+        return focused.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload (args.Text))) is true;
+    }
+
     #endregion Input (Mouse/Keyboard)
 
     #region Navigation and Popover
