@@ -7,15 +7,8 @@ namespace ViewsTests;
 /// <summary>
 ///     Verifies that all View types dispose properly after being run in an Application.
 /// </summary>
-public class AllViewsDisposalTests : TestsAllViews
+public class AllViewsDisposalTests (ITestOutputHelper output) : TestsAllViews
 {
-    private readonly ITestOutputHelper _output;
-
-    public AllViewsDisposalTests (ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
     [Theory]
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Dispose_Properly (Type viewType)
@@ -24,7 +17,7 @@ public class AllViewsDisposalTests : TestsAllViews
 
         if (view is null)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
             return;
         }
@@ -51,7 +44,7 @@ public class AllViewsDisposalTests : TestsAllViews
 
         foreach (View leaked in leakedViews)
         {
-            _output.WriteLine ($"  NOT DISPOSED: {leaked.GetType ().Name} - {leaked.ToDebugString ()}");
+            output.WriteLine ($"  NOT DISPOSED: {leaked.GetType ().Name} - {leaked.ToDebugString ()}");
         }
 
         View.Instances.Clear ();
