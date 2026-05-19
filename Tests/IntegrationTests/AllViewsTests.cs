@@ -2,12 +2,13 @@
 
 using UnitTests;
 
-namespace ViewsTests;
+namespace IntegrationTests;
 
 /// <summary>
 ///     Verifies that all View types dispose properly after being run in an Application.
+///     This test must run in IntegrationTests (non-parallel) because View.Instances is static.
 /// </summary>
-public class AllViewsDisposalTests (ITestOutputHelper output) : TestsAllViews
+public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
