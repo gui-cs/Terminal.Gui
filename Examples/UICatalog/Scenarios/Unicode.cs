@@ -1,6 +1,7 @@
-#nullable enable
-using Terminal.Gui.Editor;
+﻿#nullable enable
 using System.Text;
+using Terminal.Gui.Editor;
+// ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
 
@@ -11,88 +12,46 @@ public class UnicodeInMenu : Scenario
 {
     public override void Main ()
     {
-        string unicode =
-            "?? ???ssa �?? ?d?sa? ????????\nt? sp?t? ft????? st?? ?��??d??? t?? ?�????.\n?????? ?????a ? ???ssa �?? st?? ?��??d??? t?? ?�????.";
+        const string UNICODE =
+            "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
 
-        string gitString =
-            $"gui.cs ? (h�) {Glyphs.IdenticalTo} {Glyphs.DownArrow}18 {Glyphs.UpArrow}10 {Glyphs.VerticalFourDots}1 {Glyphs.HorizontalEllipsis}";
+        var gitString = $"gui.cs 糊 (hú) {Glyphs.IdenticalTo} {Glyphs.DownArrow}18 {Glyphs.UpArrow}10 {Glyphs.VerticalFourDots}1 {Glyphs.HorizontalEllipsis}";
 
         ConfigurationManager.Enable (ConfigLocations.All);
 
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.BorderStyle = LineStyle.None;
 
         // MenuBar
         MenuBar menu = new ();
 
-        menu.Add (
-                  new MenuBarItem (
-                                   "_????",
+        menu.Add (new MenuBarItem ("_Файл",
                                    [
-                                       new MenuItem
-                                       {
-                                           Title = "_???????",
-                                           HelpText = "Creates new file"
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_???????"
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "??_???????"
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_?????",
-                                           Action = () => appWindow.RequestStop ()
-                                       }
-                                   ]
-                                  )
-                 );
+                                       new MenuItem { Title = "_Создать", HelpText = "Creates new file" },
+                                       new MenuItem { Title = "_Открыть" },
+                                       new MenuItem { Title = "Со_хранить" },
+                                       new MenuItem { Title = "_Выход", Action = appWindow.RequestStop }
+                                   ]));
 
-        menu.Add (
-                  new MenuBarItem (
-                                   "_Edit",
+        menu.Add (new MenuBarItem ("_Edit",
                                    [
-                                       new MenuItem
-                                       {
-                                           Title = Strings.cmdCopy
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = Strings.cmdCut
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_?",
-                                           HelpText = "h� (Paste)"
-                                       }
-                                   ]
-                                  )
-                 );
-
+                                       new MenuItem { Title = Strings.cmdCopy },
+                                       new MenuItem { Title = Strings.cmdCut },
+                                       new MenuItem { Title = "_糊", HelpText = "hú (Paste)" }
+                                   ]));
         appWindow.Add (menu);
 
         Label label = new () { X = 0, Y = Pos.Bottom (menu), Text = "Label:" };
         appWindow.Add (label);
 
-        Label testlabel = new ()
-        {
-            X = 20,
-            Y = Pos.Y (label),
-            Width = Dim.Percent (50),
-            Text = gitString
-        };
-        appWindow.Add (testlabel);
+        Label testLabel = new () { X = 20, Y = Pos.Y (label), Width = Dim.Percent (50), Text = gitString };
+        appWindow.Add (testLabel);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
+        label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Label (CanFocus):" };
         appWindow.Add (label);
 
         StringBuilder sb = new ();
@@ -100,24 +59,24 @@ public class UnicodeInMenu : Scenario
         sb.Append ('\u0301');
         sb.Append ('\u0301');
 
-        testlabel = new ()
+        testLabel = new Label
         {
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (50),
             CanFocus = true,
-            HotKeySpecifier = new ('&'),
+            HotKeySpecifier = new Rune ('&'),
             Text = $"Should be [e with two accents, but isn't due to #2616]: [{sb}]"
         };
-        appWindow.Add (testlabel);
+        appWindow.Add (testLabel);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
+        label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
         appWindow.Add (label);
 
         Button button = new () { X = 20, Y = Pos.Y (label), Text = "A123456789????JQK" };
         appWindow.Add (button);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
+        label = new Label { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
         appWindow.Add (label);
 
         CheckBox checkBox = new ()
@@ -141,19 +100,16 @@ public class UnicodeInMenu : Scenario
         };
         appWindow.Add (checkBoxRight);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 2, Text = "HexView:" };
+        label = new Label { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 2, Text = "HexView:" };
         appWindow.Add (label);
 
         HexView hexView = new (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " ??_???????")))
         {
-            X = 20,
-            Y = Pos.Y (label),
-            Width = Dim.Percent (60),
-            Height = 5
+            X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Height = 5
         };
         appWindow.Add (hexView);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
+        label = new Label { X = Pos.X (label), Y = Pos.Bottom (hexView) + 1, Text = "ListView:" };
         appWindow.Add (label);
 
         ListView listView = new ()
@@ -162,61 +118,44 @@ public class UnicodeInMenu : Scenario
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
             Height = 3,
-            Source = new ListWrapper<string> (
-                                              ["item #1", gitString, "??_???????", unicode]
-                                             )
+            Source = new ListWrapper<string> (["item #1", gitString, "??_???????", UNICODE])
         };
         appWindow.Add (listView);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "OptionSelector:" };
+        label = new Label { X = Pos.X (label), Y = Pos.Bottom (listView) + 1, Text = "OptionSelector:" };
         appWindow.Add (label);
 
         OptionSelector optionSelector = new ()
         {
-            X = 20,
-            Y = Pos.Y (label),
-            Width = Dim.Percent (60),
-            Labels = ["item #1", gitString, "??_???????", "??????????R"]
+            X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Labels = ["item #1", gitString, "??_???????", "??????????R"]
         };
         appWindow.Add (optionSelector);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (optionSelector) + 1, Text = "TextField:" };
+        label = new Label { X = Pos.X (label), Y = Pos.Bottom (optionSelector) + 1, Text = "TextField:" };
         appWindow.Add (label);
 
-        TextField textField = new ()
-        {
-            X = 20,
-            Y = Pos.Y (label),
-            Width = Dim.Percent (60),
-            Text = gitString + " = ??_???????"
-        };
+        TextField textField = new () { X = 20, Y = Pos.Y (label), Width = Dim.Percent (60), Text = gitString + " = ??_???????" };
         appWindow.Add (textField);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "Editor:" };
+        label = new Label { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "Editor:" };
         appWindow.Add (label);
 
-        Editor textView = new ()
+        Editor editor = new ()
         {
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
             Height = 5,
-            Text = unicode
+            Text = UNICODE
         };
-        appWindow.Add (textView);
+        appWindow.Add (editor);
 
         // StatusBar
-        StatusBar statusBar = new (
-                                   [
-                                       new (
-                                            Application.GetDefaultKey (Command.Quit),
-                                            "?????",
-                                            () => appWindow.RequestStop ()
-                                           ),
-                                       new (Key.F2, "???????", null),
-                                       new (Key.F3, "??_???????", null)
-                                   ]
-                                  );
+        StatusBar statusBar = new ([
+                                       new Shortcut (Application.GetDefaultKey (Command.Quit), "?????", appWindow.RequestStop),
+                                       new Shortcut (Key.F2, "???????", null),
+                                       new Shortcut (Key.F3, "??_???????", null)
+                                   ]);
         appWindow.Add (statusBar);
 
         app.Run (appWindow);

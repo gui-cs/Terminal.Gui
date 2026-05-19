@@ -18,7 +18,7 @@ public class DimAutoDemo : Scenario
         appWindow.Title = GetQuitKeyAndName ();
 
         // For diagnostics
-        appWindow.Padding.Thickness = new (1);
+        appWindow.Padding.Thickness = new Thickness (1);
 
         FrameView dimAutoFrameView = CreateDimAutoContentFrameView (app);
 
@@ -34,8 +34,8 @@ public class DimAutoDemo : Scenario
         {
             Title = "Type to make View grow",
 
-            //X = Pos.Center (),
-            //Y = Pos.Center (),
+            // X = Pos.Center (),
+            // Y = Pos.Center (),
             Width = Dim.Auto (DimAutoStyle.Content, Dim.Percent (25)),
             Height = Dim.Auto (DimAutoStyle.Content, 10),
             Arrangement = ViewArrangement.Resizable
@@ -43,13 +43,7 @@ public class DimAutoDemo : Scenario
         dimAutoFrameView.Margin.Thickness = new Thickness (1);
         dimAutoFrameView.ValidatePosDim = true;
 
-        Editor textEdit = new ()
-        {
-            X = 0,
-            Y = 0,
-            Width = 20,
-            Height = 4
-        };
+        Editor textEdit = new () { X = 0, Y = 0, Width = 20, Height = 4 };
         dimAutoFrameView.Add (textEdit);
 
         Label vlabel = new ()
@@ -117,13 +111,13 @@ public class DimAutoDemo : Scenario
         dimAutoFrameView.Add (bothAuto);
 
         textEdit.Document!.Changed += (s, e) =>
-                                    {
-                                        hlabel.Text = textEdit.Text;
-                                        vlabel.Text = textEdit.Text;
-                                        heightAuto.Text = textEdit.Text;
-                                        widthAuto.Text = textEdit.Text;
-                                        bothAuto.Text = textEdit.Text;
-                                    };
+                                      {
+                                          hlabel.Text = textEdit.Text;
+                                          vlabel.Text = textEdit.Text;
+                                          heightAuto.Text = textEdit.Text;
+                                          widthAuto.Text = textEdit.Text;
+                                          bothAuto.Text = textEdit.Text;
+                                      };
 
         Button movingButton = new () { Text = "_Move", X = Pos.Right (vlabel), Y = Pos.Bottom (vlabel) };
         movingButton.Accepting += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };

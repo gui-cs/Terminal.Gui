@@ -16,13 +16,7 @@ public class MarkdownTester : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        Window window = new ()
-        {
-            Title = "Markdown Tester",
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        Window window = new () { Title = "Markdown Tester", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
         // --- Source editor (top half) ---
         FrameView editorFrame = new ()

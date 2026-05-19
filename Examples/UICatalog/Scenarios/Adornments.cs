@@ -79,7 +79,7 @@ public class Adornments : Scenario
 
         button.Accepting += (_, _) => MessageBox.Query (appWindow.App!, "Hi", $"Am I a {window.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
 
-        Editor label = new ()
+        Editor editor = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (button),
@@ -87,8 +87,8 @@ public class Adornments : Scenario
             Width = 40,
             Height = 6 // TODO: Use Dim.Auto
         };
-        label.Text = "I have a 3 row top border.\nMy border inherits from the SuperView.";
-        label.Border.Thickness = new Thickness (1, 3, 1, 1);
+        editor.Text = "I have a 3 row top border.\nMy border inherits from the SuperView.";
+        editor.Border.Thickness = new Thickness (1, 3, 1, 1);
 
         Button btnButtonInWindow = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Button" };
 
@@ -184,7 +184,7 @@ public class Adornments : Scenario
 
         Label longLabel = new () { X = 40, Y = 5, Title = "This is long text (in a label) that should clip." };
         longLabel.TextFormatter.WordWrap = true;
-        window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);
+        window.Add (tf1, color, button, editor, btnButtonInWindow, labelAnchorEnd, longLabel);
 
         window.Initialized += (_, _) =>
                               {

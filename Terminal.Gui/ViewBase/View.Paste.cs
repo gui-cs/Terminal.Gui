@@ -17,7 +17,7 @@ public partial class View // Paste APIs
     ///     <para>
     ///         Plain <see cref="View"/> instances return <see langword="false"/> from
     ///         <see cref="OnPaste"/> by default. Subclasses that accept text (for example
-    ///         <see cref="TextField"/> and <see cref="TextView"/>) override
+    ///         <see cref="TextField"/>) overrides
     ///         <see cref="OnPaste"/> to perform the insertion.
     ///     </para>
     ///     <para>
@@ -110,7 +110,7 @@ public partial class View // Paste APIs
     /// <summary>
     ///     Override to insert sanitized paste text into the view. The default returns
     ///     <see langword="false"/> because a plain <see cref="View"/> has no text model. Text-input
-    ///     views (<see cref="TextField"/>, <see cref="TextView"/>) override this to perform the
+    ///     views (<see cref="TextField"/>) override this to perform the
     ///     insertion.
     /// </summary>
     /// <param name="text">The sanitized text to insert. Never <see langword="null"/> or empty.</param>

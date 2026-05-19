@@ -98,7 +98,7 @@ public class Localization : Scenario
         };
         _win.Add (textAndFileDialogLabel);
 
-        Editor textField = new () { X = 2, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Width = Dim.Fill (32), Height = 1 };
+        TextField textField = new () { X = 2, Y = Pos.Bottom (textAndFileDialogLabel) + 1, Width = Dim.Fill (32), Height = 1 };
         _win.Add (textField);
 
         _allowAnyCheckBox = new CheckBox

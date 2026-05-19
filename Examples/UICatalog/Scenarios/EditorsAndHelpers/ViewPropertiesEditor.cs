@@ -1,4 +1,3 @@
-#nullable enable
 using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
@@ -10,7 +9,17 @@ public class ViewPropertiesEditor : EditorBase
     private OptionSelector<Orientation>? _orientationOptionSelector;
     private Editor? _text;
 
-    public string DemoText { get => _text?.Text ?? string.Empty; set { if (_text is { } t) { t.Text = value; } } }
+    public string DemoText
+    {
+        get => _text?.Text ?? string.Empty;
+        set
+        {
+            if (_text is { } t)
+            {
+                t.Text = value;
+            }
+        }
+    }
 
     /// <inheritdoc/>
     public override void EndInit ()
@@ -52,13 +61,7 @@ public class ViewPropertiesEditor : EditorBase
 
         label = new Label { X = 0, Y = Pos.Bottom (_orientationOptionSelector), Text = "Text:" };
 
-        _text = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = Dim.Fill (),
-            Height = Dim.Auto (minimumContentDim: 2)
-        };
+        _text = new Editor { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Fill (), Height = Dim.Auto (minimumContentDim: 2) };
 
         _text.Text = "This is demo text";
         _text.Document!.Changed += (_, _) => { ViewToEdit?.Text = _text.Text; };

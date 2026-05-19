@@ -515,7 +515,7 @@ public interface IValue<TValue> : IValue
 |------|-----------|---------|
 | <xref:Terminal.Gui.Views.CheckBox> | `CheckState` | Current checked state (Unchecked, Checked, CheckedMark) |
 | <xref:Terminal.Gui.Views.TextField> | `string` | Text content |
-| <xref:Terminal.Gui.Views.TextView> | `string` | Full text content |
+| <xref:Terminal.Gui.Views.Editor> | `string` | Full text content |
 | `DateEditor` | `DateTime?` | Selected date |
 | `TimeEditor` | `TimeSpan` | Selected time |
 | `ScrollBar` | `int` | Current scroll position |

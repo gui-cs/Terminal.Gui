@@ -226,7 +226,7 @@ view.KeyDown += (s, key) =>
        - `KeyDownNotHandled` is raised.
 
 - Subclasses of <xref:Terminal.Gui.ViewBase.View> can (rarely) override `OnKeyDown` (or subscribe to `KeyDown`) to see keys before they are processed
-- Subclasses of <xref:Terminal.Gui.ViewBase.View> can (often) override `OnKeyDownNotHandled` to do key processing for keys that were not previously handled. <xref:Terminal.Gui.Views.TextField> and <xref:Terminal.Gui.Views.TextView> are examples.
+- Subclasses of <xref:Terminal.Gui.ViewBase.View> can (often) override `OnKeyDownNotHandled` to do key processing for keys that were not previously handled. <xref:Terminal.Gui.Views.Editor> and <xref:Terminal.Gui.Views.TextView> are examples.
 
 ## Application
 

@@ -12,7 +12,7 @@ public class ClassExplorer : Scenario
 {
     private CheckBox? _highlightModelTextOnlyCheckBox;
     private CheckBox? _showPrivateCheckBox;
-    private Code? _textView;
+    private Code? _codeView;
     private TreeView<object>? _treeView;
 
     private Window? _win;
@@ -74,7 +74,7 @@ public class ClassExplorer : Scenario
         _treeView.SelectionChanged += TreeView_SelectionChanged;
 
         // Code view for details
-        _textView = new ()
+        _codeView = new ()
         {
             X = Pos.Right (_treeView),
             Y = Pos.Top (_treeView),
@@ -144,7 +144,7 @@ public class ClassExplorer : Scenario
                     );
 
         // Add views in order of visual appearance
-        _win.Add (menuBar, lblSearch, tfSearch, _treeView, _textView);
+        _win.Add (menuBar, lblSearch, tfSearch, _treeView, _codeView);
 
         app.Run (_win);
         _win.Dispose ();
@@ -225,7 +225,7 @@ public class ClassExplorer : Scenario
 
     private void TreeView_SelectionChanged (object? sender, SelectionChangedEventArgs<object> e)
     {
-        if (_treeView is null || _textView is null)
+        if (_treeView is null || _codeView is null)
         {
             return;
         }
@@ -242,7 +242,7 @@ public class ClassExplorer : Scenario
         {
             if (all.Length > 1)
             {
-                _textView.Text = $"{all.Length} Objects";
+                _codeView.Text = $"{all.Length} Objects";
             }
             else
             {
@@ -311,15 +311,15 @@ public class ClassExplorer : Scenario
                         break;
                 }
 
-                _textView.Text = sb.ToString ().Replace ("\r\n", "\n");
+                _codeView.Text = sb.ToString ().Replace ("\r\n", "\n");
             }
         }
         catch (Exception ex)
         {
-            _textView.Text = ex.Message;
+            _codeView.Text = ex.Message;
         }
 
-        _textView.SetNeedsDraw ();
+        _codeView.SetNeedsDraw ();
     }
 
     private enum Showable

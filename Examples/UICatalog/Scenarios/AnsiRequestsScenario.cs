@@ -89,9 +89,9 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                                     return true;
                                                 });
 
-        Editor tv = new () { Y = Pos.Bottom (lbl), Width = Dim.Percent (50), Height = Dim.Fill () };
+        Editor editor = new () { Y = Pos.Bottom (lbl), Width = Dim.Percent (50), Height = Dim.Fill () };
 
-        var lblDar = new Label { Y = Pos.Bottom (lbl), X = Pos.Right (tv) + 1, Text = "DAR per second" };
+        var lblDar = new Label { Y = Pos.Bottom (lbl), X = Pos.Right (editor) + 1, Text = "DAR per second" };
         var cbDar = new NumericUpDown { X = Pos.Right (lblDar), Y = Pos.Bottom (lbl), Value = 0 };
 
         cbDar.ValueChanging += (_, e) =>
@@ -133,16 +133,16 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
                                                     return true;
                                                 });
 
-        _graphView = new GraphView { Y = Pos.Bottom (cbDar), X = Pos.Right (tv), Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _graphView = new GraphView { Y = Pos.Bottom (cbDar), X = Pos.Right (editor), Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        _lblSummary = new Label { Y = Pos.Bottom (_graphView), X = Pos.Right (tv), Width = Dim.Fill () };
+        _lblSummary = new Label { Y = Pos.Bottom (_graphView), X = Pos.Right (editor), Width = Dim.Fill () };
 
         SetupGraph ();
 
         w.Add (lbl);
         w.Add (lblDar);
         w.Add (cbDar);
-        w.Add (tv);
+        w.Add (editor);
         w.Add (_graphView);
         w.Add (_lblSummary);
 

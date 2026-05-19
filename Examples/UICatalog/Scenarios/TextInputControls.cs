@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using Terminal.Gui.Editor;
+// ReSharper disable AccessToDisposedClosure
 
 // ReSharper disable AccessToModifiedClosure
 
@@ -42,9 +43,6 @@ public class TextInputControls : Scenario
         textField.Autocomplete?.SuggestionGenerator = textFieldWordGenerator;
         textField.TextChanging += TextFieldTextChanging;
 
-        void TextFieldTextChanging (object? sender, ResultEventArgs<string> e) =>
-            textFieldWordGenerator.AllSuggestions = Regex.Matches (e.Result!, "\\w+").Select (s => s.Value).Distinct ().ToList ();
-
         win.Add (textField);
 
         View labelMirroringTextField = new ()
@@ -71,16 +69,13 @@ public class TextInputControls : Scenario
         textField2.Autocomplete.SuggestionGenerator = textField2WordGenerator;
         textField2.TextChanging += AppendTextFieldTextChanging;
 
-        void AppendTextFieldTextChanging (object? sender, ResultEventArgs<string> e) =>
-            textField2WordGenerator.AllSuggestions = Regex.Matches (e.Result!, "\\w+").Select (s => s.Value).Distinct ().ToList ();
-
         win.Add (textField2);
 
         // Editor is a rope-backed multi-line text editor from Terminal.Gui.Editor
         label = new Label { Text = "    E_ditor:", Y = Pos.Bottom (label) + 1 };
         win.Add (label);
 
-        Editor Editor = new ()
+        Editor editor = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -91,37 +86,37 @@ public class TextInputControls : Scenario
 
         // TODO: Editor does not yet expose an autocomplete API. Add when available.
 
-        win.Add (Editor);
+        win.Add (editor);
 
         Label labelMirroringEditorView = new ()
         {
-            X = Pos.Right (Editor) + 1,
-            Y = Pos.Top (Editor),
+            X = Pos.Right (editor) + 1,
+            Y = Pos.Top (editor),
             Width = Dim.Fill (1) - 1,
-            Height = Dim.Height (Editor) - 1,
+            Height = Dim.Height (editor) - 1,
             Enabled = false
         };
         win.Add (labelMirroringEditorView);
 
         // Use DocumentChanged to detect if the user has typed something in Editor.
-        Editor.Document!.Changed += (_, _) => { labelMirroringEditorView.Text = Editor.Text; };
-        Editor.Text = "Editor with some more test text. Unicode shouldn't ??AR??!";
+        editor.Document!.Changed += (_, _) => { labelMirroringEditorView.Text = editor.Text; };
+        editor.Text = "Editor with some more test text. Unicode shouldn't ??AR??!";
 
         CheckBox chxReadOnly = new ()
         {
-            X = Pos.Left (Editor), Y = Pos.Bottom (Editor), Value = Editor.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
+            X = Pos.Left (editor), Y = Pos.Bottom (editor), Value = editor.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
         };
-        chxReadOnly.ValueChanging += (_, args) => Editor.ReadOnly = args.NewValue == CheckState.Checked;
+        chxReadOnly.ValueChanging += (_, args) => editor.ReadOnly = args.NewValue == CheckState.Checked;
         win.Add (chxReadOnly);
 
         CheckBox chxWordWrap = new ()
         {
             X = Pos.Right (chxReadOnly) + 2,
             Y = Pos.Top (chxReadOnly),
-            Value = Editor.WordWrap ? CheckState.Checked : CheckState.UnChecked,
+            Value = editor.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.ValueChanging += (_, e) => Editor.WordWrap = e.NewValue == CheckState.Checked;
+        chxWordWrap.ValueChanging += (_, e) => editor.WordWrap = e.NewValue == CheckState.Checked;
         win.Add (chxWordWrap);
 
         CheckBox scrollBars = new ()
@@ -136,11 +131,11 @@ public class TextInputControls : Scenario
                                    {
                                        if (scrollBars.Value == CheckState.Checked)
                                        {
-                                           Editor.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar;
+                                           editor.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar;
                                        }
                                        else
                                        {
-                                           Editor.ViewportSettings &= ~(ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar);
+                                           editor.ViewportSettings &= ~(ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar);
                                        }
                                    };
 
@@ -391,6 +386,12 @@ public class TextInputControls : Scenario
         app.Run (win);
 
         return;
+
+        void TextFieldTextChanging (object? sender, ResultEventArgs<string> e) =>
+            textFieldWordGenerator.AllSuggestions = Regex.Matches (e.Result!, "\\w+").Select (s => s.Value).Distinct ().ToList ();
+
+        void AppendTextFieldTextChanging (object? sender, ResultEventArgs<string> e) =>
+            textField2WordGenerator.AllSuggestions = Regex.Matches (e.Result!, "\\w+").Select (s => s.Value).Distinct ().ToList ();
 
         void WinOnAccept (object? sender, CommandEventArgs e)
         {

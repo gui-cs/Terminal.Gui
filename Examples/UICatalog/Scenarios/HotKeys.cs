@@ -18,17 +18,17 @@ public class HotKeys : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        Label textViewLabel = new ()
+        Label editorLabel = new ()
         {
             Text = "_Editor:",
             X = 0,
             Y = 0
         };
-        mainWindow.Add (textViewLabel);
+        mainWindow.Add (editorLabel);
 
         TextField textField = new ()
         {
-            X = Pos.Right (textViewLabel) + 1,
+            X = Pos.Right (editorLabel) + 1,
             Y = 0,
             Width = 10
         };
