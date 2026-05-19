@@ -46,16 +46,44 @@ public class TableViewScrollBenchmark
     }
 
     /// <summary>
-    ///     Positions the selected row at the last visible data row so the next down-arrow scrolls.
+    ///     Positions the selected row at the last visible data row so the next down-arrow or page-down scrolls.
     /// </summary>
-    [IterationSetup]
-    public void IterationSetup ()
+    [IterationSetup (Targets = [nameof (ScrollDown_OneStep), nameof (PageDown_OneStep)])]
+    public void IterationSetup_ScrollDown ()
     {
         // TableView reserves row 0 for the header; data rows start at display row 1.
-        // Place selection at the last visible data row.
+        // Place selection at the last visible data row so the next scroll action triggers rendering.
         int visibleDataRows = SCREEN_HEIGHT - 1; // subtract header row
         _tableView.RowOffset = 0;
         _tableView.Value = new TableSelection (new Point (0, Math.Min (visibleDataRows - 1, Rows - 1)));
+        _tableView.SetNeedsDraw ();
+    }
+
+    /// <summary>
+    ///     Positions the selection at the last fully-visible column so the next right-arrow triggers horizontal scrolling.
+    /// </summary>
+    [IterationSetup (Targets = [nameof (ScrollRight_OneStep)])]
+    public void IterationSetup_ScrollRight ()
+    {
+        // With wide cell data (16+ chars per column) and a 120-cell viewport,
+        // only ~7 columns are visible. Position at the last visible column so
+        // CursorRight forces a horizontal scroll to reveal the next off-screen column.
+        int lastVisibleCol = Math.Min (SCREEN_WIDTH / 16, COLUMN_COUNT - 2);
+        _tableView.RowOffset = 0;
+        _tableView.Value = new TableSelection (new Point (lastVisibleCol, 0));
+        _tableView.SetNeedsDraw ();
+    }
+
+    /// <summary>
+    ///     Positions the selected row at the first visible data row with a non-zero offset so the next up-arrow scrolls.
+    /// </summary>
+    [IterationSetup (Targets = [nameof (ScrollUp_OneStep)])]
+    public void IterationSetup_ScrollUp ()
+    {
+        // Place selection at the first visible data row with RowOffset mid-table so up-arrow triggers a scroll.
+        int midRow = Rows / 2;
+        _tableView.RowOffset = midRow;
+        _tableView.Value = new TableSelection (new Point (0, midRow));
         _tableView.SetNeedsDraw ();
     }
 
@@ -86,7 +114,7 @@ public class TableViewScrollBenchmark
 
     /// <summary>
     ///     Injects a single <see cref="Key.CursorRight"/> keystroke and redraws.
-    ///     Measures horizontal scrolling / column navigation.
+    ///     With wide cell data and the selection at the last visible column, this triggers a horizontal scroll.
     /// </summary>
     [Benchmark]
     public void ScrollRight_OneStep ()
@@ -136,7 +164,7 @@ public class TableViewScrollBenchmark
 
         for (var colIndex = 0; colIndex < cols; colIndex++)
         {
-            dt.Columns.Add ($"Col{colIndex,2}", typeof (string));
+            dt.Columns.Add ($"Column_{colIndex:D2}", typeof (string));
         }
 
         for (var rowIndex = 0; rowIndex < rows; rowIndex++)
@@ -145,7 +173,7 @@ public class TableViewScrollBenchmark
 
             for (var colIndex = 0; colIndex < cols; colIndex++)
             {
-                row [colIndex] = $"R{rowIndex}C{colIndex}";
+                row [colIndex] = $"R{rowIndex:D4}_C{colIndex:D2}_Data";
             }
 
             dt.Rows.Add (row);
