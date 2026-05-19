@@ -1,18 +1,19 @@
-﻿#nullable enable
+#nullable enable
 
-using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using Terminal.Gui.Editor;
+using EditorView = Terminal.Gui.Editor.Editor;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Editor", "A Text Editor using the TextView control.")]
+[ScenarioMetadata ("Editor", "A Text Editor using the EditorView control.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Arrangement")]
 [ScenarioCategory ("Files and IO")]
-[ScenarioCategory ("TextView")]
+[ScenarioCategory ("Editor")]
 [ScenarioCategory ("Menus")]
 public partial class Editor : Scenario
 {
@@ -29,7 +30,7 @@ public partial class Editor : Scenario
     private bool _saved = true;
     private string _textToFind = string.Empty;
     private string _textToReplace = string.Empty;
-    private TextView? _textView;
+    private Terminal.Gui.Editor.Editor? _textView;
     private FindReplaceWindow? _findReplaceWindow;
 
     public override void Main ()
@@ -58,13 +59,13 @@ public partial class Editor : Scenario
 
         _cultureInfos = Application.SupportedCultures?.ToList ();
 
-        _textView = new TextView
+        _textView = new Terminal.Gui.Editor.Editor
         {
             X = 0,
             Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            ScrollBars = true
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar
         };
 
         LoadFile ();
@@ -104,11 +105,7 @@ public partial class Editor : Scenario
         menu.Add (new MenuBarItem ("Forma_t",
                                    [
                                        CreateWrapChecked (),
-                                       CreateAutocomplete (),
-                                       CreateAllowsTabChecked (),
                                        CreateReadOnlyChecked (),
-                                       CreateUseSameRuneTypeForWords (),
-                                       CreateSelectWordOnlyOnDoubleClick (),
                                        new MenuItem { Title = "Colors", Key = Key.L.WithCtrl, Action = () => _textView?.PromptForColors () }
                                    ]));
 
@@ -122,12 +119,6 @@ public partial class Editor : Scenario
         _miForceMinimumPosToZeroCheckBox.ValueChanged += (_, e) =>
                                                          {
                                                              _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
-
-                                                             // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
-                                                             // if (_textView?.ContextMenu is not null)
-                                                             // {
-                                                             //     _textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-                                                             // }
                                                          };
 
         menu.Add (new MenuBarItem ("Conte_xtMenu",
@@ -146,12 +137,19 @@ public partial class Editor : Scenario
                                        siCursorPosition
                                    ]) { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast };
 
-        _textView.UnwrappedCursorPositionChanged += (_, e) =>
-                                                    {
-                                                        List<Cell> line = _textView.GetLine (e.Y).Take (e.X).ToList ();
-                                                        int colsWidth = _textView.GetColumnsWidth (line);
-                                                        siCursorPosition.Title = $"Ln {e.Y + 1}, Cc {e.X + 1}, Col {colsWidth + 1}";
-                                                    };
+        _textView.CaretChanged += (_, _) =>
+                                  {
+                                      if (_textView.Document is null)
+                                      {
+                                          return;
+                                      }
+
+                                      int offset = _textView.CaretOffset;
+                                      Terminal.Gui.Document.DocumentLine line = _textView.Document.GetLineByOffset (offset);
+                                      int lineNumber = line.LineNumber;
+                                      int col = offset - line.Offset;
+                                      siCursorPosition.Title = $"Ln {lineNumber}, Col {col + 1}";
+                                  };
 
         _appWindow.Add (statusBar);
 
@@ -177,12 +175,12 @@ public partial class Editor : Scenario
             return true;
         }
 
-        if (_textView.Text == Encoding.Unicode.GetString (_originalText))
+        string currentText = _textView.Document?.Text ?? string.Empty;
+
+        if (currentText == Encoding.Unicode.GetString (_originalText))
         {
             return true;
         }
-
-        Debug.Assert (_textView.IsDirty);
 
         int? r = MessageBox.ErrorQuery (_appWindow!.App!,
                                         "Save File",
@@ -208,7 +206,6 @@ public partial class Editor : Scenario
 
         try
         {
-            _textView.CloseFile ();
             New (false);
         }
         catch (Exception ex)
@@ -217,9 +214,9 @@ public partial class Editor : Scenario
         }
     }
 
-    private void Copy () => _textView?.Copy ();
+    private void Copy () => _textView?.InvokeCommand (Command.Copy);
 
-    private void Cut () => _textView?.Cut ();
+    private void Cut () => _textView?.InvokeCommand (Command.Cut);
 
     private void SelectAll () => _textView?.SelectAll ();
 
@@ -232,7 +229,7 @@ public partial class Editor : Scenario
 
         for (var i = 0; i < 30; i++)
         {
-            sb.Append ($"{i} - This is a test with a very long line and many lines to test the ScrollViewBar against the TextView. - {i}\n");
+            sb.Append ($"{i} - This is a test with a very long line and many lines to test the ScrollViewBar against the Editor. - {i}\n");
         }
 
         StreamWriter sw = File.CreateText (fileName);
@@ -268,8 +265,12 @@ public partial class Editor : Scenario
             return;
         }
 
-        _textView.Load (_fileName);
-        _originalText = Encoding.Unicode.GetBytes (_textView.Text);
+        string content = File.ReadAllText (_fileName);
+        _textView.Document = new Terminal.Gui.Document.TextDocument (content);
+        _textView.CaretOffset = 0;
+        _textView.Document.UndoStack.ClearAll ();
+        _textView.Document.UndoStack.MarkAsOriginalFile ();
+        _originalText = Encoding.Unicode.GetBytes (content);
         _appWindow.Title = _fileName;
         _saved = true;
     }
@@ -289,7 +290,8 @@ public partial class Editor : Scenario
         _appWindow.Title = "Untitled.txt";
         _fileName = null;
         _originalText = new MemoryStream ().ToArray ();
-        _textView.Text = Encoding.Unicode.GetString (_originalText);
+        _textView.Document = new Terminal.Gui.Document.TextDocument (string.Empty);
+        _textView.CaretOffset = 0;
     }
 
     private void Open ()
@@ -320,7 +322,7 @@ public partial class Editor : Scenario
         d.Dispose ();
     }
 
-    private void Paste () => _textView?.Paste ();
+    private void Paste () => _textView?.InvokeCommand (Command.Paste);
 
     private void Quit ()
     {
@@ -396,12 +398,14 @@ public partial class Editor : Scenario
 
         try
         {
+            string text = _textView.Document?.Text ?? string.Empty;
             _appWindow.Title = title;
             _fileName = file;
-            File.WriteAllText (_fileName, _textView.Text);
-            _originalText = Encoding.Unicode.GetBytes (_textView.Text);
+            File.WriteAllText (_fileName, text);
+            _originalText = Encoding.Unicode.GetBytes (text);
             _saved = true;
-            _textView.ClearHistoryChanges ();
+            _textView.Document?.UndoStack.ClearAll ();
+            _textView.Document?.UndoStack.MarkAsOriginalFile ();
             MessageBox.Query (_appWindow.App!, "Save File", "File was successfully saved.", Strings.btnOk);
         }
         catch (Exception ex)

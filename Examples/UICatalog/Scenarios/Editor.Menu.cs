@@ -1,7 +1,7 @@
 #nullable enable
 
 using System.Globalization;
-using System.Text.RegularExpressions;
+using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
 
@@ -16,9 +16,20 @@ public partial class Editor
 
         List<MenuItem> menuItems = [];
 
-        CheckBox scrollBarCheckBox = new () { Title = "_Scroll Bars", Value = _textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked };
+        bool hasScrollBars = _textView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar);
+        CheckBox scrollBarCheckBox = new () { Title = "_Scroll Bars", Value = hasScrollBars ? CheckState.Checked : CheckState.UnChecked };
 
-        scrollBarCheckBox.ValueChanged += (_, _) => { _textView.ScrollBars = scrollBarCheckBox.Value == CheckState.Checked; };
+        scrollBarCheckBox.ValueChanged += (_, _) =>
+                                          {
+                                              if (scrollBarCheckBox.Value == CheckState.Checked)
+                                              {
+                                                  _textView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar;
+                                              }
+                                              else
+                                              {
+                                                  _textView.ViewportSettings &= ~(ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar);
+                                              }
+                                          };
 
         MenuItem verticalItem = new () { CommandView = scrollBarCheckBox };
 
@@ -111,64 +122,6 @@ public partial class Editor
         return item;
     }
 
-    private MenuItem CreateAutocomplete ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "Autocomplete" };
-        }
-
-        SingleWordSuggestionGenerator singleWordGenerator = new ();
-        _textView.Autocomplete.SuggestionGenerator = singleWordGenerator;
-
-        CheckBox checkBox = new () { Title = "Autocomplete", Value = CheckState.UnChecked };
-
-        checkBox.ValueChanged += (_, _) =>
-                                 {
-                                     if (checkBox.Value == CheckState.Checked)
-                                     {
-                                         singleWordGenerator.AllSuggestions =
-                                             Regex.Matches (_textView.Text, "\\w+").Select (m => m.Value).Distinct ().ToList ();
-                                     }
-                                     else
-                                     {
-                                         singleWordGenerator.AllSuggestions.Clear ();
-                                     }
-                                 };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (_, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateAllowsTabChecked ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "Tab Enters Tab" };
-        }
-
-        CheckBox checkBox = new () { Title = "Tab Enters Tab", Value = _textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (_, _) => { _textView.TabKeyAddsTab = checkBox.Value == CheckState.Checked; };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (_, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
     private MenuItem CreateReadOnlyChecked ()
     {
         if (_textView is null)
@@ -179,53 +132,6 @@ public partial class Editor
         CheckBox checkBox = new () { Title = "Read Only", Value = _textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked };
 
         checkBox.ValueChanged += (_, _) => { _textView.ReadOnly = checkBox.Value == CheckState.Checked; };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (_, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateUseSameRuneTypeForWords ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "UseSameRuneTypeForWords" };
-        }
-
-        CheckBox checkBox = new () { Title = "UseSameRuneTypeForWords", Value = _textView.UseSameRuneTypeForWords ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (_, _) => { _textView.UseSameRuneTypeForWords = checkBox.Value == CheckState.Checked; };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (_, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateSelectWordOnlyOnDoubleClick ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "SelectWordOnlyOnDoubleClick" };
-        }
-
-        CheckBox checkBox = new ()
-        {
-            Title = "SelectWordOnlyOnDoubleClick", Value = _textView.SelectWordOnlyOnDoubleClick ? CheckState.Checked : CheckState.UnChecked
-        };
-
-        checkBox.ValueChanged += (_, _) => { _textView.SelectWordOnlyOnDoubleClick = checkBox.Value == CheckState.Checked; };
 
         MenuItem item = new () { CommandView = checkBox };
 

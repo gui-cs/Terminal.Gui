@@ -1,5 +1,7 @@
 #nullable enable
 
+using Terminal.Gui.Editor;
+
 namespace UICatalog.Scenarios;
 
 public partial class Editor
@@ -25,38 +27,39 @@ public partial class Editor
         }
 
         bool found;
-        bool gaveFullTurn;
 
         if (next)
         {
             if (!replace)
             {
-                found = _textView.FindNextText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord);
+                found = _textView.FindNext (_textToFind, _matchCase);
             }
             else
             {
-                found = _textView.FindNextText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord, _textToReplace, true);
+                found = _textView.ReplaceNext (_textToFind, _textToReplace, _matchCase);
             }
         }
         else
         {
             if (!replace)
             {
-                found = _textView.FindPreviousText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord);
+                found = _textView.FindPrevious (_textToFind, _matchCase);
             }
             else
             {
-                found = _textView.FindPreviousText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord, _textToReplace, true);
+                // FindPrevious then replace selection
+                found = _textView.FindPrevious (_textToFind, _matchCase);
+
+                if (found && _textView.HasSelection)
+                {
+                    _textView.ReplaceSelection (_textToReplace);
+                }
             }
         }
 
         if (!found)
         {
             MessageBox.Query (_appWindow!.App!, "Find", $"The following specified text was not found: '{_textToFind}'", Strings.btnOk);
-        }
-        else if (gaveFullTurn)
-        {
-            MessageBox.Query (_appWindow!.App!, "Find", $"No more occurrences were found for the following specified text: '{_textToFind}'", Strings.btnOk);
         }
     }
 
@@ -80,11 +83,13 @@ public partial class Editor
             return;
         }
 
-        if (_textView.ReplaceAllText (_textToFind, _matchCase, _matchWholeWord, _textToReplace))
+        int count = _textView.ReplaceAll (_textToFind, _textToReplace, _matchCase);
+
+        if (count > 0)
         {
             MessageBox.Query (_appWindow!.App!,
                               "Replace All",
-                              $"All occurrences were replaced for the following specified text: '{_textToReplace}'",
+                              $"All occurrences were replaced for the following specified text: '{_textToReplace}' ({count} replacements)",
                               Strings.btnOk);
         }
         else
@@ -195,7 +200,6 @@ public partial class Editor
         txtToFind.TextChanged += (_, _) =>
                                  {
                                      _textToFind = txtToFind.Text;
-                                     _textView.FindTextChanged ();
                                      btnFindNext.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
                                      btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
                                  };
@@ -274,7 +278,6 @@ public partial class Editor
         txtToFind.TextChanged += (_, _) =>
                                  {
                                      _textToFind = txtToFind.Text;
-                                     _textView.FindTextChanged ();
                                      btnFindNext.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
                                      btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
                                      btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
@@ -299,9 +302,9 @@ public partial class Editor
 
     private class FindReplaceWindow : Window
     {
-        private readonly TextView _textView;
+        private readonly Terminal.Gui.Editor.Editor _textView;
 
-        public FindReplaceWindow (TextView textView)
+        public FindReplaceWindow (Terminal.Gui.Editor.Editor textView)
         {
             Title = "Find and Replace";
 
