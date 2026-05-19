@@ -1,5 +1,5 @@
-﻿#nullable enable
-
+#nullable enable
+using Terminal.Gui.Editor;
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -12,10 +12,10 @@ public class UnicodeInMenu : Scenario
     public override void Main ()
     {
         string unicode =
-            "Τὴ γλῶσσα μοῦ ἔδωσαν ἑλληνικὴ\nτὸ σπίτι φτωχικὸ στὶς ἀμμουδιὲς τοῦ Ὁμήρου.\nΜονάχη ἔγνοια ἡ γλῶσσα μου στὶς ἀμμουδιὲς τοῦ Ὁμήρου.";
+            "?? ???ssa �?? ?d?sa? ????????\nt? sp?t? ft????? st?? ?��??d??? t?? ?�????.\n?????? ?????a ? ???ssa �?? st?? ?��??d??? t?? ?�????.";
 
         string gitString =
-            $"gui.cs 糊 (hú) {Glyphs.IdenticalTo} {Glyphs.DownArrow}18 {Glyphs.UpArrow}10 {Glyphs.VerticalFourDots}1 {Glyphs.HorizontalEllipsis}";
+            $"gui.cs ? (h�) {Glyphs.IdenticalTo} {Glyphs.DownArrow}18 {Glyphs.UpArrow}10 {Glyphs.VerticalFourDots}1 {Glyphs.HorizontalEllipsis}";
 
         ConfigurationManager.Enable (ConfigLocations.All);
 
@@ -33,24 +33,24 @@ public class UnicodeInMenu : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_Файл",
+                                   "_????",
                                    [
                                        new MenuItem
                                        {
-                                           Title = "_Создать",
+                                           Title = "_???????",
                                            HelpText = "Creates new file"
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Открыть"
+                                           Title = "_???????"
                                        },
                                        new MenuItem
                                        {
-                                           Title = "Со_хранить"
+                                           Title = "??_???????"
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Выход",
+                                           Title = "_?????",
                                            Action = () => appWindow.RequestStop ()
                                        }
                                    ]
@@ -71,8 +71,8 @@ public class UnicodeInMenu : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_糊",
-                                           HelpText = "hú (Paste)"
+                                           Title = "_?",
+                                           HelpText = "h� (Paste)"
                                        }
                                    ]
                                   )
@@ -114,7 +114,7 @@ public class UnicodeInMenu : Scenario
         label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "Button:" };
         appWindow.Add (label);
 
-        Button button = new () { X = 20, Y = Pos.Y (label), Text = "A123456789♥♦♣♠JQK" };
+        Button button = new () { X = 20, Y = Pos.Y (label), Text = "A123456789????JQK" };
         appWindow.Add (button);
 
         label = new () { X = Pos.X (label), Y = Pos.Bottom (label) + 1, Text = "CheckBox:" };
@@ -144,7 +144,7 @@ public class UnicodeInMenu : Scenario
         label = new () { X = Pos.X (label), Y = Pos.Bottom (checkBoxRight) + 2, Text = "HexView:" };
         appWindow.Add (label);
 
-        HexView hexView = new (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " Со_хранить")))
+        HexView hexView = new (new MemoryStream (Encoding.ASCII.GetBytes (gitString + " ??_???????")))
         {
             X = 20,
             Y = Pos.Y (label),
@@ -163,7 +163,7 @@ public class UnicodeInMenu : Scenario
             Width = Dim.Percent (60),
             Height = 3,
             Source = new ListWrapper<string> (
-                                              ["item #1", gitString, "Со_хранить", unicode]
+                                              ["item #1", gitString, "??_???????", unicode]
                                              )
         };
         appWindow.Add (listView);
@@ -176,7 +176,7 @@ public class UnicodeInMenu : Scenario
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
-            Labels = ["item #1", gitString, "Со_хранить", "𝔽𝕆𝕆𝔹𝔸ℝ"]
+            Labels = ["item #1", gitString, "??_???????", "??????????R"]
         };
         appWindow.Add (optionSelector);
 
@@ -188,14 +188,14 @@ public class UnicodeInMenu : Scenario
             X = 20,
             Y = Pos.Y (label),
             Width = Dim.Percent (60),
-            Text = gitString + " = Со_хранить"
+            Text = gitString + " = ??_???????"
         };
         appWindow.Add (textField);
 
-        label = new () { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "TextView:" };
+        label = new () { X = Pos.X (label), Y = Pos.Bottom (textField) + 1, Text = "Editor:" };
         appWindow.Add (label);
 
-        TextView textView = new ()
+        Editor textView = new ()
         {
             X = 20,
             Y = Pos.Y (label),
@@ -210,11 +210,11 @@ public class UnicodeInMenu : Scenario
                                    [
                                        new (
                                             Application.GetDefaultKey (Command.Quit),
-                                            "Выход",
+                                            "?????",
                                             () => appWindow.RequestStop ()
                                            ),
-                                       new (Key.F2, "Создать", null),
-                                       new (Key.F3, "Со_хранить", null)
+                                       new (Key.F2, "???????", null),
+                                       new (Key.F3, "??_???????", null)
                                    ]
                                   );
         appWindow.Add (statusBar);

@@ -1,8 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using System.Reflection;
 using Terminal.Gui.Document;
 using Terminal.Gui.Editor;
-using Editor = Terminal.Gui.Editor.Editor;
+using Terminal.Gui.Highlighting;
 
 namespace UICatalog.Scenarios;
 
@@ -178,6 +178,7 @@ public class ConfigurationEditor : Scenario
         internal ConfigEditorView ()
         {
             TabStop = TabBehavior.TabGroup;
+            HighlightingDefinition = HighlightingManager.Instance.GetDefinition ("Json");
             ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar;
         }
 
@@ -207,7 +208,7 @@ public class ConfigurationEditor : Scenario
                 }
 
                 using Stream? stream = assembly.GetManifestResourceStream (name);
-                using var reader = new StreamReader (stream!);
+                using StreamReader reader = new (stream!);
                 Text = reader.ReadToEnd ();
                 ReadOnly = true;
                 Document!.UndoStack.ClearAll ();

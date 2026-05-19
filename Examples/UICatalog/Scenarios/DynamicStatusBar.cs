@@ -1,9 +1,10 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
 
@@ -105,7 +106,7 @@ public class DynamicStatusBar : Scenario
             var lblAction = new Label { X = Pos.Left (lblTitle), Y = Pos.Bottom (lblTitle) + 1, Text = "Action:" };
             Add (lblAction);
 
-            TextAction = new TextView
+            TextAction = new ()
             {
                 X = Pos.Left (TextTitle), Y = Pos.Top (lblAction), Width = Dim.Fill (), Height = 5
             };
@@ -140,7 +141,7 @@ public class DynamicStatusBar : Scenario
             Add (btnKey);
         }
 
-        public TextView TextAction { get; }
+        public Editor TextAction { get; }
         public TextField TextKey { get; }
         public TextField TextTitle { get; }
         public Action CreateAction (DynamicStatusItem item) => () => MessageBox.ErrorQuery (_app!, item.Title, item.Action, "Ok");

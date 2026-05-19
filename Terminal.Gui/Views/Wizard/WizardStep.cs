@@ -11,10 +11,9 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class WizardStep : View, IDesignable
 {
-    private readonly TextView _helpTextView = new ()
+    private readonly Code _helpTextView = new ()
     {
-        ReadOnly = true,
-        WordWrap = true,
+        SyntaxHighlighter = null,
         X = Pos.AnchorEnd () + 1,
         Height = Dim.Fill (),
 #if DEBUG
@@ -70,14 +69,13 @@ public class WizardStep : View, IDesignable
     ///     The help text displayed in the right <see cref="Padding"/>.
     ///     If empty, the right padding is hidden and content fills the entire step.
     /// </summary>
-    /// <remarks>The help text is displayed using a read-only <see cref="TextView"/>.</remarks>
+    /// <remarks>The help text is displayed using a read-only <see cref="Code"/> view.</remarks>
     public string HelpText
     {
         get => _helpTextView.Text;
         set
         {
             _helpTextView.Text = value;
-            _helpTextView.MoveHome ();
             ShowHide ();
         }
     }

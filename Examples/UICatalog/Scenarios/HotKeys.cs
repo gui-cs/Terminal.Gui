@@ -20,7 +20,7 @@ public class HotKeys : Scenario
 
         Label textViewLabel = new ()
         {
-            Text = "_TextView:",
+            Text = "_Editor:",
             X = 0,
             Y = 0
         };

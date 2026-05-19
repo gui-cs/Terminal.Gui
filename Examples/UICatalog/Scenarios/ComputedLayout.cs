@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
 
@@ -276,7 +277,7 @@ public class ComputedLayout : Scenario
         window.Add (frameView);
 
         // Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
-        var textView = new TextView
+        Editor textView = new ()
         {
             X = Pos.Center (),
             Y = Pos.Percent (50),
@@ -286,7 +287,7 @@ public class ComputedLayout : Scenario
         };
 
         textView.Text =
-            "This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
+            "This Editor should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
         window.Add (textView);
 
         var oddballButton = new Button

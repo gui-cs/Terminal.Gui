@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Text;
 using System.Text.RegularExpressions;
 using Terminal.Gui.Editor;
@@ -35,7 +35,7 @@ public class TextInputControls : Scenario
 
         TextField textField = new ()
         {
-            X = Pos.Right (label) + 1, Y = 0, Width = Dim.Percent (50) - 1, Text = "TextField with test text. Unicode shouldn't 𝔹Aℝ𝔽!"
+            X = Pos.Right (label) + 1, Y = 0, Width = Dim.Percent (50) - 1, Text = "TextField with test text. Unicode shouldn't ??AR??!"
         };
 
         SingleWordSuggestionGenerator textFieldWordGenerator = new ();
@@ -76,11 +76,11 @@ public class TextInputControls : Scenario
 
         win.Add (textField2);
 
-        // EditorView is a rope-backed multi-line text editor from Terminal.Gui.Editor
+        // Editor is a rope-backed multi-line text editor from Terminal.Gui.Editor
         label = new Label { Text = "    E_ditor:", Y = Pos.Bottom (label) + 1 };
         win.Add (label);
 
-        EditorView editorView = new ()
+        Editor Editor = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -89,39 +89,39 @@ public class TextInputControls : Scenario
             ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar
         };
 
-        // TODO: EditorView does not yet expose an autocomplete API. Add when available.
+        // TODO: Editor does not yet expose an autocomplete API. Add when available.
 
-        win.Add (editorView);
+        win.Add (Editor);
 
         Label labelMirroringEditorView = new ()
         {
-            X = Pos.Right (editorView) + 1,
-            Y = Pos.Top (editorView),
+            X = Pos.Right (Editor) + 1,
+            Y = Pos.Top (Editor),
             Width = Dim.Fill (1) - 1,
-            Height = Dim.Height (editorView) - 1,
+            Height = Dim.Height (Editor) - 1,
             Enabled = false
         };
         win.Add (labelMirroringEditorView);
 
-        // Use ContentsChanged to detect if the user has typed something in EditorView.
-        editorView.ContentsChanged += (_, _) => { labelMirroringEditorView.Text = editorView.Text; };
-        editorView.Text = "EditorView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
+        // Use DocumentChanged to detect if the user has typed something in Editor.
+        Editor.Document!.Changed += (_, _) => { labelMirroringEditorView.Text = Editor.Text; };
+        Editor.Text = "Editor with some more test text. Unicode shouldn't ??AR??!";
 
         CheckBox chxReadOnly = new ()
         {
-            X = Pos.Left (editorView), Y = Pos.Bottom (editorView), Value = editorView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
+            X = Pos.Left (Editor), Y = Pos.Bottom (Editor), Value = Editor.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
         };
-        chxReadOnly.ValueChanging += (_, args) => editorView.ReadOnly = args.NewValue == CheckState.Checked;
+        chxReadOnly.ValueChanging += (_, args) => Editor.ReadOnly = args.NewValue == CheckState.Checked;
         win.Add (chxReadOnly);
 
         CheckBox chxWordWrap = new ()
         {
             X = Pos.Right (chxReadOnly) + 2,
             Y = Pos.Top (chxReadOnly),
-            Value = editorView.WordWrap ? CheckState.Checked : CheckState.UnChecked,
+            Value = Editor.WordWrap ? CheckState.Checked : CheckState.UnChecked,
             Text = "_Word Wrap"
         };
-        chxWordWrap.ValueChanging += (_, e) => editorView.WordWrap = e.NewValue == CheckState.Checked;
+        chxWordWrap.ValueChanging += (_, e) => Editor.WordWrap = e.NewValue == CheckState.Checked;
         win.Add (chxWordWrap);
 
         CheckBox scrollBars = new ()
@@ -136,11 +136,11 @@ public class TextInputControls : Scenario
                                    {
                                        if (scrollBars.Value == CheckState.Checked)
                                        {
-                                           editorView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar;
+                                           Editor.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar;
                                        }
                                        else
                                        {
-                                           editorView.ViewportSettings &= ~(ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar);
+                                           Editor.ViewportSettings &= ~(ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar);
                                        }
                                    };
 
@@ -150,7 +150,7 @@ public class TextInputControls : Scenario
         label = new Label { Text = "   _HexView:", Y = Pos.Bottom (scrollBars) + 1 };
         win.Add (label);
 
-        HexView hexEditor = new (new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't 𝔹Aℝ𝔽!")))
+        HexView hexEditor = new (new MemoryStream (Encoding.UTF8.GetBytes ("HexEditor Unicode that shouldn't ??AR??!")))
         {
             X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Percent (50) - 1, Height = Dim.Percent (30)
         };

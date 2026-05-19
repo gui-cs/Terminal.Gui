@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Text;
+using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
 
@@ -27,7 +28,7 @@ public class TextAlignmentAndDirection : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        string txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
+        string txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}?? ??";
 
         SchemeManager.AddScheme ("TextAlignmentAndDirection1", new () { Normal = new (Color.Black, Color.Gray) });
         SchemeManager.AddScheme ("TextAlignmentAndDirection2", new () { Normal = new (Color.Black, Color.DarkGray) });
@@ -437,14 +438,14 @@ public class TextAlignmentAndDirection : Scenario
             Text = "Edit Text:"
         };
 
-        TextView editText = new ()
+        Editor editText = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Fill (31),
-            Height = 3,
-            Text = txt
+            Height = 3
         };
+        editText.Text = txt;
 
         window.KeyDown += (_, _) =>
                      {

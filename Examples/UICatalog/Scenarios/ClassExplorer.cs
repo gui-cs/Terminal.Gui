@@ -12,7 +12,7 @@ public class ClassExplorer : Scenario
 {
     private CheckBox? _highlightModelTextOnlyCheckBox;
     private CheckBox? _showPrivateCheckBox;
-    private TextView? _textView;
+    private Code? _textView;
     private TreeView<object>? _treeView;
 
     private Window? _win;
@@ -73,14 +73,14 @@ public class ClassExplorer : Scenario
         _treeView.TreeBuilder = new DelegateTreeBuilder<object> (ChildGetter, CanExpand);
         _treeView.SelectionChanged += TreeView_SelectionChanged;
 
-        // TextView for details
+        // Code view for details
         _textView = new ()
         {
             X = Pos.Right (_treeView),
             Y = Pos.Top (_treeView),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            ReadOnly = true,
+            SyntaxHighlighter = null
         };
 
         // Menu setup

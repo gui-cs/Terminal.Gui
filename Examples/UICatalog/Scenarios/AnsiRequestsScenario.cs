@@ -1,6 +1,7 @@
 #nullable enable
 using System.Collections.ObjectModel;
 using System.Text;
+using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
 
@@ -8,15 +9,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tests")]
 public sealed class AnsiEscapeSequenceRequests : Scenario
 {
-    private GraphView? _graphView;
-
-    private ScatterSeries? _sentSeries;
-    private ScatterSeries? _answeredSeries;
-
     private readonly List<DateTime> _sends = [];
 
     private readonly Lock _lockAnswers = new ();
     private readonly Dictionary<DateTime, string> _answers = new ();
+    private GraphView? _graphView;
+
+    private ScatterSeries? _sentSeries;
+    private ScatterSeries? _answeredSeries;
     private Label? _lblSummary;
 
     private object? _updateTimeoutToken;
@@ -39,11 +39,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
 
-        Tabs tabs = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        Tabs tabs = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
         View singleTab = new () { Title = "_Single" };
         singleView.Width = Dim.Fill ();
@@ -68,6 +64,91 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         _app.RemoveTimeout (_sendDarTimeoutToken!);
     }
 
+    private View BuildBulkTab ()
+    {
+        var w = new View { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
+
+        var lbl = new Label
+        {
+            Text =
+                "This scenario tests Ansi request/response processing. Use the Editor to ensure regular user interaction continues as normal during sends",
+            Height = 2,
+            Width = Dim.Fill ()
+        };
+
+        _updateTimeoutToken = _app!.AddTimeout (TimeSpan.FromMilliseconds (1000),
+                                                () =>
+                                                {
+                                                    lock (_lockAnswers)
+                                                    {
+                                                        UpdateGraph ();
+
+                                                        UpdateResponses ();
+                                                    }
+
+                                                    return true;
+                                                });
+
+        Editor tv = new () { Y = Pos.Bottom (lbl), Width = Dim.Percent (50), Height = Dim.Fill () };
+
+        var lblDar = new Label { Y = Pos.Bottom (lbl), X = Pos.Right (tv) + 1, Text = "DAR per second" };
+        var cbDar = new NumericUpDown { X = Pos.Right (lblDar), Y = Pos.Bottom (lbl), Value = 0 };
+
+        cbDar.ValueChanging += (_, e) =>
+                               {
+                                   if (e.NewValue is < 0 or > 20)
+                                   {
+                                       e.Handled = true;
+                                   }
+                               };
+        w.Add (cbDar);
+
+        int lastSendTime = Environment.TickCount;
+        var lockObj = new object ();
+
+        _sendDarTimeoutToken = _app.AddTimeout (TimeSpan.FromMilliseconds (50),
+                                                () =>
+                                                {
+                                                    lock (lockObj)
+                                                    {
+                                                        switch (cbDar.Value)
+                                                        {
+                                                            case > 0:
+                                                            {
+                                                                int interval = 1000 / cbDar.Value; // Calculate the desired interval in milliseconds
+                                                                int currentTime = Environment.TickCount; // Current system time in milliseconds
+
+                                                                // Check if the time elapsed since the last send is greater than the interval
+                                                                if (currentTime - lastSendTime >= interval)
+                                                                {
+                                                                    SendDar (); // Send the request
+                                                                    lastSendTime = currentTime; // Update the last send time
+                                                                }
+
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    return true;
+                                                });
+
+        _graphView = new GraphView { Y = Pos.Bottom (cbDar), X = Pos.Right (tv), Width = Dim.Fill (), Height = Dim.Fill (1) };
+
+        _lblSummary = new Label { Y = Pos.Bottom (_graphView), X = Pos.Right (tv), Width = Dim.Fill () };
+
+        SetupGraph ();
+
+        w.Add (lbl);
+        w.Add (lblDar);
+        w.Add (cbDar);
+        w.Add (tv);
+        w.Add (_graphView);
+        w.Add (_lblSummary);
+
+        return w;
+    }
+
     private View BuildSingleTab ()
     {
         var w = new View { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
@@ -89,7 +170,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         {
             Title = "Ansi Escape Sequence",
             BorderStyle = LineStyle.Dotted,
-            ReadOnly = true, 
+            ReadOnly = true,
             Source = new ListWrapper<string> (new ObservableCollection<string> (scrRequests)),
             Text = scrRequests [0]
         };
@@ -157,49 +238,49 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
         label = new Label { Y = Pos.Bottom (tfRequest) + 2, Text = "Response:" };
 
-        var tvResponse = new TextView
+        var tvResponse = new Code
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
             Width = 40,
             Height = 4,
-            ReadOnly = true
+            SyntaxHighlighter = null
         };
         w.Add (label, tvResponse);
 
         label = new Label { X = Pos.Right (tvResponse) + 1, Y = Pos.Top (tvResponse) - 1, Text = "Error:" };
 
-        var tvError = new TextView
+        var tvError = new Code
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
             Width = 40,
             Height = 4,
-            ReadOnly = true
+            SyntaxHighlighter = null
         };
         w.Add (label, tvError);
 
         label = new Label { X = Pos.Right (tvError) + 1, Y = Pos.Top (tvError) - 1, Text = "Value:" };
 
-        var tvValue = new TextView
+        var tvValue = new Code
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
             Width = 6,
             Height = 4,
-            ReadOnly = true
+            SyntaxHighlighter = null
         };
         w.Add (label, tvValue);
 
         label = new Label { X = Pos.Right (tvValue) + 1, Y = Pos.Top (tvValue) - 1, Text = "Terminator:" };
 
-        var tvTerminator = new TextView
+        var tvTerminator = new Code
         {
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
             Width = 4,
             Height = 4,
-            ReadOnly = true
+            SyntaxHighlighter = null
         };
         w.Add (label, tvTerminator);
 
@@ -234,119 +315,6 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         return w;
     }
 
-    private void OnSuccess (string response, TextView tvResponse, TextView tvError, TextView tvValue, TextView tvTerminator, Label lblSuccess)
-    {
-        tvResponse.Text = response;
-        tvError.Text = string.Empty;
-        tvValue.Text = string.Empty;
-        tvTerminator.Text = string.Empty;
-
-        lblSuccess.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
-        lblSuccess.Text = "Successful";
-    }
-
-    private void OnFail (TextView tvResponse, TextView tvError, TextView tvValue, TextView tvTerminator, Label lblSuccess)
-    {
-        tvResponse.Text = string.Empty;
-        tvError.Text = "No Response";
-        tvValue.Text = string.Empty;
-        tvTerminator.Text = string.Empty;
-
-        lblSuccess.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error);
-        lblSuccess.Text = "Error";
-    }
-
-    private View BuildBulkTab ()
-    {
-        var w = new View { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
-
-        var lbl = new Label
-        {
-            Text =
-                "This scenario tests Ansi request/response processing. Use the TextView to ensure regular user interaction continues as normal during sends",
-            Height = 2,
-            Width = Dim.Fill ()
-        };
-
-        _updateTimeoutToken = _app!.AddTimeout (TimeSpan.FromMilliseconds (1000),
-                                                () =>
-                                                {
-                                                    lock (_lockAnswers)
-                                                    {
-                                                        UpdateGraph ();
-
-                                                        UpdateResponses ();
-                                                    }
-
-                                                    return true;
-                                                });
-
-        var tv = new TextView { Y = Pos.Bottom (lbl), Width = Dim.Percent (50), Height = Dim.Fill () };
-
-        var lblDar = new Label { Y = Pos.Bottom (lbl), X = Pos.Right (tv) + 1, Text = "DAR per second" };
-        var cbDar = new NumericUpDown { X = Pos.Right (lblDar), Y = Pos.Bottom (lbl), Value = 0 };
-
-        cbDar.ValueChanging += (_, e) =>
-                               {
-                                   if (e.NewValue is < 0 or > 20)
-                                   {
-                                       e.Handled = true;
-                                   }
-                               };
-        w.Add (cbDar);
-
-        int lastSendTime = Environment.TickCount;
-        var lockObj = new object ();
-
-        _sendDarTimeoutToken = _app.AddTimeout (TimeSpan.FromMilliseconds (50),
-                                                () =>
-                                                {
-                                                    lock (lockObj)
-                                                    {
-                                                        switch (cbDar.Value)
-                                                        {
-                                                            case > 0:
-                                                            {
-                                                                int interval = 1000 / cbDar.Value; // Calculate the desired interval in milliseconds
-                                                                int currentTime = Environment.TickCount; // Current system time in milliseconds
-
-                                                                // Check if the time elapsed since the last send is greater than the interval
-                                                                if (currentTime - lastSendTime >= interval)
-                                                                {
-                                                                    SendDar (); // Send the request
-                                                                    lastSendTime = currentTime; // Update the last send time
-                                                                }
-
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-
-                                                    return true;
-                                                });
-
-        _graphView = new GraphView { Y = Pos.Bottom (cbDar), X = Pos.Right (tv), Width = Dim.Fill (), Height = Dim.Fill (1) };
-
-        _lblSummary = new Label { Y = Pos.Bottom (_graphView), X = Pos.Right (tv), Width = Dim.Fill () };
-
-        SetupGraph ();
-
-        w.Add (lbl);
-        w.Add (lblDar);
-        w.Add (cbDar);
-        w.Add (tv);
-        w.Add (_graphView);
-        w.Add (_lblSummary);
-
-        return w;
-    }
-
-    private void UpdateResponses ()
-    {
-        _lblSummary!.Text = GetSummary ();
-        _lblSummary.SetNeedsDraw ();
-    }
-
     private string GetSummary ()
     {
         if (_answers.Count == 0)
@@ -362,6 +330,49 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         int totalAnswers = _answers.Count;
 
         return $"TS:{totalSends} Last:{last} U:{unique} TA:{totalAnswers}";
+    }
+
+    private void HandleResponse (string response)
+    {
+        lock (_lockAnswers)
+        {
+            _answers.Add (DateTime.Now, response);
+        }
+    }
+
+    private void OnFail (Code tvResponse, Code tvError, Code tvValue, Code tvTerminator, Label lblSuccess)
+    {
+        tvResponse.Text = string.Empty;
+        tvError.Text = "No Response";
+        tvValue.Text = string.Empty;
+        tvTerminator.Text = string.Empty;
+
+        lblSuccess.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error);
+        lblSuccess.Text = "Error";
+    }
+
+    private void OnSuccess (string response, Code tvResponse, Code tvError, Code tvValue, Code tvTerminator, Label lblSuccess)
+    {
+        tvResponse.Text = response;
+        tvError.Text = string.Empty;
+        tvValue.Text = string.Empty;
+        tvTerminator.Text = string.Empty;
+
+        lblSuccess.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        lblSuccess.Text = "Successful";
+    }
+
+    private void SendDar ()
+    {
+        _app?.Driver?.QueueAnsiRequest (new AnsiEscapeSequenceRequest
+        {
+            Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
+            Value = EscSeqUtils.CSI_SendDeviceAttributes.Value,
+            Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
+            ResponseReceived = HandleResponse!
+        });
+
+        _sends.Add (DateTime.Now);
     }
 
     private void SetupGraph ()
@@ -382,6 +393,8 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         _graphView.GraphColor = new Attribute (Color.Green, Color.Black);
     }
 
+    private int ToSeconds (DateTime t) => (int)(DateTime.Now - t).TotalSeconds;
+
     private void UpdateGraph ()
     {
         _sentSeries!.Points = _sends.GroupBy (ToSeconds).Select (g => new PointF (g.Key, g.Count ())).ToList ();
@@ -392,26 +405,9 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         _graphView!.SetNeedsDraw ();
     }
 
-    private int ToSeconds (DateTime t) => (int)(DateTime.Now - t).TotalSeconds;
-
-    private void SendDar ()
+    private void UpdateResponses ()
     {
-        _app?.Driver?.QueueAnsiRequest (new AnsiEscapeSequenceRequest
-        {
-            Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
-            Value = EscSeqUtils.CSI_SendDeviceAttributes.Value,
-            Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
-            ResponseReceived = HandleResponse!
-        });
-
-        _sends.Add (DateTime.Now);
-    }
-
-    private void HandleResponse (string response)
-    {
-        lock (_lockAnswers)
-        {
-            _answers.Add (DateTime.Now, response);
-        }
+        _lblSummary!.Text = GetSummary ();
+        _lblSummary.SetNeedsDraw ();
     }
 }

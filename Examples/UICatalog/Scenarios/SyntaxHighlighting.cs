@@ -1,11 +1,11 @@
-﻿#nullable enable
+#nullable enable
 using Terminal.Gui.Document;
 using Terminal.Gui.Editor;
 using Terminal.Gui.Highlighting;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Syntax Highlighting", "Text editor with keyword highlighting using the EditorView control.")]
+[ScenarioMetadata ("Syntax Highlighting", "Text editor with keyword highlighting using the Editor control.")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Editor")]
@@ -70,7 +70,7 @@ public class SyntaxHighlighting : Scenario
             return;
         }
 
-        // EditorView handles syntax highlighting natively via HighlightingDefinition.
+        // Editor handles syntax highlighting natively via HighlightingDefinition.
         _editor.HighlightingDefinition = HighlightingManager.Instance.GetDefinition ("TSQL");
 
         _editor.Document = new TextDocument (

@@ -66,7 +66,6 @@ internal static class ConfigPropertyHostTypes
         typeof (SelectorBase),
         typeof (StatusBar),
         typeof (TextField),
-        typeof (TextView),
         typeof (Window)
     ];
 
@@ -97,7 +96,6 @@ internal static class ConfigPropertyHostTypes
     [DynamicDependency (PreservedMembers, typeof (SelectorBase))]
     [DynamicDependency (PreservedMembers, typeof (StatusBar))]
     [DynamicDependency (PreservedMembers, typeof (TextField))]
-    [DynamicDependency (PreservedMembers, typeof (TextView))]
     [DynamicDependency (PreservedMembers, typeof (Window))]
     internal static Type [] GetTypes () => _types;
 }

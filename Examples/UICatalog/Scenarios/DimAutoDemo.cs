@@ -1,4 +1,5 @@
 #nullable enable
+using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
 
@@ -42,9 +43,8 @@ public class DimAutoDemo : Scenario
         dimAutoFrameView.Margin.Thickness = new Thickness (1);
         dimAutoFrameView.ValidatePosDim = true;
 
-        TextView textEdit = new ()
+        Editor textEdit = new ()
         {
-            Text = "",
             X = 0,
             Y = 0,
             Width = 20,
@@ -116,7 +116,7 @@ public class DimAutoDemo : Scenario
         bothAuto.Id = "bothAuto";
         dimAutoFrameView.Add (bothAuto);
 
-        textEdit.ContentsChanged += (s, e) =>
+        textEdit.Document!.Changed += (s, e) =>
                                     {
                                         hlabel.Text = textEdit.Text;
                                         vlabel.Text = textEdit.Text;

@@ -10,6 +10,7 @@ using Terminal.Gui.Drivers;
 using Terminal.Gui.Resources;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
+using Terminal.Gui.Editor;
 using Color = Terminal.Gui.Drawing.Color;
 
 // ReSharper disable AccessToDisposedClosure
@@ -60,11 +61,11 @@ textFieldButton.Accepting += (_, _) =>
 mainWindow.Add (textFieldButton);
 
 // Example 1: TextField with string result using auto-Text extraction
-Button textViewButton = new () { Title = "TextView (Auto-Text)", X = Pos.Center (), Y = buttonY++ };
+Button textViewButton = new () { Title = "Editor (Auto-Text)", X = Pos.Center (), Y = buttonY++ };
 
 textViewButton.Accepting += (_, _) =>
                             {
-                                string? result = mainWindow.Prompt<TextView, string> (beginInitHandler: prompt =>
+                                string? result = mainWindow.Prompt<Editor, string> (beginInitHandler: prompt =>
                                                                                                         {
                                                                                                             prompt.Title = textViewButton.Title;
 

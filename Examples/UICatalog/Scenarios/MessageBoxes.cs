@@ -1,4 +1,6 @@
-﻿namespace UICatalog.Scenarios;
+using Terminal.Gui.Editor;
+
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("MessageBoxes", "Demonstrates how to use the MessageBox class.")]
 [ScenarioCategory ("Controls")]
@@ -55,15 +57,15 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        TextView messageEdit = new ()
+        Editor messageEdit = new ()
         {
-            Text = "Message line 1.\nMessage line two. This is a really long line to force wordwrap. It needs to be long for it to work.",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Fill (0, 50),
             Height = 5,
             WordWrap = true
         };
+        messageEdit.Text = "Message line 1.\nMessage line two. This is a really long line to force wordwrap. It needs to be long for it to work.";
         frame.Add (messageEdit);
 
         label = new Label

@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using Terminal.Gui.Configuration;
+using Terminal.Gui.Editor;
 using UICatalog.Scenarios;
 
 namespace NativeAot;
@@ -192,7 +193,7 @@ public sealed class AotAllViewsWindow : Runnable
         yield return Design (new Tabs ());
         yield return Design (new TextField ());
         yield return Design (new TextValidateField ());
-        yield return Design (new TextView ());
+        yield return Design (new Editor ());
         yield return Design (new TreeView ());
 
         // ── Views without IDesignable (still AOT-relevant as config hosts or common views) ──
