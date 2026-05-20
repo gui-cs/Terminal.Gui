@@ -236,7 +236,20 @@ internal static class UnixIOHelper
         {
             int n = poll (pollMap, (uint)pollMap.Length, timeoutMs);
 
-            return n > 0;
+            if (n <= 0)
+            {
+                return false;
+            }
+
+            foreach (Pollfd pollfd in pollMap)
+            {
+                if ((pollfd.revents & (short)Condition.PollIn) != 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         catch
         {
