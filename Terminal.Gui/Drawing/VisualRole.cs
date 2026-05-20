@@ -53,7 +53,7 @@ public enum VisualRole
     Disabled,
 
     /// <summary>
-    ///     The visual role for elements that are editable (e.g., <see cref="TextField"/> and <see cref="TextView"/>).
+    ///     The visual role for elements that are editable (e.g., <see cref="TextField"/>).
     /// </summary>
     Editable,
 

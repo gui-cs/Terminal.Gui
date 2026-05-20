@@ -11,6 +11,10 @@
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Terminal.Gui.Editor" />
+  </ItemGroup>
+
   <!-- Link AOT-safe editor files from UICatalog (no reflection, no heavy deps) -->
   <ItemGroup>
     <Compile Include="..\UICatalog\Scenarios\EditorsAndHelpers\ExpanderButton.cs" Link="Editors\ExpanderButton.cs" />

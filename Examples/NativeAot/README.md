@@ -18,7 +18,7 @@ infrastructure is also AOT-safe.
 Views tested: `Button`, `CheckBox`, `ColorPicker`, `DatePicker`, `DropDownList`,
 `FlagSelector`, `GraphView`, `HexView`, `Label`, `Line`, `Link`, `ListView`,
 `NumericUpDown`, `OptionSelector`, `ProgressBar`, `ScrollBar`, `Shortcut`, `SpinnerView`,
-`Tabs`, `TextField`, `TextValidateField`, `TextView`, `TreeView`, `CharMap`, `FrameView`,
+`Tabs`, `TextField`, `TextValidateField`, `Editor`, `TreeView`, `CharMap`, `FrameView`,
 `MenuBar`, `Menu`, `StatusBar`, `MessageBox` (via dialog), `Dialog` (via `Wizard` base).
 
 ## Publishing

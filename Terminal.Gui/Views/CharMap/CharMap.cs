@@ -559,14 +559,13 @@ public class CharMap : View, IDesignable, IValue<Rune>
         };
         dlg.Add (label);
 
-        TextView json = new ()
+        Code json = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
             Width = Dim.Fill (0, 60),
             Height = Dim.Fill (0, 5),
-            ReadOnly = true,
-            WordWrap = true,
+            Language = "json",
             Text = decResponse
         };
 

@@ -647,7 +647,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     private readonly Attribute? _editable;
 
     /// <summary>
-    ///     The visual role for elements that are editable (e.g., <see cref="TextField"/> and <see cref="TextView"/>).
+    ///     The visual role for elements that are editable (e.g., <see cref="TextField"/>.
     ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
     ///     algorithm used.
     /// </summary>

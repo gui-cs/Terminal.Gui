@@ -224,7 +224,7 @@ Many views provide meaningful `.Text` implementations that enable automatic text
 | View | Text Behavior |
 |------|---------------|
 | `TextField` | User input text |
-| `TextView` | Multiline text content |
+| `Editor` | Multiline text content |
 | `DatePicker` | Formatted date string (e.g., "1/15/2026") |
 | `ColorPicker` | Color name or representation (e.g., "Red", "Color [A=255, R=255, G=0, B=0]") |
 | `Label` | Label text |
@@ -460,7 +460,7 @@ Attribute? result = mainWindow.Prompt<AttributePicker, Attribute?> (
 
 if (result.HasValue)
 {
-    myTextView.SetAttribute (result.Value);
+    myEditor.SetAttribute (result.Value);
 }
 ```
 

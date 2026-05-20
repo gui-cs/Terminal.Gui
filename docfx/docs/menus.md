@@ -522,7 +522,7 @@ MenuBarItem optionsMenu = new ("_Options", [
 
 ```csharp
 // Bind menu items to commands on a target view
-TextView editor = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
+Editor editor = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill () };
 
 MenuBar menuBar = new ([
     new MenuBarItem ("_Edit", [

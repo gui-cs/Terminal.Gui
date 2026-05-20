@@ -385,7 +385,7 @@ Implementing `IValue<T>` requires `ValueChanging`, `ValueChanged`, and `ValueCha
 |Button|Class|Text,Accept event,IsDefault
 |Label|Class|Text display,TextAlignment
 |TextField|Class|Single-line input,Text,Secret
-|TextView|Class|Multi-line editor,Text,ReadOnly
+|Editor|Class|Multi-line editor,Text,ReadOnly
 |CheckBox|Class|CheckedState,AllowCheckStateNone
 |DropDownList|Class|Dropdown,Source,SelectedItem
 |ProgressBar|Class|Fraction,BidirectionalMarquee

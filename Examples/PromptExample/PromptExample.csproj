@@ -12,4 +12,8 @@
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Terminal.Gui.Editor" />
+  </ItemGroup>
+
 </Project>

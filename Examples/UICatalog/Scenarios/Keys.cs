@@ -102,7 +102,7 @@ public class Keys : Scenario
         edit.KeyDownNotHandled += (_, a) => { keyDownNotHandledList.Add ($"{a}"); };
 
         // KeyDown
-        label = new Label { X = Pos.Right (appKeyListView) + 1, Y = Pos.Top (label), Text = "TextView Key Down:" };
+        label = new Label { X = Pos.Right (appKeyListView) + 1, Y = Pos.Top (label), Text = "Editor Key Down:" };
         win.Add (label);
 
         ListView onKeyDownListView = new ()
@@ -117,7 +117,7 @@ public class Keys : Scenario
         win.Add (onKeyDownListView);
 
         // KeyDownNotHandled
-        label = new Label { X = Pos.Right (onKeyDownListView) + 1, Y = Pos.Top (label), Text = "TextView KeyDownNotHandled:" };
+        label = new Label { X = Pos.Right (onKeyDownListView) + 1, Y = Pos.Top (label), Text = "Editor KeyDownNotHandled:" };
         win.Add (label);
 
         ListView onKeyDownNotHandledListView = new ()
