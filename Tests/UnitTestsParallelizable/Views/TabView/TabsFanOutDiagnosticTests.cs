@@ -427,9 +427,10 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         {
             ViewActivityCounters.Counts c = counters.Get (codes [i]);
 
+            // Copilot: Lock in current fan-out behavior. After #4973, this should likely become == 0.
             Assert.True (
-                         c.DrawComplete >= 0,
-                         $"Tab {i + 1} DrawComplete counter must be observable (got {c.DrawComplete}) even with Transparent.");
+                         c.DrawComplete > 0,
+                         $"Tab {i + 1} should currently still record DrawComplete even with Transparent (got {c.DrawComplete}). Update this expectation after #4973.");
         }
 
         root.Dispose ();
