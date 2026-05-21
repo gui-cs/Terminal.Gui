@@ -1,5 +1,8 @@
-﻿#nullable enable
+#nullable enable
 using System.Reflection;
+using Terminal.Gui.Document;
+using Terminal.Gui.Editor;
+using Terminal.Gui.Highlighting;
 
 namespace UICatalog.Scenarios;
 
@@ -7,7 +10,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Tabs")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Files and IO")]
-[ScenarioCategory ("TextView")]
+[ScenarioCategory ("Editor")]
 [ScenarioCategory ("Configuration")]
 public class ConfigurationEditor : Scenario
 {
@@ -61,7 +64,7 @@ public class ConfigurationEditor : Scenario
 
     public void Save ()
     {
-        if (_app?.Navigation?.GetFocused () is ConfigTextView editor)
+        if (_app?.Navigation?.GetFocused () is ConfigEditorView editor)
         {
             editor.Save ();
         }
@@ -74,7 +77,7 @@ public class ConfigurationEditor : Scenario
             var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
             FileInfo fileInfo = new (config.Value.Replace ("~", homeDir));
 
-            ConfigTextView editor = new ()
+            ConfigEditorView editor = new ()
             {
                 Title = config.Value.StartsWith ("resource://", StringComparison.Ordinal) ? fileInfo.Name : config.Value,
                 Width = Dim.Fill (),
@@ -96,9 +99,9 @@ public class ConfigurationEditor : Scenario
 
             editor.Disposing += (_, _) =>
                                 {
-                                    editor.ContentsChanged -= OnEditorOnContentsChanged;
+                                    editor.Document!.Changed -= OnEditorDocumentChanged;
                                 };
-            editor.ContentsChanged += OnEditorOnContentsChanged;
+            editor.Document!.Changed += OnEditorDocumentChanged;
 
             _lenShortcut?.Title = $"{editor.Title}";
         }
@@ -108,7 +111,7 @@ public class ConfigurationEditor : Scenario
 
     private void OnTabsOnValueChanged (object? _, ValueChangedEventArgs<View?> args)
     {
-        ConfigTextView? editor = args.NewValue?.SubViews.OfType<ConfigTextView> ().FirstOrDefault ();
+        ConfigEditorView? editor = args.NewValue?.SubViews.OfType<ConfigEditorView> ().FirstOrDefault ();
 
         if (editor is { })
         {
@@ -116,12 +119,16 @@ public class ConfigurationEditor : Scenario
         }
     }
 
-    private void OnEditorOnContentsChanged (object? o, ContentsChangedEventArgs contentsChangedEventArgs)
+    private void OnEditorDocumentChanged (object? o, DocumentChangeEventArgs _)
     {
-        var editor = (ConfigTextView)o!;
+        if (_app?.Navigation?.GetFocused () is not ConfigEditorView editor)
+        {
+            return;
+        }
+
         _lenShortcut?.Title = _lenShortcut.Title.Replace ("*", "");
 
-        if (editor.IsDirty)
+        if (!editor.Document!.UndoStack.IsOriginalFile)
         {
             _lenShortcut?.Title += "*";
         }
@@ -129,9 +136,9 @@ public class ConfigurationEditor : Scenario
 
     private void Quit ()
     {
-        foreach (ConfigTextView editor in _tabs?.TabCollection.SelectMany (t => t.SubViews.OfType<ConfigTextView> ()) ?? [])
+        foreach (ConfigEditorView editor in _tabs?.TabCollection.SelectMany (t => t.SubViews.OfType<ConfigEditorView> ()) ?? [])
         {
-            if (!editor.IsDirty)
+            if (editor.Document!.UndoStack.IsOriginalFile)
             {
                 continue;
             }
@@ -160,18 +167,19 @@ public class ConfigurationEditor : Scenario
 
     private void Reload ()
     {
-        if (_app?.Navigation?.GetFocused () is ConfigTextView editor)
+        if (_app?.Navigation?.GetFocused () is ConfigEditorView editor)
         {
             editor.Read ();
         }
     }
 
-    private class ConfigTextView : TextView
+    private class ConfigEditorView : Editor
     {
-        internal ConfigTextView ()
+        internal ConfigEditorView ()
         {
             TabStop = TabBehavior.TabGroup;
-            ScrollBars = true;
+            HighlightingDefinition = HighlightingManager.Instance.GetDefinition ("Json");
+            ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar | ViewportSettingsFlags.HasHorizontalScrollBar;
         }
 
         internal FileInfo? FileInfo { get; init; }
@@ -200,9 +208,11 @@ public class ConfigurationEditor : Scenario
                 }
 
                 using Stream? stream = assembly.GetManifestResourceStream (name);
-                using var reader = new StreamReader (stream!);
+                using StreamReader reader = new (stream!);
                 Text = reader.ReadToEnd ();
                 ReadOnly = true;
+                Document!.UndoStack.ClearAll ();
+                Document!.UndoStack.MarkAsOriginalFile ();
 
                 return;
             }
@@ -225,6 +235,9 @@ public class ConfigurationEditor : Scenario
             {
                 Text = File.ReadAllText (FileInfo.FullName);
             }
+
+            Document!.UndoStack.ClearAll ();
+            Document!.UndoStack.MarkAsOriginalFile ();
         }
 
         internal void Save ()
@@ -232,7 +245,8 @@ public class ConfigurationEditor : Scenario
             if (FileInfo!.FullName.Contains ("RuntimeConfig"))
             {
                 ConfigurationManager.RuntimeConfig = Text;
-                ClearHistoryChanges ();
+                Document!.UndoStack.ClearAll ();
+                Document!.UndoStack.MarkAsOriginalFile ();
 
                 return;
             }
@@ -246,7 +260,8 @@ public class ConfigurationEditor : Scenario
             using StreamWriter writer = File.CreateText (FileInfo.FullName);
             writer.Write (Text);
             writer.Close ();
-            ClearHistoryChanges ();
+            Document!.UndoStack.ClearAll ();
+            Document!.UndoStack.MarkAsOriginalFile ();
         }
     }
 }

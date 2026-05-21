@@ -1,4 +1,5 @@
 #nullable enable
+using Terminal.Gui.Editor;
 
 // ReSharper disable AccessToDisposedClosure
 
@@ -78,16 +79,16 @@ public class Adornments : Scenario
 
         button.Accepting += (_, _) => MessageBox.Query (appWindow.App!, "Hi", $"Am I a {window.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
 
-        TextView label = new ()
+        Editor editor = new ()
         {
             X = Pos.Center (),
             Y = Pos.Bottom (button),
             Title = "Title",
-            Text = "I have a 3 row top border.\nMy border inherits from the SuperView.",
             Width = 40,
             Height = 6 // TODO: Use Dim.Auto
         };
-        label.Border.Thickness = new Thickness (1, 3, 1, 1);
+        editor.Text = "I have a 3 row top border.\nMy border inherits from the SuperView.";
+        editor.Border.Thickness = new Thickness (1, 3, 1, 1);
 
         Button btnButtonInWindow = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Button" };
 
@@ -106,10 +107,10 @@ public class Adornments : Scenario
 
         window.Border.GetOrCreateView ();
 
-        //window.Border.View.Text = "Border Text";
+        // window.Border.View.Text = "Border Text";
         window.Border.Thickness = new Thickness (3);
 
-        //window.Border.View?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
+        // window.Border.View?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
 
         window.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
         window.BorderStyle = LineStyle.Rounded;
@@ -183,7 +184,7 @@ public class Adornments : Scenario
 
         Label longLabel = new () { X = 40, Y = 5, Title = "This is long text (in a label) that should clip." };
         longLabel.TextFormatter.WordWrap = true;
-        window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);
+        window.Add (tf1, color, button, editor, btnButtonInWindow, labelAnchorEnd, longLabel);
 
         window.Initialized += (_, _) =>
                               {

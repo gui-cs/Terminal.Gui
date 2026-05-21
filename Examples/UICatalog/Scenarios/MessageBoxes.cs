@@ -1,17 +1,65 @@
-﻿namespace UICatalog.Scenarios;
+using Terminal.Gui.Editor;
+// ReSharper disable AccessToDisposedClosure
+
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("MessageBoxes", "Demonstrates how to use the MessageBox class.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 public class MessageBoxes : Scenario
 {
+    public override List<Key> GetDemoKeyStrokes (IApplication app)
+    {
+        List<Key> keys = [];
+
+        keys.Add (Key.S.WithAlt);
+        keys.Add (Key.Esc);
+
+        keys.Add (Key.E.WithAlt);
+        keys.Add (Key.S.WithAlt);
+        keys.Add (Key.Esc);
+
+        keys.Add (Key.N.WithAlt);
+        keys.Add (Key.D5);
+        keys.Add (Key.S.WithAlt);
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.T.WithAlt);
+        keys.Add (Key.T.WithCtrl);
+        keys.AddRange (GetKeysFromText ("This is a really long title"));
+        keys.Add (Key.M.WithAlt);
+        keys.Add (Key.T.WithCtrl);
+        keys.AddRange (GetKeysFromText ("This is a long,\nmulti-line message.\nThis is a test of the emergency\nbroadcast\nsystem."));
+        keys.Add (Key.S.WithAlt);
+
+        for (var i = 0; i < 10; i++)
+        {
+            keys.Add (Key.Tab);
+        }
+
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.W.WithAlt);
+        keys.Add (Key.S.WithAlt);
+
+        for (var i = 0; i < 10; i++)
+        {
+            keys.Add (Key.Tab);
+        }
+
+        keys.Add (Key.Enter);
+
+        return keys;
+    }
+
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window window = new () { Title = GetQuitKeyAndName () };
+        using Window window = new ();
+        window.Title = GetQuitKeyAndName ();
 
         FrameView frame = new ()
         {
@@ -55,15 +103,15 @@ public class MessageBoxes : Scenario
         };
         frame.Add (label);
 
-        TextView messageEdit = new ()
+        Editor messageEdit = new ()
         {
-            Text = "Message line 1.\nMessage line two. This is a really long line to force wordwrap. It needs to be long for it to work.",
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Width = Dim.Fill (0, 50),
             Height = 5,
             WordWrap = true
         };
+        messageEdit.Text = "Message line 1.\nMessage line two. This is a really long line to force wordwrap. It needs to be long for it to work.";
         frame.Add (messageEdit);
 
         label = new Label
@@ -184,50 +232,6 @@ public class MessageBoxes : Scenario
         window.Add (buttonPressedLabel);
 
         app.Run (window);
-    }
-
-    public override List<Key> GetDemoKeyStrokes (IApplication app)
-    {
-        List<Key> keys = [];
-
-        keys.Add (Key.S.WithAlt);
-        keys.Add (Key.Esc);
-
-        keys.Add (Key.E.WithAlt);
-        keys.Add (Key.S.WithAlt);
-        keys.Add (Key.Esc);
-
-        keys.Add (Key.N.WithAlt);
-        keys.Add (Key.D5);
-        keys.Add (Key.S.WithAlt);
-        keys.Add (Key.Enter);
-
-        keys.Add (Key.T.WithAlt);
-        keys.Add (Key.T.WithCtrl);
-        keys.AddRange (GetKeysFromText ("This is a really long title"));
-        keys.Add (Key.M.WithAlt);
-        keys.Add (Key.T.WithCtrl);
-        keys.AddRange (GetKeysFromText ("This is a long,\nmulti-line message.\nThis is a test of the emergency\nbroadcast\nsystem."));
-        keys.Add (Key.S.WithAlt);
-
-        for (var i = 0; i < 10; i++)
-        {
-            keys.Add (Key.Tab);
-        }
-
-        keys.Add (Key.Enter);
-
-        keys.Add (Key.W.WithAlt);
-        keys.Add (Key.S.WithAlt);
-
-        for (var i = 0; i < 10; i++)
-        {
-            keys.Add (Key.Tab);
-        }
-
-        keys.Add (Key.Enter);
-
-        return keys;
     }
 
     private List<Key> GetKeysFromText (string text)

@@ -719,7 +719,7 @@ Key bindings for Application-level commands, base View commands, and per-view co
       "Undo": { "All": ["Ctrl+Z"] },
       "CutToEndOfLine": { "All": ["Ctrl+K"] }
     },
-    "TextView": {
+    "Editor": {
       "Redo": { "All": ["Ctrl+Shift+Z"], "Windows": ["Ctrl+Y"] }
     }
   }

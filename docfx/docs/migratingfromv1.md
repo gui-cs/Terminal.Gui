@@ -1006,11 +1006,11 @@ var textView = new TextView
 
 **v2:**
 ```csharp
-var textView = new TextView
+var editor = new Editor
 {
     Text = "Initial text"
 };
-// Same API, but better performance
+// Similar API, but better performance
 ```
 
 ### Button

@@ -313,7 +313,7 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     height,
     ///     and is 80% the width of the SuperView.
     ///     <code>
-    ///  var textView = new TextField {
+    ///  var textField = new TextField {
     ///     X = Pos.Center (),
     ///     Y = Pos.Percent (50),
     ///     Width = Dim.Percent (80),

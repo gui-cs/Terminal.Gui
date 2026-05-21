@@ -110,7 +110,7 @@ protected override void OnDrawContent (Rectangle viewport)
 **CRITICAL**: `Cursor.Position` must ALWAYS be in screen coordinates.
 
 Views have three coordinate systems:
-1. **Content Area**: View's internal coordinates (e.g., document position in TextView)
+1. **Content Area**: View's internal coordinates (e.g., document position in Editor)
 2. **Viewport**: Visible portion of content (accounting for scrolling)
 3. **Screen**: Absolute terminal screen coordinates
 

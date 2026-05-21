@@ -7,6 +7,7 @@ using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Drivers;
+using Terminal.Gui.Editor;
 using Terminal.Gui.Resources;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
@@ -60,31 +61,29 @@ textFieldButton.Accepting += (_, _) =>
 mainWindow.Add (textFieldButton);
 
 // Example 1: TextField with string result using auto-Text extraction
-Button textViewButton = new () { Title = "TextView (Auto-Text)", X = Pos.Center (), Y = buttonY++ };
+Button editorButton = new () { Title = "Editor (Auto-Text)", X = Pos.Center (), Y = buttonY++ };
 
-textViewButton.Accepting += (_, _) =>
-                            {
-                                string? result = mainWindow.Prompt<TextView, string> (beginInitHandler: prompt =>
+editorButton.Accepting += (_, _) =>
+                          {
+                              string? result = mainWindow.Prompt<Editor, string> (beginInitHandler: prompt =>
+                                                                                                    {
+                                                                                                        prompt.Title = editorButton.Title;
+
+                                                                                                        prompt.GetWrappedView ().Text = "Some text\nis nice.";
+                                                                                                        prompt.GetWrappedView ().Width = Dim.Fill (0, 40);
+                                                                                                        prompt.GetWrappedView ().Height = Dim.Fill (0, 8);
+
+                                                                                                        if (!string.IsNullOrEmpty (initialValueField.Text))
                                                                                                         {
-                                                                                                            prompt.Title = textViewButton.Title;
+                                                                                                            ((IValue)prompt.GetWrappedView ())
+                                                                                                                .TrySetValueFromString (initialValueField.Text);
+                                                                                                        }
+                                                                                                    });
 
-                                                                                                            prompt.GetWrappedView ().Text =
-                                                                                                                "Some text\nis nice.";
-                                                                                                            prompt.GetWrappedView ().Width = Dim.Fill (0, 40);
-                                                                                                            prompt.GetWrappedView ().Height = Dim.Fill (0, 8);
+                              MessageBox.Query (app, editorButton.Title, result is { } ? $"You entered: {result}" : "Canceled", Strings.btnOk);
+                          };
 
-                                                                                                            if (!string.IsNullOrEmpty (initialValueField.Text))
-                                                                                                            {
-                                                                                                                ((IValue)prompt.GetWrappedView ())
-                                                                                                                    .TrySetValueFromString (initialValueField
-                                                                                                                        .Text);
-                                                                                                            }
-                                                                                                        });
-
-                                MessageBox.Query (app, textViewButton.Title, result is { } ? $"You entered: {result}" : "Canceled", Strings.btnOk);
-                            };
-
-mainWindow.Add (textViewButton);
+mainWindow.Add (editorButton);
 
 // Example 2: DatePicker with DateTime result
 Button datePickerButton = new () { Title = "DatePicker (Typed Result)", X = Pos.Center (), Y = buttonY++ };
@@ -297,7 +296,7 @@ FormData ExtractFormData (View form)
 // Result type for custom form
 internal record FormData
 {
-    public string Name { get; init; } = string.Empty;
     public int Age { get; init; }
     public bool Agreed { get; init; }
+    public string Name { get; init; } = string.Empty;
 }
