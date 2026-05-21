@@ -22,6 +22,13 @@ namespace ViewsTests;
 ///         shadow margins, and adornment subviews.
 ///     </para>
 ///     <para>
+///         <see cref="Code"/> is used as the scrollable tab content because the older
+///         <c>TextView</c> is being deprecated. The fan-out behavior lives in the <see cref="View"/>
+///         layout/draw pipeline and is independent of which content widget is used, so any view
+///         that scrolls inside an Overlapped-arrangement <see cref="Tabs"/> exercises the same
+///         code paths.
+///     </para>
+///     <para>
 ///         Each test reports its measured counts through <see cref="ITestOutputHelper"/> so the data
 ///         is visible in CI logs even when the test passes. When the fan-out problem is fixed, these
 ///         tests are expected to be updated to assert the new (lower) counts; the diagnostic helper
@@ -122,7 +129,18 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         return sb.ToString ();
     }
 
-    private static (View Root, Tabs Tabs, TextView [] TextViews, ViewActivityCounters Counters) BuildTabbedScenario (IDriver driver)
+    private static Code MakeCode (string title, string text) =>
+        new ()
+        {
+            Title = title,
+            Text = text,
+            Language = null,
+            SyntaxHighlighter = null,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+    private static (View Root, Tabs Tabs, Code [] Codes, ViewActivityCounters Counters) BuildTabbedScenario (IDriver driver)
     {
         View root = new ()
         {
@@ -135,20 +153,12 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         root.Add (tabs);
 
-        TextView [] textViews = new TextView [TabCount];
+        Code [] codes = new Code [TabCount];
 
         for (var i = 0; i < TabCount; i++)
         {
-            TextView tv = new ()
-            {
-                Title = $"Tab{i + 1}",
-                Text = MakeText ($"Tab{i + 1} line", 50),
-                Width = Dim.Fill (),
-                Height = Dim.Fill ()
-            };
-
-            textViews [i] = tv;
-            tabs.Add (tv);
+            codes [i] = MakeCode ($"Tab{i + 1}", MakeText ($"Tab{i + 1} line", 50));
+            tabs.Add (codes [i]);
         }
 
         ViewActivityCounters counters = new ();
@@ -156,13 +166,13 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
 
         for (var i = 0; i < TabCount; i++)
         {
-            counters.Track (textViews [i], $"TextView{i + 1}");
+            counters.Track (codes [i], $"Code{i + 1}");
         }
 
-        return (root, tabs, textViews, counters);
+        return (root, tabs, codes, counters);
     }
 
-    private static (View Root, TextView TextView, ViewActivityCounters Counters) BuildSingleTextViewScenario (IDriver driver)
+    private static (View Root, Code Code, ViewActivityCounters Counters) BuildSingleScenario (IDriver driver)
     {
         View root = new ()
         {
@@ -172,20 +182,13 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
             Height = Dim.Fill ()
         };
 
-        TextView tv = new ()
-        {
-            Title = "Only",
-            Text = MakeText ("Only line", 50),
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
-
-        root.Add (tv);
+        Code code = MakeCode ("Only", MakeText ("Only line", 50));
+        root.Add (code);
 
         ViewActivityCounters counters = new ();
-        counters.Track (tv, "TextView");
+        counters.Track (code, "Code");
 
-        return (root, tv, counters);
+        return (root, code, counters);
     }
 
     /// <summary>
@@ -196,13 +199,13 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
     public void Diagnostic_ActiveTabScroll_LayoutEvents_OnEachTab ()
     {
         IDriver driver = CreateTestDriver (DriverWidth, DriverHeight);
-        (View root, Tabs tabs, TextView [] textViews, ViewActivityCounters counters) = BuildTabbedScenario (driver);
+        (View root, Tabs tabs, Code [] codes, ViewActivityCounters counters) = BuildTabbedScenario (driver);
 
         root.Layout ();
         root.Draw ();
 
-        TextView active = (TextView)tabs.Value!;
-        Assert.Same (textViews [0], active);
+        Code active = (Code)tabs.Value!;
+        Assert.Same (codes [0], active);
 
         counters.Reset ();
 
@@ -221,7 +224,7 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
 
         for (var i = 1; i < TabCount; i++)
         {
-            inactiveLayouts += counters.Get (textViews [i]).SubViewsLaidOut;
+            inactiveLayouts += counters.Get (codes [i]).SubViewsLaidOut;
         }
 
         output.WriteLine ($"Active SubViewsLaidOut: {activeCounts.SubViewsLaidOut}");
@@ -247,12 +250,12 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
     public void Diagnostic_ActiveTabScroll_DrawEvents_OnEachTab ()
     {
         IDriver driver = CreateTestDriver (DriverWidth, DriverHeight);
-        (View root, Tabs tabs, TextView [] textViews, ViewActivityCounters counters) = BuildTabbedScenario (driver);
+        (View root, Tabs tabs, Code [] codes, ViewActivityCounters counters) = BuildTabbedScenario (driver);
 
         root.Layout ();
         root.Draw ();
 
-        TextView active = (TextView)tabs.Value!;
+        Code active = (Code)tabs.Value!;
 
         counters.Reset ();
 
@@ -274,7 +277,7 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
 
         for (var i = 1; i < TabCount; i++)
         {
-            ViewActivityCounters.Counts c = counters.Get (textViews [i]);
+            ViewActivityCounters.Counts c = counters.Get (codes [i]);
             inactiveDraws += c.DrawComplete;
             inactiveClears += c.ClearedViewport;
             inactiveContentDraws += c.DrawingContent;
@@ -285,22 +288,24 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         output.WriteLine ($"Sum of inactive ClearedViewport: {inactiveClears}");
         output.WriteLine ($"Sum of inactive DrawingContent:  {inactiveContentDraws}");
 
-        // CURRENT BEHAVIOR (issue #4973): inactive tabs receive draw, clear, and content-draw work
-        // when the active tab scrolls. After #4973 is fixed, flip these to `Assert.Equal (0, ...)`.
+        // CURRENT BEHAVIOR (issue #4973): inactive tabs receive full draw passes when active scrolls.
+        // DrawComplete is the widget-agnostic signal — it always fires once per call to Draw(),
+        // regardless of whether the view overrides OnClearingViewport / OnDrawingContent (as Code does).
+        // After #4973 is fixed, flip this to `Assert.Equal (0, inactiveDraws)`.
         Assert.True (
                      inactiveDraws > 0,
                      $"Documents issue #4973 draw fan-out: inactive_total DrawComplete={inactiveDraws}, " +
                      $"active={activeCounts.DrawComplete}. Flip to Assert.Equal(0, inactiveDraws) after #4973 fix.");
 
+        // ClearedViewport / DrawingContent on Code instances will be 0 because Code overrides those
+        // handlers and returns true (suppressing the events). The Tabs container still fires them,
+        // so they remain useful as a secondary diagnostic — recorded in the report above but not
+        // asserted at the per-tab level.
+        ViewActivityCounters.Counts tabsCounts = counters.Get (tabs);
         Assert.True (
-                     inactiveClears > 0,
-                     $"Documents issue #4973 clear fan-out: ClearViewport propagates via SetNeedsDraw. " +
-                     $"inactive_total ClearedViewport={inactiveClears}. Flip after #4973 fix.");
-
-        Assert.True (
-                     inactiveContentDraws > 0,
-                     $"Documents issue #4973 content-draw fan-out: inactive_total DrawingContent={inactiveContentDraws}. " +
-                     "Flip after #4973 fix.");
+                     tabsCounts.ClearedViewport > 0,
+                     $"Tabs container must register clear activity (got {tabsCounts.ClearedViewport}); " +
+                     "this confirms the lower-level draw pipeline is being exercised.");
 
         root.Dispose ();
         driver.Dispose ();
@@ -308,13 +313,13 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
 
     /// <summary>
     ///     Issue #5356 acceptance criterion: a comparable fan-out metric between an equivalent
-    ///     single-TextView scenario and a tabbed-TextView scenario.
+    ///     single-Code scenario and a tabbed-Code scenario.
     /// </summary>
     [Fact]
-    public void Diagnostic_TabbedFanOut_ComparedTo_SingleTextViewBaseline ()
+    public void Diagnostic_TabbedFanOut_ComparedTo_SingleViewBaseline ()
     {
         IDriver driverSingle = CreateTestDriver (DriverWidth, DriverHeight);
-        (View singleRoot, TextView singleTv, ViewActivityCounters singleCounters) = BuildSingleTextViewScenario (driverSingle);
+        (View singleRoot, Code single, ViewActivityCounters singleCounters) = BuildSingleScenario (driverSingle);
 
         singleRoot.Layout ();
         singleRoot.Draw ();
@@ -322,21 +327,21 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
 
         for (var y = 1; y <= 5; y++)
         {
-            singleTv.Viewport = singleTv.Viewport with { Y = y };
+            single.Viewport = single.Viewport with { Y = y };
             singleRoot.Layout ();
             singleRoot.Draw ();
         }
 
-        ViewActivityCounters.Counts singleCounts = singleCounters.Get (singleTv);
-        output.WriteLine (singleCounters.Report ("Single-TextView baseline (5 scrolls):"));
+        ViewActivityCounters.Counts singleCounts = singleCounters.Get (single);
+        output.WriteLine (singleCounters.Report ("Single-Code baseline (5 scrolls):"));
 
         IDriver driverTabbed = CreateTestDriver (DriverWidth, DriverHeight);
-        (View tabRoot, Tabs tabs, TextView [] textViews, ViewActivityCounters tabCounters) = BuildTabbedScenario (driverTabbed);
+        (View tabRoot, Tabs tabs, Code [] codes, ViewActivityCounters tabCounters) = BuildTabbedScenario (driverTabbed);
 
         tabRoot.Layout ();
         tabRoot.Draw ();
 
-        TextView active = (TextView)tabs.Value!;
+        Code active = (Code)tabs.Value!;
         tabCounters.Reset ();
 
         for (var y = 1; y <= 5; y++)
@@ -354,8 +359,8 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
 
         for (var i = 1; i < TabCount; i++)
         {
-            totalTabDraws += tabCounters.Get (textViews [i]).DrawComplete;
-            totalTabLayouts += tabCounters.Get (textViews [i]).SubViewsLaidOut;
+            totalTabDraws += tabCounters.Get (codes [i]).DrawComplete;
+            totalTabLayouts += tabCounters.Get (codes [i]).SubViewsLaidOut;
         }
 
         double drawFanOut = singleCounts.DrawComplete == 0 ? double.NaN : (double)totalTabDraws / singleCounts.DrawComplete;
@@ -364,19 +369,19 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         output.WriteLine ($"Tabbed total draws / single draws  = {totalTabDraws} / {singleCounts.DrawComplete} = {drawFanOut:F2}");
         output.WriteLine ($"Tabbed total layouts / single layouts = {totalTabLayouts} / {singleCounts.SubViewsLaidOut} = {layoutFanOut:F2}");
 
-        Assert.True (singleCounts.DrawComplete > 0, "Single-TextView baseline must record draw activity.");
+        Assert.True (singleCounts.DrawComplete > 0, "Single-Code baseline must record draw activity.");
         Assert.True (tabActiveCounts.DrawComplete > 0, "Active tab in tabbed scenario must record draw activity.");
 
         // CURRENT BEHAVIOR (issue #4973): tabbed scenario produces N-times more total work than baseline.
         // After #4973 is fixed, drawFanOut and layoutFanOut should approach 1.0 (within rounding).
         Assert.True (
                      drawFanOut > 1.0,
-                     $"Documents issue #4973: tabbed draw fan-out ({drawFanOut:F2}x) exceeds single-TextView baseline. " +
+                     $"Documents issue #4973: tabbed draw fan-out ({drawFanOut:F2}x) exceeds single-Code baseline. " +
                      "After fix, drawFanOut should approach 1.0.");
 
         Assert.True (
                      layoutFanOut > 1.0,
-                     $"Documents issue #4973: tabbed layout fan-out ({layoutFanOut:F2}x) exceeds single-TextView baseline. " +
+                     $"Documents issue #4973: tabbed layout fan-out ({layoutFanOut:F2}x) exceeds single-Code baseline. " +
                      "After fix, layoutFanOut should approach 1.0.");
 
         singleRoot.Dispose ();
@@ -395,15 +400,15 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
     public void Diagnostic_TransparentInactiveTab_StillObservable ()
     {
         IDriver driver = CreateTestDriver (DriverWidth, DriverHeight);
-        (View root, Tabs tabs, TextView [] textViews, ViewActivityCounters counters) = BuildTabbedScenario (driver);
+        (View root, Tabs tabs, Code [] codes, ViewActivityCounters counters) = BuildTabbedScenario (driver);
 
-        textViews [1].ViewportSettings |= ViewportSettingsFlags.Transparent;
-        textViews [2].ViewportSettings |= ViewportSettingsFlags.Transparent;
+        codes [1].ViewportSettings |= ViewportSettingsFlags.Transparent;
+        codes [2].ViewportSettings |= ViewportSettingsFlags.Transparent;
 
         root.Layout ();
         root.Draw ();
 
-        TextView active = (TextView)tabs.Value!;
+        Code active = (Code)tabs.Value!;
         counters.Reset ();
 
         for (var y = 1; y <= 3; y++)
@@ -420,7 +425,7 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
 
         for (var i = 1; i < TabCount; i++)
         {
-            ViewActivityCounters.Counts c = counters.Get (textViews [i]);
+            ViewActivityCounters.Counts c = counters.Get (codes [i]);
 
             Assert.True (
                          c.DrawComplete >= 0,
@@ -439,15 +444,15 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
     public void Diagnostic_ShadowMargin_DoesNotMaskActiveTabActivity ()
     {
         IDriver driver = CreateTestDriver (DriverWidth, DriverHeight);
-        (View root, Tabs tabs, TextView [] textViews, ViewActivityCounters counters) = BuildTabbedScenario (driver);
+        (View root, Tabs tabs, Code [] codes, ViewActivityCounters counters) = BuildTabbedScenario (driver);
 
-        textViews [0].ShadowStyle = ShadowStyles.Opaque;
+        codes [0].ShadowStyle = ShadowStyles.Opaque;
 
         root.Layout ();
         root.Draw ();
 
-        TextView active = (TextView)tabs.Value!;
-        Assert.Same (textViews [0], active);
+        Code active = (Code)tabs.Value!;
+        Assert.Same (codes [0], active);
 
         counters.Reset ();
 
@@ -477,12 +482,12 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
     public void Diagnostic_IOutputLayer_ObservesActiveTabContent ()
     {
         IDriver driver = CreateTestDriver (DriverWidth, DriverHeight);
-        (View root, Tabs tabs, TextView [] textViews, ViewActivityCounters counters) = BuildTabbedScenario (driver);
+        (View root, Tabs tabs, Code [] codes, ViewActivityCounters counters) = BuildTabbedScenario (driver);
 
         root.Layout ();
         root.Draw ();
 
-        TextView active = (TextView)tabs.Value!;
+        Code active = (Code)tabs.Value!;
 
         IOutput output1 = driver.GetOutput ();
         IOutputBuffer buffer = driver.GetOutputBuffer ();
@@ -523,12 +528,12 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
     public void Diagnostic_LayoutAndDraw_ReportedSeparately ()
     {
         IDriver driver = CreateTestDriver (DriverWidth, DriverHeight);
-        (View root, Tabs tabs, TextView [] textViews, ViewActivityCounters counters) = BuildTabbedScenario (driver);
+        (View root, Tabs tabs, Code [] codes, ViewActivityCounters counters) = BuildTabbedScenario (driver);
 
         root.Layout ();
         root.Draw ();
 
-        TextView active = (TextView)tabs.Value!;
+        Code active = (Code)tabs.Value!;
         counters.Reset ();
 
         active.Viewport = active.Viewport with { Y = 2 };
@@ -543,8 +548,8 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
 
         for (var i = 1; i < TabCount; i++)
         {
-            inactiveLayouts += counters.Get (textViews [i]).SubViewsLaidOut;
-            inactiveDraws += counters.Get (textViews [i]).DrawComplete;
+            inactiveLayouts += counters.Get (codes [i]).SubViewsLaidOut;
+            inactiveDraws += counters.Get (codes [i]).DrawComplete;
         }
 
         output.WriteLine ($"Layout: active={activeLayouts}, inactive_total={inactiveLayouts}");
