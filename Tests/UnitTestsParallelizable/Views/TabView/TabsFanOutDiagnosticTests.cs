@@ -192,11 +192,10 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
     }
 
     /// <summary>
-    ///     Issue #5356 / #4973 acceptance criterion: diagnostics can show whether inactive tabs
-    ///     received layout work when the active tab scrolls.
+    ///     Issue #5357 acceptance criterion: layout work stays on the active tab when the active tab scrolls.
     /// </summary>
     [Fact]
-    public void Diagnostic_ActiveTabScroll_LayoutEvents_OnEachTab ()
+    public void Diagnostic_ActiveTabScroll_LayoutEvents_StayOnActiveTab ()
     {
         IDriver driver = CreateTestDriver (DriverWidth, DriverHeight);
         (View root, Tabs tabs, Code [] codes, ViewActivityCounters counters) = BuildTabbedScenario (driver);
@@ -230,13 +229,9 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         output.WriteLine ($"Active SubViewsLaidOut: {activeCounts.SubViewsLaidOut}");
         output.WriteLine ($"Sum of inactive SubViewsLaidOut: {inactiveLayouts}");
 
-        // CURRENT BEHAVIOR (issue #4973): inactive tabs receive the same layout count as active.
-        // After #4973 is fixed, flip this to `Assert.Equal (0, inactiveLayouts)`.
-        Assert.True (
-                     inactiveLayouts > 0,
-                     $"Documents issue #4973: inactive tabs receive layout work when active tab scrolls. " +
-                     $"Observed inactive_total={inactiveLayouts}, active={activeCounts.SubViewsLaidOut}. " +
-                     "Flip to Assert.Equal(0, inactiveLayouts) after #4973 fix lands.");
+        Assert.Equal (
+                      0,
+                      inactiveLayouts);
 
         root.Dispose ();
         driver.Dispose ();
@@ -372,17 +367,15 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         Assert.True (singleCounts.DrawComplete > 0, "Single-Code baseline must record draw activity.");
         Assert.True (tabActiveCounts.DrawComplete > 0, "Active tab in tabbed scenario must record draw activity.");
 
-        // CURRENT BEHAVIOR (issue #4973): tabbed scenario produces N-times more total work than baseline.
-        // After #4973 is fixed, drawFanOut and layoutFanOut should approach 1.0 (within rounding).
+        // CURRENT BEHAVIOR: draw fan-out still exists, but layout fan-out should now match baseline.
         Assert.True (
                      drawFanOut > 1.0,
                      $"Documents issue #4973: tabbed draw fan-out ({drawFanOut:F2}x) exceeds single-Code baseline. " +
                      "After fix, drawFanOut should approach 1.0.");
 
-        Assert.True (
-                     layoutFanOut > 1.0,
-                     $"Documents issue #4973: tabbed layout fan-out ({layoutFanOut:F2}x) exceeds single-Code baseline. " +
-                     "After fix, layoutFanOut should approach 1.0.");
+        Assert.Equal (
+                      1.0,
+                      layoutFanOut);
 
         singleRoot.Dispose ();
         tabRoot.Dispose ();
