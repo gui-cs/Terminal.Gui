@@ -186,6 +186,29 @@ public class SetNeedsLayoutPropagationTests
     }
 
     [Fact]
+    public void SetNeedsLayout_On_AdornmentView_Directly_Reaches_AdornmentParent_Without_Marking_Siblings ()
+    {
+        View root = new () { Id = "root" };
+        View view = new () { Id = "view" };
+        View sibling = new () { Id = "sibling" };
+        View borderSubView = new () { Id = "borderSubView" };
+        view.Border.GetOrCreateView ().Add (borderSubView);
+        root.Add (view, sibling);
+
+        ClearAllNeedsLayout (root);
+
+        view.Border.View!.SetNeedsLayout ();
+
+        Assert.True (view.Border.View.NeedsLayout, "AdornmentView must be marked.");
+        Assert.True (borderSubView.NeedsLayout, "AdornmentView subtree must be marked.");
+        Assert.True (view.NeedsLayout, "Adornment parent must be marked.");
+        Assert.True (root.NeedsLayout, "Adornment parent's SuperView must be marked.");
+        Assert.False (sibling.NeedsLayout, "Sibling subtree must not be marked.");
+
+        root.Dispose ();
+    }
+
+    [Fact]
     public void SetNeedsLayout_Tabs_Active_Scroll_Does_Not_Mark_Inactive_Pages ()
     {
         View root = new () { Id = "root", Width = 60, Height = 20 };
@@ -220,6 +243,35 @@ public class SetNeedsLayoutPropagationTests
         Assert.False (page2Child.NeedsLayout, "Inactive tab page subtree must not be re-marked.");
         Assert.False (page3.NeedsLayout, "Inactive tab page must not be re-marked.");
         Assert.False (page3Child.NeedsLayout, "Inactive tab page subtree must not be re-marked.");
+
+        root.Dispose ();
+    }
+
+    [Fact]
+    public void SetNeedsLayout_Tabs_Active_Scroll_Does_Not_Redraw_Inactive_Pages_After_Layout ()
+    {
+        View root = new () { Id = "root", Width = 60, Height = 20 };
+        Tabs tabs = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+        root.Add (tabs);
+
+        View page1 = new () { Id = "page1", Title = "Tab1", Width = Dim.Fill (), Height = Dim.Fill () };
+        View page1Child = new () { Id = "page1Child", Width = 10, Height = 1 };
+        page1.Add (page1Child);
+
+        View page2 = new () { Id = "page2", Title = "Tab2", Width = Dim.Fill (), Height = Dim.Fill () };
+        View page2Child = new () { Id = "page2Child", Width = 10, Height = 1 };
+        page2.Add (page2Child);
+
+        tabs.Add (page1, page2);
+        root.Layout ();
+        root.ClearNeedsDraw ();
+        ClearAllNeedsLayout (root);
+
+        page1.SetNeedsLayout ();
+        root.Layout ();
+
+        Assert.False (page2.NeedsDraw, "Inactive tab page must not be redrawn.");
+        Assert.False (page2Child.NeedsDraw, "Inactive tab page subtree must not be redrawn.");
 
         root.Dispose ();
     }

@@ -558,15 +558,29 @@ public partial class View // Layout APIs
     /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
     public bool Layout (Size contentSize)
     {
+        bool needsDrawAfterLayout = _needsDrawAfterLayout;
+        Rectangle originalFrame = Frame;
+
         if (!SetRelativeLayout (contentSize))
         {
             return false;
         }
+
+        bool frameChanged = Frame != originalFrame;
         LayoutSubViews ();
 
-        // A layout was performed so a draw is needed
-        // NeedsLayout may still be true if a dependent View still needs layout after SubViewsLaidOut event
-        SetNeedsDraw ();
+        if (frameChanged || needsDrawAfterLayout)
+        {
+            // Ancestor-only layout propagation should not force redraw when a peer view is merely
+            // recomputed during dependency resolution. Draw after layout only when this view was
+            // directly invalidated for layout or its resolved frame actually changed.
+            SetNeedsDraw ();
+        }
+
+        if (!NeedsLayout)
+        {
+            _needsDrawAfterLayout = false;
+        }
 
         return true;
     }
@@ -880,6 +894,8 @@ public partial class View // Layout APIs
     /// </value>
     public bool NeedsLayout { get; internal set; } = true;
 
+    private bool _needsDrawAfterLayout = true;
+
     /// <summary>
     ///     Sets <see cref="NeedsLayout"/> to return <see langword="true"/>, indicating this View and all of it's subviews
     ///     (including adornments) need to be laid out in the next Application iteration.
@@ -892,6 +908,7 @@ public partial class View // Layout APIs
     /// </remarks>
     public void SetNeedsLayout ()
     {
+        _needsDrawAfterLayout = true;
         MarkSubtreeNeedsLayout ();
 
         TextFormatter.NeedsFormat = true;
