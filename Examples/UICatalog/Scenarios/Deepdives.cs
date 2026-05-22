@@ -51,6 +51,18 @@ public class Deepdives : Scenario
         _docList = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
 
         _docList.ValueChanged += OnDocListValueChanged;
+
+        // Prevent CursorDown/CursorUp from escaping the list when at boundaries.
+        // Without this, an unhandled CursorDown at the bottom propagates to Application
+        // which maps it to NextTabStop, shifting focus to the markdown viewer.
+        _docList.KeyDownNotHandled += (_, e) =>
+                                      {
+                                          if (e.KeyCode is KeyCode.CursorDown or KeyCode.CursorUp)
+                                          {
+                                              e.Handled = true;
+                                          }
+                                      };
+
         listFrame.Add (_docList);
 
         _viewerFrame = new FrameView
