@@ -34,7 +34,7 @@ jobs:
       run: dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-restore
 
     - name: Build EditorRef (for Terminal.Gui.Editor docs)
-      run: dotnet build docfx/EditorRef/EditorRef.csproj --configuration Release --no-restore
+      run: dotnet build docfx/EditorRef/EditorRef.csproj --configuration Release
 
     - name: DocFX Build
       working-directory: docfx
