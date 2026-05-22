@@ -394,7 +394,7 @@ public partial class TextField
     private void SetText (IEnumerable<string> newText) => SetText (newText.ToList ());
 
     /// <summary>Sets or gets the text held by the view.</summary>
-    public override string Text
+    public new string Text
     {
         get => StringExtensions.ToString (_text);
         set
@@ -438,6 +438,9 @@ public partial class TextField
 
             // Note we use NewValue here; TextChanging subscribers may have changed it
             _text = args.Result!.ToStringList ();
+
+            // Keep base View._text in sync
+            SetTextDirect (StringExtensions.ToString (_text));
 
             if (!Secret && !_historyText.IsFromHistory)
             {

@@ -152,6 +152,7 @@ public class TextValidateField : View, IDesignable, IValue<string>
             {
                 _provider.TextChanged += ProviderOnTextChanged;
                 _lastKnownText = _provider.Text;
+                SetTextDirect (_provider.Text);
             }
 
             if (_provider!.Fixed)
@@ -203,56 +204,76 @@ public class TextValidateField : View, IDesignable, IValue<string>
     #endregion
 
     /// <summary>Text</summary>
-    public override string Text
+    protected override void OnTextChanged ()
     {
-        get => _provider is null ? string.Empty : _provider.Text;
-        set
+        string value = Text;
+
+        if (_provider is null)
         {
-            if (_provider is null)
-            {
-                return;
-            }
+            base.OnTextChanged ();
 
-            string oldValue = _provider.Text;
-
-            if (oldValue == value)
-            {
-                return;
-            }
-
-            if (!SuppressValueEvents)
-            {
-                ValueChangingEventArgs<string?> args = new (oldValue, value);
-
-                if (OnValueChanging (args) || args.Handled)
-                {
-                    return;
-                }
-
-                ValueChanging?.Invoke (this, args);
-
-                if (args.Handled)
-                {
-                    return;
-                }
-
-                // Allow subscribers to modify the new value
-                value = args.NewValue ?? string.Empty;
-            }
-
-            _lastKnownText = value;
-            _provider.Text = value;
-
-            if (!SuppressValueEvents)
-            {
-                ValueChangedEventArgs<string?> changedArgs = new (oldValue, value);
-                OnValueChanged (changedArgs);
-                ValueChanged?.Invoke (this, changedArgs);
-                ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
-            }
-
-            SetNeedsDraw ();
+            return;
         }
+
+        string oldValue = _provider.Text;
+
+        if (oldValue == value)
+        {
+            base.OnTextChanged ();
+
+            return;
+        }
+
+        if (!SuppressValueEvents)
+        {
+            ValueChangingEventArgs<string?> args = new (oldValue, value);
+
+            if (OnValueChanging (args) || args.Handled)
+            {
+                // Revert Text to the provider's current value
+                SetTextDirect (oldValue);
+
+                return;
+            }
+
+            ValueChanging?.Invoke (this, args);
+
+            if (args.Handled)
+            {
+                // Revert Text to the provider's current value
+                SetTextDirect (oldValue);
+
+                return;
+            }
+
+            // Allow subscribers to modify the new value
+            value = args.NewValue ?? string.Empty;
+
+            if (value != Text)
+            {
+                SetTextDirect (value);
+            }
+        }
+
+        _lastKnownText = value;
+        _provider.Text = value;
+
+        // The provider may transform the text (e.g., mask formatting).
+        // Keep base _text in sync with the provider's actual text.
+        SetTextDirect (_provider.Text);
+
+        if (!SuppressValueEvents)
+        {
+            string oldVal = oldValue;
+            ValueChangedEventArgs<string?> changedArgs = new (oldVal, _provider.Text);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldVal, _provider.Text));
+        }
+
+        SetNeedsDraw ();
+
+        base.OnTextChanged ();
     }
 
     private int _insertionPoint;
@@ -324,6 +345,9 @@ public class TextValidateField : View, IDesignable, IValue<string>
 
         // Sync _lastKnownText with actual provider state (may have been reverted by handler)
         _lastKnownText = _provider.Text;
+
+        // Keep base Text in sync with provider
+        SetTextDirect (_provider.Text);
     }
 
     private void RevertProviderText (string oldText)

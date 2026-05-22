@@ -165,7 +165,7 @@ public partial class TextView
     ///     The <see cref="View.TextChanged"/> event is fired whenever this property is set. Note, however, that Text is not
     ///     set by <see cref="TextView"/> as the user types.
     /// </remarks>
-    public override string Text
+    public new string Text
     {
         get
         {
@@ -187,6 +187,9 @@ public partial class TextView
                 _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
                 _lastWrapWidth = Viewport.Width;
             }
+
+            // Keep base View._text in sync
+            SetTextDirect (value);
 
             OnTextChanged ();
             SetNeedsDraw ();

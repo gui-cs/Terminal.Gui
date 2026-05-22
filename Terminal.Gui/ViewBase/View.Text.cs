@@ -59,7 +59,7 @@ public partial class View // Text Property APIs
     ///         After the text is changed, the <see cref="TextChanged"/> event is raised.
     ///     </para>
     /// </remarks>
-    public virtual string Text
+    public string Text
     {
         get => _text;
         set
@@ -89,6 +89,26 @@ public partial class View // Text Property APIs
 
             OnTextChanged ();
         }
+    }
+
+    /// <summary>
+    ///     Sets the <see cref="Text"/> backing field directly without raising <see cref="TextChanging"/>
+    ///     or <see cref="TextChanged"/> events and without invoking the <see cref="OnTextChanging"/>
+    ///     or <see cref="OnTextChanged"/> virtual methods.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Use this method in derived views that maintain an internal text model (e.g., an editor
+    ///         buffer) and need to keep <see cref="Text"/> in sync after internal edits without
+    ///         re-entering the CWP flow.
+    ///     </para>
+    /// </remarks>
+    /// <param name="value">The new text value to store.</param>
+    protected void SetTextDirect (string value)
+    {
+        _text = value;
+        UpdateTextFormatterText ();
+        SetNeedsLayout ();
     }
 
     /// <summary>

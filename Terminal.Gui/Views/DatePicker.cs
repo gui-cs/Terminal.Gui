@@ -47,16 +47,14 @@ public class DatePicker : View, IValue<DateTime>
     }
 
     /// <inheritdoc/>
-    public override string Text
+    protected override void OnTextChanged ()
     {
-        get => Value.ToString (Format);
-        set
+        if (DateTime.TryParse (Text, out DateTime result))
         {
-            if (DateTime.TryParse (value, out DateTime result))
-            {
-                Value = result;
-            }
+            Value = result;
         }
+
+        base.OnTextChanged ();
     }
 
     #region IValue<DateTime> Implementation
@@ -89,6 +87,9 @@ public class DatePicker : View, IValue<DateTime>
             }
 
             _date = value;
+
+            // Keep Text in sync with the new date value
+            SetTextDirect (_date.ToString (Format));
 
             // Propagate value to embedded editor
             _dateEditor?.Value = value;
