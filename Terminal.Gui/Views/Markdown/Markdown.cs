@@ -403,16 +403,8 @@ public partial class Markdown : View, IDesignable
 
         BuildRenderedLines ();
 
-        // Enable focus on tables that contain links. This is done here (after Add)
-        // rather than in BuildLinkRegions to avoid the auto-focus side-effect that
-        // Add() triggers on focusable subviews when the parent has focus.
-        foreach (MarkdownTable table in _tableViews)
-        {
-            table.CanFocus = table.HasLinks;
-        }
-
-        // Clear any auto-focus that the CanFocus setter triggered on the first table.
-        // Tables should only receive focus via explicit Tab navigation.
+        // Clear any auto-focus that Add() triggered when a focusable table was added
+        // while this view has focus. Tables should only receive focus via explicit Tab.
         if (Focused is MarkdownTable)
         {
             Focused.HasFocus = false;

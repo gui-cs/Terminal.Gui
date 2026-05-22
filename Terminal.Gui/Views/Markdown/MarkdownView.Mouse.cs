@@ -153,7 +153,15 @@ public partial class Markdown
     /// </remarks>
     protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (behavior is { } && behavior != TabStop)
+        // Cancel auto-advance (behavior==null, used by SetHasFocusTrue) so that gaining
+        // focus doesn't automatically drill into a table SubView or link region.
+        // Only explicit Tab navigation (behavior==TabStop) should cycle through links.
+        if (behavior is null)
+        {
+            return true;
+        }
+
+        if (behavior != TabStop)
         {
             return false;
         }

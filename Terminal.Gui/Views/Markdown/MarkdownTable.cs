@@ -1143,15 +1143,11 @@ public sealed class MarkdownTable : View, IDesignable
 
         bool hasLinks = _linkRegions.Count > 0;
 
-        // When hosted inside a Markdown parent, CanFocus is managed by the parent's
-        // OnSubViewLayout to avoid the auto-focus side-effect triggered by Add().
-        // For standalone usage (SuperView is set but not Markdown, or this is called
-        // after being added to a non-Markdown parent during layout), set CanFocus here.
-        if (SuperView is not null and not Markdown)
-        {
-            CanFocus = hasLinks;
-        }
-
+        // Setting CanFocus here is safe: during BuildRenderedLines the table has not yet
+        // been Add()'d so SuperView is null, meaning the CanFocus setter's auto-focus
+        // guard (SuperView is { Focused: null }) won't fire. For standalone usage where
+        // SuperView IS set, the setter may auto-focus which is the expected behavior.
+        CanFocus = hasLinks;
         TabStop = hasLinks ? TabBehavior.TabStop : TabBehavior.NoStop;
 
         return;
