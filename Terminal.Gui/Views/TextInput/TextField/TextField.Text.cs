@@ -9,7 +9,7 @@ public partial class TextField
     private string? _lastPastedText;
 
     /// <summary>Raised before <see cref="Text"/> changes. The change can be canceled the text adjusted.</summary>
-    public event EventHandler<ResultEventArgs<string>>? TextChanging;
+    public new event EventHandler<ResultEventArgs<string>>? TextChanging;
 
     /// <summary>
     ///     Tracks whether the text field should be considered "used", that is, that the user has moved in the entry, so

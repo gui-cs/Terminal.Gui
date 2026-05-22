@@ -1,13 +1,10 @@
+using System.ComponentModel;
+
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Text Property APIs
 {
     private string _text = string.Empty;
-
-    /// <summary>
-    ///     Called when the <see cref="Text"/> has changed. Fires the <see cref="TextChanged"/> event.
-    /// </summary>
-    public void OnTextChanged () => TextChanged?.Invoke (this, EventArgs.Empty);
 
     /// <summary>
     ///     Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
@@ -50,7 +47,17 @@ public partial class View // Text Property APIs
     ///         If <see cref="View.Width"/> or <see cref="View.Height"/> are using <see cref="DimAutoStyle.Text"/>,
     ///         the <see cref="GetContentSize ()"/> will be adjusted to fit the text.
     ///     </para>
-    ///     <para>When the text changes, the <see cref="TextChanged"/> is fired.</para>
+    ///     <para>
+    ///         Setting <see cref="Text"/> to the same value as the current value is a no-op; neither
+    ///         <see cref="TextChanging"/> nor <see cref="TextChanged"/> will be raised.
+    ///     </para>
+    ///     <para>
+    ///         Before the text is changed, the <see cref="TextChanging"/> CWP hook is invoked. If cancelled,
+    ///         the text remains unchanged and <see cref="TextChanged"/> is not raised.
+    ///     </para>
+    ///     <para>
+    ///         After the text is changed, the <see cref="TextChanged"/> event is raised.
+    ///     </para>
     /// </remarks>
     public virtual string Text
     {
@@ -62,13 +69,78 @@ public partial class View // Text Property APIs
                 return;
             }
 
+            if (OnTextChanging ())
+            {
+                return;
+            }
+
+            CancelEventArgs args = new ();
+            TextChanging?.Invoke (this, args);
+
+            if (args.Cancel)
+            {
+                return;
+            }
+
             _text = value;
 
             UpdateTextFormatterText ();
             SetNeedsLayout ();
+
             OnTextChanged ();
         }
     }
+
+    /// <summary>
+    ///     Called before the <see cref="Text"/> changes. Invokes the <see cref="TextChanging"/> event, which can
+    ///     be cancelled.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a signal-only notification. It does not carry old or new text values because
+    ///         <see cref="View.Text"/> semantics vary across derived views.
+    ///     </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> if the text change should be cancelled; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnTextChanging () => false;
+
+    /// <summary>
+    ///     Raised when the <see cref="Text"/> is about to change. Set <see cref="CancelEventArgs.Cancel"/> to
+    ///     <see langword="true"/> to prevent the change.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a signal-only notification at the <see cref="View"/> level. It does not carry old or new
+    ///         text values. Derived controls that need richer text-edit semantics may expose their own specific events.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<CancelEventArgs>? TextChanging;
+
+    /// <summary>
+    ///     Called after the <see cref="Text"/> has been changed. Raises the <see cref="TextChanged"/> event.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a signal-only notification. It does not carry old or new text values because
+    ///         <see cref="View.Text"/> semantics vary across derived views.
+    ///     </para>
+    ///     <para>
+    ///         Derived views that override <see cref="Text"/> and do not call <c>base.Text</c> should call
+    ///         this method after mutating text to participate in the CWP workflow.
+    ///     </para>
+    /// </remarks>
+    protected virtual void OnTextChanged () => TextChanged?.Invoke (this, EventArgs.Empty);
+
+    /// <summary>
+    ///     Raised after the <see cref="Text"/> has been changed.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a signal-only notification at the <see cref="View"/> level. It does not carry old or new
+    ///         text values. Derived controls that need richer text-edit semantics may expose their own specific events.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler? TextChanged;
 
     /// <summary>
     ///     Gets or sets how the View's <see cref="Text"/> is aligned horizontally when drawn. Changing this property will
@@ -91,11 +163,6 @@ public partial class View // Text Property APIs
             SetNeedsLayout ();
         }
     }
-
-    /// <summary>
-    ///     Text changed event, raised when the text has changed.
-    /// </summary>
-    public event EventHandler? TextChanged;
 
     /// <summary>
     ///     Gets or sets the direction of the View's <see cref="Text"/>. Changing this property will redisplay the
