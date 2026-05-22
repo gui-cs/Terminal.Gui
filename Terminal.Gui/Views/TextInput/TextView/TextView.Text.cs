@@ -198,6 +198,37 @@ public partial class TextView
         }
     }
 
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Syncs the internal <see cref="TextModel"/> when <see cref="View.Text"/> is set through a
+    ///     polymorphic (<see cref="View"/>) reference, ensuring the TextView's editing model stays consistent.
+    /// </remarks>
+    protected override void OnTextChanged ()
+    {
+        string baseText = base.Text;
+
+        // Only sync when the internal model diverges (polymorphic setter case).
+        // When TextView's own `new Text` setter runs, it already calls LoadString
+        // and SetTextDirect, so base.Text matches _model — this is a no-op.
+        if (_model.ToString () != baseText)
+        {
+            ResetPosition ();
+            _model.LoadString (baseText);
+
+            if (_wordWrap)
+            {
+                _wrapManager = new WordWrapManager (_model);
+                _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
+                _lastWrapWidth = Viewport.Width;
+            }
+
+            _historyText.Clear (_model.GetAllLines ());
+            SetNeedsDraw ();
+        }
+
+        base.OnTextChanged ();
+    }
+
     /// <summary>
     ///     Tracks whether the text view should be considered "used", that is, that the user has moved in the entry, so
     ///     new input should be appended at the cursor position, rather than clearing the entry

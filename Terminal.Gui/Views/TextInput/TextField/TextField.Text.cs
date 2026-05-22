@@ -466,8 +466,30 @@ public partial class TextField
         }
     }
 
-    /// <summary>
-    ///     Returns <see langword="true"/> if the current cursor position is at the end of the <see cref="Text"/>. This
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Syncs the internal text buffer when <see cref="View.Text"/> is set through a polymorphic
+    ///     (<see cref="View"/>) reference, ensuring the TextField's editing model stays consistent.
+    /// </remarks>
+    protected override void OnTextChanged ()
+    {
+        string baseText = base.Text;
+
+        // Only sync when the internal model diverges (polymorphic setter case).
+        // When TextField's own `new Text` setter runs, it already updates _text
+        // and calls SetTextDirect, so base.Text matches _text — this is a no-op.
+        if (StringExtensions.ToString (_text) != baseText)
+        {
+            _text = baseText.ToStringList ();
+
+            if (InsertionPoint > _text.Count)
+            {
+                InsertionPoint = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
+            }
+        }
+
+        base.OnTextChanged ();
+    }
     ///     includes when it is empty.
     /// </summary>
     /// <returns></returns>

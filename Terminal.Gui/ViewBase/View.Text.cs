@@ -74,14 +74,6 @@ public partial class View // Text Property APIs
                 return;
             }
 
-            CancelEventArgs args = new ();
-            TextChanging?.Invoke (this, args);
-
-            if (args.Cancel)
-            {
-                return;
-            }
-
             _text = value;
 
             UpdateTextFormatterText ();
@@ -122,7 +114,13 @@ public partial class View // Text Property APIs
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/> if the text change should be cancelled; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnTextChanging () => false;
+    protected virtual bool OnTextChanging ()
+    {
+        CancelEventArgs args = new ();
+        TextChanging?.Invoke (this, args);
+
+        return args.Cancel;
+    }
 
     /// <summary>
     ///     Raised when the <see cref="Text"/> is about to change. Set <see cref="CancelEventArgs.Cancel"/> to

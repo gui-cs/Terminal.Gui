@@ -55,6 +55,7 @@ public class ProgressBar : View, IDesignable
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         CanFocus = false;
         _fraction = 0;
+        SetTextDirect ("0%");
     }
 
     /// <summary>
