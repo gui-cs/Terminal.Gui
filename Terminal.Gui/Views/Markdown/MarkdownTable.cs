@@ -1141,9 +1141,18 @@ public sealed class MarkdownTable : View, IDesignable
             ScanCellSegments (_rowSegments [r], r);
         }
 
-        // Set TabStop so the parent can manage CanFocus without triggering auto-focus
-        // during layout. CanFocus is set by the parent Markdown view after Add() completes.
-        TabStop = _linkRegions.Count > 0 ? TabBehavior.TabStop : TabBehavior.NoStop;
+        bool hasLinks = _linkRegions.Count > 0;
+
+        // When hosted inside a Markdown parent, CanFocus is managed by the parent's
+        // OnSubViewLayout to avoid the auto-focus side-effect triggered by Add().
+        // For standalone usage (SuperView is set but not Markdown, or this is called
+        // after being added to a non-Markdown parent during layout), set CanFocus here.
+        if (SuperView is not null and not Markdown)
+        {
+            CanFocus = hasLinks;
+        }
+
+        TabStop = hasLinks ? TabBehavior.TabStop : TabBehavior.NoStop;
 
         return;
 
