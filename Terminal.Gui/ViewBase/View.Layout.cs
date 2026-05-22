@@ -555,7 +555,7 @@ public partial class View // Layout APIs
     ///     </para>
     /// </remarks>
     /// <param name="contentSize"></param>
-    /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
+    /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependency was not ready). </returns>
     public bool Layout (Size contentSize)
     {
         if (!SetRelativeLayout (contentSize))
