@@ -15,6 +15,18 @@
     {
       "src": [
         {
+          "src": "EditorRef/bin/Release/net10.0",
+          "files": [
+            "Terminal.Gui.Editor.dll"
+          ]
+        }
+      ],
+      "dest": "api",
+      "memberLayout": "separatePages"
+    },
+    {
+      "src": [
+        {
           "src": "../UICatalog",
           "files": [
             "**/*.csproj"
