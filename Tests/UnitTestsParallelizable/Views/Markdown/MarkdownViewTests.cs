@@ -2364,4 +2364,61 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Assert.False (markdown.HasFocus);
     }
+
+    // Copilot - regression test for #5365
+    [Fact]
+    public void Initial_Render_With_Table_Links_Does_Not_Scroll_Viewport ()
+    {
+        // When a Markdown view contains tables with hyperlinks, the viewport must remain
+        // at Y=0 after initial layout. No table should have auto-focus.
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 10);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          # Title
+
+                          Some introductory text at the top.
+
+                          | Command | Description |
+                          |---------|-------------|
+                          | [help](app:help) | Shows help |
+                          | [quit](app:quit) | Quits the app |
+
+                          More text below.
+
+                          | Name | Link |
+                          |------|------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          | [gamma](https://c.com) | [delta](https://d.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = markdown
+        };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Viewport must remain at the top — no auto-scrolling to a focused table
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // No table SubView should have focus
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable table)
+            {
+                Assert.False (table.HasFocus, "No table should have auto-focus on initial render");
+            }
+        }
+
+        app.Dispose ();
+    }
 }

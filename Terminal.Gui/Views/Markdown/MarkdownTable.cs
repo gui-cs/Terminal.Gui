@@ -199,6 +199,9 @@ public sealed class MarkdownTable : View, IDesignable
     /// </summary>
     internal int RenderedHeight { get; private set; }
 
+    /// <summary>Gets whether this table contains any navigable link regions.</summary>
+    internal bool HasLinks => _linkRegions.Count > 0;
+
     /// <summary>Gets the total rendered height of this table in lines (simple estimate).</summary>
     /// <remarks>
     ///     This simple estimation assumes single-line rows. Used by external callers that don't have
@@ -1138,10 +1141,9 @@ public sealed class MarkdownTable : View, IDesignable
             ScanCellSegments (_rowSegments [r], r);
         }
 
-        // Make the table focusable and navigable when it contains links
-        bool hasLinks = _linkRegions.Count > 0;
-        CanFocus = hasLinks;
-        TabStop = hasLinks ? TabBehavior.TabStop : TabBehavior.NoStop;
+        // Set TabStop so the parent can manage CanFocus without triggering auto-focus
+        // during layout. CanFocus is set by the parent Markdown view after Add() completes.
+        TabStop = _linkRegions.Count > 0 ? TabBehavior.TabStop : TabBehavior.NoStop;
 
         return;
 
