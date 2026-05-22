@@ -897,7 +897,7 @@ public partial class View // Layout APIs
     private bool _needsDrawAfterLayout = true;
 
     /// <summary>
-    ///     Sets <see cref="NeedsLayout"/> to return <see langword="true"/>, indicating this View and all of it's subviews
+    ///     Sets <see cref="NeedsLayout"/> to return <see langword="true"/>, indicating this View and all of its subviews
     ///     (including adornments) need to be laid out in the next Application iteration.
     /// </summary>
     /// <remarks>
