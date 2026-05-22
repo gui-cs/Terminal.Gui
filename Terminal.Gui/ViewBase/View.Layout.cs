@@ -892,22 +892,28 @@ public partial class View // Layout APIs
     /// </remarks>
     public void SetNeedsLayout ()
     {
+        MarkSubtreeNeedsLayout ();
+
+        TextFormatter.NeedsFormat = true;
+
+        if (SuperView is { NeedsLayout: false } superView)
+        {
+            superView.MarkAncestorsNeedLayout ();
+        }
+
+        if (this is AdornmentView adornment && adornment.Adornment?.Parent is { NeedsLayout: false } adornmentParent)
+        {
+            adornmentParent.MarkAncestorsNeedLayout ();
+        }
+    }
+
+    // Marks this view and every descendant in its own subtree (including adornment subview
+    // trees) as needing layout. Does NOT propagate to SuperView or Adornment.Parent. See
+    // <see cref="SetNeedsLayout"/> and issue #5357.
+    private void MarkSubtreeNeedsLayout ()
+    {
         NeedsLayout = true;
-
-        if (Margin.View is { SubViews.Count: > 0 })
-        {
-            Margin.View.SetNeedsLayout ();
-        }
-
-        if (Border.View is { SubViews.Count: > 0 })
-        {
-            Border.View.SetNeedsLayout ();
-        }
-
-        if (Padding.View is { SubViews.Count: > 0 })
-        {
-            Padding.View.SetNeedsLayout ();
-        }
+        MarkAdornmentSubViewTrees ();
 
         // TODO: Optimize this - see Setting_Thickness_Causes_Adornment_SubView_Layout
         // Use a stack to avoid recursion
@@ -923,44 +929,61 @@ public partial class View // Layout APIs
             {
                 continue;
             }
+
             current.NeedsLayout = true;
-
-            if (current.Margin.View is { SubViews.Count: > 0 })
-            {
-                current.Margin.View.SetNeedsLayout ();
-            }
-
-            if (current.Border.View is { SubViews.Count: > 0 })
-            {
-                current.Border.View.SetNeedsLayout ();
-            }
-
-            if (current.Padding.View is { SubViews.Count: > 0 })
-            {
-                current.Padding.View.SetNeedsLayout ();
-            }
+            current.MarkAdornmentSubViewTrees ();
 
             foreach (View subview in current.SubViews)
             {
                 stack.Push (subview);
             }
         }
+    }
 
-        TextFormatter.NeedsFormat = true;
-
-        if (SuperView is { NeedsLayout: false })
+    // Marks this view's Margin/Border/Padding view trees as needing layout when they have
+    // subviews. Adornment subview trees live separately from the regular SubViews tree.
+    private void MarkAdornmentSubViewTrees ()
+    {
+        if (Margin.View is { SubViews.Count: > 0 })
         {
-            SuperView?.SetNeedsLayout ();
+            Margin.View.MarkSubtreeNeedsLayout ();
         }
 
-        if (this is not AdornmentView adornment)
+        if (Border.View is { SubViews.Count: > 0 })
+        {
+            Border.View.MarkSubtreeNeedsLayout ();
+        }
+
+        if (Padding.View is { SubViews.Count: > 0 })
+        {
+            Padding.View.MarkSubtreeNeedsLayout ();
+        }
+    }
+
+    // Walks up the ancestor chain marking each ancestor as needing layout, without descending
+    // into the ancestor's regular SubViews tree. Adornment subview trees on each ancestor are
+    // still marked so adornment content re-lays-out when its parent does. Stops at any ancestor
+    // already marked, mirroring the early-exit guards in the original recursive call. See
+    // issue #5357.
+    private void MarkAncestorsNeedLayout ()
+    {
+        if (NeedsLayout)
         {
             return;
         }
 
-        if (adornment.Adornment?.Parent is { NeedsLayout: false })
+        NeedsLayout = true;
+        TextFormatter.NeedsFormat = true;
+        MarkAdornmentSubViewTrees ();
+
+        if (SuperView is { NeedsLayout: false } superView)
         {
-            adornment.Adornment.Parent?.SetNeedsLayout ();
+            superView.MarkAncestorsNeedLayout ();
+        }
+
+        if (this is AdornmentView adornment && adornment.Adornment?.Parent is { NeedsLayout: false } adornmentParent)
+        {
+            adornmentParent.MarkAncestorsNeedLayout ();
         }
     }
 
