@@ -1,4 +1,4 @@
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Provides ergonomic factory methods for creating <see cref="PlatformKeyBinding"/> instances.
