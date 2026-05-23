@@ -118,18 +118,6 @@ public partial class TextField
         }
     }
 
-    /// <summary>Raises the <see cref="TextChanging"/> event, enabling canceling the change or adjusting the text.</summary>
-    /// <param name="args">The event arguments.</param>
-    /// <returns><see langword="true"/> if the event was cancelled or the text was adjusted by the event.</returns>
-    public bool RaiseTextChanging (ResultEventArgs<string> args)
-    {
-        // TODO: CWP: Add an OnTextChanging protected virtual method that can be overridden to handle text changing events.
-
-        TextChanging?.Invoke (this, args);
-
-        return args.Handled;
-    }
-
     /// <summary>
     ///     Gets the horizontal scroll offset, representing the index of the first visible text element.
     /// </summary>
@@ -346,7 +334,7 @@ public partial class TextField
         }
 
         ResultEventArgs<string> args = new (sanitized);
-        RaiseTextChanging (args);
+        TextChanging?.Invoke (this, args);
 
         if (args.Handled)
         {
