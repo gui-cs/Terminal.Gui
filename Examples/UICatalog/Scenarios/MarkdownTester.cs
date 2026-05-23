@@ -1,10 +1,12 @@
 // ReSharper disable AccessToDisposedClosure
 
+using Terminal.Gui.Editor;
+using Terminal.Gui.Highlighting;
 using TextMateSharp.Grammars;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Markdown Tester", "Edit Markdown in a TextView and see it rendered in a MarkdownView.")]
+[ScenarioMetadata ("Markdown Tester", "Edit Markdown in an Editor and see it rendered in a MarkdownView.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Text and Formatting")]
 public class MarkdownTester : Scenario
@@ -14,14 +16,7 @@ public class MarkdownTester : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        Window window = new ()
-        {
-            Title = "Markdown Tester",
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None,
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent)
-        };
+        Window window = new () { Title = "Markdown Tester", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
         // --- Source editor (top half) ---
         FrameView editorFrame = new ()
@@ -35,15 +30,16 @@ public class MarkdownTester : Scenario
         };
         editorFrame.Border.Thickness = new Thickness (0, 2, 0, 0);
 
-        TextView editor = new ()
+        Editor editor = new ()
         {
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            TabKeyAddsTab = false,
-            Text = Markdown.DefaultMarkdownSample
+            HighlightingDefinition = HighlightingManager.Instance.GetDefinition ("MarkDown")
         };
+
+        editor.Text = Markdown.DefaultMarkdownSample;
 
         editorFrame.Add (editor);
 
@@ -71,7 +67,7 @@ public class MarkdownTester : Scenario
         previewFrame.Add (preview);
 
         // Update preview when editor text changes
-        editor.ContentsChanged += (_, _) => { preview.Text = editor.Text; };
+        editor.Document!.Changed += (_, _) => { preview.Text = editor.Text; };
 
         window.Add (editorFrame, previewFrame);
 
@@ -81,9 +77,7 @@ public class MarkdownTester : Scenario
 
         DropDownList<ThemeName> themeDropDown = new ()
         {
-            Value = (preview.SyntaxHighlighter as TextMateSyntaxHighlighter)?.ThemeName ?? ThemeName.DarkPlus,
-            ReadOnly = true,
-            CanFocus = false
+            Value = (preview.SyntaxHighlighter as TextMateSyntaxHighlighter)?.ThemeName ?? ThemeName.DarkPlus, ReadOnly = true, CanFocus = false
         };
 
         themeDropDown.ValueChanged += (_, e) =>
@@ -100,16 +94,16 @@ public class MarkdownTester : Scenario
 
         // Auto-select a light or dark syntax theme based on the terminal's actual background color.
         app.Driver!.DefaultAttributeChanged += (_, e) =>
-                                                {
-                                                    if (e.NewValue is not { } attr)
-                                                    {
-                                                        return;
-                                                    }
+                                               {
+                                                   if (e.NewValue is not { } attr)
+                                                   {
+                                                       return;
+                                                   }
 
-                                                    ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
-                                                    preview.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
-                                                    themeDropDown.Value = autoTheme;
-                                                };
+                                                   ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
+                                                   preview.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
+                                                   themeDropDown.Value = autoTheme;
+                                               };
 
         CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = preview.UseThemeBackground ? CheckState.Checked : CheckState.UnChecked };
 

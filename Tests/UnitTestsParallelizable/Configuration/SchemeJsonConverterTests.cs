@@ -148,4 +148,22 @@ public class SchemeJsonConverterTests
         Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out _));
         Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out _));
     }
+
+    [Fact]
+    public void CodeToken_Attributes_RoundTrip ()
+    {
+        // Copilot
+        Scheme expected = new ()
+        {
+            Normal = new (Color.White, Color.Black),
+            CodeKeyword = new (Color.Blue, Color.Black, TextStyle.Bold)
+        };
+
+        string json = JsonSerializer.Serialize (expected, ConfigurationManager.SerializerContext.Options);
+        Scheme? actual = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options);
+
+        Assert.NotNull (actual);
+        Assert.True (actual.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? attr));
+        Assert.Equal (expected.CodeKeyword, attr);
+    }
 }

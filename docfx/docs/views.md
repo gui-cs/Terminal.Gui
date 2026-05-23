@@ -974,7 +974,7 @@ Masked text editor that validates input through a <xref:Terminal.Gui.Views.IText
 </pre>
 
 
-## [TextView](xref:Terminal.Gui.Views.TextView)
+## [Editor](xref:Terminal.Gui.Views.Editor)
 
 Fully featured multi-line text editor.
 

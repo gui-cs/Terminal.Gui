@@ -7,44 +7,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Layout_Does_Not_Draw (Type viewType)
-    {
-        IDriver driver = CreateTestDriver ();
-
-        View? view = CreateInstanceIfNotGeneric (viewType);
-
-        if (view is null)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
-
-            return;
-        }
-
-        if (view is IDesignable designable)
-        {
-            designable.EnableForDesign ();
-        }
-
-        var drawContentCount = 0;
-        view.DrawingContent += (s, e) => drawContentCount++;
-
-        var layoutStartedCount = 0;
-        view.SubViewLayout += (s, e) => layoutStartedCount++;
-
-        var layoutCompleteCount = 0;
-        view.SubViewsLaidOut += (s, e) => layoutCompleteCount++;
-
-        view.SetNeedsLayout ();
-        view.SetNeedsDraw ();
-        view.Layout ();
-
-        Assert.Equal (0, drawContentCount);
-        Assert.Equal (1, layoutStartedCount);
-        Assert.Equal (1, layoutCompleteCount);
-    }
-
-    [Theory]
-    [MemberData (nameof (AllViewTypes))]
     public void AllViews_Center_Properly (Type viewType)
     {
         IDriver driver = CreateTestDriver ();
@@ -86,33 +48,35 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Tests_All_Constructors (Type viewType)
+    public void AllViews_Command_Accept_Raises_Accepting (Type viewType)
     {
-        Assert.True (TestAllConstructorsOfType (viewType));
+        View? view = CreateInstanceIfNotGeneric (viewType);
 
-        return;
-
-        bool TestAllConstructorsOfType (Type type)
+        if (view == null)
         {
-            foreach (ConstructorInfo ctor in type.GetConstructors ())
-            {
-                View? view = CreateViewFromType (type, ctor);
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
-                if (view != null)
-                {
-                    Assert.True (type.FullName == view.GetType ().FullName);
-                }
-
-                view?.Dispose ();
-            }
-
-            return true;
+            return;
         }
+
+        // if (view is IDesignable designable)
+        // {
+        //    designable.EnableForDesign ();
+        // }
+
+        var acceptingCount = 0;
+        view.Accepting += (s, e) => { acceptingCount++; };
+
+        if (view.InvokeCommand (Command.Accept) == true)
+        {
+            Assert.Equal (1, acceptingCount);
+        }
+        view?.Dispose ();
     }
 
-    //[Fact]
-    //public void AllViews_HotKey_Works ()
-    //{
+    // [Fact]
+    // public void AllViews_HotKey_Works ()
+    // {
     //	foreach (var type in GetAllViewClasses ()) {
     //		_output.WriteLine ($"Testing {type.Name}");
     //		var view = GetTypeInitializer (type, type.GetConstructor (Array.Empty<Type> ()));
@@ -120,7 +84,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     //		view.Text = "^text";
     //		Assert.Equal(Key.T, view.HotKey);
     //	}
-    //}
+    // }
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
@@ -150,34 +114,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         {
             Assert.Equal (1, activatingCount);
             Assert.Equal (0, acceptedCount);
-        }
-        view?.Dispose ();
-    }
-
-    [Theory]
-    [MemberData (nameof (AllViewTypes))]
-    public void AllViews_Command_Accept_Raises_Accepting (Type viewType)
-    {
-        View? view = CreateInstanceIfNotGeneric (viewType);
-
-        if (view == null)
-        {
-            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
-
-            return;
-        }
-
-        //if (view is IDesignable designable)
-        //{
-        //    designable.EnableForDesign ();
-        //}
-
-        var acceptingCount = 0;
-        view.Accepting += (s, e) => { acceptingCount++; };
-
-        if (view.InvokeCommand (Command.Accept) == true)
-        {
-            Assert.Equal (1, acceptingCount);
         }
         view?.Dispose ();
     }
@@ -214,10 +150,74 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view?.Dispose ();
     }
 
-    //[Theory]
-    //[MemberData (nameof (AllViewTypes))]
-    //public void AllViews_Disabled_Draws_Disabled_Or_Faint (Type viewType)
-    //{
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Layout_Does_Not_Draw (Type viewType)
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View? view = CreateInstanceIfNotGeneric (viewType);
+
+        if (view is null)
+        {
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+
+            return;
+        }
+
+        if (view is IDesignable designable)
+        {
+            designable.EnableForDesign ();
+        }
+
+        var drawContentCount = 0;
+        view.DrawingContent += (s, e) => drawContentCount++;
+
+        var layoutStartedCount = 0;
+        view.SubViewLayout += (s, e) => layoutStartedCount++;
+
+        var layoutCompleteCount = 0;
+        view.SubViewsLaidOut += (s, e) => layoutCompleteCount++;
+
+        view.SetNeedsLayout ();
+        view.SetNeedsDraw ();
+        view.Layout ();
+
+        Assert.Equal (0, drawContentCount);
+        Assert.Equal (1, layoutStartedCount);
+        Assert.Equal (1, layoutCompleteCount);
+    }
+
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Tests_All_Constructors (Type viewType)
+    {
+        Assert.True (TestAllConstructorsOfType (viewType));
+
+        return;
+
+        bool TestAllConstructorsOfType (Type type)
+        {
+            foreach (ConstructorInfo ctor in type.GetConstructors ())
+            {
+                View? view = CreateViewFromType (type, ctor);
+
+                if (view != null)
+                {
+                    Assert.True (type.FullName == view.GetType ().FullName);
+                }
+
+                view?.Dispose ();
+            }
+
+            return true;
+        }
+    }
+
+    // [Theory]
+    // [MemberData (nameof (AllViewTypes))]
+    // public void AllViews_Disabled_Draws_Disabled_Or_Faint (Type viewType)
+    // {
     //    var view = CreateInstanceIfNotGeneric (viewType);
 
     //    if (view == null)
@@ -246,5 +246,5 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     //    view.Draw ();
 
     //    view?.Dispose ();
-    //}
+    // }
 }

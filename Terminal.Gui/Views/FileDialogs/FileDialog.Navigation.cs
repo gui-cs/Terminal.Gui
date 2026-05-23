@@ -194,8 +194,21 @@ public partial class FileDialog
 
     private static void SuppressIfBadChar (Key k)
     {
-        // don't let user type bad letters
-        var ch = (char)k;
+        // Only suppress actual typed printable characters.
+        // Navigation keys (Home/End/etc.) must pass through to key bindings.
+        if (k.IsAlt || k.IsCtrl)
+        {
+            return;
+        }
+
+        string grapheme = k.AsGrapheme;
+
+        if (grapheme.Length != 1)
+        {
+            return;
+        }
+
+        char ch = grapheme [0];
 
         if (_badChars.Contains (ch))
         {

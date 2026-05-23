@@ -129,4 +129,53 @@ public class SchemeCodeRoleTests
         Scheme scheme = new ();
         Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Code, out _));
     }
+
+    [Fact]
+    public void CodeToken_Roles_Derive_From_Code ()
+    {
+        // Copilot
+        Attribute codeAttr = new ("Green", "Yellow", TextStyle.Italic);
+        Scheme scheme = new () { Normal = new Attribute ("Red", "Blue"), Code = codeAttr };
+
+        foreach (VisualRole role in Enum.GetValues<VisualRole> ().Where (role => role > VisualRole.Code))
+        {
+            Assert.False (scheme.TryGetExplicitlySetAttributeForRole (role, out _));
+            Assert.Equal (codeAttr, scheme.GetAttributeForRole (role));
+        }
+    }
+
+    [Fact]
+    public void CodeToken_Role_Can_Be_Explicitly_Set ()
+    {
+        // Copilot
+        Attribute keywordAttr = new ("Cyan", "Black", TextStyle.Bold);
+        Scheme scheme = new () { Normal = new Attribute ("Red", "Blue"), CodeKeyword = keywordAttr };
+
+        Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? retrieved));
+        Assert.Equal (keywordAttr, retrieved);
+        Assert.Equal (keywordAttr, scheme.GetAttributeForRole (VisualRole.CodeKeyword));
+    }
+
+    [Fact]
+    public void HardCoded_Base_Has_Default_CodeToken_Colors ()
+    {
+        // Copilot
+        Scheme baseScheme = Scheme.GetHardCodedSchemes () ["Base"];
+
+        Assert.True (baseScheme.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? keyword));
+        Assert.NotEqual (baseScheme.Code.Foreground, keyword!.Value.Foreground);
+    }
+
+    [Fact]
+    public void DeriveAccent_Preserves_Base_CodeToken_Colors ()
+    {
+        // Copilot
+        Attribute terminalDefault = new (Color.White, Color.Black);
+        Scheme baseScheme = Scheme.GetHardCodedSchemes () ["Base"];
+
+        Scheme accent = Scheme.DeriveAccent (baseScheme, terminalDefault);
+
+        Assert.True (accent.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? keyword));
+        Assert.Equal (baseScheme.CodeKeyword.Foreground, keyword!.Value.Foreground);
+    }
 }

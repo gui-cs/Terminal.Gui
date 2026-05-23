@@ -9,7 +9,6 @@ namespace Terminal.Gui.Views;
 ///         <listheader>
 ///             <term>Key</term> <description>Action</description>
 ///         </listheader>
-
 ///         <item>
 ///             <term>Left, Ctrl+B</term> <description>Moves the editing point left.</description>
 ///         </item>

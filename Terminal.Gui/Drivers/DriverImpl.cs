@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using Terminal.Gui.Tracing;
 
@@ -70,6 +70,7 @@ internal class DriverImpl : IDriver
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.SyntheticMouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
+        _inputProcessor.Paste += (s, e) => Paste?.Invoke (s, e);
         _outputBuffer = outputBuffer;
         _output = output;
         _ansiRequestScheduler = ansiRequestScheduler;
@@ -271,6 +272,22 @@ internal class DriverImpl : IDriver
     #region Color Support
 
     /// <inheritdoc/>
+    public SixelSupportResult? SixelSupport { get; private set; }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
+
+    /// <summary>
+    ///     Sets the terminal's sixel support result (detected during initialization).
+    /// </summary>
+    internal void SetSixelSupport (SixelSupportResult result)
+    {
+        SixelSupportResult? old = SixelSupport;
+        SixelSupport = result;
+        SixelSupportChanged?.Invoke (this, new ValueChangedEventArgs<SixelSupportResult?> (old, result));
+    }
+
+    /// <inheritdoc/>
     public bool SupportsTrueColor => !IsLegacyConsole;
 
     /// <inheritdoc/>
@@ -468,6 +485,9 @@ internal class DriverImpl : IDriver
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
+
+    /// <summary>Event fired when a bracketed paste is received from the terminal.</summary>
+    public event EventHandler<string>? Paste;
 
     #endregion Input Events
 

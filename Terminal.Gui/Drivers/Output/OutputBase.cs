@@ -252,13 +252,14 @@ public abstract class OutputBase
         // Render queued sixel images
         foreach (SixelToRender s in GetSixels ())
         {
-            if (string.IsNullOrWhiteSpace (s.SixelData))
+            if (string.IsNullOrWhiteSpace (s.SixelData) || (!s.IsDirty && !s.AlwaysRender))
             {
                 continue;
             }
 
             SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
             Write (new StringBuilder (s.SixelData));
+            s.IsDirty = false;
         }
     }
 
@@ -399,10 +400,14 @@ public abstract class OutputBase
                 lastUrl = null;
             }
 
-            // Add newline at end of row if requested
+            // Add newline at end of row if requested. Use a fixed '\n', NOT
+            // StringBuilder.AppendLine () / Environment.NewLine: ToAnsi produces a portable
+            // escape-sequence stream that must be byte-identical regardless of the OS it ran
+            // on (golden snapshots, cross-platform diffing). Terminals map LF -> CRLF via the
+            // ONLCR tty discipline, so a '\n' row break still recreates the screen correctly.
             if (addNewlines)
             {
-                output.AppendLine ();
+                output.Append ('\n');
             }
         }
     }
@@ -478,7 +483,8 @@ public abstract class OutputBase
                     }
                 }
 
-                output.AppendLine ();
+                // Fixed '\n' (not Environment.NewLine) — keep legacy-console output portable too.
+                output.Append ('\n');
             }
 
             return output.ToString ();

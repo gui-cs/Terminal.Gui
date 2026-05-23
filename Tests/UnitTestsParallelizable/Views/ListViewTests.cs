@@ -582,7 +582,7 @@ hree - lon",
 
         matchNone.Setup (m => m.IsCompatibleKey (It.IsAny<Key> ())).Returns (false);
 
-        lv.KeystrokeNavigator.Matcher = matchNone.Object;
+        lv.KeystrokeNavigator?.Matcher = matchNone.Object;
 
         // Keys are ignored because IsCompatibleKey returned false i.e. don't use these keys for navigation
         Assert.False (lv.NewKeyDownEvent (Key.B));
@@ -591,6 +591,51 @@ hree - lon",
 
         // assert IsMatch never called
         matchNone.Verify (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ()), Times.Never ());
+    }
+
+    // Copilot
+    [Fact]
+    public void KeystrokeNavigator_SetNull_DisablesKeystrokeNavigation ()
+    {
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
+        ListView lv = new () { Source = new ListWrapper<string> (source) };
+
+        lv.SetFocus ();
+
+        // Verify keystroke navigation works by default
+        Assert.NotNull (lv.KeystrokeNavigator);
+        Assert.True (lv.NewKeyDownEvent (Key.B));
+        Assert.Equal (2, lv.SelectedItem); // "bat"
+
+        // Disable keystroke navigation
+        lv.KeystrokeNavigator = null;
+
+        // Reset selection
+        lv.SelectedItem = 0;
+
+        // Typing should no longer navigate — key events are not consumed
+        Assert.False (lv.NewKeyDownEvent (Key.C));
+        Assert.Equal (0, lv.SelectedItem); // unchanged
+        Assert.False (lv.NewKeyDownEvent (Key.A));
+        Assert.Equal (0, lv.SelectedItem); // unchanged
+    }
+
+    // Copilot
+    [Fact]
+    public void KeystrokeNavigator_ReassignAfterSource_SyncsCollection ()
+    {
+        ObservableCollection<string> source = ["apricot", "arm", "bat", "batman", "bates hotel", "candle"];
+        ListView lv = new () { Source = new ListWrapper<string> (source) };
+
+        lv.SetFocus ();
+
+        // Disable then re-enable with a fresh navigator
+        lv.KeystrokeNavigator = null;
+        lv.KeystrokeNavigator = new CollectionNavigator ();
+
+        // The new navigator should have been synced with Source automatically
+        Assert.True (lv.NewKeyDownEvent (Key.C));
+        Assert.Equal (5, lv.SelectedItem); // "candle"
     }
 
     [Fact]
@@ -607,7 +652,7 @@ hree - lon",
         matchNone.Setup (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ()))
                  .Returns ((string s, object key) => s.StartsWith ('B') && key?.ToString () == "candle");
 
-        lv.KeystrokeNavigator.Matcher = matchNone.Object;
+        lv.KeystrokeNavigator?.Matcher = matchNone.Object;
 
         // Keys are consumed during navigation
         Assert.True (lv.NewKeyDownEvent (Key.B));
@@ -1031,14 +1076,14 @@ Five ",
 
         // Press Space+Shift again - cannot move down further
         // In radio button mode, item should toggle: marked → unmarked
-        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.False (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // Still at item 2
         Assert.False (lv.Source.IsMarked (0));
         Assert.False (lv.Source.IsMarked (1));
         Assert.False (lv.Source.IsMarked (2)); // Toggled off
 
         // Press key combo again - should toggle back to marked
-        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.False (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // Still at item 2
         Assert.False (lv.Source.IsMarked (0));
         Assert.False (lv.Source.IsMarked (1));
@@ -1092,14 +1137,14 @@ Five ",
         Assert.False (lv.Source.IsMarked (2));
 
         // Press key combo again
-        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.False (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // cannot move down any further
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
         Assert.True (lv.Source.IsMarked (2)); // but can toggle marked
 
         // Press key combo again 
-        Assert.True (lv.NewKeyDownEvent (Key.Space.WithShift));
+        Assert.False (lv.NewKeyDownEvent (Key.Space.WithShift));
         Assert.Equal (2, lv.SelectedItem); // cannot move down any further
         Assert.True (lv.Source.IsMarked (0));
         Assert.True (lv.Source.IsMarked (1));
@@ -3084,4 +3129,80 @@ Five ",
     }
 
     #endregion RowRender RowAttribute Override
+
+    #region Movement Cycling
+
+    // Copilot
+    [Fact]
+    public void MoveDown_AtBottom_WhenTabStopIsNoStop_WrapsToTop ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Source = new ListWrapper<string> (source), TabStop = TabBehavior.NoStop };
+        lv.SetFocus ();
+
+        // Move to last item
+        Assert.True (lv.MoveDown ()); // selects 0
+        Assert.True (lv.MoveDown ()); // selects 1
+        Assert.True (lv.MoveDown ()); // selects 2
+        Assert.Equal (2, lv.SelectedItem);
+
+        // Should wrap to top
+        Assert.True (lv.MoveDown ());
+        Assert.Equal (0, lv.SelectedItem);
+    }
+
+    // Copilot
+    [Fact]
+    public void MoveDown_AtBottom_WhenTabStopIsNotNoStop_ReturnsFalse ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Source = new ListWrapper<string> (source), TabStop = TabBehavior.TabStop };
+        lv.SetFocus ();
+
+        // Move to last item
+        Assert.True (lv.MoveDown ()); // selects 0
+        Assert.True (lv.MoveDown ()); // selects 1
+        Assert.True (lv.MoveDown ()); // selects 2
+        Assert.Equal (2, lv.SelectedItem);
+
+        // Should NOT wrap — returns false
+        Assert.False (lv.MoveDown ());
+        Assert.Equal (2, lv.SelectedItem);
+    }
+
+    // Copilot
+    [Fact]
+    public void MoveUp_AtTop_WhenTabStopIsNoStop_WrapsToBottom ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Frame = new Rectangle (0, 0, 10, 20), Source = new ListWrapper<string> (source), TabStop = TabBehavior.NoStop };
+        lv.SetFocus ();
+
+        // Select first item
+        Assert.True (lv.MoveDown ());
+        Assert.Equal (0, lv.SelectedItem);
+
+        // Should wrap to bottom
+        Assert.True (lv.MoveUp ());
+        Assert.Equal (2, lv.SelectedItem);
+    }
+
+    // Copilot
+    [Fact]
+    public void MoveUp_AtTop_WhenTabStopIsNotNoStop_ReturnsFalse ()
+    {
+        ObservableCollection<string> source = ["one", "two", "three"];
+        ListView lv = new () { Frame = new Rectangle (0, 0, 10, 20), Source = new ListWrapper<string> (source), TabStop = TabBehavior.TabStop };
+        lv.SetFocus ();
+
+        // Select first item
+        Assert.True (lv.MoveDown ());
+        Assert.Equal (0, lv.SelectedItem);
+
+        // Should NOT wrap — returns false
+        Assert.False (lv.MoveUp ());
+        Assert.Equal (0, lv.SelectedItem);
+    }
+
+    #endregion Movement Cycling
 }

@@ -80,6 +80,9 @@ ThemeManager.Theme = "Dark";
 ConfigurationManager.Apply();
 ```
 
+To customize syntax highlighting colors, override the `Code*` visual roles on a scheme. See
+`Examples/Themes/code-dark.config.json` for a minimal Dark theme override.
+
 ---
 
 ## Configuration Scopes
@@ -716,7 +719,7 @@ Key bindings for Application-level commands, base View commands, and per-view co
       "Undo": { "All": ["Ctrl+Z"] },
       "CutToEndOfLine": { "All": ["Ctrl+K"] }
     },
-    "TextView": {
+    "Editor": {
       "Redo": { "All": ["Ctrl+Shift+Z"], "Windows": ["Ctrl+Y"] }
     }
   }

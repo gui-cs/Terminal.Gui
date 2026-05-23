@@ -32,6 +32,7 @@
         <PackageReference Include="CsvHelper" />
         <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" />
         <PackageReference Include="System.CommandLine" V="" />
+        <PackageReference Include="Terminal.Gui.Editor" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />

@@ -1,4 +1,5 @@
-﻿using System.Text;
+using System.Text;
+using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
 
@@ -6,15 +7,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TextAlignmentAndDirection : Scenario
 {
-    internal class AlignmentAndDirectionView : View
-    {
-        public AlignmentAndDirectionView ()
-        {
-            ViewportSettings = ViewportSettingsFlags.Transparent;
-            BorderStyle = LineStyle.Dotted;
-        }
-    }
-
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
@@ -22,15 +14,12 @@ public class TextAlignmentAndDirection : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window window = new ()
-        {
-            Title = GetQuitKeyAndName ()
-        };
+        using Window window = new () { Title = GetQuitKeyAndName () };
 
-        string txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}世界 您好";
+        var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}🦮 👨‍👩‍👧";
 
-        SchemeManager.AddScheme ("TextAlignmentAndDirection1", new () { Normal = new (Color.Black, Color.Gray) });
-        SchemeManager.AddScheme ("TextAlignmentAndDirection2", new () { Normal = new (Color.Black, Color.DarkGray) });
+        SchemeManager.AddScheme ("TextAlignmentAndDirection1", new Scheme { Normal = new Attribute (Color.Black, Color.Gray) });
+        SchemeManager.AddScheme ("TextAlignmentAndDirection2", new Scheme { Normal = new Attribute (Color.Black, Color.DarkGray) });
 
         List<View> singleLineLabels = []; // single line
         List<View> multiLineLabels = []; // multi line
@@ -271,12 +260,9 @@ public class TextAlignmentAndDirection : Scenario
 
         View container = new ()
         {
-            X = 0,
-            Y = Pos.Bottom (txtLabelHJ),
-            Width = Dim.Fill (31),
-            Height = Dim.Fill (4)
+            X = 0, Y = Pos.Bottom (txtLabelHJ), Width = Dim.Fill (31), Height = Dim.Fill (4)
 
-            //SchemeName = "TextAlignmentAndDirection2"
+            // SchemeName = "TextAlignmentAndDirection2"
         };
 
         AlignmentAndDirectionView txtLabelTL = new ()
@@ -437,7 +423,7 @@ public class TextAlignmentAndDirection : Scenario
             Text = "Edit Text:"
         };
 
-        TextView editText = new ()
+        Editor editText = new ()
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -446,18 +432,18 @@ public class TextAlignmentAndDirection : Scenario
             Text = txt
         };
 
-        window.KeyDown += (_, _) =>
-                     {
-                         foreach (View v in singleLineLabels)
-                         {
-                             v.Text = editText.Text;
-                         }
+        editText.Document?.Changed += (_, _) =>
+                                      {
+                                          foreach (View v in singleLineLabels)
+                                          {
+                                              v.Text = editText.Text;
+                                          }
 
-                         foreach (View v in multiLineLabels)
-                         {
-                             v.Text = editText.Text;
-                         }
-                     };
+                                          foreach (View v in multiLineLabels)
+                                          {
+                                              v.Text = editText.Text;
+                                          }
+                                      };
 
         editText.SetFocus ();
 
@@ -506,22 +492,22 @@ public class TextAlignmentAndDirection : Scenario
         wrapCheckbox.Value = wrapCheckbox.TextFormatter.WordWrap ? CheckState.Checked : CheckState.UnChecked;
 
         wrapCheckbox.ValueChanging += (s, e) =>
-                                             {
-                                                 if (e.NewValue == CheckState.Checked)
-                                                 {
-                                                     foreach (View t in multiLineLabels)
-                                                     {
-                                                         t.TextFormatter.WordWrap = false;
-                                                     }
-                                                 }
-                                                 else
-                                                 {
-                                                     foreach (View t in multiLineLabels)
-                                                     {
-                                                         t.TextFormatter.WordWrap = true;
-                                                     }
-                                                 }
-                                             };
+                                      {
+                                          if (e.NewValue == CheckState.Checked)
+                                          {
+                                              foreach (View t in multiLineLabels)
+                                              {
+                                                  t.TextFormatter.WordWrap = false;
+                                              }
+                                          }
+                                          else
+                                          {
+                                              foreach (View t in multiLineLabels)
+                                              {
+                                                  t.TextFormatter.WordWrap = true;
+                                              }
+                                          }
+                                      };
 
         window.Add (wrapCheckbox);
 
@@ -546,7 +532,7 @@ public class TextAlignmentAndDirection : Scenario
                                                  ToggleJustify (true);
                                              }
 
-                                             foreach (View v in multiLineLabels.Where (v => ev.NewValue is not null))
+                                             foreach (View v in multiLineLabels.Where (v => ev.NewValue is { }))
                                              {
                                                  v.TextDirection = (TextDirection)ev.NewValue!.Value;
                                              }
@@ -603,11 +589,13 @@ public class TextAlignmentAndDirection : Scenario
                                 t.TextAlignment = data!.h;
 
                                 break;
+
                             case 1:
                                 t.VerticalTextAlignment = data!.v;
                                 t.TextAlignment = Alignment.Fill;
 
                                 break;
+
                             case 2:
                                 t.VerticalTextAlignment = Alignment.Fill;
                                 t.TextAlignment = Alignment.Fill;
@@ -624,11 +612,13 @@ public class TextAlignmentAndDirection : Scenario
                                 t.VerticalTextAlignment = data!.v;
 
                                 break;
+
                             case 1:
                                 t.TextAlignment = data!.h;
                                 t.VerticalTextAlignment = Alignment.Fill;
 
                                 break;
+
                             case 2:
                                 t.TextAlignment = Alignment.Fill;
                                 t.VerticalTextAlignment = Alignment.Fill;
@@ -638,6 +628,15 @@ public class TextAlignmentAndDirection : Scenario
                     }
                 }
             }
+        }
+    }
+
+    internal class AlignmentAndDirectionView : View
+    {
+        public AlignmentAndDirectionView ()
+        {
+            ViewportSettings = ViewportSettingsFlags.Transparent;
+            BorderStyle = LineStyle.Dotted;
         }
     }
 

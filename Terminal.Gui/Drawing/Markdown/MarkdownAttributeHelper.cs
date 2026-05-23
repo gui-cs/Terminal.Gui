@@ -28,6 +28,13 @@ internal static class MarkdownAttributeHelper
     /// <returns>A fully resolved <see cref="Attribute"/> ready for drawing.</returns>
     public static Attribute GetAttributeForSegment (View view, StyledSegment segment, ISyntaxHighlighter? highlighter = null, Color? themeBackground = null)
     {
+        if (segment.Role is { } role)
+        {
+            Attribute roleAttr = view.GetAttributeForRole (role);
+
+            return ResolveRoleAttribute (view, role, roleAttr, themeBackground);
+        }
+
         if (segment.Attribute is { } explicitAttr)
         {
             // When a caller-provided background override is present, apply it even to
@@ -70,6 +77,35 @@ internal static class MarkdownAttributeHelper
                };
     }
 
+    private static Attribute ResolveRoleAttribute (View view, VisualRole role, Attribute roleAttr, Color? themeBackground)
+    {
+        if (themeBackground is { } roleBg)
+        {
+            return roleAttr with { Background = roleBg };
+        }
+
+        if (!IsCodeTokenRole (role) || roleAttr.Background != Color.None)
+        {
+            return roleAttr;
+        }
+
+        return roleAttr with { Background = view.GetAttributeForRole (VisualRole.Code).Background };
+    }
+
+    private static bool IsCodeTokenRole (VisualRole role) =>
+        role is VisualRole.CodeComment
+             or VisualRole.CodeKeyword
+             or VisualRole.CodeString
+             or VisualRole.CodeNumber
+             or VisualRole.CodeOperator
+             or VisualRole.CodeType
+             or VisualRole.CodePreprocessor
+             or VisualRole.CodeIdentifier
+             or VisualRole.CodeConstant
+             or VisualRole.CodePunctuation
+             or VisualRole.CodeFunctionName
+             or VisualRole.CodeAttribute;
+
     /// <summary>
     ///     Converts a list of <see cref="InlineRun"/> (from parsing) into
     ///     <see cref="StyledSegment"/> instances suitable for rendering.
@@ -80,7 +116,7 @@ internal static class MarkdownAttributeHelper
 
         foreach (InlineRun run in runs)
         {
-            segments.Add (new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource, run.Attribute));
+            segments.Add (new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource, run.Attribute, run.Role));
         }
 
         return segments;

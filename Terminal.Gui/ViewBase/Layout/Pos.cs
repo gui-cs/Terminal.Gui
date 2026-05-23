@@ -255,10 +255,10 @@ public abstract record Pos
     /// <summary>Creates a <see cref="Pos"/> object that can be used to center the <see cref="View"/>.</summary>
     /// <returns>The center Pos.</returns>
     /// <example>
-    ///     This creates a <see cref="TextView"/> centered horizontally, is 50% of the way down, is 30% the height, and
+    ///     This creates a <see cref="TextField"/> centered horizontally, is 50% of the way down, is 30% the height, and
     ///     is 80% the width of the <see cref="View"/> it added to.
     ///     <code>
-    ///  var textView = new TextView () {
+    ///  var textField = new TextField () {
     ///     X = Pos.Center (),
     ///     Y = Pos.Percent (50),
     ///     Width = Dim.Percent (80),

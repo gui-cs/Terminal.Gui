@@ -1458,6 +1458,286 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot
     [Fact]
+    public void Paste_Uses_Clipboard_Text ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
+        using Runnable runnable = new ();
+
+        TextField tf = new () { Width = 40, Text = string.Empty };
+        runnable.Add (tf);
+        app.Begin (runnable);
+
+        app.Driver.Clipboard!.SetClipboardData ("Hello ");
+
+        bool result = tf.Paste ();
+
+        Assert.True (result);
+        Assert.Equal ("Hello ", tf.Text);
+    }
+
+    // Copilot
+    [Fact]
+    public void CtrlV_Pastes_From_Clipboard ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
+        using Runnable runnable = new ();
+
+        TextField tf = new () { Width = 40, Text = string.Empty };
+        runnable.Add (tf);
+        app.Begin (runnable);
+        tf.SetFocus ();
+
+        app.Driver.Clipboard!.SetClipboardData ("Hello ");
+
+        bool? result = tf.NewKeyDownEvent (Key.V.WithCtrl);
+
+        Assert.True (result);
+        Assert.Equal ("Hello ", tf.Text);
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_CancelledByValueChanging_DoesNotRaisePasted_OrMoveCursor ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
+        using Runnable runnable = new ();
+
+        TextField tf = new () { Width = 40, Text = "abc" };
+        app.Begin (runnable);
+        runnable.Add (tf);
+        tf.InsertionPoint = 1;
+        tf.SelectedStart = -1;
+
+        int pastedCount = 0;
+        tf.Pasted += (_, _) => pastedCount++;
+        tf.ValueChanging += (_, e) => e.Handled = true;
+
+        app.Driver.Clipboard!.SetClipboardData ("ZZ");
+
+        bool result = tf.Paste ();
+
+        Assert.True (result);
+        Assert.Equal ("abc", tf.Text);
+        Assert.Equal (1, tf.InsertionPoint);
+        Assert.Equal (0, pastedCount);
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_RewrittenByTextChanging_Raises_Pasted_With_ActualInsertedText ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.Clipboard = new FakeClipboard ();
+        using Runnable runnable = new ();
+
+        TextField tf = new () { Width = 40, Text = string.Empty };
+        runnable.Add (tf);
+        app.Begin (runnable);
+
+        string? pastedText = null;
+        tf.Pasted += (_, e) => pastedText = e.Text;
+        tf.TextChanging += (_, e) => e.Result = e.Result!.ToUpperInvariant ();
+
+        app.Driver.Clipboard!.SetClipboardData ("Hello");
+
+        bool result = tf.Paste ();
+
+        Assert.True (result);
+        Assert.Equal ("HELLO", tf.Text);
+        Assert.Equal ("HELLO", pastedText);
+        Assert.Equal (5, tf.InsertionPoint);
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_RewrittenByTextChanging_With_Existing_Text_Raises_Only_Inserted_Text ()
+    {
+        TextField tf = new () { Width = 40, Text = "abc" };
+        tf.InsertionPoint = 1;
+        tf.SelectedStart = -1;
+
+        string? pastedText = null;
+        tf.Pasted += (_, e) => pastedText = e.Text;
+        tf.TextChanging += (_, e) => e.Result = e.Result!.ToUpperInvariant ();
+
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (tf), binding: null)
+        {
+            Routing = CommandRouting.BubblingUp
+        };
+
+        bool? result = tf.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload ("zz")));
+
+        Assert.True (result);
+        Assert.Equal ("AZZBC", tf.Text);
+        Assert.Equal ("ZZ", pastedText);
+        Assert.Equal (3, tf.InsertionPoint);
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_RewrittenByTextChanging_With_AddedPrefixAndSuffix_Raises_Only_Inserted_Text ()
+    {
+        TextField tf = new () { Width = 40, Text = "abcd" };
+        tf.InsertionPoint = 2;
+        tf.SelectedStart = -1;
+
+        string? pastedText = null;
+        tf.Pasted += (_, e) => pastedText = e.Text;
+        tf.TextChanging += (_, e) => e.Result = $"[{e.Result}]";
+
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (tf), binding: null)
+        {
+            Routing = CommandRouting.BubblingUp
+        };
+
+        bool? result = tf.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload ("X")));
+
+        Assert.True (result);
+        Assert.Equal ("[abXcd]", tf.Text);
+        Assert.Equal ("X", pastedText);
+        Assert.Equal (4, tf.InsertionPoint);
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_RewrittenByTextChanging_In_Empty_Field_Excludes_Boundary_Wrappers ()
+    {
+        TextField tf = new () { Width = 40, Text = string.Empty };
+        tf.SelectedStart = -1;
+
+        string? pastedText = null;
+        tf.Pasted += (_, e) => pastedText = e.Text;
+        tf.TextChanging += (_, e) => e.Result = $"[{e.Result}]";
+
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (tf), binding: null)
+        {
+            Routing = CommandRouting.BubblingUp
+        };
+
+        bool? result = tf.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload ("Hello")));
+
+        Assert.True (result);
+        Assert.Equal ("[Hello]", tf.Text);
+        Assert.Equal ("Hello", pastedText);
+        Assert.Equal (6, tf.InsertionPoint);
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_Replacing_Selection_With_No_Inserted_Text_Moves_Cursor_To_Selection_Start ()
+    {
+        TextField tf = new () { Width = 40, Text = "abcd" };
+        tf.InsertionPoint = 4;
+        tf.SelectedStart = 2;
+
+        int pastedCount = 0;
+        tf.Pasted += (_, _) => pastedCount++;
+        tf.TextChanging += (_, e) => e.Result = "ab";
+
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (tf), binding: null)
+        {
+            Routing = CommandRouting.BubblingUp
+        };
+
+        bool? result = tf.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload ("X")));
+
+        Assert.True (result);
+        Assert.Equal ("ab", tf.Text);
+        Assert.Equal (2, tf.InsertionPoint);
+        Assert.Equal (0, pastedCount);
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_RewrittenWithoutLengthChange_Does_Not_Allocate_Quadratic_Memory ()
+    {
+        const int pasteLength = 3000;
+        const long allocationBudget = 10_000_000;
+
+        TextField tf = new () { Width = 4000, Text = string.Empty };
+        string pasted = new ('a', pasteLength);
+        tf.TextChanging += (_, e) => e.Result = e.Result!.ToUpperInvariant ();
+
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (tf), binding: null)
+        {
+            Routing = CommandRouting.BubblingUp
+        };
+
+        GC.Collect ();
+        GC.WaitForPendingFinalizers ();
+        GC.Collect ();
+
+        long before = GC.GetAllocatedBytesForCurrentThread ();
+
+        bool? result = tf.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload (pasted)));
+
+        long allocated = GC.GetAllocatedBytesForCurrentThread () - before;
+
+        Assert.True (result);
+        Assert.Equal (pasted.ToUpperInvariant (), tf.Text);
+        Assert.Equal (pasteLength, tf.InsertionPoint);
+        Assert.True (allocated < allocationBudget, $"Allocated {allocated:N0} bytes.");
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_Pasting_Event_Text_Matches_TextField_Insertable_Text ()
+    {
+        TextField tf = new () { Width = 40, Text = string.Empty };
+
+        string? pastingText = null;
+        string? pastedText = null;
+        tf.Pasting += (_, e) => pastingText = e.Text;
+        tf.Pasted += (_, e) => pastedText = e.Text;
+
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (tf), binding: null)
+        {
+            Routing = CommandRouting.BubblingUp
+        };
+
+        bool? result = tf.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload ("A\tB")));
+
+        Assert.True (result);
+        Assert.Equal ("AB", tf.Text);
+        Assert.Equal ("AB", pastingText);
+        Assert.Equal ("AB", pastedText);
+    }
+
+    // Copilot
+    [Fact]
+    public void Paste_Replacing_Selection_With_Identical_Text_Clears_Selection_And_Raises_Pasted ()
+    {
+        TextField tf = new () { Width = 40, Text = "abcd" };
+        tf.InsertionPoint = 3;
+        tf.SelectedStart = 1;
+
+        string? pastedText = null;
+        tf.Pasted += (_, e) => pastedText = e.Text;
+
+        CommandContext ctx = new (Command.Paste, new WeakReference<View> (tf), binding: null)
+        {
+            Routing = CommandRouting.BubblingUp
+        };
+
+        bool? result = tf.InvokeCommand (Command.Paste, ctx.WithValue (new PastePayload ("bc")));
+
+        Assert.True (result);
+        Assert.Equal ("abcd", tf.Text);
+        Assert.Equal (3, tf.InsertionPoint);
+        Assert.Equal (0, tf.SelectedLength);
+        Assert.Null (tf.SelectedText);
+        Assert.Equal ("bc", pastedText);
+    }
+
+    // Copilot
+    [Fact]
     public void UnifiedKeyBindings_NonWindows_Undo_Redo ()
     {
         if (PlatformDetection.IsWindows ())

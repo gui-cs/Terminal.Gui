@@ -90,7 +90,7 @@ Terminal.Gui defines these keys for keyboard navigation:
 
 `F6` was chosen to match [Windows](https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#common-keyboard-accelerators) conventions.
 
-These keys are all registered as `KeyBindingScope.Application` key bindings by <xref:Terminal.Gui.App.Application>. Because application-scoped key bindings have the lowest priority, Views can override the behaviors of these keys (e.g. <xref:Terminal.Gui.Views.TextView> overrides `Key.Tab` by default, enabling the user to enter `\t` into text). The `AllViews_AtLeastOneNavKey_Leaves` unit test ensures all built-in Views have at least one of the above keys that can advance focus.
+These keys are all registered as `KeyBindingScope.Application` key bindings by <xref:Terminal.Gui.App.Application>. Because application-scoped key bindings have the lowest priority, Views can override the behaviors of these keys (e.g. <xref:Terminal.Gui.Views.Editor> overrides `Key.Tab` by default, enabling the user to enter `\t` into text). The `AllViews_AtLeastOneNavKey_Leaves` unit test ensures all built-in Views have at least one of the above keys that can advance focus.
 
 ### Navigation Examples
 
@@ -473,7 +473,7 @@ The following table summarizes how built-in views respond to various input metho
 | **LinearRange** | >1 | No | No | 1 | SetFocusedOption | SetFocusedOption+OnAccept | Focus | SetFocus+SetOption | - | SetFocus+SetOption | Yes |
 | **<xref:Terminal.Gui.Views.ListView>** | >1 | No | No | 1 | MarkUnMarkRow | OpenSelected+OnAccept | OnAccept | SetMark+OnSelectedChanged | OpenSelected+OnAccept | - | No |
 | **<xref:Terminal.Gui.Views.TextField>** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | SelectAll | ContextMenu | No |
-| **<xref:Terminal.Gui.Views.TextView>** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | - | ContextMenu | Yes |
+| **<xref:Terminal.Gui.Views.Editor>** | 1 | No | No | 1 | - | OnAccept | Focus | Focus | - | ContextMenu | Yes |
 
 ### Table Legend
 
