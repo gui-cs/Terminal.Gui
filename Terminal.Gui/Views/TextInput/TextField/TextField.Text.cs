@@ -437,7 +437,14 @@ public partial class TextField
         // Stash the (possibly subscriber-modified) result for OnTextChanged
         _pendingText = args.Result;
 
-        return base.OnTextChanging (newText);
+        if (base.OnTextChanging (newText))
+        {
+            _pendingText = null;
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>

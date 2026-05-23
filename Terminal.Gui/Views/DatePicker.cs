@@ -47,6 +47,18 @@ public class DatePicker : View, IValue<DateTime>
     }
 
     /// <inheritdoc/>
+    protected override bool OnTextChanging (string newText)
+    {
+        // Reject text that cannot be parsed as a valid DateTime
+        if (!DateTime.TryParse (newText, out _))
+        {
+            return true;
+        }
+
+        return base.OnTextChanging (newText);
+    }
+
+    /// <inheritdoc/>
     protected override void OnTextChanged ()
     {
         if (DateTime.TryParse (Text, out DateTime result))

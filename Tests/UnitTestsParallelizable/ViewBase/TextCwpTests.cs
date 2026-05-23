@@ -227,4 +227,140 @@ public class TextCwpTests
             return BaseReturnedCancel;
         }
     }
+
+    // --- CR feedback regression tests ---
+
+    /// <summary>
+    ///     Verifies that when TextField's TextChanging subscriber modifies text, and then a
+    ///     subsequent base TextChanging event cancels, the stale modified text does not leak
+    ///     into the next successful text change.
+    /// </summary>
+    [Fact]
+    public void TextField_PendingText_ClearedOnBaseCancel ()
+    {
+        // Copilot
+        TextField tf = new () { Width = 20, Height = 1 };
+        tf.Text = "initial";
+
+        // First: a subscriber modifies text via ResultEventArgs
+        tf.TextChanging += (_, args) =>
+                           {
+                               if (args.Result == "modified")
+                               {
+                                   args.Result = "subscriber_changed";
+                               }
+                           };
+
+        tf.Text = "modified";
+        Assert.Equal ("subscriber_changed", tf.Text);
+
+        // Now subscribe to base View.TextChanging to cancel the NEXT change
+        var cancelOnce = true;
+
+        ((View)tf).TextChanging += (_, e) =>
+                                   {
+                                       if (cancelOnce)
+                                       {
+                                           e.Cancel = true;
+                                           cancelOnce = false;
+                                       }
+                                   };
+
+        // This should be cancelled by the base event
+        tf.Text = "blocked";
+        Assert.Equal ("subscriber_changed", tf.Text);
+
+        // Next change should succeed with fresh text, NOT stale _pendingText
+        tf.Text = "final";
+        Assert.Equal ("final", tf.Text);
+    }
+
+    /// <summary>
+    ///     Verifies that TextValidateField does not raise View.TextChanged when
+    ///     ValueChanging is cancelled (CWP semantics: cancel suppresses TextChanged).
+    /// </summary>
+    [Fact]
+    public void TextValidateField_ValueChangingCancel_SuppressesTextChanged ()
+    {
+        // Copilot
+        TextValidateField field = new () { Width = 20, Height = 1 };
+
+        // Set a provider that accepts any text
+        field.Provider = new TextRegexProvider (".*");
+        field.Text = "initial";
+
+        // Cancel ValueChanging
+        field.ValueChanging += (_, args) => args.Handled = true;
+
+        bool textChangedRaised = false;
+        ((View)field).TextChanged += (_, _) => textChangedRaised = true;
+
+        field.Text = "blocked";
+
+        Assert.False (textChangedRaised, "TextChanged should not fire when ValueChanging cancels");
+        Assert.Equal ("initial", field.Text);
+    }
+
+    /// <summary>
+    ///     Verifies that DatePicker rejects invalid (unparseable) text: Text should not
+    ///     persist an invalid string that cannot round-trip through DateTime.
+    /// </summary>
+    [Fact]
+    public void DatePicker_InvalidText_DoesNotPersist ()
+    {
+        // Copilot
+        DatePicker dp = new () { Width = 20, Height = 1 };
+        DateTime originalValue = dp.Value;
+        string originalText = dp.Text;
+
+        // Set invalid date text
+        dp.Text = "not-a-date";
+
+        // Value should remain unchanged
+        Assert.Equal (originalValue, dp.Value);
+
+        // Text should NOT hold the invalid string — it should revert or be rejected
+        Assert.NotEqual ("not-a-date", dp.Text);
+    }
+
+    /// <summary>
+    ///     Verifies that ColorPicker rejects invalid (unparseable) text: Text should not
+    ///     persist an invalid string that cannot round-trip through Color.
+    /// </summary>
+    [Fact]
+    public void ColorPicker_InvalidText_DoesNotPersist ()
+    {
+        // Copilot
+        ColorPicker cp = new () { Width = 20, Height = 3 };
+        cp.SelectedColor = new Color (255, 0, 0);
+        string originalText = cp.Text;
+
+        // Set invalid color text
+        cp.Text = "not-a-color";
+
+        // SelectedColor should remain unchanged
+        Assert.Equal (new Color (255, 0, 0), cp.SelectedColor);
+
+        // Text should NOT hold the invalid string — it should revert or be rejected
+        Assert.NotEqual ("not-a-color", cp.Text);
+    }
+
+    /// <summary>
+    ///     Verifies that setting View.Text on a word-wrapped TextView via a View reference
+    ///     does not corrupt or redundantly re-process the model.
+    /// </summary>
+    [Fact]
+    public void TextView_WordWrap_PolymorphicSet_DoesNotCorruptModel ()
+    {
+        // Copilot
+        TextView tv = new () { Width = 10, Height = 5, WordWrap = true };
+        tv.Text = "Hello World this wraps";
+
+        // Set via polymorphic View reference
+        View viewRef = tv;
+        viewRef.Text = "Short";
+
+        Assert.Equal ("Short", tv.Text);
+        Assert.Equal ("Short", viewRef.Text);
+    }
 }

@@ -153,7 +153,7 @@ public partial class View // Text Property APIs
     ///         call this method after mutating text to participate in the CWP workflow.
     ///     </para>
     /// </remarks>
-    internal void RaiseTextChanged ()
+    protected internal void RaiseTextChanged ()
     {
         OnTextChanged ();
         TextChanged?.Invoke (this, EventArgs.Empty);

@@ -197,12 +197,17 @@ public partial class TextView
             // Keep base View._text in sync
             SetTextDirect (value);
 
+            _ownSetterActive = true;
             RaiseTextChanged ();
+            _ownSetterActive = false;
             SetNeedsDraw ();
 
             _historyText.Clear (_model.GetAllLines ());
         }
     }
+
+    /// <summary>Tracks whether the <c>new Text</c> setter is active to avoid redundant sync in <see cref="OnTextChanged"/>.</summary>
+    private bool _ownSetterActive;
 
     /// <inheritdoc/>
     /// <remarks>
@@ -211,26 +216,29 @@ public partial class TextView
     /// </remarks>
     protected override void OnTextChanged ()
     {
+        // Skip sync when called from our own `new Text` setter — it already updated the model.
+        if (_ownSetterActive)
+        {
+            base.OnTextChanged ();
+
+            return;
+        }
+
         string baseText = base.Text;
 
-        // Only sync when the internal model diverges (polymorphic setter case).
-        // When TextView's own `new Text` setter runs, it already calls LoadString
-        // and SetTextDirect, so base.Text matches _model — this is a no-op.
-        if (_model.ToString () != baseText)
+        // Sync when the internal model diverges (polymorphic setter case).
+        ResetPosition ();
+        _model.LoadString (baseText);
+
+        if (_wordWrap)
         {
-            ResetPosition ();
-            _model.LoadString (baseText);
-
-            if (_wordWrap)
-            {
-                _wrapManager = new WordWrapManager (_model);
-                _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
-                _lastWrapWidth = Viewport.Width;
-            }
-
-            _historyText.Clear (_model.GetAllLines ());
-            SetNeedsDraw ();
+            _wrapManager = new WordWrapManager (_model);
+            _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
+            _lastWrapWidth = Viewport.Width;
         }
+
+        _historyText.Clear (_model.GetAllLines ());
+        SetNeedsDraw ();
 
         base.OnTextChanged ();
     }

@@ -153,6 +153,18 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
     protected virtual void OnValueChanged (ValueChangedEventArgs<Color?> args) { }
 
     /// <inheritdoc/>
+    protected override bool OnTextChanging (string newText)
+    {
+        // Reject text that cannot be parsed as a valid color
+        if (!_colorNameResolver.TryParseColor (newText, out _))
+        {
+            return true;
+        }
+
+        return base.OnTextChanging (newText);
+    }
+
+    /// <inheritdoc/>
     protected override void OnTextChanged ()
     {
         if (_colorNameResolver.TryParseColor (Text, out Color newColor))

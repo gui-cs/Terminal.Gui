@@ -203,10 +203,52 @@ public class TextValidateField : View, IDesignable, IValue<string>
 
     #endregion
 
+    /// <summary>
+    ///     Stashes the final text value determined during <see cref="OnTextChanging"/> (after possible
+    ///     subscriber modification) for use in <see cref="OnTextChanged"/>.
+    /// </summary>
+    private string? _pendingValidatedText;
+
+    /// <inheritdoc/>
+    protected override bool OnTextChanging (string newText)
+    {
+        if (_provider is null || SuppressValueEvents)
+        {
+            return base.OnTextChanging (newText);
+        }
+
+        string oldValue = _provider.Text;
+
+        if (oldValue == newText)
+        {
+            return true;
+        }
+
+        ValueChangingEventArgs<string?> args = new (oldValue, newText);
+
+        if (OnValueChanging (args) || args.Handled)
+        {
+            return true;
+        }
+
+        ValueChanging?.Invoke (this, args);
+
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        // Allow subscribers to modify the new value
+        _pendingValidatedText = args.NewValue ?? string.Empty;
+
+        return base.OnTextChanging (newText);
+    }
+
     /// <summary>Text</summary>
     protected override void OnTextChanged ()
     {
-        string value = Text;
+        string value = _pendingValidatedText ?? Text;
+        _pendingValidatedText = null;
 
         if (_provider is null)
         {
@@ -224,35 +266,10 @@ public class TextValidateField : View, IDesignable, IValue<string>
             return;
         }
 
-        if (!SuppressValueEvents)
+        // Apply subscriber-modified value if different from what the base stored
+        if (value != Text)
         {
-            ValueChangingEventArgs<string?> args = new (oldValue, value);
-
-            if (OnValueChanging (args) || args.Handled)
-            {
-                // Revert Text to the provider's current value
-                SetTextDirect (oldValue);
-
-                return;
-            }
-
-            ValueChanging?.Invoke (this, args);
-
-            if (args.Handled)
-            {
-                // Revert Text to the provider's current value
-                SetTextDirect (oldValue);
-
-                return;
-            }
-
-            // Allow subscribers to modify the new value
-            value = args.NewValue ?? string.Empty;
-
-            if (value != Text)
-            {
-                SetTextDirect (value);
-            }
+            SetTextDirect (value);
         }
 
         _lastKnownText = value;
@@ -264,11 +281,10 @@ public class TextValidateField : View, IDesignable, IValue<string>
 
         if (!SuppressValueEvents)
         {
-            string oldVal = oldValue;
-            ValueChangedEventArgs<string?> changedArgs = new (oldVal, _provider.Text);
+            ValueChangedEventArgs<string?> changedArgs = new (oldValue, _provider.Text);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
-            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldVal, _provider.Text));
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _provider.Text));
         }
 
         SetNeedsDraw ();
