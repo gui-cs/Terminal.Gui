@@ -74,10 +74,7 @@ public partial class View // Text Property APIs
                 return;
             }
 
-            _text = value;
-
-            UpdateTextFormatterText ();
-            SetNeedsLayout ();
+            SetTextDirect (value);
 
             OnTextChanged ();
         }
