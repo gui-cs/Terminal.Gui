@@ -16,7 +16,7 @@ public class TextAlignmentAndDirection : Scenario
 
         using Window window = new () { Title = GetQuitKeyAndName () };
 
-        var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}?? ??";
+        var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}🦮 👨‍👩‍👧";
 
         SchemeManager.AddScheme ("TextAlignmentAndDirection1", new Scheme { Normal = new Attribute (Color.Black, Color.Gray) });
         SchemeManager.AddScheme ("TextAlignmentAndDirection2", new Scheme { Normal = new Attribute (Color.Black, Color.DarkGray) });
