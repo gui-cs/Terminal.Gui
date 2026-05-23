@@ -390,112 +390,116 @@ public partial class TextField
     /// </summary>
     private List<string> _text;
 
+    /// <summary>
+    ///     Stashes the final text value determined during <see cref="OnTextChanging"/> (after sanitization
+    ///     and possible subscriber modification) for use in <see cref="OnTextChanged"/>.
+    /// </summary>
+    private string? _pendingText;
+
     private void SetText (List<string> newText) => Text = StringExtensions.ToString (newText);
     private void SetText (IEnumerable<string> newText) => SetText (newText.ToList ());
 
-    /// <summary>Sets or gets the text held by the view.</summary>
-    public new string Text
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     <para>
+    ///         TextField overrides this to sanitize text (strip tabs and newlines), fire
+    ///         <see cref="IValue{TValue}.ValueChanging"/>, and raise the TextField-specific
+    ///         <see cref="TextChanging"/> event (which allows subscribers to modify the text).
+    ///     </para>
+    /// </remarks>
+    protected override bool OnTextChanging (string newText)
     {
-        get => StringExtensions.ToString (_text);
-        set
+        // Guard against base constructor calling before _text is initialized
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (_text is null)
         {
-            // Guard against base constructor calling before _text is initialized
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (_text is null)
-            {
-                return;
-            }
+            return true;
+        }
 
-            var oldText = StringExtensions.ToString (_text);
+        // Sanitize: single-line, no tabs
+        string sanitized = newText.Replace ("\t", "").Split ("\n") [0];
 
-            if (oldText == value)
-            {
-                return;
-            }
+        string oldText = StringExtensions.ToString (_text);
 
-            string newText = value.Replace ("\t", "").Split ("\n") [0];
+        // After sanitization, check if there is an effective change
+        if (oldText == sanitized)
+        {
+            return true;
+        }
 
-            // Raise IValue<string>.ValueChanging
-            if (RaiseValueChanging (oldText, newText))
-            {
-                return;
-            }
+        // Raise IValue<string>.ValueChanging
+        if (RaiseValueChanging (oldText, sanitized))
+        {
+            return true;
+        }
 
-            ResultEventArgs<string> args = new (newText);
-            RaiseTextChanging (args);
+        ResultEventArgs<string> args = new (sanitized);
+        RaiseTextChanging (args);
 
-            if (args.Handled)
-            {
-                if (InsertionPoint > _text.Count)
-                {
-                    InsertionPoint = _text.Count;
-                }
-
-                return;
-            }
-
-            // Raise View.TextChanging so subscribers holding a View reference can cancel.
-            if (base.OnTextChanging ())
-            {
-                return;
-            }
-
-            ClearAllSelection ();
-
-            // Note we use NewValue here; TextChanging subscribers may have changed it
-            _text = args.Result!.ToStringList ();
-
-            // Keep base View._text in sync
-            SetTextDirect (StringExtensions.ToString (_text));
-
-            if (!Secret && !_historyText.IsFromHistory)
-            {
-                _historyText.Add ([Cell.ToCellList (oldText)], new Point (InsertionPoint, 0));
-
-                _historyText.Add ([Cell.ToCells (_text)], new Point (InsertionPoint, 0), TextEditingLineStatus.Replaced);
-            }
-
-            OnTextChanged ();
-
-            // Raise IValue<string>.ValueChanged
-            RaiseValueChanged (oldText, StringExtensions.ToString (_text));
-
-            ProcessAutocomplete ();
-
+        if (args.Handled)
+        {
             if (InsertionPoint > _text.Count)
             {
-                InsertionPoint = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
+                InsertionPoint = _text.Count;
             }
 
-            Adjust ();
-            SetNeedsDraw ();
+            return true;
         }
+
+        // Stash the (possibly subscriber-modified) result for OnTextChanged
+        _pendingText = args.Result;
+
+        return base.OnTextChanging (newText);
     }
 
     /// <inheritdoc/>
     /// <remarks>
-    ///     Syncs the internal text buffer when <see cref="View.Text"/> is set through a polymorphic
-    ///     (<see cref="View"/>) reference, ensuring the TextField's editing model stays consistent.
+    ///     <para>
+    ///         Syncs the internal grapheme-list editing model from the base <see cref="View.Text"/> value,
+    ///         applying any sanitization or subscriber modifications stashed during <see cref="OnTextChanging"/>.
+    ///     </para>
     /// </remarks>
     protected override void OnTextChanged ()
     {
-        string baseText = base.Text;
+        // Use stashed text from OnTextChanging if available; otherwise sanitize base.Text
+        string finalText = _pendingText ?? base.Text.Replace ("\t", "").Split ("\n") [0];
+        _pendingText = null;
 
-        // Only sync when the internal model diverges (polymorphic setter case).
-        // When TextField's own `new Text` setter runs, it already updates _text
-        // and calls SetTextDirect, so base.Text matches _text — this is a no-op.
-        if (StringExtensions.ToString (_text) != baseText)
+        string oldText = StringExtensions.ToString (_text);
+
+        ClearAllSelection ();
+        _text = finalText.ToStringList ();
+
+        // Ensure base View._text holds the sanitized/modified value
+        if (base.Text != finalText)
         {
-            _text = baseText.ToStringList ();
+            SetTextDirect (finalText);
+        }
 
-            if (InsertionPoint > _text.Count)
-            {
-                InsertionPoint = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
-            }
+        if (!Secret && !_historyText.IsFromHistory)
+        {
+            _historyText.Add ([Cell.ToCellList (oldText)], new Point (InsertionPoint, 0));
+
+            _historyText.Add ([Cell.ToCells (_text)], new Point (InsertionPoint, 0), TextEditingLineStatus.Replaced);
         }
 
         base.OnTextChanged ();
+
+        // Raise IValue<string>.ValueChanged
+        RaiseValueChanged (oldText, StringExtensions.ToString (_text));
+
+        ProcessAutocomplete ();
+
+        if (InsertionPoint > _text.Count)
+        {
+            InsertionPoint = Math.Max (TextModel.DisplaySize (_text, 0).size - 1, 0);
+        }
+
+        Adjust ();
+        SetNeedsDraw ();
     }
+
+    /// <summary>Returns <see langword="true"/> if the current cursor position is at the end of the <see cref="TextField"/>,
     ///     includes when it is empty.
     /// </summary>
     /// <returns></returns>

@@ -156,7 +156,7 @@ public class ProgressBar : View, IDesignable
     ///     <see cref="ProgressBarFormat"/> is <see cref="ProgressBarFormat.SimplePlusPercentage"/> the percentage will be
     ///     displayed. If <see cref="ProgressBarStyle"/> is a marquee style, the text will be displayed.
     /// </summary>
-    protected override bool OnTextChanging ()
+    protected override bool OnTextChanging (string newText)
     {
         // Only allow text to be set externally in marquee mode
         if (ProgressBarStyle is not (ProgressBarStyle.MarqueeBlocks or ProgressBarStyle.MarqueeContinuous))
@@ -164,7 +164,7 @@ public class ProgressBar : View, IDesignable
             return true;
         }
 
-        return false;
+        return base.OnTextChanging (newText);
     }
 
     ///<inheritdoc/>

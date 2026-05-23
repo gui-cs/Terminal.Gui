@@ -194,7 +194,7 @@ public class TextCwpTests
     {
         public bool AllowChange { get; set; }
 
-        protected override bool OnTextChanging () => !AllowChange;
+        protected override bool OnTextChanging (string newText) => !AllowChange;
     }
 
     /// <summary>A test subclass that tracks calls to <see cref="View.OnTextChanged"/>.</summary>
@@ -220,9 +220,9 @@ public class TextCwpTests
     {
         public bool BaseReturnedCancel { get; private set; }
 
-        protected override bool OnTextChanging ()
+        protected override bool OnTextChanging (string newText)
         {
-            BaseReturnedCancel = base.OnTextChanging ();
+            BaseReturnedCancel = base.OnTextChanging (newText);
 
             return BaseReturnedCancel;
         }

@@ -179,7 +179,7 @@ public partial class TextView
         set
         {
             // Raise View.TextChanging so subscribers holding a View reference can cancel.
-            if (OnTextChanging ())
+            if (OnTextChanging (value))
             {
                 return;
             }

@@ -69,7 +69,7 @@ public partial class View // Text Property APIs
                 return;
             }
 
-            if (OnTextChanging ())
+            if (OnTextChanging (value))
             {
                 return;
             }
@@ -109,12 +109,13 @@ public partial class View // Text Property APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This is a signal-only notification. It does not carry old or new text values because
-    ///         <see cref="View.Text"/> semantics vary across derived views.
+    ///         The base implementation raises the <see cref="TextChanging"/> event. Override in derived views
+    ///         to perform validation or fire control-specific pre-change events.
     ///     </para>
     /// </remarks>
+    /// <param name="newText">The proposed new text value.</param>
     /// <returns><see langword="true"/> if the text change should be cancelled; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnTextChanging ()
+    protected virtual bool OnTextChanging (string newText)
     {
         CancelEventArgs args = new ();
         TextChanging?.Invoke (this, args);
