@@ -197,7 +197,7 @@ public partial class TextView
             // Keep base View._text in sync
             SetTextDirect (value);
 
-            OnTextChanged ();
+            RaiseTextChanged ();
             SetNeedsDraw ();
 
             _historyText.Clear (_model.GetAllLines ());

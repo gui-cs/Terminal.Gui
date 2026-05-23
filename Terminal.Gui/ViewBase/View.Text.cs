@@ -76,7 +76,7 @@ public partial class View // Text Property APIs
 
             SetTextDirect (value);
 
-            OnTextChanged ();
+            RaiseTextChanged ();
         }
     }
 
@@ -133,19 +133,31 @@ public partial class View // Text Property APIs
     public event EventHandler<CancelEventArgs>? TextChanging;
 
     /// <summary>
-    ///     Called after the <see cref="Text"/> has been changed. Raises the <see cref="TextChanged"/> event.
+    ///     Called after the <see cref="Text"/> has been changed.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This is a signal-only notification. It does not carry old or new text values because
-    ///         <see cref="View.Text"/> semantics vary across derived views.
-    ///     </para>
-    ///     <para>
-    ///         Derived views that override <see cref="Text"/> and do not call <c>base.Text</c> should call
-    ///         this method after mutating text to participate in the CWP workflow.
+    ///         Override in derived views to react to text changes. The base implementation is empty.
+    ///         The <see cref="TextChanged"/> event is raised by the caller after this method returns.
     ///     </para>
     /// </remarks>
-    protected virtual void OnTextChanged () => TextChanged?.Invoke (this, EventArgs.Empty);
+    protected virtual void OnTextChanged () { }
+
+    /// <summary>
+    ///     Invokes the CWP post-change workflow for <see cref="Text"/>: calls <see cref="OnTextChanged"/>
+    ///     then raises <see cref="TextChanged"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Derived views that bypass the base <see cref="Text"/> setter (e.g., using <c>new</c>) should
+    ///         call this method after mutating text to participate in the CWP workflow.
+    ///     </para>
+    /// </remarks>
+    internal void RaiseTextChanged ()
+    {
+        OnTextChanged ();
+        TextChanged?.Invoke (this, EventArgs.Empty);
+    }
 
     /// <summary>
     ///     Raised after the <see cref="Text"/> has been changed.
