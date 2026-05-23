@@ -434,6 +434,12 @@ public partial class TextField
                 return;
             }
 
+            // Raise View.TextChanging so subscribers holding a View reference can cancel.
+            if (base.OnTextChanging ())
+            {
+                return;
+            }
+
             ClearAllSelection ();
 
             // Note we use NewValue here; TextChanging subscribers may have changed it

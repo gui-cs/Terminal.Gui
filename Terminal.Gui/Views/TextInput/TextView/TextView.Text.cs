@@ -178,6 +178,12 @@ public partial class TextView
         }
         set
         {
+            // Raise View.TextChanging so subscribers holding a View reference can cancel.
+            if (OnTextChanging ())
+            {
+                return;
+            }
+
             ResetPosition ();
             _model.LoadString (value);
 
