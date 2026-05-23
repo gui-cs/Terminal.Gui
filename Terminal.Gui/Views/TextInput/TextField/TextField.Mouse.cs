@@ -65,7 +65,7 @@ public partial class TextField
         }
         else
         {
-            int cols = TextModel.GetColumnWidthsBeforeStart (glyphWidths, ScrollOffset + pX, out int clipOffset, out int newInsertionIndex);
+            TextModel.GetColumnWidthsBeforeStart (glyphWidths, ScrollOffset + pX, out int _, out int newInsertionIndex);
 
             InsertionPoint = newInsertionIndex;
         }
