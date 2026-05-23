@@ -33,7 +33,25 @@ public partial class Markdown
                         return true;
                     });
 
+        // Home (without Ctrl) also scrolls to top — this is a read-only view with no cursor
+        AddCommand (Command.LeftStart,
+                    () =>
+                    {
+                        Viewport = Viewport with { Y = 0 };
+
+                        return true;
+                    });
+
         AddCommand (Command.End,
+                    () =>
+                    {
+                        Viewport = Viewport with { Y = Math.Max (GetContentHeight () - Viewport.Height, 0) };
+
+                        return true;
+                    });
+
+        // End (without Ctrl) also scrolls to bottom — this is a read-only view with no cursor
+        AddCommand (Command.RightEnd,
                     () =>
                     {
                         Viewport = Viewport with { Y = Math.Max (GetContentHeight () - Viewport.Height, 0) };
@@ -135,7 +153,15 @@ public partial class Markdown
     /// </remarks>
     protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (behavior is { } && behavior != TabStop)
+        // Cancel auto-advance (behavior==null, used by SetHasFocusTrue) so that gaining
+        // focus doesn't automatically drill into a table SubView or link region.
+        // Only explicit Tab navigation (behavior==TabStop) should cycle through links.
+        if (behavior is null)
+        {
+            return true;
+        }
+
+        if (behavior != TabStop)
         {
             return false;
         }

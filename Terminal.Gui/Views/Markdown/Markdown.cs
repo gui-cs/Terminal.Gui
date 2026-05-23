@@ -403,6 +403,16 @@ public partial class Markdown : View, IDesignable
 
         BuildRenderedLines ();
 
+        // Clear any auto-focus that Add() triggered when a focusable table was added
+        // while this view has focus. Tables should only receive focus via explicit Tab.
+        // The cascade from HasFocus=false calls OnAdvancingFocus(Forward, TabStop) which
+        // just sets _activeLinkIndex without focusing another table — safe here.
+        if (Focused is MarkdownTable)
+        {
+            Focused.HasFocus = false;
+            _activeLinkIndex = -1;
+        }
+
         // Update content size so the viewport knows the scrollable extent
         int contentWidth = Math.Max (effectiveWidth, _maxLineWidth);
         _inLayout = true;
