@@ -26,7 +26,7 @@
     <PackageVersion Include="System.IO.Abstractions" Version="22.1.1" />
     <PackageVersion Include="System.CommandLine" Version="2.0.7" />
     <PackageVersion Include="Wcwidth" Version="4.0.1" />
-    <PackageVersion Include="Terminal.Gui.Editor" Version="2.2.1-develop.133" />
+    <PackageVersion Include="Terminal.Gui.Editor" Version="2.2.5" />
     <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4" />
     <PackageVersion Include="AnsiConsoleToHtml" Version="0.2.0" />
     <PackageVersion Include="ColorHelper" Version="1.8.1" />
