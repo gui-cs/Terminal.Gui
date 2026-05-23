@@ -49,10 +49,10 @@ public partial class Markdown
 
         try
         {
-            IApplication app = Application.Create ().Init (DriverRegistry.Names.ANSI);
+            using IApplication app = Application.Create ().Init (DriverRegistry.Names.ANSI);
             app.Driver!.SetScreenSize (width, width);
 
-            Markdown renderView = new ()
+            using Markdown renderView = new ()
             {
                 Text = text,
                 Width = Dim.Fill (),
@@ -72,9 +72,6 @@ public partial class Markdown
 
             if (contentHeight < 1)
             {
-                renderView.Dispose ();
-                app.Dispose ();
-
                 return string.Empty;
             }
 
@@ -85,11 +82,7 @@ public partial class Markdown
             app.Driver.ClearContents ();
             renderView.Draw ();
 
-            string rendered = app.Driver.ToAnsi ();
-            renderView.Dispose ();
-            app.Dispose ();
-
-            return rendered;
+            return app.Driver.ToAnsi ();
         }
         finally
         {
