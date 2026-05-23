@@ -1143,10 +1143,9 @@ public sealed class MarkdownTable : View, IDesignable
 
         bool hasLinks = _linkRegions.Count > 0;
 
-        // Setting CanFocus here is safe: during BuildRenderedLines the table has not yet
-        // been Add()'d so SuperView is null, meaning the CanFocus setter's auto-focus
-        // guard (SuperView is { Focused: null }) won't fire. For standalone usage where
-        // SuperView IS set, the setter may auto-focus which is the expected behavior.
+        // For standalone usage (SuperView is NOT a Markdown), setting CanFocus here enables
+        // keyboard navigation to the table. When hosted inside MarkdownView, BuildRenderedLines
+        // explicitly overrides CanFocus=false before Add() so these lines have no lasting effect.
         CanFocus = hasLinks;
         TabStop = hasLinks ? TabBehavior.TabStop : TabBehavior.NoStop;
 

@@ -109,6 +109,11 @@ public partial class Markdown
                                              e.Handled = true;
                                          };
 
+                // Temporarily disable CanFocus before Add() to prevent AddAt() from
+                // auto-focusing this table when MarkdownView currently has focus.
+                // CanFocus is re-enabled safely after all tables are added (see below).
+                tableView.CanFocus = false;
+
                 _tableViews.Add (tableView);
                 Add (tableView);
 
@@ -146,6 +151,30 @@ public partial class Markdown
 
         SyncCodeBlockViews ();
         BuildLinkRegions ();
+
+        // Re-enable CanFocus on tables that have links. A temporary HasFocusChanging
+        // handler cancels any auto-focus triggered by the CanFocus setter's guard
+        // (which fires when SuperView.Focused is null). This keeps tables navigable
+        // via Tab without stealing focus during layout.
+        foreach (MarkdownTable table in _tableViews)
+        {
+            if (!table.HasLinks)
+            {
+                continue;
+            }
+
+            table.HasFocusChanging += CancelFocusDuringLayout;
+            table.CanFocus = true;
+            table.TabStop = TabBehavior.TabStop;
+            table.HasFocusChanging -= CancelFocusDuringLayout;
+        }
+
+        return;
+
+        static void CancelFocusDuringLayout (object? sender, HasFocusEventArgs e)
+        {
+            e.Cancel = true;
+        }
     }
 
     /// <summary>

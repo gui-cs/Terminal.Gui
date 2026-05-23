@@ -2419,6 +2419,211 @@ public class MarkdownViewTests (ITestOutputHelper output)
             }
         }
 
+        // Additional layout/draw cycles must not cause viewport drift or focus theft
+        app.LayoutAndDraw ();
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        app.LayoutAndDraw ();
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void Multiple_LayoutDraw_Cycles_Do_Not_Scroll_Or_Focus_Table ()
+    {
+        // Verifies that repeated layout/draw cycles don't cause viewport drift
+        // or auto-focus into a table (regression guard for issue #5365).
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 10);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          # Title
+
+                          Some text at the top.
+
+                          | Command | Description |
+                          |---------|-------------|
+                          | [help](app:help) | Shows help |
+                          | [quit](app:quit) | Quits the app |
+
+                          More text.
+
+                          | Name | Link |
+                          |------|------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = markdown
+        };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+
+        // Perform multiple layout/draw cycles
+        for (var i = 0; i < 5; i++)
+        {
+            app.LayoutAndDraw ();
+
+            Assert.Equal (0, markdownView.Viewport.Y);
+
+            foreach (View sub in markdownView.SubViews)
+            {
+                if (sub is MarkdownTable table)
+                {
+                    Assert.False (table.HasFocus, $"Table should not have focus after cycle {i}");
+                }
+            }
+        }
+
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void Content_Change_While_Focused_Does_Not_Focus_Table ()
+    {
+        // When the MarkdownView itself has focus and content changes (triggering re-layout),
+        // no table should steal focus. This tests the AddAt() auto-focus path.
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 15);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        Terminal.Gui.Views.Markdown markdownView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = "# No tables yet"
+        };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Give focus to the markdown view explicitly
+        markdownView.SetFocus ();
+        app.LayoutAndDraw ();
+        Assert.True (markdownView.HasFocus);
+
+        // Now change content to include tables with links — this triggers re-layout
+        markdownView.Text = """
+                            # Title
+
+                            | Command | Link |
+                            |---------|------|
+                            | [help](app:help) | Shows help |
+                            | [quit](app:quit) | Quits app |
+
+                            | Name | Link |
+                            |------|------|
+                            | [a](https://a.com) | [b](https://b.com) |
+                            """;
+
+        app.LayoutAndDraw ();
+
+        // Viewport must remain at top
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // The MarkdownView should still have focus, not any table
+        Assert.True (markdownView.HasFocus, "MarkdownView should retain focus after content change");
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable table)
+            {
+                Assert.False (table.HasFocus, "No table should steal focus when content changes");
+            }
+        }
+
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void Multiple_Tables_With_Links_No_Cascade_Focus ()
+    {
+        // When multiple tables have links, clearing auto-focus on one table must not
+        // cascade focus to another table (AdvanceFocus wrapping concern).
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 20);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          # Multi-table document
+
+                          | T1 Col | Link |
+                          |--------|------|
+                          | [a](https://a.com) | [b](https://b.com) |
+                          | [c](https://c.com) | [d](https://d.com) |
+
+                          | T2 Col | Link |
+                          |--------|------|
+                          | [e](https://e.com) | [f](https://f.com) |
+                          | [g](https://g.com) | [h](https://h.com) |
+
+                          | T3 Col | Link |
+                          |--------|------|
+                          | [i](https://i.com) | [j](https://j.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = markdown
+        };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // No table should have focus at all
+        int focusedTableCount = 0;
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable table && table.HasFocus)
+            {
+                focusedTableCount++;
+            }
+        }
+
+        Assert.Equal (0, focusedTableCount);
+
+        // Viewport should be at top
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // Now give focus to markdownView and do another layout cycle
+        markdownView.SetFocus ();
+        app.LayoutAndDraw ();
+
+        focusedTableCount = 0;
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable table && table.HasFocus)
+            {
+                focusedTableCount++;
+            }
+        }
+
+        Assert.Equal (0, focusedTableCount);
+
         app.Dispose ();
     }
 }
