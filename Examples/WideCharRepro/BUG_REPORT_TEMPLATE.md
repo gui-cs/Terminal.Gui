@@ -73,7 +73,8 @@ Wide characters advance the cursor by only 1 column. Grids misalign and text ove
 | Terminal | Version | OS | Test 1 (Emoji) | Test 2 (CJK) | Test 3 (Mixed) | Test 4 (Grid) | Test 5 (Align) | Status |
 |---------|---------|-----|:-:|:-:|:-:|:-:|:-:|--------|
 | Windows Terminal | 1.22+ | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
-| VS Code Insiders (terminal) | 1.x | Windows | ✅ | ✅ | ❌ | ✅ | ✅ | **FAIL** |
+| VS Code Insiders (terminal) | 1.x | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
+| Visual Studio 2026 (terminal) | — | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
 | GitHub Copilot (terminal) | — | Windows | ❌ | ❌ | ❌ | ❌ | ❌ | **FAIL** |
 | GitHub Copilot (terminal) | — | macOS | ❌ | ❌ | ❌ | ❌ | ❌ | **FAIL** |
 | iTerm2 | 3.5+ | macOS | | | | | | _untested_ |
