@@ -25,7 +25,7 @@ dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
 
 # 2. Record
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
-$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,A,r,r,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Ctrl+Q'
+$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,A,r,r,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
 
 tuirec record `
     --binary $binary `
@@ -95,7 +95,7 @@ interesting. Translate them to tuirec syntax:
    with generous waits beats many rapid keystrokes.
 4. **Show variety** — demonstrate 2–3 features of the scenario, not just
    scrolling. Navigate between controls, trigger category changes, etc.
-5. **End with `Ctrl+Q`** — the standard Terminal.Gui quit key.
+5. **End with `Escape`** — the default Terminal.Gui quit key.
 6. **Avoid wide glyphs** — Emoji and CJK characters cause misaligned rendering
    in terminal recordings (agg renders each cell as monospace but wide glyphs
    consume 2 cells). Prefer categories with single-width characters (Arrows,
@@ -125,14 +125,27 @@ Copy-Item artifacts/<ScenarioName>.gif Examples/UICatalog/Scenarios/<ScenarioDir
 
 ### Output File Placement
 
-Scenario demo GIFs live alongside their scenario source code:
+Scenario demo GIFs and any bespoke recording scripts live **alongside their
+scenario source code**:
 
 ```
 Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
+Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>-tuirec.ps1   (optional)
 ```
+
+For scenarios whose `.cs` file lives directly in `Scenarios/` (no subdirectory),
+the GIF and script go in that same folder (e.g.
+`Scenarios/AllViewsTester.gif` next to `Scenarios/AllViewsTester.cs`).
+
+For **View-derived classes**, the GIF and optional script go in the same folder
+as the View's `.cs` file (e.g. `Terminal.Gui/Views/Button.gif`).
 
 Use `--name <ScenarioName>` (PascalCase matching the class name) so the output
 file is named correctly. The `--name` value determines the artifact filenames.
+
+A `*-tuirec.ps1` script is only needed when the default recording workflow
+requires scenario-specific overrides (custom keystrokes, non-default cols/rows,
+etc.). For simple recordings, just follow the template command below.
 
 ### Critical: `--kitty-keyboard` Decision
 
@@ -167,7 +180,7 @@ backtick literals:
 
 ```powershell
 # Correct — single quotes prevent PowerShell backtick interpolation:
-$ks = 'wait:1000,`search text`,Enter,wait:500,Ctrl+Q'
+$ks = 'wait:1000,`search text`,Enter,wait:500,Escape'
 
 # WRONG — PowerShell eats the backticks:
 --keystrokes "wait:1000,`search text`,Enter"
@@ -179,7 +192,7 @@ $ks = 'wait:1000,`search text`,Enter,wait:500,Ctrl+Q'
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
 
 # Browse categories (Box Drawing, Arrows), show context menu on a glyph
-$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,A,r,r,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Ctrl+Q'
+$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,A,r,r,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
 
 tuirec record `
     --binary $binary `
@@ -208,7 +221,7 @@ tuirec record `
 | 9 | `CursorDown` ×3 | Navigate to a glyph |
 | 10 | `Shift+F10` | Open context menu (Copy Glyph / Copy Code Point) |
 | 11 | `wait:1500,Escape` | Let viewer see the menu, then dismiss |
-| 12 | `Ctrl+Q` | Quit |
+| 12 | `Escape` | Quit |
 
 **Key techniques demonstrated:**
 - **CollectionNavigator typing** — type category name prefixes to jump directly
@@ -233,7 +246,7 @@ For apps in `Examples/` that are not UICatalog scenarios:
 
 ```powershell
 $binary = "./Examples/<AppName>/bin/Release/net10.0/<AppName>.exe"
-$ks = 'wait:1000,<keystrokes>,Ctrl+Q'
+$ks = 'wait:1000,<keystrokes>,Escape'
 
 tuirec record `
     --binary $binary `
@@ -276,7 +289,7 @@ After every recording, verify:
 |---------|-------|-----|
 | Wide glyphs misaligned in GIF | Emoji/CJK chars are 2-cell wide; agg renders per-cell | Avoid emoji/CJK categories; use single-width ranges (Arrows, Box Drawing, etc.) |
 | Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
-| App doesn't quit | `Ctrl+Q` needs Kitty for disambiguation | Add `--kitty-keyboard` (Ctrl keys work correctly) |
+| App doesn't quit | Wrong quit key or key not delivered | Use `Escape` (the default quit key); check `--kitty-keyboard` interaction |
 | Blank frames at start | Startup too slow | Increase `--startup-delay` |
 | Recording times out | App stuck / wrong keystrokes | Check with `--verbosity high`, fix script |
 | `--binary` permission error | Relative path on Windows | Use `./` prefix or absolute path with forward slashes |

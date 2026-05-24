@@ -2,7 +2,7 @@
 
 For recording Terminal.Gui app/scenario GIFs, use:
 
-- [`./Scripts/tuirec.md`](./Scripts/tuirec.md) — Full recording workflow with tuirec
+- [`./README.md`](./README.md) — Full recording workflow with tuirec
 
 ## Quick Reference
 
@@ -15,10 +15,19 @@ dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
 
 # Record a scenario
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
-$ks = 'wait:1000,<keystrokes>,Ctrl+Q'
+$ks = 'wait:1000,<keystrokes>,Escape'
 tuirec record --binary $binary --args "run,<Scenario Name>" --name <id> `
     --keystrokes $ks --startup-delay 2000 --drain 2000 --cols 120 --rows 30 --open
 ```
 
-See `Scripts/tuirec.md` for complete guidance including keystroke syntax,
+See `README.md` (this directory) for complete guidance including keystroke syntax,
 PowerShell quoting rules, and the `--kitty-keyboard` decision tree.
+
+## File Placement
+
+- **Scenario GIFs** go alongside the scenario `.cs` file:
+  `Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif`
+- **View GIFs** go alongside the View's `.cs` file:
+  `Terminal.Gui/Views/<ViewName>.gif`
+- **Bespoke recording scripts** (when needed) use the naming convention:
+  `<ClassName>-tuirec.ps1` in the same directory as the `.cs` file.
