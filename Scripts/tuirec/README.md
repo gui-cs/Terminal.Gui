@@ -23,13 +23,13 @@ Verify: `tuirec --version`. If not on PATH, add `$(go env GOPATH)\bin` to PATH.
 # 1. Build ScenarioRunner (do this ONCE before recording)
 dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
 
-# 2. Record
-$binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
+# 2. Record (cross-platform: use dotnet to run the DLL)
+$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
 $ks = 'wait:1200,Tab,Tab,wait:400,A,wait:1800,B,o,wait:1800,E,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
 
 tuirec record `
-    --binary $binary `
-    --args "run,Character Map" `
+    --binary dotnet `
+    --args "$dll,run,Character Map" `
     --name CharacterMap `
     --title "Character Map" `
     --keystrokes $ks `
@@ -104,12 +104,12 @@ interesting. Translate them to tuirec syntax:
 ### Template Command
 
 ```powershell
-$binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
+$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
 $ks = '<your keystroke script here>'
 
 tuirec record `
-    --binary $binary `
-    --args "run,<Scenario Name>" `
+    --binary dotnet `
+    --args "$dll,run,<Scenario Name>" `
     --name <ScenarioName> `
     --title "<Scenario Name>" `
     --keystrokes $ks `
@@ -178,14 +178,14 @@ $ks = 'wait:1000,`search text`,Enter,wait:500,Escape'
 ### Example: Character Map Scenario
 
 ```powershell
-$binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
+$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
 
 # Navigate to category list, browse Arrows → Box Drawing → Emoji, then context menu
 $ks = 'wait:1200,Tab,Tab,wait:400,A,wait:1800,B,o,wait:1800,E,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
 
 tuirec record `
-    --binary $binary `
-    --args "run,Character Map" `
+    --binary dotnet `
+    --args "$dll,run,Character Map" `
     --name CharacterMap `
     --title "Character Map" `
     --keystrokes $ks `
@@ -235,11 +235,12 @@ a single View with `EnableForDesign()` and records its interactions.)
 For apps in `Examples/` that are not UICatalog scenarios:
 
 ```powershell
-$binary = "./Examples/<AppName>/bin/Release/net10.0/<AppName>.exe"
+$dll = "./Examples/<AppName>/bin/Release/net10.0/<AppName>.dll"
 $ks = 'wait:1000,<keystrokes>,Escape'
 
 tuirec record `
-    --binary $binary `
+    --binary dotnet `
+    --args "$dll" `
     --name <app-id> `
     --title "<App Name> Demo" `
     --keystrokes $ks `

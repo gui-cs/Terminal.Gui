@@ -81,7 +81,7 @@ if (string.IsNullOrEmpty (viewName))
 // If --keystrokes, just query the view's demo keystrokes and exit
 if (queryKeyStrokes)
 {
-    Type? type = Type.GetType ($"Terminal.Gui.Views.{viewName}, Terminal.Gui", false, true);
+    Type? type = ViewDemoWindow.ResolveViewType (viewName);
 
     if (type is null)
     {
@@ -131,6 +131,7 @@ else
     if (result is { })
     {
         Console.WriteLine (result);
+        app.Dispose ();
 
         return;
     }
@@ -182,6 +183,29 @@ internal class ViewDemoWindow : Runnable<string>
 
     public static bool AddBorderFrame { get; set; }
 
+    /// <summary>
+    ///     Resolves a view type name to its <see cref="Type"/>, handling generic types like "ListView`1".
+    /// </summary>
+    public static Type? ResolveViewType (string viewName)
+    {
+        // Try direct resolution first
+        Type? type = Type.GetType ($"Terminal.Gui.Views.{viewName}, Terminal.Gui", false, true);
+
+        if (type is not null)
+        {
+            return type;
+        }
+
+        // Search the assembly for types matching by name (handles generics)
+        System.Reflection.Assembly asm = typeof (View).Assembly;
+
+        return asm.GetTypes ()
+                  .FirstOrDefault (t => t.IsClass
+                                        && !t.IsAbstract
+                                        && t.IsSubclassOf (typeof (View))
+                                        && string.Equals (t.Name, viewName, StringComparison.OrdinalIgnoreCase));
+    }
+
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsRunning)
     {
@@ -193,7 +217,7 @@ internal class ViewDemoWindow : Runnable<string>
         }
 
         // Convert ViewName to type that's in the Terminal.Gui assembly:
-        var type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
+        Type? type = ResolveViewType (ViewName!);
 
         if (type is null)
         {

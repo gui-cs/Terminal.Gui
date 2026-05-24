@@ -16,7 +16,6 @@ Write-Host "Working directory: $(Get-Location)"
 Write-Host "Looking for view files in: $ApiPath"
 
 # Create images output directory
-$repoRoot = Split-Path -Parent $rootPath
 if (-not (Test-Path $ImagePath)) {
     New-Item -ItemType Directory -Path $ImagePath -Force | Out-Null
 }
@@ -28,7 +27,7 @@ if ($LASTEXITCODE -ne 0) {
     Write-Host "Failed to build OutputView!" -ForegroundColor Red
     exit 1
 }
-$outputViewBinary = "scripts/OutputView/bin/Release/net10.0/OutputView.exe"
+$outputViewDll = "scripts/OutputView/bin/Release/net10.0/OutputView.dll"
 
 # Get all .yml files in the API directory that are Views
 if ($Debug) {
@@ -105,7 +104,7 @@ foreach ($file in $viewFiles) {
             try {
                 # Query the view's demo keystrokes
                 Write-Host "  Querying keystrokes for $viewNameClean..." -ForegroundColor Gray
-                $ks = & dotnet run --project scripts/OutputView --no-build -- --view=$viewNameClean --keystrokes 2>$null
+                $ks = & dotnet $outputViewDll --view=$viewNameClean --keystrokes 2>$null
                 $ks = $ks.Trim()
                 
                 if ([string]::IsNullOrEmpty($ks)) {
@@ -123,12 +122,12 @@ foreach ($file in $viewFiles) {
                 Write-Host "    Keystrokes: $ks" -ForegroundColor Gray
                 
                 tuirec record `
-                    --binary $outputViewBinary `
-                    --args "--view=$viewNameClean,--live,--frame" `
+                    --binary dotnet `
+                    --args "$outputViewDll,--view=$viewNameClean,--live,--frame" `
                     --name $viewNameClean `
                     --title $viewNameClean `
                     --keystrokes $ks `
-                    --startup-delay 1500 `
+                    --startup-delay 0 `
                     --drain 1000 `
                     --cols 80 --rows 20 `
                     --output $gifFile `

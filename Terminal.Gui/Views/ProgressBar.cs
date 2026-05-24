@@ -341,6 +341,4 @@ public class ProgressBar : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc/>
-    public string? GetDemoKeyStrokes () => null;
 }

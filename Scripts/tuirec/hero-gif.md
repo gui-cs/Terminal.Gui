@@ -13,10 +13,10 @@ go install github.com/gui-cs/tuirec/cmd/tuirec@latest
 # Build ScenarioRunner (before any recording)
 dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
 
-# Record a scenario
-$binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
+# Record a scenario (cross-platform: use dotnet to run the DLL)
+$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
 $ks = 'wait:1000,<keystrokes>,Escape'
-tuirec record --binary $binary --args "run,<Scenario Name>" --name <id> `
+tuirec record --binary dotnet --args "$dll,run,<Scenario Name>" --name <id> `
     --keystrokes $ks --startup-delay 2000 --drain 2000 --cols 120 --rows 30 --open
 ```
 
