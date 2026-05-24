@@ -1093,6 +1093,9 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
     }
 
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorRight,wait:800,CursorRight,wait:800,CursorLeft,wait:800";
+
     #endregion
 
     private bool _disposing;

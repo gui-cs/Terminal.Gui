@@ -255,6 +255,9 @@ public partial class TextField : View, IDesignable, IValue<string>
         return true;
     }
 
+    /// <inheritdoc/>
+    public virtual string? GetDemoKeyStrokes () => "wait:300,Home,wait:300,`Hello `,wait:800,End,wait:300,` World`,wait:1000";
+
     #region IValue<string> Implementation
 
     /// <summary>

@@ -108,6 +108,9 @@ public partial class ListView : View, IDesignable, IValue<int?>
     }
 
     /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,CursorDown,wait:400,CursorDown,wait:400,CursorUp,wait:800";
+
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         Source?.Dispose ();

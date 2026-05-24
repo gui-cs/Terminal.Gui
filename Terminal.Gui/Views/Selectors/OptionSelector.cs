@@ -243,4 +243,7 @@ public class OptionSelector : SelectorBase, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:600,CursorDown,wait:600,CursorUp,wait:800";
 }

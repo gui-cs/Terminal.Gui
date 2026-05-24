@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using AnsiConsoleToHtml;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
@@ -33,6 +32,8 @@ string? outputFile = null;
 string [] commandArgs = Environment.GetCommandLineArgs ();
 var ansi = false;
 var addBorderFrame = false;
+var live = false;
+var queryKeyStrokes = false;
 
 for (var i = 0; i < commandArgs.Length; i++)
 {
@@ -60,11 +61,47 @@ for (var i = 0; i < commandArgs.Length; i++)
     {
         ansi = true;
     }
+    else if (commandArgs [i] == "--live" || commandArgs [i] == "-l")
+    {
+        live = true;
+    }
+    else if (commandArgs [i] == "--keystrokes" || commandArgs [i] == "-k")
+    {
+        queryKeyStrokes = true;
+    }
 }
 
 if (string.IsNullOrEmpty (viewName))
 {
     Console.WriteLine (@"No view name specified. Use --view=ViewName to specify a view.");
+
+    return;
+}
+
+// If --keystrokes, just query the view's demo keystrokes and exit
+if (queryKeyStrokes)
+{
+    Type? type = Type.GetType ($"Terminal.Gui.Views.{viewName}, Terminal.Gui", false, true);
+
+    if (type is null)
+    {
+        Console.Error.WriteLine ($"`{viewName}` type is not a valid Terminal.Gui View type.");
+        Environment.Exit (1);
+
+        return;
+    }
+
+    View? view = (View?)Activator.CreateInstance (type);
+
+    if (view is IDesignable designable)
+    {
+        string? keystrokes = designable.GetDemoKeyStrokes ();
+        Console.WriteLine (keystrokes ?? "");
+    }
+    else
+    {
+        Console.WriteLine ("");
+    }
 
     return;
 }
@@ -75,46 +112,56 @@ ViewDemoWindow.AddBorderFrame = addBorderFrame;
 IApplication app = Application.Create ();
 app.Init (DriverRegistry.Names.ANSI);
 
-// Force 16 colors and end after first iteration
-app.StopAfterFirstIteration = true;
-app.Driver!.Force16Colors = !ansi;
-app.Driver!.SetScreenSize (80, 20);
-
-var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
-
-if (result is { })
+if (live)
 {
-    Console.WriteLine (result);
-
-    return;
-}
-
-// Run it again, since it set the Screen size to just fit
-app.Run<ViewDemoWindow> ().GetResult<string> ();
-
-string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
-app.Dispose ();
-
-if (string.IsNullOrEmpty (output))
-{
-    Console.WriteLine (@"No output was generated.");
-
-    return;
-}
-
-if (ansi)
-{
-    output = AnsiConsole.ToHtml (output);
-}
-
-// Write to file or console
-if (!string.IsNullOrEmpty (outputFile))
-{
-    File.WriteAllText (outputFile, output);
+    // Live mode: run normally so tuirec can record the interaction
+    app.Driver!.SetScreenSize (80, 20);
+    app.Run<ViewDemoWindow> ();
+    app.Dispose ();
 }
 else
 {
-    Console.WriteLine (output);
+    // Original mode: stop after first iteration and capture output
+    app.StopAfterFirstIteration = true;
+    app.Driver!.Force16Colors = !ansi;
+    app.Driver!.SetScreenSize (80, 20);
+
+    var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+
+    if (result is { })
+    {
+        Console.WriteLine (result);
+
+        return;
+    }
+
+    // Run it again, since it set the Screen size to just fit
+    app.Run<ViewDemoWindow> ().GetResult<string> ();
+
+    string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
+    app.Dispose ();
+
+    if (string.IsNullOrEmpty (output))
+    {
+        Console.WriteLine (@"No output was generated.");
+
+        return;
+    }
+
+    if (ansi)
+    {
+        output = AnsiConsoleToHtml.AnsiConsole.ToHtml (output);
+    }
+
+    // Write to file or console
+    if (!string.IsNullOrEmpty (outputFile))
+    {
+        File.WriteAllText (outputFile, output);
+    }
+    else
+    {
+        Console.WriteLine (output);
+    }
 }
 
 // Defines a top-level window with border and title

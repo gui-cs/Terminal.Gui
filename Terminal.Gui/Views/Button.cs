@@ -335,6 +335,9 @@ public class Button : View, IDesignable, IAcceptTarget
         return true;
     }
 
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
+
     // GetDecoratedText (called by UpdateTextFormatterText for Dim.Auto sizing) and GetInteriorText
     // (called by OnDrawingText for rendering) must remain in sync when modifying button text formatting.
     private string GetDecoratedText ()

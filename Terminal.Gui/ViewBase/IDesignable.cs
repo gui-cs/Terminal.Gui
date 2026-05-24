@@ -20,4 +20,14 @@ public interface IDesignable
     /// </summary>
     /// <returns><see langword="true"/> if the view successfully loaded demo data.</returns>
     public bool EnableForDesign () => false;
+
+    /// <summary>
+    ///     Returns a tuirec-format keystroke string for recording a demo GIF of this view.
+    ///     The string uses tuirec token syntax (e.g. <c>"wait:500,Enter,wait:800,Escape"</c>).
+    /// </summary>
+    /// <returns>
+    ///     A keystroke string for tuirec, or <see langword="null"/> if no demo interaction is defined
+    ///     (the view will be recorded as a static 2-second capture).
+    /// </returns>
+    public string? GetDemoKeyStrokes () => null;
 }

@@ -355,4 +355,7 @@ public class SpinnerView : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:3000";
 }
