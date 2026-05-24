@@ -25,7 +25,7 @@ dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
 
 # 2. Record
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
-$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,A,r,r,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
+$ks = 'wait:1200,Tab,Tab,wait:400,A,wait:1800,B,o,wait:1800,E,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
 
 tuirec record `
     --binary $binary `
@@ -180,8 +180,8 @@ $ks = 'wait:1000,`search text`,Enter,wait:500,Escape'
 ```powershell
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
 
-# Browse categories (Box Drawing, Arrows), show context menu on a glyph
-$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,A,r,r,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
+# Navigate to category list, browse Arrows → Box Drawing → Emoji, then context menu
+$ks = 'wait:1200,Tab,Tab,wait:400,A,wait:1800,B,o,wait:1800,E,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
 
 tuirec record `
     --binary $binary `
@@ -200,24 +200,25 @@ tuirec record `
 | Step | Tokens | What happens |
 |------|--------|--------------|
 | 1 | `wait:1200` | Let the CharMap UI fully render |
-| 2 | `CursorDown` ×8 | Scroll through the initial unicode code points |
-| 3 | `wait:800,Shift+Tab` | Pause, then move focus to category table |
-| 4 | `B,o,x` | Type "Box" — CollectionNavigator jumps to "Box Drawing" |
-| 5 | `wait:1800` | Pause so viewer sees box-drawing characters |
-| 6 | `A,r,r` | Type "Arr" — jumps to "Arrows" category |
-| 7 | `wait:1800` | Pause so viewer sees arrow characters |
-| 8 | `Tab` | Return focus to charmap grid |
-| 9 | `CursorDown` ×3 | Navigate to a glyph |
-| 10 | `Shift+F10` | Open context menu (Copy Glyph / Copy Code Point) |
-| 11 | `wait:1500,Escape` | Let viewer see the menu, then dismiss |
-| 12 | `Escape` | Quit |
+| 2 | `Tab,Tab` | Move focus to category list |
+| 3 | `A` | CollectionNavigator jumps to "Arrows" |
+| 4 | `wait:1800` | Pause so viewer sees arrow characters |
+| 5 | `B,o` | Type "Bo" — jumps to "Box Drawing" |
+| 6 | `wait:1800` | Pause so viewer sees box-drawing characters |
+| 7 | `E` | Type "E" — jumps to "Emoji" |
+| 8 | `wait:1800` | Pause so viewer sees emoji characters |
+| 9 | `Tab` | Return focus to charmap grid |
+| 10 | `CursorDown` ×3 | Navigate to a glyph |
+| 11 | `Shift+F10` | Open context menu (Copy Glyph / Copy Code Point) |
+| 12 | `wait:1500,Escape` | Let viewer see the menu, then dismiss |
+| 13 | `Escape` | Quit |
 
 **Key techniques demonstrated:**
 - **CollectionNavigator typing** — type category name prefixes to jump directly
   (much better than scrolling through dozens of categories with arrow keys)
 - **Context menu** — `Shift+F10` (the `PopoverMenu.DefaultKey`) shows the
   right-click menu on the selected glyph
-- **Generous waits** — 1500–1800ms between feature demonstrations so viewers
+- **Generous waits** — 1800ms between feature demonstrations so viewers
   can absorb each state change
 
 ---
