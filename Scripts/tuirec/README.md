@@ -131,7 +131,7 @@ GIFs live **alongside the `.cs` file they document**:
 |------|-------|
 | Scenario in a subdirectory | `Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif` |
 | Scenario directly in `Scenarios/` | `Examples/UICatalog/Scenarios/<ScenarioName>.gif` |
-| View-derived class | Same folder as the View's `.cs` file (e.g. `Terminal.Gui/Views/Button.gif`) |
+| View-derived class | `docfx/images/views/<ViewName>.gif` |
 
 Use `--name <ScenarioName>` (PascalCase matching the class name) so the output
 file is named correctly. The `--name` value determines the artifact filenames.

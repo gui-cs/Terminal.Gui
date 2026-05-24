@@ -27,5 +27,4 @@ PowerShell quoting rules, and the `--kitty-keyboard` decision tree.
 
 - **Scenario GIFs** go alongside the scenario `.cs` file:
   `Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif`
-- **View GIFs** go alongside the View's `.cs` file:
-  `Terminal.Gui/Views/<ViewName>.gif`
+- **View GIFs** go in `docfx/images/views/<ViewName>.gif`
