@@ -2,6 +2,23 @@
 
 For recording Terminal.Gui app/scenario GIFs, use:
 
-- [`./Scripts/tuirec.md`](./Scripts/tuirec.md)
+- [`./Scripts/tuirec.md`](./Scripts/tuirec.md) — Full recording workflow with tuirec
 
-This file is intentionally minimal. The recording workflow, quality checks, and agent guidance are maintained in `Scripts/tuirec.md`.
+## Quick Reference
+
+```powershell
+# Install tuirec (one-time)
+go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+
+# Build ScenarioRunner (before any recording)
+dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
+
+# Record a scenario
+$binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
+$ks = 'wait:1000,<keystrokes>,Ctrl+Q'
+tuirec record --binary $binary --args "run,<Scenario Name>" --name <id> `
+    --keystrokes $ks --startup-delay 2000 --drain 2000 --cols 120 --rows 30 --open
+```
+
+See `Scripts/tuirec.md` for complete guidance including keystroke syntax,
+PowerShell quoting rules, and the `--kitty-keyboard` decision tree.

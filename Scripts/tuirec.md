@@ -1,55 +1,262 @@
 # Recording Terminal.Gui Apps with `tuirec`
 
-Use this guide when an issue or PR asks for a GIF/video capture of a Terminal.Gui app or scenario.
+Use this guide when an issue or PR asks for a GIF/video capture of a Terminal.Gui
+app or scenario. The recording tool is [`gui-cs/tuirec`](https://github.com/gui-cs/tuirec) —
+a Go CLI that spawns the target app in a PTY, injects keystrokes, records terminal
+output as an asciinema v2 cast, and renders an animated GIF via `agg`.
 
-## Goals
+## Install
 
-- Record a **visible, stable** terminal session.
-- Convert the recording to a GIF artifact for docs.
-- Validate output before committing.
+```powershell
+# Requires Go 1.22+
+go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+tuirec --version
 
-## Recommended Workflow
+# agg is auto-downloaded on first use — no separate install needed.
+```
 
-1. Build first.
-   - To avoid recording startup/build noise, build before launching recording.
-2. Launch the target app/scenario with a dedicated entry point.
-   - To reduce timing and startup variability, prefer a scenario runner or focused runner over `dotnet run` of a large app shell.
-3. Start `tuirec` recording and drive the UI interactions.
-   - Keep the terminal size fixed for the whole recording.
-   - Move slowly enough for frames to be readable.
-4. Export a GIF from the recording.
-5. Validate the output artifact before commit.
-   - Confirm the GIF is not blank.
-   - Confirm expected UI text appears.
-   - Confirm the interaction sequence is complete.
+Verify: `tuirec --version`. If not on PATH, add `$(go env GOPATH)\bin` to PATH.
 
-## Practical Guidance for Agents
+## Quick Start — Recording a UICatalog Scenario
 
-- To avoid blank captures, do not rely on first-run restore/build while recording.
-- To keep captures deterministic, use a dedicated runner that goes directly to the target scenario.
-- To verify quality, inspect the output and confirm key labels are visible before replacing docs assets.
-- To update docs assets, write GIFs to `docfx/images/` with a descriptive name.
+```powershell
+# 1. Build ScenarioRunner (do this ONCE before recording)
+dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
+
+# 2. Record
+$binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
+$ks = 'wait:1000,CursorDown,CursorDown,CursorDown,wait:1000,Ctrl+Q'
+
+tuirec record `
+    --binary $binary `
+    --args "run,Character Map" `
+    --name charmap `
+    --title "Character Map — Unicode Viewer" `
+    --keystrokes $ks `
+    --startup-delay 2000 `
+    --drain 2000 `
+    --cols 120 --rows 30 `
+    --open --copy
+```
+
+Output: `artifacts/charmap.gif` and `artifacts/charmap.cast`.
+
+---
 
 ## Recording UICatalog Scenarios
 
-(TBD - detailed instructions coming soon)
+### Prerequisites
+
+1. **Build ScenarioRunner** — always build before recording to avoid startup noise:
+   ```powershell
+   dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
+   ```
+2. **Know the scenario name** — list available scenarios:
+   ```powershell
+   dotnet run --project Examples/ScenarioRunner -c Release --no-build -- list
+   ```
+
+### Finding the Right Keystrokes
+
+Each scenario has a `GetDemoKeyStrokes()` method that defines a canonical
+interaction sequence for benchmarking. **Use this as your starting point:**
+
+```powershell
+# Find the demo keystrokes for a scenario:
+grep -n "GetDemoKeyStrokes" Examples/UICatalog/Scenarios/<ScenarioFile>.cs
+```
+
+The demo keystrokes show what keys the scenario expects and what UI flow is
+interesting. Translate them to tuirec syntax:
+
+| Terminal.Gui Key | tuirec Token |
+|---|---|
+| `Key.CursorDown` | `CursorDown` |
+| `Key.CursorLeft` | `CursorLeft` |
+| `Key.Tab` | `Tab` |
+| `Key.Tab.WithShift` | `Shift+Tab` |
+| `Key.Enter` | `Enter` |
+| `Key.Esc` | `Esc` |
+| `Key.B` | `B` (or `` `B` `` for literal) |
+
+### Composing the Keystroke Script
+
+**Principles for a great recording:**
+
+1. **Start with `wait:1000`** — let the UI render fully after startup-delay.
+2. **Add `wait:` between logical steps** — `wait:500` to `wait:1500` between
+   groups of actions so viewers can follow what's happening.
+3. **Keep it short** — 10–20 seconds of real-time interaction. Fewer keystrokes
+   with generous waits beats many rapid keystrokes.
+4. **Show variety** — demonstrate 2–3 features of the scenario, not just
+   scrolling. Navigate between controls, trigger category changes, etc.
+5. **End with `Ctrl+Q`** — the standard Terminal.Gui quit key.
+
+### Template Command
+
+```powershell
+$binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
+$ks = '<your keystroke script here>'
+
+tuirec record `
+    --binary $binary `
+    --args "run,<Scenario Name>" `
+    --name <scenario-id> `
+    --title "<Scenario Name> — <subtitle>" `
+    --keystrokes $ks `
+    --startup-delay 2000 `
+    --drain 2000 `
+    --cols 120 --rows 30 `
+    --verbosity high `
+    --open --copy
+```
+
+### Critical: `--kitty-keyboard` Decision
+
+Terminal.Gui v2 alpha builds may **ignore Kitty-encoded navigation keys**
+(`CursorUp`, `CursorDown`, `CursorLeft`, `CursorRight`, `PageUp`, `PageDown`,
+`Home`, `End`).
+
+**Rule:**
+- **Omit `--kitty-keyboard`** for navigation-heavy demos (scrolling, arrow keys).
+- **Add `--kitty-keyboard`** only when you need modifier disambiguation
+  (`Ctrl+M` vs Enter, `Ctrl+I` vs Tab) and the demo doesn't rely on nav keys.
+- **If navigation keys don't work**, remove `--kitty-keyboard` and retry.
+
+### `--args` for ScenarioRunner
+
+The `--args` flag uses **comma-separated** values (not space-separated):
+
+```powershell
+--args "run,Character Map"      # Correct: two args ["run", "Character Map"]
+--args "run Character Map"      # WRONG: one arg "run Character Map"
+```
+
+### PowerShell Quoting
+
+Always assign keystrokes to a **single-quoted** `$ks` variable to preserve
+backtick literals:
+
+```powershell
+# Correct — single quotes prevent PowerShell backtick interpolation:
+$ks = 'wait:1000,`search text`,Enter,wait:500,Ctrl+Q'
+
+# WRONG — PowerShell eats the backticks:
+--keystrokes "wait:1000,`search text`,Enter"
+```
+
+### Example: Character Map Scenario
+
+```powershell
+$binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
+
+# Scroll the char grid, switch to category list, browse categories, switch back
+$ks = 'wait:1000,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:1000,Shift+Tab,wait:500,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:1000,Tab,wait:500,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,wait:1500,Ctrl+Q'
+
+tuirec record `
+    --binary $binary `
+    --args "run,Character Map" `
+    --name charmap `
+    --title "Character Map — Unicode Viewer" `
+    --keystrokes $ks `
+    --startup-delay 2000 `
+    --drain 2000 `
+    --cols 120 --rows 30 `
+    --open --copy
+```
+
+**Script breakdown:**
+
+| Step | Tokens | What happens |
+|------|--------|--------------|
+| 1 | `wait:1000` | Let the CharMap UI render |
+| 2 | `CursorDown` ×20 | Scroll through unicode characters in the grid |
+| 3 | `wait:1000,Shift+Tab` | Pause, then move focus to category table |
+| 4 | `CursorDown` ×10 | Browse down through unicode categories |
+| 5 | `wait:1000,Tab` | Pause, then return focus to char grid |
+| 6 | `CursorLeft` ×10 | Scroll horizontally to show different columns |
+| 7 | `wait:1500,Ctrl+Q` | Final pause for viewer, then quit |
+
+---
 
 ## Recording Individual View Sub-classes with EnableForDesign
 
-(TBD - detailed instructions coming soon)
+(Coming soon — will use a dedicated design-mode runner that instantiates
+a single View with `EnableForDesign()` and records its interactions.)
+
+---
 
 ## Recording Standalone Example Apps
 
-(TBD - detailed instructions coming soon)
+For apps in `Examples/` that are not UICatalog scenarios:
+
+```powershell
+$binary = "./Examples/<AppName>/bin/Release/net10.0/<AppName>.exe"
+$ks = 'wait:1000,<keystrokes>,Ctrl+Q'
+
+tuirec record `
+    --binary $binary `
+    --name <app-id> `
+    --title "<App Name> Demo" `
+    --keystrokes $ks `
+    --startup-delay 2000 `
+    --drain 2000 `
+    --cols 120 --rows 30 `
+    --open --copy
+```
+
+---
 
 ## Validation Checklist
 
-- [ ] The app content is visible (not empty/black).
-- [ ] The expected scenario title/controls are readable.
-- [ ] The capture shows the intended interaction.
-- [ ] The final GIF path and filename are correct.
+After every recording, verify:
 
-## Notes
+- [ ] `tuirec record` exited with code 0 and wrote both `.gif` and `.cast`.
+- [ ] **Error check** — no errors in the cast:
+  ```powershell
+  Select-String -Path artifacts/<name>.cast -Pattern "error|unknown|not found|usage:" -CaseSensitive:$false
+  ```
+- [ ] **GIF is not blank** — file size > 100KB for a typical scenario recording.
+      (A blank/static GIF is typically < 50KB.)
+- [ ] **Visual check** — open the GIF (`--open` flag) and confirm:
+  - The app content is visible (menu bar, controls, content).
+  - The interaction sequence is visible (scrolling, focus changes, etc.).
+  - The recording ends cleanly (no frozen frame or abrupt cutoff).
+- [ ] **Output path is correct** — for docs assets, copy to `docfx/images/`.
 
-- `tuirec` CLI options can change over time. To find current syntax, run `tuirec --help`.
-- If a capture fails, retry with a dedicated runner and pre-built binaries before attempting other changes.
+---
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| GIF is tiny (< 50KB) or static | Nav keys ignored (Kitty encoding) | Remove `--kitty-keyboard` |
+| App doesn't quit | `Ctrl+Q` not recognized | Try with `--kitty-keyboard` for modifier keys |
+| Blank frames at start | Startup too slow | Increase `--startup-delay` |
+| Recording times out | App stuck / wrong keystrokes | Check with `--verbosity high`, fix script |
+| `--binary` permission error | Relative path on Windows | Use `./` prefix or absolute path with forward slashes |
+| Backtick text missing | PowerShell interpolation | Use single-quoted `$ks` variable |
+
+---
+
+## Agent Workflow Summary
+
+When asked to record a scenario GIF:
+
+1. **Build** — `dotnet build Examples/ScenarioRunner -c Release`
+2. **Find scenario name** — `dotnet run --project Examples/ScenarioRunner -c Release --no-build -- list`
+3. **Read `GetDemoKeyStrokes()`** — find it in the scenario source file
+4. **Compose keystrokes** — translate to tuirec syntax, add waits, keep short
+5. **Record** — `tuirec record --binary ... --args "run,<Name>" --keystrokes $ks ...`
+6. **Validate** — error-grep the cast, check GIF file size, visual confirm
+7. **If nav keys fail** — remove `--kitty-keyboard` and retry
+8. **Report** — share the output paths and exact command used
+
+---
+
+## Reference
+
+- **tuirec repo:** https://github.com/gui-cs/tuirec
+- **Full keystroke syntax:** `tuirec agent-guide` (embeds the complete reference)
+- **CLI flags:** `tuirec record --help`
+- **ScenarioRunner:** `Examples/ScenarioRunner/` — CLI that runs individual UICatalog scenarios
