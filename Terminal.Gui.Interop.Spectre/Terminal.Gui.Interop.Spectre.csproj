@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Terminal.Gui.Interop.Spectre</AssemblyName>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>14</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <IsTrimmable>true</IsTrimmable>
+    <NoLogo>true</NoLogo>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    <PackageId>Terminal.Gui.Interop.Spectre</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>Bridge package for Spectre.Console markup and Terminal.Gui styled text.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" GlobalPropertiesToRemove="PublishAot" />
+  </ItemGroup>
+</Project>

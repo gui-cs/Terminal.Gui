@@ -48,6 +48,7 @@
     <PackageVersion Include="ReportGenerator" Version="5.5.9" />
     <PackageVersion Include="coverlet.collector" Version="10.0.0" />
     <PackageVersion Include="GitVersion.MsBuild" Version="6.7.0" />
+    <PackageVersion Include="Spectre.Console" Version="0.50.0" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <PackageVersion Include="Terminal.Gui" Version="2.0.0" />

@@ -44,6 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Terminal.Gui.Interop.Spectre\Terminal.Gui.Interop.Spectre.csproj" />
     <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
     </ProjectReference>

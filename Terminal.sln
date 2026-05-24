@@ -158,6 +158,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui.Analyzers.Inte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTests", "Tests\PerformanceTests\PerformanceTests.csproj", "{6E98BACA-E6B6-47A0-B45C-B624F8E74EC2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui.Interop.Spectre", "Terminal.Gui.Interop.Spectre\Terminal.Gui.Interop.Spectre.csproj", "{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -468,6 +470,18 @@ Global
 		{6E98BACA-E6B6-47A0-B45C-B624F8E74EC2}.Release|x64.Build.0 = Release|Any CPU
 		{6E98BACA-E6B6-47A0-B45C-B624F8E74EC2}.Release|x86.ActiveCfg = Release|Any CPU
 		{6E98BACA-E6B6-47A0-B45C-B624F8E74EC2}.Release|x86.Build.0 = Release|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Debug|x64.Build.0 = Debug|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Debug|x86.Build.0 = Debug|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Release|x64.ActiveCfg = Release|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Release|x64.Build.0 = Release|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Release|x86.ActiveCfg = Release|Any CPU
+		{6A4D11FE-BBD6-4592-9057-5D3DB5D7001A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
