@@ -82,7 +82,12 @@ public class SpectreViewTests
             Renderable = new Rule ("Before")
         };
 
-        using Runnable root = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        using Runnable root = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
         root.Add (view);
         app.Begin (root);
         app.LayoutAndDraw ();
@@ -117,7 +122,12 @@ public class SpectreViewTests
             Renderable = table
         };
 
-        using Runnable root = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        using Runnable root = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
         root.Add (view);
 
         app.Begin (root);
@@ -134,7 +144,12 @@ public class SpectreViewTests
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (80, 10);
 
-        Button button = new () { Text = "Go", X = 0, Y = 0 };
+        Button button = new ()
+        {
+            Text = "Go",
+            X = 0,
+            Y = 0
+        };
         SpectreView spectre = new ()
         {
             Renderable = new Rule ("Decor"),
@@ -144,7 +159,12 @@ public class SpectreViewTests
             Height = 3
         };
 
-        Window window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        Window window = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
         window.Add (button, spectre);
 
         app.Begin (window);
@@ -168,7 +188,12 @@ public class SpectreViewTests
             Renderable = renderable
         };
 
-        using Runnable root = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        using Runnable root = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
         root.Add (view);
 
         app.Begin (root);

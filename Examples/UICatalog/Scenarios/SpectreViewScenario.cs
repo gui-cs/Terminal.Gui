@@ -108,7 +108,10 @@ public sealed class SpectreViewScenario : Scenario
                                       spectreView.Renderable = CreateRenderable (selectedLabel, userInput.Text);
                                   };
 
-        autoSizeCheckBox.ValueChanged += (_, args) => { spectreView.AutoSize = args.NewValue == CheckState.Checked; };
+        autoSizeCheckBox.ValueChanged += (_, args) =>
+                                        {
+                                            spectreView.AutoSize = args.NewValue == CheckState.Checked;
+                                        };
 
         app.Run (appWindow);
     }
