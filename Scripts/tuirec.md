@@ -25,12 +25,12 @@ dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
 
 # 2. Record
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
-$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,E,m,o,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Ctrl+Q'
+$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,A,r,r,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Ctrl+Q'
 
 tuirec record `
     --binary $binary `
     --args "run,Character Map" `
-    --name charmap `
+    --name CharacterMap `
     --title "Character Map" `
     --keystrokes $ks `
     --startup-delay 2000 `
@@ -39,7 +39,12 @@ tuirec record `
     --open --copy
 ```
 
-Output: `artifacts/charmap.gif` and `artifacts/charmap.cast`.
+Output: `artifacts/CharacterMap.gif` and `artifacts/CharacterMap.cast`.
+
+Copy the GIF to the scenario directory:
+```powershell
+Copy-Item artifacts/CharacterMap.gif Examples/UICatalog/Scenarios/CharacterMap/CharacterMap.gif
+```
 
 ---
 
@@ -91,6 +96,10 @@ interesting. Translate them to tuirec syntax:
 4. **Show variety** — demonstrate 2–3 features of the scenario, not just
    scrolling. Navigate between controls, trigger category changes, etc.
 5. **End with `Ctrl+Q`** — the standard Terminal.Gui quit key.
+6. **Avoid wide glyphs** — Emoji and CJK characters cause misaligned rendering
+   in terminal recordings (agg renders each cell as monospace but wide glyphs
+   consume 2 cells). Prefer categories with single-width characters (Arrows,
+   Box Drawing, Block Elements, Mathematical Operators, etc.).
 
 ### Template Command
 
@@ -101,15 +110,29 @@ $ks = '<your keystroke script here>'
 tuirec record `
     --binary $binary `
     --args "run,<Scenario Name>" `
-    --name <scenario-id> `
-    --title "<Scenario Name> — <subtitle>" `
+    --name <ScenarioName> `
+    --title "<Scenario Name>" `
     --keystrokes $ks `
     --startup-delay 2000 `
     --drain 2000 `
     --cols 120 --rows 30 `
     --verbosity high `
     --open --copy
+
+# Copy GIF to scenario directory
+Copy-Item artifacts/<ScenarioName>.gif Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
 ```
+
+### Output File Placement
+
+Scenario demo GIFs live alongside their scenario source code:
+
+```
+Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
+```
+
+Use `--name <ScenarioName>` (PascalCase matching the class name) so the output
+file is named correctly. The `--name` value determines the artifact filenames.
 
 ### Critical: `--kitty-keyboard` Decision
 
@@ -155,13 +178,13 @@ $ks = 'wait:1000,`search text`,Enter,wait:500,Ctrl+Q'
 ```powershell
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
 
-# Browse categories (Box Drawing, Emojis), show context menu on a glyph
-$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,E,m,o,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Ctrl+Q'
+# Browse categories (Box Drawing, Arrows), show context menu on a glyph
+$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,A,r,r,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Ctrl+Q'
 
 tuirec record `
     --binary $binary `
     --args "run,Character Map" `
-    --name charmap `
+    --name CharacterMap `
     --title "Character Map" `
     --keystrokes $ks `
     --startup-delay 2000 `
@@ -179,8 +202,8 @@ tuirec record `
 | 3 | `wait:800,Shift+Tab` | Pause, then move focus to category table |
 | 4 | `B,o,x` | Type "Box" — CollectionNavigator jumps to "Box Drawing" |
 | 5 | `wait:1800` | Pause so viewer sees box-drawing characters |
-| 6 | `E,m,o` | Type "Emo" — jumps to "Emojis Symbols" category |
-| 7 | `wait:1800` | Pause so viewer sees emoji rendering |
+| 6 | `A,r,r` | Type "Arr" — jumps to "Arrows" category |
+| 7 | `wait:1800` | Pause so viewer sees arrow characters |
 | 8 | `Tab` | Return focus to charmap grid |
 | 9 | `CursorDown` ×3 | Navigate to a glyph |
 | 10 | `Shift+F10` | Open context menu (Copy Glyph / Copy Code Point) |
@@ -240,7 +263,10 @@ After every recording, verify:
   - The app content is visible (menu bar, controls, content).
   - The interaction sequence is visible (scrolling, focus changes, etc.).
   - The recording ends cleanly (no frozen frame or abrupt cutoff).
-- [ ] **Output path is correct** — for docs assets, copy to `docfx/images/`.
+- [ ] **Output path is correct** — scenario GIFs go with their scenario code:
+  ```
+  Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
+  ```
 
 ---
 
@@ -248,6 +274,7 @@ After every recording, verify:
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
+| Wide glyphs misaligned in GIF | Emoji/CJK chars are 2-cell wide; agg renders per-cell | Avoid emoji/CJK categories; use single-width ranges (Arrows, Box Drawing, etc.) |
 | Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
 | App doesn't quit | `Ctrl+Q` needs Kitty for disambiguation | Add `--kitty-keyboard` (Ctrl keys work correctly) |
 | Blank frames at start | Startup too slow | Increase `--startup-delay` |
