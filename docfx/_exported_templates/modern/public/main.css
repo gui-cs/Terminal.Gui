@@ -24,7 +24,7 @@
 }
 
 .toc {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
 }
 
 .toc li {
@@ -55,5 +55,5 @@ h6, .h6, h5, .h5, h4, .h4, h3, .h3, h2, .h2, h1, .h1 {
 
 /* Widen the TOC sidebar to accommodate long namespace names (e.g., Terminal.Gui.Editor.Highlighting.Xshd) */
 body:not([data-search]) > main > .toc-offcanvas {
-    max-width: 420px;
+    max-width: 380px;
 }
