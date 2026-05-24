@@ -113,15 +113,20 @@ tuirec record `
 
 ### Critical: `--kitty-keyboard` Decision
 
-Terminal.Gui v2 alpha builds may **ignore Kitty-encoded navigation keys**
-(`CursorUp`, `CursorDown`, `CursorLeft`, `CursorRight`, `PageUp`, `PageDown`,
-`Home`, `End`).
+**Known bug ([gui-cs/tuirec#54](https://github.com/gui-cs/tuirec/issues/54)):**
+tuirec currently encodes navigation keys (`CursorUp`, `CursorDown`, `CursorLeft`,
+`CursorRight`, `PageUp`, `PageDown`, `Home`, `End`) incorrectly under
+`--kitty-keyboard` — it sends fabricated CSI u codepoints that the Kitty spec
+doesn't define. Terminal.Gui ignores or misinterprets these sequences.
 
-**Rule:**
-- **Omit `--kitty-keyboard`** for navigation-heavy demos (scrolling, arrow keys).
-- **Add `--kitty-keyboard`** only when you need modifier disambiguation
-  (`Ctrl+M` vs Enter, `Ctrl+I` vs Tab) and the demo doesn't rely on nav keys.
-- **If navigation keys don't work**, remove `--kitty-keyboard` and retry.
+**Workaround until fixed:**
+- **Omit `--kitty-keyboard`** for demos that use navigation keys.
+- **Add `--kitty-keyboard`** only when you need modifier disambiguation for
+  non-navigation keys (`Ctrl+M` vs Enter, `Ctrl+I` vs Tab, `Ctrl+Q`, etc.)
+  and the demo doesn't rely on arrow/page/home/end keys.
+
+Once the bug is fixed, `--kitty-keyboard` should be the default for all
+Terminal.Gui recordings (it provides cleaner modifier handling).
 
 ### `--args` for ScenarioRunner
 
@@ -230,8 +235,8 @@ After every recording, verify:
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
-| GIF is tiny (< 50KB) or static | Nav keys ignored (Kitty encoding) | Remove `--kitty-keyboard` |
-| App doesn't quit | `Ctrl+Q` not recognized | Try with `--kitty-keyboard` for modifier keys |
+| Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
+| App doesn't quit | `Ctrl+Q` needs Kitty for disambiguation | Add `--kitty-keyboard` (Ctrl keys work correctly) |
 | Blank frames at start | Startup too slow | Increase `--startup-delay` |
 | Recording times out | App stuck / wrong keystrokes | Check with `--verbosity high`, fix script |
 | `--binary` permission error | Relative path on Windows | Use `./` prefix or absolute path with forward slashes |
