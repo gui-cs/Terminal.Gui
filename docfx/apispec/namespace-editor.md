@@ -3,7 +3,7 @@ uid: Terminal.Gui.Editor
 summary: A reusable text-editing View for Terminal.Gui with caret movement, selection, clipboard, undo/redo, search & replace, folding, syntax highlighting, word wrap, and multi-caret editing.
 ---
 
-![Terminal.Gui.Editor (ted demo app)](https://raw.githubusercontent.com/gui-cs/Editor/develop/Docs/images/hero.gif)
+![Terminal.Gui.Editor (ted demo app)](https://raw.githubusercontent.com/gui-cs/Editor/develop/docs/images/hero.gif)
 
 The `Editor` class is a `View` subclass that consumes the `TextDocument` through a cell-grid rendering pipeline (`VisualLineBuilder` → `CellVisualLine`, with pluggable `IVisualLineTransformer`s and `IBackgroundRenderer`s).
 
