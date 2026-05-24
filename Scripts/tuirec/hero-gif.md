@@ -29,5 +29,3 @@ PowerShell quoting rules, and the `--kitty-keyboard` decision tree.
   `Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif`
 - **View GIFs** go alongside the View's `.cs` file:
   `Terminal.Gui/Views/<ViewName>.gif`
-- **Bespoke recording scripts** (when needed) use the naming convention:
-  `<ClassName>-tuirec.ps1` in the same directory as the `.cs` file.

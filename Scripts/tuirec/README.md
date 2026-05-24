@@ -125,27 +125,16 @@ Copy-Item artifacts/<ScenarioName>.gif Examples/UICatalog/Scenarios/<ScenarioDir
 
 ### Output File Placement
 
-Scenario demo GIFs and any bespoke recording scripts live **alongside their
-scenario source code**:
+GIFs live **alongside the `.cs` file they document**:
 
-```
-Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
-Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>-tuirec.ps1   (optional)
-```
-
-For scenarios whose `.cs` file lives directly in `Scenarios/` (no subdirectory),
-the GIF and script go in that same folder (e.g.
-`Scenarios/AllViewsTester.gif` next to `Scenarios/AllViewsTester.cs`).
-
-For **View-derived classes**, the GIF and optional script go in the same folder
-as the View's `.cs` file (e.g. `Terminal.Gui/Views/Button.gif`).
+| What | Where |
+|------|-------|
+| Scenario in a subdirectory | `Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif` |
+| Scenario directly in `Scenarios/` | `Examples/UICatalog/Scenarios/<ScenarioName>.gif` |
+| View-derived class | Same folder as the View's `.cs` file (e.g. `Terminal.Gui/Views/Button.gif`) |
 
 Use `--name <ScenarioName>` (PascalCase matching the class name) so the output
 file is named correctly. The `--name` value determines the artifact filenames.
-
-A `*-tuirec.ps1` script is only needed when the default recording workflow
-requires scenario-specific overrides (custom keystrokes, non-default cols/rows,
-etc.). For simple recordings, just follow the template command below.
 
 ### Critical: `--kitty-keyboard` Decision
 
