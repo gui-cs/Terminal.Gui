@@ -25,16 +25,16 @@ dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
 
 # 2. Record
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
-$ks = 'wait:1000,CursorDown,CursorDown,CursorDown,wait:1000,Ctrl+Q'
+$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,E,m,o,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Ctrl+Q'
 
 tuirec record `
     --binary $binary `
     --args "run,Character Map" `
     --name charmap `
-    --title "Character Map — Unicode Viewer" `
+    --title "Character Map" `
     --keystrokes $ks `
     --startup-delay 2000 `
-    --drain 2000 `
+    --drain 1500 `
     --cols 120 --rows 30 `
     --open --copy
 ```
@@ -155,17 +155,17 @@ $ks = 'wait:1000,`search text`,Enter,wait:500,Ctrl+Q'
 ```powershell
 $binary = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.exe"
 
-# Scroll the char grid, switch to category list, browse categories, switch back
-$ks = 'wait:1000,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:1000,Shift+Tab,wait:500,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:1000,Tab,wait:500,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,CursorLeft,wait:1500,Ctrl+Q'
+# Browse categories (Box Drawing, Emojis), show context menu on a glyph
+$ks = 'wait:1200,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,CursorDown,wait:800,Shift+Tab,wait:400,B,o,x,wait:1800,E,m,o,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Ctrl+Q'
 
 tuirec record `
     --binary $binary `
     --args "run,Character Map" `
     --name charmap `
-    --title "Character Map — Unicode Viewer" `
+    --title "Character Map" `
     --keystrokes $ks `
     --startup-delay 2000 `
-    --drain 2000 `
+    --drain 1500 `
     --cols 120 --rows 30 `
     --open --copy
 ```
@@ -174,13 +174,26 @@ tuirec record `
 
 | Step | Tokens | What happens |
 |------|--------|--------------|
-| 1 | `wait:1000` | Let the CharMap UI render |
-| 2 | `CursorDown` ×20 | Scroll through unicode characters in the grid |
-| 3 | `wait:1000,Shift+Tab` | Pause, then move focus to category table |
-| 4 | `CursorDown` ×10 | Browse down through unicode categories |
-| 5 | `wait:1000,Tab` | Pause, then return focus to char grid |
-| 6 | `CursorLeft` ×10 | Scroll horizontally to show different columns |
-| 7 | `wait:1500,Ctrl+Q` | Final pause for viewer, then quit |
+| 1 | `wait:1200` | Let the CharMap UI fully render |
+| 2 | `CursorDown` ×8 | Scroll through the initial unicode code points |
+| 3 | `wait:800,Shift+Tab` | Pause, then move focus to category table |
+| 4 | `B,o,x` | Type "Box" — CollectionNavigator jumps to "Box Drawing" |
+| 5 | `wait:1800` | Pause so viewer sees box-drawing characters |
+| 6 | `E,m,o` | Type "Emo" — jumps to "Emojis Symbols" category |
+| 7 | `wait:1800` | Pause so viewer sees emoji rendering |
+| 8 | `Tab` | Return focus to charmap grid |
+| 9 | `CursorDown` ×3 | Navigate to a glyph |
+| 10 | `Shift+F10` | Open context menu (Copy Glyph / Copy Code Point) |
+| 11 | `wait:1500,Escape` | Let viewer see the menu, then dismiss |
+| 12 | `Ctrl+Q` | Quit |
+
+**Key techniques demonstrated:**
+- **CollectionNavigator typing** — type category name prefixes to jump directly
+  (much better than scrolling through dozens of categories with arrow keys)
+- **Context menu** — `Shift+F10` (the `PopoverMenu.DefaultKey`) shows the
+  right-click menu on the selected glyph
+- **Generous waits** — 1500–1800ms between feature demonstrations so viewers
+  can absorb each state change
 
 ---
 
