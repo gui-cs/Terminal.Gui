@@ -1,3 +1,4 @@
+using global::Spectre.Console;
 using global::Spectre.Console.Rendering;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Text;
@@ -12,6 +13,11 @@ namespace Terminal.Gui.Interop.Spectre;
 /// </summary>
 public class SpectreView : View
 {
+    private static readonly IAnsiConsole _nullConsole = AnsiConsole.Create (new AnsiConsoleSettings
+    {
+        Out = new AnsiConsoleOutput (TextWriter.Null)
+    });
+
     private IRenderable? _renderable;
     private bool _autoSize = true;
 
@@ -84,40 +90,44 @@ public class SpectreView : View
                 continue;
             }
 
-            if (string.IsNullOrEmpty (segment.Text))
+            if (segment.IsControlCode || string.IsNullOrEmpty (segment.Text))
             {
                 continue;
             }
 
-            DrawSegment (segment, row, col);
-            col += segment.Text.GetColumns ();
+            DrawSegment (segment, row, ref col);
         }
 
         return true;
     }
 
-    private void DrawSegment (Segment segment, int row, int col)
+    private void DrawSegment (Segment segment, int row, ref int col)
     {
         if (row < Viewport.Y || row >= Viewport.Bottom)
         {
+            col += segment.Text.GetColumns ();
+
             return;
         }
 
         TgAttribute attribute = segment.Style.ToAttribute ();
-        int x = col;
 
         foreach (string grapheme in GraphemeHelper.GetGraphemes (segment.Text))
         {
-            int graphemeWidth = Math.Max (grapheme.GetColumns (), 1);
-            bool visible = x + graphemeWidth > Viewport.X && x < Viewport.Right;
+            int graphemeWidth = grapheme.GetColumns ();
 
-            if (visible)
+            if (graphemeWidth > 0)
             {
-                SetAttribute (attribute);
-                AddStr (x - Viewport.X, row - Viewport.Y, grapheme);
+                bool visible = col + graphemeWidth > Viewport.X && col < Viewport.Right;
+
+                if (visible)
+                {
+                    SetAttribute (attribute);
+                    AddStr (col - Viewport.X, row - Viewport.Y, grapheme);
+                }
             }
 
-            x += graphemeWidth;
+            col += graphemeWidth;
         }
     }
 
@@ -144,7 +154,7 @@ public class SpectreView : View
 
     private static (IReadOnlyList<Segment> Segments, int ContentWidth, int ContentHeight) RenderSegments (IRenderable renderable, int maxWidth)
     {
-        RenderOptions renderOptions = RenderOptions.Create (global::Spectre.Console.AnsiConsole.Console, null);
+        RenderOptions renderOptions = RenderOptions.Create (_nullConsole, null);
         Measurement measurement = renderable.Measure (renderOptions, maxWidth);
         List<Segment> segments = [.. renderable.Render (renderOptions, maxWidth)];
 
@@ -168,7 +178,7 @@ public class SpectreView : View
                 continue;
             }
 
-            if (string.IsNullOrEmpty (segment.Text))
+            if (segment.IsControlCode || string.IsNullOrEmpty (segment.Text))
             {
                 continue;
             }

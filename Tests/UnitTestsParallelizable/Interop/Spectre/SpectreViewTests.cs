@@ -248,6 +248,100 @@ public class SpectreViewTests
         Assert.Contains ("Decor", output);
     }
 
+    [Fact]
+    public void SpectreView_Skips_ControlCode_Segments ()
+    {
+        // A custom IRenderable that emits a control-code segment between text segments.
+        // If control codes are not skipped, the escape text will appear between Hello and World.
+        ControlCodeRenderable renderable = new ();
+
+        string output = RenderToText (renderable, 40, 3);
+
+        // The control code text "[?25l" should NOT appear as visible text between Hello and World
+        Assert.DoesNotContain ("[?25", output);
+        // The two text segments should be adjacent (no garbage between them)
+        Assert.Contains ("HelloWorld", output);
+    }
+
+    [Fact]
+    public void SpectreView_ZeroWidth_Characters_Do_Not_Misalign ()
+    {
+        // A renderable that emits a combining character (zero-width) followed by normal text.
+        // The combining mark merges with the preceding character into a single grapheme.
+        // "After" should follow immediately without spurious gaps.
+        ZeroWidthRenderable renderable = new ();
+
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 3);
+
+        SpectreView view = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Renderable = renderable
+        };
+
+        using Runnable root = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None
+        };
+        root.Add (view);
+        app.Begin (root);
+        app.LayoutAndDraw ();
+
+        Cell [,] contents = app.Driver.Contents!;
+        StringBuilder row0 = new ();
+
+        for (int col = 0; col < contents.GetLength (1); col++)
+        {
+            row0.Append (contents [0, col].Grapheme);
+        }
+
+        string line = row0.ToString ().TrimEnd ();
+
+        // "Base\u0301" renders as "Bas" + "é" (4 display columns), then "After" immediately follows
+        Assert.Contains ("After", line);
+
+        // "After" should start at column 4 (width of "Base\u0301" = 4 graphemes, each 1 col)
+        // No spurious gap between the combined character and "After"
+        Assert.DoesNotContain ("  After", line);
+    }
+
+    /// <summary>A test renderable that emits control-code segments between text.</summary>
+    private sealed class ControlCodeRenderable : IRenderable
+    {
+        public Measurement Measure (RenderOptions options, int maxWidth)
+        {
+            return new Measurement (10, 10);
+        }
+
+        public IEnumerable<Segment> Render (RenderOptions options, int maxWidth)
+        {
+            yield return new Segment ("Hello", Style.Plain);
+            yield return Segment.Control ("\x1b[?25l");
+            yield return new Segment ("World", Style.Plain);
+        }
+    }
+
+    /// <summary>A test renderable that emits a combining mark (zero-width) character.</summary>
+    private sealed class ZeroWidthRenderable : IRenderable
+    {
+        public Measurement Measure (RenderOptions options, int maxWidth)
+        {
+            return new Measurement (10, 10);
+        }
+
+        public IEnumerable<Segment> Render (RenderOptions options, int maxWidth)
+        {
+            // "Base" + combining diacritical acute (U+0301, zero-width) + "After"
+            yield return new Segment ("Base\u0301", Style.Plain);
+            yield return new Segment ("After", Style.Plain);
+        }
+    }
+
     private static string RenderToText (IRenderable renderable, int width, int height)
     {
         using IApplication app = Application.Create ();

@@ -25,4 +25,8 @@
     <PackageTags>terminal;gui;console;spectre;interop</PackageTags>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="GitVersion.MsBuild" PrivateAssets="all" />
+  </ItemGroup>
+
 </Project>
