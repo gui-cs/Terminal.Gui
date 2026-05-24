@@ -72,18 +72,18 @@ Wide characters advance the cursor by only 1 column. Grids misalign and text ove
 
 | Terminal | Version | OS | Test 1 (Emoji) | Test 2 (CJK) | Test 3 (Mixed) | Test 4 (Grid) | Test 5 (Align) | Status |
 |---------|---------|-----|:-:|:-:|:-:|:-:|:-:|--------|
-| Windows Terminal | 1.22+ | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
-| VS Code Insiders (terminal) | 1.x | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
-| Visual Studio 2026 (terminal) | — | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
-| GitHub Copilot (terminal) | — | Windows | ❌ | ❌ | ❌ | ❌ | ❌ | **FAIL** |
-| GitHub Copilot (terminal) | — | macOS | ❌ | ❌ | ❌ | ❌ | ❌ | **FAIL** |
-| iTerm2 | 3.5+ | macOS | | | | | | _untested_ |
-| Terminal.app | — | macOS | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
-| GNOME Terminal | 3.x | Linux | | | | | | _untested_ |
 | Alacritty | 0.13+ | cross | | | | | | _untested_ |
-| Ghostty | — | cross | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
-| Kitty | 0.35+ | cross | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
+| Ghostty | — | macOS | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
+| GitHub Copilot (terminal) | — | macOS | ❌ | ❌ | ❌ | ❌ | ❌ | **FAIL** |
+| GitHub Copilot (terminal) | — | Windows | ❌ | ❌ | ❌ | ❌ | ❌ | **FAIL** |
+| GNOME Terminal | 3.x | Linux | | | | | | _untested_ |
+| iTerm2 | 3.5+ | macOS | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
+| Kitty | 0.35+ | macOS | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
+| Terminal.app | — | macOS | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
+| Visual Studio 2026 (terminal) | — | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
+| VS Code Insiders (terminal) | 1.x | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
 | WezTerm | — | cross | | | | | | _untested_ |
+| Windows Terminal | 1.22+ | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
 
 > **To contributors**: please fill in your terminal's results and submit a PR or comment.
 
