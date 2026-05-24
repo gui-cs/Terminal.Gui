@@ -2,9 +2,9 @@ using System.IO;
 using Spectre.Console;
 using Spectre.Console.Rendering;
 using Terminal.Gui.Drawing;
+using SpectreColor = global::Spectre.Console.Color;
 using TgAttribute = Terminal.Gui.Drawing.Attribute;
 using TgColor = Terminal.Gui.Drawing.Color;
-using SpectreColor = global::Spectre.Console.Color;
 
 namespace Terminal.Gui.Interop.Spectre;
 

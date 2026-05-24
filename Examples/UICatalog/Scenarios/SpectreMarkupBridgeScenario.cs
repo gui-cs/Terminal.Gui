@@ -33,7 +33,7 @@ public sealed class SpectreMarkupBridgeScenario : Scenario
             Text = "Enter Spectre markup, then apply it to the preview label and inspect parsed StyledSegment values."
         };
 
-        _markupField = new TextField
+        _markupField = new ()
         {
             X = 0,
             Y = Pos.Bottom (intro),
@@ -50,10 +50,10 @@ public sealed class SpectreMarkupBridgeScenario : Scenario
             Text = "_Apply Markup"
         };
         applyButton.Accepting += (_, e) =>
-                                {
-                                    e.Handled = true;
-                                    ApplyMarkup ();
-                                };
+        {
+            e.Handled = true;
+            ApplyMarkup ();
+        };
 
         FrameView previewFrame = new ()
         {
@@ -64,7 +64,7 @@ public sealed class SpectreMarkupBridgeScenario : Scenario
             Title = "Preview"
         };
 
-        _previewLabel = new Label
+        _previewLabel = new ()
         {
             X = 0,
             Y = 0,
@@ -72,7 +72,7 @@ public sealed class SpectreMarkupBridgeScenario : Scenario
             Height = 1
         };
 
-        _statusLabel = new Label
+        _statusLabel = new ()
         {
             X = 0,
             Y = Pos.Bottom (_previewLabel),
@@ -82,7 +82,7 @@ public sealed class SpectreMarkupBridgeScenario : Scenario
 
         previewFrame.Add (_previewLabel, _statusLabel);
 
-        _segmentListView = new ListView
+        _segmentListView = new ()
         {
             X = 0,
             Y = Pos.Bottom (previewFrame),
