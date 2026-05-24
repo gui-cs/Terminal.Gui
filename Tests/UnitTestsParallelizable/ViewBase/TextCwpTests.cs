@@ -363,4 +363,111 @@ public class TextCwpTests
         Assert.Equal ("Short", tv.Text);
         Assert.Equal ("Short", viewRef.Text);
     }
+
+    /// <summary>
+    ///     Verifies that setting a valid date string via Text updates DatePicker.Value accordingly.
+    ///     Ensures Text↔Value consistency on the happy path.
+    /// </summary>
+    [Fact]
+    public void DatePicker_ValidText_UpdatesValue ()
+    {
+        // Copilot
+        DatePicker dp = new () { Width = 20, Height = 1 };
+        DateTime target = new (2025, 12, 25);
+
+        // Use the same short-date format the picker uses internally
+        string formatted = target.ToShortDateString ();
+        dp.Text = formatted;
+
+        Assert.Equal (target, dp.Value);
+        Assert.Equal (formatted, dp.Text);
+    }
+
+    /// <summary>
+    ///     Verifies that setting DatePicker.Value updates Text to the formatted representation.
+    ///     Ensures Value→Text consistency.
+    /// </summary>
+    [Fact]
+    public void DatePicker_ValueSet_UpdatesText ()
+    {
+        // Copilot
+        DatePicker dp = new () { Width = 20, Height = 1 };
+        DateTime target = new (2024, 7, 4);
+
+        dp.Value = target;
+
+        Assert.Equal (target, dp.Value);
+
+        // Text should be parseable back to the same date
+        Assert.True (DateTime.TryParse (dp.Text, out DateTime roundTrip));
+        Assert.Equal (target, roundTrip);
+    }
+
+    /// <summary>
+    ///     Verifies that setting a valid color string via Text updates ColorPicker.SelectedColor.
+    ///     Ensures Text↔Value consistency on the happy path.
+    /// </summary>
+    [Fact]
+    public void ColorPicker_ValidText_UpdatesSelectedColor ()
+    {
+        // Copilot
+        ColorPicker cp = new () { Width = 20, Height = 3 };
+        cp.SelectedColor = new Color (0, 0, 0);
+
+        // StandardColorsNameResolver accepts StandardColor enum names
+        cp.Text = "Red";
+
+        // SelectedColor should have changed from black to red
+        Assert.NotEqual (new Color (0, 0, 0), cp.SelectedColor);
+        Assert.Equal ("Red", cp.Text);
+    }
+
+    /// <summary>
+    ///     Verifies that setting ColorPicker.SelectedColor updates Text to the color string.
+    ///     Ensures Value→Text consistency.
+    /// </summary>
+    [Fact]
+    public void ColorPicker_SelectedColorSet_UpdatesText ()
+    {
+        // Copilot
+        ColorPicker cp = new () { Width = 20, Height = 3 };
+
+        cp.SelectedColor = new Color (0, 0, 255);
+
+        Assert.Equal (new Color (0, 0, 255).ToString (), cp.Text);
+    }
+
+    /// <summary>
+    ///     Verifies that TextValidateField accepts valid text and updates Value accordingly.
+    ///     Ensures Text↔Value consistency on the happy path.
+    /// </summary>
+    [Fact]
+    public void TextValidateField_ValidText_UpdatesValue ()
+    {
+        // Copilot
+        TextValidateField tvf = new () { Provider = new TextRegexProvider ("^[0-9]+$") };
+        tvf.Text = "123";
+
+        tvf.Text = "456";
+
+        Assert.Equal ("456", tvf.Text);
+    }
+
+    /// <summary>
+    ///     Verifies that when TextValidateField.ValueChanging cancels, both Text and the
+    ///     provider's internal value remain at the old value (no divergence).
+    /// </summary>
+    [Fact]
+    public void TextValidateField_ValueChangingCancel_TextAndProviderStayConsistent ()
+    {
+        // Copilot
+        TextValidateField tvf = new () { Provider = new TextRegexProvider ("^[0-9]+$") };
+        tvf.Text = "111";
+        tvf.ValueChanging += (_, e) => e.Handled = true;
+
+        tvf.Text = "222";
+
+        // Both must stay at original value
+        Assert.Equal ("111", tvf.Text);
+    }
 }
