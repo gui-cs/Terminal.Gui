@@ -440,6 +440,9 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
         }
     }
 
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,CursorRight,wait:400,CursorDown,wait:400,CursorRight,wait:800";
+
     bool IDesignable.EnableForDesign ()
     {
         DataTable dt = BuildDemoDataTable (5, 5);

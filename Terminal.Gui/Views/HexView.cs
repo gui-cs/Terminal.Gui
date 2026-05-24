@@ -941,6 +941,9 @@ public class HexView : View, IDesignable
     }
 
     /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorRight,wait:300,CursorRight,wait:300,CursorDown,wait:300,CursorDown,wait:800";
+
+    /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
         Source = new MemoryStream ("HexView data with wide codepoints: 𝔹Aℝ𝔽!"u8.ToArray ());

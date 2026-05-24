@@ -325,6 +325,9 @@ public partial class TextView : View, IDesignable
     public PopoverMenu? ContextMenu { get; private set; }
 
     /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,End,wait:300,` Editing`,wait:400,` text!`,wait:800";
+
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         Text = """

@@ -231,6 +231,9 @@ public class DateEditor : TextValidateField, IValue<DateTime>, IDesignable
     }
 
     /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorRight,wait:300,CursorRight,wait:300,CursorUp,wait:600,CursorUp,wait:800";
+
+    /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
         Value = new DateTime (2024, 1, 15);

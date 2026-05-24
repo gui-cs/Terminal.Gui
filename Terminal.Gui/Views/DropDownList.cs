@@ -606,7 +606,7 @@ public class DropDownList : TextField
     }
 
     /// <inheritdoc/>
-    public string? GetDemoKeyStrokes () => "wait:500,Enter,wait:600,CursorDown,wait:400,CursorDown,wait:400,Enter,wait:800";
+    public override string? GetDemoKeyStrokes () => "wait:500,F4,wait:600,CursorDown,wait:400,CursorDown,wait:400,Enter,wait:800";
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

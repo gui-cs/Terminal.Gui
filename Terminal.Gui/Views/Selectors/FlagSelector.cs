@@ -307,6 +307,9 @@ public class FlagSelector : SelectorBase, IDesignable
     }
 
     /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,Space,wait:600,CursorDown,wait:400,Space,wait:800";
+
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         Styles = SelectorStyles.All;

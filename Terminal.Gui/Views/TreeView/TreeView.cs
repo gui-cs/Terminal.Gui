@@ -23,6 +23,9 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
     }
 
     /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,CursorDown,wait:400,CursorDown,wait:400,CursorUp,wait:400,CursorUp,wait:800";
+
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         TreeNode root1 = new () { Text = "Root1" };

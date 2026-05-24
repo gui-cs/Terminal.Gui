@@ -246,6 +246,9 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
     }
 
     /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorRight,wait:300,CursorUp,wait:600,CursorUp,wait:800";
+
+    /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
         Value = new TimeSpan (14, 30, 0);

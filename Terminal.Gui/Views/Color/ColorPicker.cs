@@ -409,6 +409,9 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
     }
 
     /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Tab,wait:400,CursorRight,wait:300,CursorRight,wait:300,CursorRight,wait:800";
+
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         SelectedColor = Color.BrightRed;
