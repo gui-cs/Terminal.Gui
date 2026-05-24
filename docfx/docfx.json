@@ -7,13 +7,7 @@
           "files": [
             "bin/Release/net10.0/Terminal.Gui.dll"
           ]
-        }
-      ],
-      "dest": "api",
-      "memberLayout": "separatePages"
-    },
-    {
-      "src": [
+        },
         {
           "src": "EditorRef/bin/Release/net10.0",
           "files": [
