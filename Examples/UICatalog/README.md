@@ -8,6 +8,12 @@ UI Catalog is a comprehensive sample library for [Terminal.Gui](https://github.c
 
 ![uicatalog](../../docfx/images/uicatalog.gif)
 
+### Spectre Markup Bridge Scenario
+
+The `Spectre Markup Bridge` scenario demonstrates the `Terminal.Gui.Interop.Spectre` bridge by applying Spectre markup to a `Label` and showing the parsed `StyledSegment` output.
+
+![Spectre Markup Bridge scenario](../../docfx/images/spectre-markup-bridge.gif)
+
 ## How To Use
 
 ```
