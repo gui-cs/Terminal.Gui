@@ -75,11 +75,13 @@ Wide characters advance the cursor by only 1 column. Grids misalign and text ove
 | Windows Terminal | 1.22+ | Windows | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
 | VS Code Insiders (terminal) | 1.x | Windows | ✅ | ✅ | ❌ | ✅ | ✅ | **FAIL** |
 | GitHub Copilot (terminal) | — | Windows | ❌ | ❌ | ❌ | ❌ | ❌ | **FAIL** |
+| GitHub Copilot (terminal) | — | macOS | ❌ | ❌ | ❌ | ❌ | ❌ | **FAIL** |
 | iTerm2 | 3.5+ | macOS | | | | | | _untested_ |
-| Terminal.app | — | macOS | | | | | | _untested_ |
+| Terminal.app | — | macOS | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
 | GNOME Terminal | 3.x | Linux | | | | | | _untested_ |
 | Alacritty | 0.13+ | cross | | | | | | _untested_ |
-| Kitty | 0.35+ | cross | | | | | | _untested_ |
+| Ghostty | — | cross | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
+| Kitty | 0.35+ | cross | ✅ | ✅ | ✅ | ✅ | ✅ | **PASS** |
 | WezTerm | — | cross | | | | | | _untested_ |
 
 > **To contributors**: please fill in your terminal's results and submit a PR or comment.
