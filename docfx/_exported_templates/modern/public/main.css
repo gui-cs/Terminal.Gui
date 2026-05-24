@@ -20,11 +20,11 @@
 }
 
 .toc, .navbar-brand, .nav-link {
-    font-family: var(--bs-font-monospace)
+    font-family: var(--bs-font-sans-serif)
 }
 
 .toc {
-    font-size: var(--bs-nav-link-font-size);
+    font-size: 0.75rem;
 }
 
 .toc li {
