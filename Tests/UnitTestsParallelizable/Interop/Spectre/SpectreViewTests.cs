@@ -34,6 +34,79 @@ public class SpectreViewTests
     }
 
     [Fact]
+    public void SpectreMarkupBridge_ToSpectreStyle_Converts_Color_And_Decoration ()
+    {
+        TgAttribute attribute = new (
+            new Terminal.Gui.Drawing.Color (0, 255, 0),
+            new Terminal.Gui.Drawing.Color (128, 0, 128),
+            TextStyle.Italic | TextStyle.Underline);
+
+        Style spectreStyle = attribute.ToSpectreStyle ();
+
+        Assert.Equal (0, spectreStyle.Foreground.R);
+        Assert.Equal (255, spectreStyle.Foreground.G);
+        Assert.Equal (0, spectreStyle.Foreground.B);
+        Assert.Equal (128, spectreStyle.Background.R);
+        Assert.Equal (0, spectreStyle.Background.G);
+        Assert.Equal (128, spectreStyle.Background.B);
+        Assert.True ((spectreStyle.Decoration & Decoration.Italic) != 0);
+        Assert.True ((spectreStyle.Decoration & Decoration.Underline) != 0);
+    }
+
+    [Fact]
+    public void SpectreMarkupBridge_RoundTrip_Preserves_Style ()
+    {
+        TgAttribute original = new (
+            new Terminal.Gui.Drawing.Color (100, 150, 200),
+            new Terminal.Gui.Drawing.Color (50, 60, 70),
+            TextStyle.Bold | TextStyle.Faint | TextStyle.Strikethrough);
+
+        Style spectreStyle = original.ToSpectreStyle ();
+        TgAttribute roundTripped = spectreStyle.ToAttribute ();
+
+        Assert.Equal (original.Foreground.R, roundTripped.Foreground.R);
+        Assert.Equal (original.Foreground.G, roundTripped.Foreground.G);
+        Assert.Equal (original.Foreground.B, roundTripped.Foreground.B);
+        Assert.Equal (original.Background.R, roundTripped.Background.R);
+        Assert.Equal (original.Background.G, roundTripped.Background.G);
+        Assert.Equal (original.Background.B, roundTripped.Background.B);
+        Assert.Equal (original.Style, roundTripped.Style);
+    }
+
+    [Fact]
+    public void SpectreMarkupBridge_Default_Colors_Map_To_None ()
+    {
+        Style style = new (SpectreColor.Default, SpectreColor.Default);
+
+        TgAttribute attribute = style.ToAttribute ();
+
+        Assert.Equal (Terminal.Gui.Drawing.Color.None, attribute.Foreground);
+        Assert.Equal (Terminal.Gui.Drawing.Color.None, attribute.Background);
+    }
+
+    [Fact]
+    public void SpectreMarkupBridge_None_Colors_Map_To_Default ()
+    {
+        TgAttribute attribute = new (Terminal.Gui.Drawing.Color.None, Terminal.Gui.Drawing.Color.None);
+
+        Style spectreStyle = attribute.ToSpectreStyle ();
+
+        Assert.Equal (SpectreColor.Default, spectreStyle.Foreground);
+        Assert.Equal (SpectreColor.Default, spectreStyle.Background);
+    }
+
+    [Fact]
+    public void SpectreView_Renders_Markup_IRenderable ()
+    {
+        Markup markup = new ("[bold red]Hello[/] [green]World[/]");
+
+        string output = RenderToText (markup, 40, 3);
+
+        Assert.Contains ("Hello", output);
+        Assert.Contains ("World", output);
+    }
+
+    [Fact]
     public void SpectreView_Renders_Table_Panel_Rule_Tree_BarChart_And_FigletText ()
     {
         Table table = new ();

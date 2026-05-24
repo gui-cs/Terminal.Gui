@@ -2,11 +2,12 @@ using global::Spectre.Console;
 using Terminal.Gui.Drawing;
 using TgAttribute = Terminal.Gui.Drawing.Attribute;
 using TgColor = Terminal.Gui.Drawing.Color;
+using SpectreColor = global::Spectre.Console.Color;
 
 namespace Terminal.Gui.Interop.Spectre;
 
 /// <summary>
-///     Converts Spectre.Console styling to Terminal.Gui drawing attributes.
+///     Converts between Spectre.Console styling and Terminal.Gui drawing attributes.
 /// </summary>
 public static class SpectreMarkupBridge
 {
@@ -17,23 +18,37 @@ public static class SpectreMarkupBridge
     /// <returns>The converted Terminal.Gui attribute.</returns>
     public static TgAttribute ToAttribute (this Style style)
     {
-        TgColor foreground = ToColor (style.Foreground);
-        TgColor background = ToColor (style.Background);
-        TextStyle textStyle = ToTextStyle (style.Decoration);
+        TgColor foreground = SpectreColorToTg (style.Foreground);
+        TgColor background = SpectreColorToTg (style.Background);
+        TextStyle textStyle = DecorationToTextStyle (style.Decoration);
 
         return new (foreground, background, textStyle);
     }
 
-    private static TgColor ToColor (global::Spectre.Console.Color? color)
+    /// <summary>
+    ///     Converts a Terminal.Gui <see cref="TgAttribute"/> to a Spectre <see cref="Style"/>.
+    /// </summary>
+    /// <param name="attribute">The Terminal.Gui attribute to convert.</param>
+    /// <returns>The converted Spectre style.</returns>
+    public static Style ToSpectreStyle (this TgAttribute attribute)
+    {
+        SpectreColor foreground = TgColorToSpectre (attribute.Foreground);
+        SpectreColor background = TgColorToSpectre (attribute.Background);
+        Decoration decoration = TextStyleToDecoration (attribute.Style);
+
+        return new (foreground, background, decoration);
+    }
+
+    private static TgColor SpectreColorToTg (SpectreColor? color)
     {
         if (color is null)
         {
             return TgColor.None;
         }
 
-        global::Spectre.Console.Color value = color.Value;
+        SpectreColor value = color.Value;
 
-        if (value == global::Spectre.Console.Color.Default)
+        if (value == SpectreColor.Default)
         {
             return TgColor.None;
         }
@@ -41,7 +56,17 @@ public static class SpectreMarkupBridge
         return new TgColor (value.R, value.G, value.B);
     }
 
-    private static TextStyle ToTextStyle (Decoration? decoration)
+    private static SpectreColor TgColorToSpectre (TgColor color)
+    {
+        if (color == TgColor.None)
+        {
+            return SpectreColor.Default;
+        }
+
+        return new SpectreColor ((byte)color.R, (byte)color.G, (byte)color.B);
+    }
+
+    private static TextStyle DecorationToTextStyle (Decoration? decoration)
     {
         if (decoration is null)
         {
@@ -87,5 +112,47 @@ public static class SpectreMarkupBridge
         }
 
         return style;
+    }
+
+    private static Decoration TextStyleToDecoration (TextStyle style)
+    {
+        Decoration decoration = Decoration.None;
+
+        if ((style & TextStyle.Bold) != 0)
+        {
+            decoration |= Decoration.Bold;
+        }
+
+        if ((style & TextStyle.Faint) != 0)
+        {
+            decoration |= Decoration.Dim;
+        }
+
+        if ((style & TextStyle.Italic) != 0)
+        {
+            decoration |= Decoration.Italic;
+        }
+
+        if ((style & TextStyle.Underline) != 0)
+        {
+            decoration |= Decoration.Underline;
+        }
+
+        if ((style & TextStyle.Reverse) != 0)
+        {
+            decoration |= Decoration.Invert;
+        }
+
+        if ((style & TextStyle.Blink) != 0)
+        {
+            decoration |= Decoration.SlowBlink;
+        }
+
+        if ((style & TextStyle.Strikethrough) != 0)
+        {
+            decoration |= Decoration.Strikethrough;
+        }
+
+        return decoration;
     }
 }

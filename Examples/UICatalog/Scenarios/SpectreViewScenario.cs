@@ -7,7 +7,7 @@ using SpectreColor = global::Spectre.Console.Color;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("SpectreView Interop", "Renders Spectre.Console widgets inside Terminal.Gui.")]
+[ScenarioMetadata ("Spectre", "Demonstrates Spectre.Console integration.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Text and Formatting")]
 public sealed class SpectreViewScenario : Scenario
