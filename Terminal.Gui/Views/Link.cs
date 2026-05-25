@@ -449,5 +449,8 @@ public class Link : View, IDesignable
         return true;
     }
 
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
+
 
 }

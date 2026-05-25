@@ -109,8 +109,9 @@ foreach ($file in $viewFiles) {
                 $isStatic = [string]::IsNullOrEmpty($ks)
                 
                 if ($isStatic) {
-                    # No demo keystrokes — static 2s capture
-                    $ks = "wait:2000"
+                    # No demo keystrokes — add a Tab to create a focus-change visual
+                    # so --trim produces 2+ frames (initial render + focus shift)
+                    $ks = "wait:1500,Tab,wait:1000"
                 }
                 
                 # Append a pause (so final state is visible) then Escape to quit
@@ -122,10 +123,7 @@ foreach ($file in $viewFiles) {
                 Write-Host "  Recording $viewNameClean with tuirec..." -ForegroundColor Cyan
                 Write-Host "    Keystrokes: $ks" -ForegroundColor Gray
                 
-                # Use --trim to remove preroll/postroll; fall back to --trim=false
-                # if validation fails (static views may produce only 1 frame after trim)
-                $trimFlag = if ($isStatic) { "--trim=false" } else { "--trim" }
-                
+                # Always use --trim to remove preroll/postroll (v0.4.2+)
                 tuirec record `
                     --binary dotnet `
                     --args "$outputViewDll,--view=$viewNameClean,--live,--frame" `
@@ -134,15 +132,16 @@ foreach ($file in $viewFiles) {
                     --keystrokes $ks `
                     --startup-delay 0 `
                     --drain 1000 `
-                    $trimFlag `
+                    --trim `
                     --cols 80 --rows 20 `
                     --output $gifFile `
                     --cast-output $castFile `
                     --verbosity quiet
                 
-                # Retry without trim if validation failed (1-frame GIF)
-                if ($LASTEXITCODE -ne 0 -and -not $isStatic) {
-                    Write-Host "    Retrying without trim..." -ForegroundColor Yellow
+                # Retry without trim if validation failed (should not happen now that
+                # OutputView writes a clear-screen baseline frame before rendering)
+                if ($LASTEXITCODE -ne 0) {
+                    Write-Host "    WARNING: --trim failed (exit $LASTEXITCODE), retrying without trim..." -ForegroundColor Yellow
                     tuirec record `
                         --binary dotnet `
                         --args "$outputViewDll,--view=$viewNameClean,--live,--frame" `

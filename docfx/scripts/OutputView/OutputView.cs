@@ -115,7 +115,15 @@ app.Init (DriverRegistry.Names.ANSI);
 
 if (live)
 {
-    // Live mode: run normally so tuirec can record the interaction
+    // Live mode: run normally so tuirec can record the interaction.
+    // Write a minimal visible character (block) before the app renders, then pause.
+    // This establishes a baseline frame for tuirec's --trim. After the pause, TG
+    // renders the view (overwriting the block), creating frame 2. This ensures --trim
+    // always produces 2+ GIF frames even for static views.
+    Console.Write ("\x1b[2J\x1b[H\x1b[8m.\x1b[0m");
+    Console.Out.Flush ();
+    Thread.Sleep (500);
+
     app.Driver!.SetScreenSize (80, 20);
     app.Run<ViewDemoWindow> ();
     app.Dispose ();

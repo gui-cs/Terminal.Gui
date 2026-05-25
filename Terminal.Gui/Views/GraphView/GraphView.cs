@@ -411,4 +411,7 @@ public class GraphView : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorRight,wait:400,CursorRight,wait:400,CursorRight,wait:400,CursorDown,wait:400,CursorDown,wait:800";
 }

@@ -871,6 +871,9 @@ public class Shortcut : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
+
+    /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         if (disposing)

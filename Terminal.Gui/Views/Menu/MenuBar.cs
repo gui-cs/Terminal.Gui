@@ -337,6 +337,7 @@ public class MenuBar : Menu, IDesignable
         return true;
 
         void ToggleMenuBorders ()
+
         {
             foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
             {
@@ -1021,4 +1022,7 @@ public class MenuBar : Menu, IDesignable
 
         menuBarItem.PopoverMenuOpen = true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,F9,wait:800,CursorDown,wait:400,CursorDown,wait:400,Escape,wait:500";
 }

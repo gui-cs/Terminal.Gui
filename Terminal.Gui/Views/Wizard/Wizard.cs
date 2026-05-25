@@ -474,4 +474,7 @@ public class Wizard : Dialog, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Tab,wait:500,Tab,wait:500,Enter,wait:1000";
 }

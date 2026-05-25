@@ -348,4 +348,7 @@ public class Bar : View, IOrientation, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public virtual string? GetDemoKeyStrokes () => "wait:500,Tab,wait:500,Tab,wait:500,Tab,wait:800";
 }

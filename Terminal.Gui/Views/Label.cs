@@ -70,4 +70,7 @@ public class Label : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:2000";
 }

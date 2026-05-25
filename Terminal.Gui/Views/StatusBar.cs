@@ -169,6 +169,9 @@ public class StatusBar : Bar, IDesignable
         void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App!, "Hi", $"You clicked {sender}"); }
     }
 
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Tab,wait:500,Tab,wait:500,Tab,wait:800";
+
     /// <inheritdoc />
     protected override void Dispose (bool disposing)
     {

@@ -1066,6 +1066,9 @@ public class CharMap : View, IDesignable, IValue<Rune>
     }
 
     #endregion Mouse Handling
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,CursorDown,wait:400,CursorRight,wait:400,CursorRight,wait:800";
 }
 
 /// <summary>

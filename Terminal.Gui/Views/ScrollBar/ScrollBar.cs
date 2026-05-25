@@ -648,4 +648,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:300,CursorDown,wait:300,CursorDown,wait:300,CursorDown,wait:800";
 }
