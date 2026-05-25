@@ -418,12 +418,17 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
         MockFileSystem? fs = null;
 
-        using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
+        using AppTestHelper c = With.A (() =>
+                                        {
+                                            IRunnable r = NewSaveDialog (out sd, out fs);
+                                            sd.Style.PreserveFilenameOnDirectoryChanges = true;
+                                            sd.AllowedTypes = [new AllowedType ("C# File", ".cs")];
+
+                                            return r;
+                                        }, 100, 20, d)
                                     .Then (_ =>
                                           {
-                                              sd!.Style.PreserveFilenameOnDirectoryChanges = true;
-                                              sd.AllowedTypes = [new AllowedType ("C# File", ".cs")];
-                                              sd.Path = fs!.Path.Combine (GetFileSystemRoot (fs), "hello.cs");
+                                              sd!.Path = fs!.Path.Combine (GetFileSystemRoot (fs), "hello.cs");
                                           })
                                     .ScreenShot ("Save dialog with filename", _out)
                                     .Focus<TableView> (_ => true)
