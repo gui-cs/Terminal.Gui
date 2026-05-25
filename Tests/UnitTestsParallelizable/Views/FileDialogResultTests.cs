@@ -244,7 +244,7 @@ public class FileDialogResultTests
 
         List<string> visibleEntries = fd.State!.Children
                                        .Where (c => !c.IsParent)
-                                       .Select (c => c.FileSystemInfo!.Name)
+                                       .Select (c => c.Name)
                                        .OrderBy (name => name)
                                        .ToList ();
 
