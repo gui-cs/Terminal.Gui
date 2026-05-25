@@ -63,6 +63,18 @@ public class TuiConfigurationBuilder
     }
 
     /// <summary>
+    ///     Gets the MEC-backed theme manager instance for this builder.
+    /// </summary>
+    public IThemeManager ThemeManager => _themeManager ??= new MecThemeManager (this);
+    private IThemeManager? _themeManager;
+
+    /// <summary>
+    ///     Gets the MEC-backed scheme manager instance for this builder.
+    /// </summary>
+    public ISchemeManager SchemeManager => _schemeManager ??= new MecSchemeManager ();
+    private ISchemeManager? _schemeManager;
+
+    /// <summary>
     ///     Applies the current configuration to all static settings facades.
     ///     Call this after building or rebuilding to push MEC values to the static <c>Defaults</c> properties.
     /// </summary>
@@ -71,6 +83,7 @@ public class TuiConfigurationBuilder
         IConfiguration config = Configuration;
 
         // SettingsScope POCOs
+        BindSection<ThemeSettings> (config, "Theme", s => ThemeSettings.Defaults = s);
         BindSection<ApplicationSettings> (config, "Application", s => ApplicationSettings.Defaults = s);
         BindSection<DriverSettings> (config, "Driver", s => DriverSettings.Defaults = s);
         BindSection<FileDialogSettings> (config, "FileDialog", s => FileDialogSettings.Defaults = s);
