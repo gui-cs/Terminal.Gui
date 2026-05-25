@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 ///     for selecting from a list of items.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/DropDownList.gif" alt="DropDownList demo"/>
 ///     <para>
 ///         <see cref="DropDownList"/> provides a modern dropdown control that can operate in two modes:
 ///     </para>

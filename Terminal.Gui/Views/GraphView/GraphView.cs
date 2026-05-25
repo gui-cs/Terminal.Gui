@@ -2,6 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Displays graphs (bar, scatter, etc...) with flexible labels, scaling, and scrolling.</summary>
 /// <remarks>
+/// <img src="../images/views/GraphView.gif" alt="GraphView demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>

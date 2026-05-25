@@ -7,6 +7,9 @@ namespace Terminal.Gui.Views;
 ///     to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a
 ///     new instance of a status bar.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/StatusBar.gif" alt="StatusBar demo"/>
+/// </remarks>
 public class StatusBar : Bar, IDesignable
 {
     private static LineStyle _defaultSeparatorLineStyle = LineStyle.Single; // Resources/config.json overrides

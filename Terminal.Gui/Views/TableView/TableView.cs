@@ -23,6 +23,7 @@ public delegate Scheme? HeaderColorGetterDelegate (HeaderColorGetterArgs args);
 ///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/TableView.gif" alt="TableView demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>

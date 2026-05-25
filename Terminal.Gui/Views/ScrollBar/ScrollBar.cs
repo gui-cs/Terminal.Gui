@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///     content to the size of the <see cref="View.Viewport"/>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/ScrollBar.gif" alt="ScrollBar demo"/>
 ///     <para>
 ///         See the <see href="https://gui-cs.github.io/Terminal.Gui/docs/scrolling.html">Scrolling Deep Dive</see>.
 ///     </para>

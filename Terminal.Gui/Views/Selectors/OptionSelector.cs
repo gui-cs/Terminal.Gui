@@ -22,6 +22,9 @@ namespace Terminal.Gui.Views;
 ///     <see cref="OptionSelector{TEnum}"/> provides a type-safe version where a <see langword="enum"/> can be
 ///     provided.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/OptionSelector.gif" alt="OptionSelector demo"/>
+/// </remarks>
 public class OptionSelector : SelectorBase, IDesignable
 {
     // By default, for OptionSelector, Value is set to 0. It can be set to null if a developer

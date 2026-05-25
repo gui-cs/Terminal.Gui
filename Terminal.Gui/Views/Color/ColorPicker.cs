@@ -7,6 +7,7 @@ namespace Terminal.Gui.Views;
 ///     sliders and color names from the <see cref="IColorNameResolver"/>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/ColorPicker.gif" alt="ColorPicker demo"/>
 ///     <para>Default mouse bindings:</para>
 ///     <list type="table">
 ///         <listheader>

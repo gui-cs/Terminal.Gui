@@ -2,6 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Single-line text editor.</summary>
 /// <remarks>
+/// <img src="../images/views/TextField.gif" alt="TextField demo"/>
 ///     <para>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</para>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">

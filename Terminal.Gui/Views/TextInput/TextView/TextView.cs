@@ -4,6 +4,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Fully featured multi-line text editor.</summary>
 /// <remarks>
+/// <img src="../images/views/TextView.gif" alt="TextView demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>

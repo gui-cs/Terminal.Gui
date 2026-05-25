@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 ///     more.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Markdown.gif" alt="Markdown demo"/>
 ///     <para>
 ///         Set the <see cref="Text"/> property to supply content. The view parses the Markdown,
 ///         performs word-wrap layout, and draws styled output. Fenced code blocks receive a

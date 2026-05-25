@@ -5,6 +5,7 @@ namespace Terminal.Gui.Views;
 ///     Serves as the base class for <see cref="Menu"/>, <see cref="MenuBar"/>, and <see cref="StatusBar"/>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Bar.gif" alt="Bar demo"/>
 ///     <para>
 ///         Any <see cref="View"/> can be added to a <see cref="Bar"/>. However, <see cref="Bar"/> is designed to work
 ///         with <see cref="Shortcut"/> objects, which display a command, help text, and key binding aligned

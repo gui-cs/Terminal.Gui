@@ -30,6 +30,7 @@ public enum ProgressBarFormat
 
 /// <summary>A Progress Bar view that can indicate progress of an activity visually.</summary>
 /// <remarks>
+/// <img src="../images/views/ProgressBar.gif" alt="ProgressBar demo"/>
 ///     <para>
 ///         <see cref="ProgressBar"/> can operate in two modes, percentage mode, or activity mode. The progress bar
 ///         starts in percentage mode and setting the Fraction property will reflect on the UI the progress made so far.

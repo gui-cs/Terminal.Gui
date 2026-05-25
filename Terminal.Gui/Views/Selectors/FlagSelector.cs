@@ -16,6 +16,9 @@ namespace Terminal.Gui.Views;
 ///     <see cref="FlagSelector{TFlagsEnum}"/> provides a type-safe version where a `[Flags]` <see langword="enum"/> can be
 ///     provided.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/FlagSelector.gif" alt="FlagSelector demo"/>
+/// </remarks>
 public class FlagSelector : SelectorBase, IDesignable
 {
     /// <summary>

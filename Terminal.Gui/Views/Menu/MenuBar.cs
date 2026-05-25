@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///     the item is selected. Typically placed at the top of a window or view.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/MenuBar.gif" alt="MenuBar demo"/>
 ///     <para>
 ///         <see cref="MenuBar"/> extends <see cref="Menu"/> with horizontal orientation and specializes it for
 ///         <see cref="MenuBarItem"/> items. By default, it is positioned at <c>Y = 0</c> with

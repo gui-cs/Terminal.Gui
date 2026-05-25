@@ -8,6 +8,9 @@ namespace Terminal.Gui.Views;
 ///     Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes implement
 ///     <see cref="ITreeNode"/>. <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/TreeView.gif" alt="TreeView demo"/>
+/// </remarks>
 public class TreeView : TreeView<ITreeNode>, IDesignable
 {
     /// <summary>

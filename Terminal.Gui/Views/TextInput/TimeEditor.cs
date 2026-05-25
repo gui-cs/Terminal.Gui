@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     Provides time editing functionality using <see cref="TextValidateField"/> with culture-aware formatting.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/TimeEditor.gif" alt="TimeEditor demo"/>
 ///     <para>
 ///         TimeEditor extends <see cref="TextValidateField"/> with time-specific functionality:
 ///         <list type="bullet">

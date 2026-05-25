@@ -1,6 +1,9 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>A read-only view that renders syntax-highlighted source code.</summary>
+/// <remarks>
+/// <img src="../images/views/Code.gif" alt="Code demo"/>
+/// </remarks>
 public class Code : View, IDesignable
 {
     /// <summary>Initializes a new instance of the <see cref="Code"/> class.</summary>

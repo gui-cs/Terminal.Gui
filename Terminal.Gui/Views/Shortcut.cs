@@ -5,6 +5,7 @@ namespace Terminal.Gui.Views;
 ///     <see cref="Bar"/>, <see cref="Menu"/>, <see cref="MenuBar"/>, and <see cref="StatusBar"/>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Shortcut.gif" alt="Shortcut demo"/>
 ///     <para>
 ///         A <see cref="Shortcut"/> is a composite view containing three subviews:
 ///         <see cref="CommandView"/> (command text and hotkey, left side by default),

@@ -7,6 +7,7 @@ namespace Terminal.Gui.Views;
 ///     <see cref="Border"/>. The currently focused SubView is the selected (front-most) tab.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Tabs.gif" alt="Tabs demo"/>
 ///     <para>
 ///         Add any <see cref="View"/> instances via <see cref="View.Add(View)"/>. Each added view is automatically
 ///         configured with <see cref="BorderSettings.Tab"/>, <see cref="ViewArrangement.Overlapped"/> arrangement,

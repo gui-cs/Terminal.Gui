@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///     A scrollable map of the Unicode codepoints.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/CharMap.gif" alt="CharMap demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>

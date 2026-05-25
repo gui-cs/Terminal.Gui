@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     A multi-step dialog for collecting related data across sequential steps.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Wizard.gif" alt="Wizard demo"/>
 ///     <para>
 ///         Each <see cref="WizardStep"/> can host arbitrary <see cref="View"/>s and display help text.
 ///         Navigation buttons (Back/Next/Finish) are automatically managed.

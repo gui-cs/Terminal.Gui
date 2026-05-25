@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     Provides date editing functionality using <see cref="TextValidateField"/> with culture-aware formatting.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/DateEditor.gif" alt="DateEditor demo"/>
 ///     <para>
 ///         DateEditor extends <see cref="TextValidateField"/> with date-specific functionality:
 ///         <list type="bullet">

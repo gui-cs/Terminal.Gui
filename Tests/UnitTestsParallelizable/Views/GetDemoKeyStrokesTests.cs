@@ -70,13 +70,12 @@ public class GetDemoKeyStrokesTests : TestsAllViews
     [Fact]
     public void DefaultInterfaceImplementation_Returns_Null ()
     {
-        // ProgressBar should NOT have an explicit GetDemoKeyStrokes that returns null
-        // (it's redundant with the default interface implementation).
-        // This test verifies the default works so explicit null returns can be removed.
-        ProgressBar pb = new ();
-        IDesignable designable = pb;
+        // Views that don't implement GetDemoKeyStrokes should return null via the
+        // default interface implementation. Use a view that genuinely has no demo.
+        ImageView iv = new ();
+        IDesignable designable = iv;
         Assert.Null (designable.GetDemoKeyStrokes ());
-        pb.Dispose ();
+        iv.Dispose ();
     }
 
     /// <summary>
@@ -98,6 +97,8 @@ public class GetDemoKeyStrokesTests : TestsAllViews
     [InlineData (typeof (HexView))]
     [InlineData (typeof (ColorPicker))]
     [InlineData (typeof (TextView))]
+    [InlineData (typeof (Terminal.Gui.Views.Markdown))]
+    [InlineData (typeof (ProgressBar))]
     public void InteractiveViews_Return_NonNull_KeyStrokes (Type viewType)
     {
         View? view = Activator.CreateInstance (viewType) as View;

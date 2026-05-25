@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///     action.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/ListView.gif" alt="ListView demo"/>
 ///     <para>
 ///         The <see cref="ListView"/> displays lists of data and allows the user to scroll through the data. Items in
 ///         the can be activated firing an event (with the ENTER key or a mouse double-click). If the

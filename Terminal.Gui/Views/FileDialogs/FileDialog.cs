@@ -7,6 +7,9 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     The base-class for <see cref="OpenDialog"/> and <see cref="SaveDialog"/>
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/FileDialog.gif" alt="FileDialog demo"/>
+/// </remarks>
 public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
 {
     /// <summary>Gets the Path separators for the operating system</summary>
