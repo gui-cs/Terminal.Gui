@@ -289,7 +289,7 @@ public partial class FileDialog
     // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/5087#issuecomment-4328093883
     private void TableViewOnValueChanged (object? sender, ValueChangedEventArgs<TableSelection?> e)
     {
-        if (!_tableView.HasFocus || _tableView.Value is null || _tableView.Table?.Rows == 0)
+        if (_pushingState || !_tableView.HasFocus || _tableView.Value is null || _tableView.Table?.Rows == 0)
         {
             return;
         }

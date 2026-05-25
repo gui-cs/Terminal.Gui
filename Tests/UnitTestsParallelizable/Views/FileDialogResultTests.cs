@@ -221,6 +221,32 @@ public class FileDialogResultTests
         Assert.Equal (insertionPointBefore, tbPath.InsertionPoint);
     }
 
+    [Fact]
+    public void FileDialog_Accepting_Directory_From_Table_Keeps_Path_On_Opened_Directory ()
+    {
+        // Copilot
+        MockFileSystem fs = new ();
+        fs.AddDirectory ("/UI");
+        fs.AddDirectory ("/UI/Window");
+        fs.AddFile ("/UI/Window/file1.txt", new MockFileData ("hello"));
+
+        using FileDialog fd = new TestableFileDialog (fs) { OpenMode = OpenMode.File };
+        fd.Path = "/UI";
+
+        FieldInfo? tableViewField = typeof (FileDialog).GetField ("_tableView", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull (tableViewField);
+
+        TableView tableView = Assert.IsType<TableView> (tableViewField!.GetValue (fd));
+        tableView.SetFocus ();
+        tableView.SetSelection (0, 1, false);
+
+        Assert.Equal ("/UI/Window", fd.Path);
+
+        tableView.InvokeCommand (Command.Accept);
+
+        Assert.Equal ("/UI/Window", fd.Path);
+    }
+
     /// <summary>Testable subclass that exposes the internal file-system constructor.</summary>
     private sealed class TestableFileDialog : FileDialog
     {
