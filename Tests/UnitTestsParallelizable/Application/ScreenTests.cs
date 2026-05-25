@@ -411,6 +411,41 @@ public class ScreenTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 100, 50), app.Screen);
     }
 
+    // Copilot
+    [Fact]
+    public void Screen_Property_Setting_Before_Begin_Raises_ScreenChanged_Once ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        int eventCount = 0;
+        Rectangle? newScreen = null;
+
+        EventHandler<EventArgs<Rectangle>> handler = (_, args) =>
+                                                     {
+                                                         eventCount++;
+                                                         newScreen = args.Value;
+                                                     };
+
+        app.ScreenChanged += handler;
+
+        try
+        {
+            // Act
+            app.Screen = new (0, 0, 100, 50);
+
+            // Assert
+            Assert.Equal (1, eventCount);
+            Assert.Equal (new (0, 0, 100, 50), newScreen);
+            Assert.Equal (new (0, 0, 100, 50), app.Screen);
+        }
+        finally
+        {
+            app.ScreenChanged -= handler;
+        }
+    }
+
     [Fact]
     public void Screen_Property_Setting_Raises_ScreenChanged_Event ()
     {
