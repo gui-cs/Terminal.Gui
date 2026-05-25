@@ -20,18 +20,19 @@ public class FileDialogColorTests
         Assert.NotNull (tableViewField);
 
         TableView tableView = Assert.IsType<TableView> (tableViewField!.GetValue (dialog));
-        Assert.NotNull (tableView.Table);
+        ITableSource table = tableView.Table!;
+        Assert.NotNull (table);
         Assert.True (dialog.State!.Children [0].IsParent);
 
         ColumnStyle nameStyle = tableView.Style.GetOrCreateColumnStyle (0);
         Assert.NotNull (nameStyle.ColorGetter);
 
-        object cellValue = tableView.Table [0, 0];
+        object cellValue = table [0, 0];
         string representation = cellValue.ToString () ?? string.Empty;
         Scheme rowScheme = tableView.GetScheme ();
         Scheme effectiveScheme = nameStyle.ColorGetter! (
                                                     new CellColorGetterArgs (
-                                                                              tableView.Table,
+                                                                              table,
                                                                               0,
                                                                               0,
                                                                               cellValue,
