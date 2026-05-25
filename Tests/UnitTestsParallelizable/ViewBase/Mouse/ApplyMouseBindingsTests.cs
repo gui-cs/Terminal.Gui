@@ -88,6 +88,33 @@ public class ApplyMouseBindingsTests
     }
 
     /// <summary>
+    ///     Verifies that all provided layers are applied in order.
+    /// </summary>
+    [Fact]
+    public void ApplyMouseBindings_Applies_Multiple_Layers ()
+    {
+        ViewWithContext view = new ();
+
+        Dictionary<Command, PlatformMouseBinding> firstLayer = new ()
+        {
+            [Command.Context] = BindMouse.All (MouseFlags.MiddleButtonReleased)
+        };
+
+        Dictionary<Command, PlatformMouseBinding> secondLayer = new ()
+        {
+            [Command.Activate] = BindMouse.All (MouseFlags.RightButtonReleased)
+        };
+
+        view.TestApplyMouseBindings (firstLayer, secondLayer);
+
+        Assert.True (view.MouseBindings.TryGet (MouseFlags.MiddleButtonReleased, out MouseBinding contextBinding));
+        Assert.Contains (Command.Context, contextBinding.Commands);
+
+        Assert.True (view.MouseBindings.TryGet (MouseFlags.RightButtonReleased, out MouseBinding activateBinding));
+        Assert.Contains (Command.Activate, activateBinding.Commands);
+    }
+
+    /// <summary>
     ///     Verifies that <see cref="View.ViewMouseBindings"/> per-type overrides are applied
     ///     using the short type name (stripping generic arity backtick suffix).
     /// </summary>
@@ -114,6 +141,35 @@ public class ApplyMouseBindingsTests
             // The ViewMouseBindings override should have been applied
             Assert.True (view.MouseBindings.TryGet (MouseFlags.RightButtonReleased, out MouseBinding binding));
             Assert.Contains (Command.Activate, binding.Commands);
+        }
+        finally
+        {
+            View.ViewMouseBindings = original;
+        }
+    }
+
+    /// <summary>
+    ///     Verifies that generic type arity is stripped when looking up <see cref="View.ViewMouseBindings"/> overrides.
+    /// </summary>
+    [Fact]
+    public void ApplyMouseBindings_Uses_Generic_TypeName_Without_GenericArity ()
+    {
+        Dictionary<string, Dictionary<Command, PlatformMouseBinding>>? original = View.ViewMouseBindings;
+
+        try
+        {
+            View.ViewMouseBindings = new ()
+            {
+                ["GenericViewWithContext"] = new ()
+                {
+                    [Command.Context] = BindMouse.All (MouseFlags.MiddleButtonReleased)
+                }
+            };
+
+            GenericViewWithContext<string> view = new ();
+
+            Assert.True (view.MouseBindings.TryGet (MouseFlags.MiddleButtonReleased, out MouseBinding binding));
+            Assert.Contains (Command.Context, binding.Commands);
         }
         finally
         {
@@ -186,6 +242,17 @@ public class ApplyMouseBindingsTests
         public void TestApplyMouseBindings (params Dictionary<Command, PlatformMouseBinding>? [] layers)
         {
             ApplyMouseBindings (layers);
+        }
+    }
+
+    /// <summary>Generic helper view that supports Command.Context for testing.</summary>
+    private class GenericViewWithContext<T> : View
+    {
+        public GenericViewWithContext ()
+        {
+            Width = 10;
+            Height = 1;
+            AddCommand (Command.Context, _ => true);
         }
     }
 }
