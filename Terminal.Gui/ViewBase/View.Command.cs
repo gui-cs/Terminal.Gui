@@ -26,6 +26,12 @@ public partial class View // Command APIs
         // Paste - Default handler resolves payload (bracketed paste payload or clipboard),
         // sanitizes, raises Pasting/Pasted, and delegates insertion to OnPaste.
         AddCommand (Command.Paste, DefaultPasteHandler);
+
+        // Context - By default, route through the NotBound handler so that
+        // CommandNotBound fires (allowing subscribers to handle it). This keeps
+        // Command.Context as a "supported" command for mouse-binding purposes
+        // while not silently swallowing the invocation.
+        AddCommand (Command.Context, DefaultCommandNotBoundHandler);
     }
 
     #region Command Management

@@ -117,134 +117,80 @@ public class AnsiMouseParser
         return m;
     }
 
+    private const int ButtonMask = 0b_0000_0011;
+    private const int ShiftMask = 0b_0000_0100;
+    private const int AltMask = 0b_0000_1000;
+    private const int CtrlMask = 0b_0001_0000;
+    private const int MotionMask = 0b_0010_0000;
+    private const int WheelMask = 0b_0100_0000;
+
     private static MouseFlags GetFlags (int buttonCode, char terminator)
     {
-        MouseFlags buttonState = buttonCode switch
-                                 {
-                                     0 or 8 or 16 or 24 or 32 or 36 or 40 or 48 or 56 => terminator == 'M'
-                                                                                             ? MouseFlags.LeftButtonPressed
-                                                                                             : MouseFlags.LeftButtonReleased,
-                                     1 or 9 or 17 or 25 or 33 or 37 or 41 or 45 or 49 or 53 or 57 or 61 => terminator == 'M'
-                                         ? MouseFlags.MiddleButtonPressed
-                                         : MouseFlags.MiddleButtonReleased,
-                                     2 or 10 or 14 or 18 or 22 or 26 or 30 or 34 or 42 or 46 or 50 or 54 or 58 or 62 => terminator == 'M'
-                                         ? MouseFlags.RightButtonPressed
-                                         : MouseFlags.RightButtonReleased,
-                                     35 or 39 or 43 or 47 or 51 or 55 or 59 or 63 => MouseFlags.PositionReport,
-                                     64 => MouseFlags.WheeledUp,
-                                     65 => MouseFlags.WheeledDown,
-                                     68 or 72 or 80 => MouseFlags.WheeledLeft // Shift/Ctrl+WheeledUp
-                                    ,
-                                     69 or 73 or 81 => MouseFlags.WheeledRight // Shift/Ctrl+WheeledDown
-                                    ,
-                                     _ => 0
-                                 };
+        MouseFlags flags = GetModifierFlags (buttonCode);
 
-        // Modifiers.
-        switch (buttonCode)
+        if ((buttonCode & WheelMask) != 0)
         {
-            case 8:
-            case 9:
-            case 10:
-            case 43:
-                buttonState |= MouseFlags.Alt;
-
-                break;
-
-            case 14:
-            case 47:
-                buttonState |= MouseFlags.Alt | MouseFlags.Shift;
-
-                break;
-
-            case 16:
-            case 17:
-            case 18:
-            case 51:
-                buttonState |= MouseFlags.Ctrl;
-
-                break;
-
-            case 22:
-            case 55:
-                buttonState |= MouseFlags.Ctrl | MouseFlags.Shift;
-
-                break;
-
-            case 24:
-            case 25:
-            case 26:
-            case 59:
-                buttonState |= MouseFlags.Ctrl | MouseFlags.Alt;
-
-                break;
-
-            case 30:
-            case 63:
-                buttonState |= MouseFlags.Ctrl | MouseFlags.Shift | MouseFlags.Alt;
-
-                break;
-
-            case 32:
-            case 33:
-            case 34:
-                buttonState |= MouseFlags.PositionReport;
-
-                break;
-
-            case 36:
-            case 37:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Shift;
-
-                break;
-
-            case 39:
-            case 68:
-            case 69:
-                buttonState |= MouseFlags.Shift;
-
-                break;
-
-            case 40:
-            case 41:
-            case 42:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Alt;
-
-                break;
-
-            case 45:
-            case 46:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Alt | MouseFlags.Shift;
-
-                break;
-
-            case 48:
-            case 49:
-            case 50:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl;
-
-                break;
-
-            case 53:
-            case 54:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Shift;
-
-                break;
-
-            case 56:
-            case 57:
-            case 58:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Alt;
-
-                break;
-
-            case 61:
-            case 62:
-                buttonState |= MouseFlags.PositionReport | MouseFlags.Ctrl | MouseFlags.Shift | MouseFlags.Alt;
-
-                break;
+            return flags | GetWheelFlags (buttonCode);
         }
 
-        return buttonState;
+        if ((buttonCode & MotionMask) != 0)
+        {
+            flags |= MouseFlags.PositionReport;
+        }
+
+        return flags | GetButtonFlags (buttonCode & ButtonMask, terminator);
+    }
+
+    private static MouseFlags GetModifierFlags (int buttonCode)
+    {
+        MouseFlags flags = MouseFlags.None;
+
+        if ((buttonCode & ShiftMask) != 0)
+        {
+            flags |= MouseFlags.Shift;
+        }
+
+        if ((buttonCode & AltMask) != 0)
+        {
+            flags |= MouseFlags.Alt;
+        }
+
+        if ((buttonCode & CtrlMask) != 0)
+        {
+            flags |= MouseFlags.Ctrl;
+        }
+
+        return flags;
+    }
+
+    private static MouseFlags GetButtonFlags (int button, char terminator)
+    {
+        return button switch
+               {
+                   0 => terminator == 'M' ? MouseFlags.LeftButtonPressed : MouseFlags.LeftButtonReleased,
+                   1 => terminator == 'M' ? MouseFlags.MiddleButtonPressed : MouseFlags.MiddleButtonReleased,
+                   2 => terminator == 'M' ? MouseFlags.RightButtonPressed : MouseFlags.RightButtonReleased,
+                   _ => MouseFlags.None
+               };
+    }
+
+    private static MouseFlags GetWheelFlags (int buttonCode)
+    {
+        return buttonCode switch
+               {
+                   66 or 68 or 72 or 80 => MouseFlags.WheeledLeft,
+                   67 or 69 or 73 or 81 => MouseFlags.WheeledRight,
+                   _ => GetVerticalWheelFlags (buttonCode)
+               };
+    }
+
+    private static MouseFlags GetVerticalWheelFlags (int buttonCode)
+    {
+        return (buttonCode & ButtonMask) switch
+               {
+                   0 => MouseFlags.WheeledUp,
+                   1 => MouseFlags.WheeledDown,
+                   _ => MouseFlags.None
+               };
     }
 }

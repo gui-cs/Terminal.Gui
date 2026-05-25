@@ -428,6 +428,29 @@ public class WindowsInputProcessorTests
             }
         ];
 
+        // Copilot - GPT-5.5
+        yield return
+        [
+            new []
+            {
+                Tuple.Create (
+                              ButtonState.Button1Pressed,
+                              EventFlags.NoEvent,
+                              ControlKeyState.ShiftPressed | ControlKeyState.LeftControlPressed,
+                              MouseFlags.LeftButtonPressed | MouseFlags.Shift | MouseFlags.Ctrl),
+                Tuple.Create (
+                              ButtonState.NoButtonPressed,
+                              EventFlags.NoEvent,
+                              ControlKeyState.ShiftPressed | ControlKeyState.CapslockOn,
+                              MouseFlags.LeftButtonReleased | MouseFlags.Shift),
+                Tuple.Create (
+                              ButtonState.NoButtonPressed,
+                              EventFlags.NoEvent,
+                              ControlKeyState.ShiftPressed | ControlKeyState.NumlockOn | ControlKeyState.ScrolllockOn,
+                              MouseFlags.None | MouseFlags.Shift)
+            }
+        ];
+
         // Test for ControlKeyState buttons pressed and not handled
         yield return
         [
