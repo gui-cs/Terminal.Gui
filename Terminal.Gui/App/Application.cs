@@ -239,6 +239,7 @@ public static partial class Application
     ///         application interacts with the terminal buffer.
     ///     </para>
     /// </remarks>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static AppModel AppModel
     {
         get => ApplicationSettings.Defaults.AppModel;
@@ -268,6 +269,7 @@ public static partial class Application
     }
 
     /// <inheritdoc cref="IApplication.ForceDriver"/>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver
     {
         get => ApplicationSettings.Defaults.ForceDriver;

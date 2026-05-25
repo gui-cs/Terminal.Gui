@@ -292,6 +292,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     /// <remarks>
     ///     This is a configuration property that affects all new <see cref="PopoverMenu"/> instances.
     /// </remarks>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey
     {
         get => PopoverMenuSettings.Defaults.DefaultKey;

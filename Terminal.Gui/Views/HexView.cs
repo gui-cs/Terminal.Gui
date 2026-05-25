@@ -79,6 +79,7 @@ public class HexView : View, IDesignable
     /// <summary>
     ///     Gets or sets the default cursor style.
     /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle
     {
         get => HexViewSettings.Defaults.DefaultCursorStyle;

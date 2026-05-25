@@ -63,6 +63,7 @@ public class Dialog : Dialog<int>
     ///     The default border style for new <see cref="Dialog"/> instances. Can be configured via
     ///     <see cref="ConfigurationManager"/> and theme files.
     /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
         get => DialogSettings.Defaults.DefaultBorderStyle;
@@ -72,6 +73,7 @@ public class Dialog : Dialog<int>
     /// <summary>
     ///     The default button alignment for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Alignment DefaultButtonAlignment
     {
         get => DialogSettings.Defaults.DefaultButtonAlignment;
@@ -81,6 +83,7 @@ public class Dialog : Dialog<int>
     /// <summary>
     ///     The default button alignment modes for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static AlignmentModes DefaultButtonAlignmentModes
     {
         get => DialogSettings.Defaults.DefaultButtonAlignmentModes;
@@ -90,6 +93,7 @@ public class Dialog : Dialog<int>
     /// <summary>
     ///     The default shadow style for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyles DefaultShadow
     {
         get => DialogSettings.Defaults.DefaultShadow;

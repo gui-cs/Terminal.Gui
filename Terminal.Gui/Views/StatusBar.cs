@@ -56,6 +56,7 @@ public class StatusBar : Bar, IDesignable
     /// <summary>
     ///     Gets or sets the default Line Style for the separators between the shortcuts of the StatusBar.
     /// </summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultSeparatorLineStyle
     {
         get => StatusBarSettings.Defaults.DefaultSeparatorLineStyle;
