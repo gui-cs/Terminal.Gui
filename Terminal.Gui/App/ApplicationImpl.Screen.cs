@@ -26,15 +26,24 @@ internal partial class ApplicationImpl
                 // Resize the output buffer to match the inline region dimensions.
                 _screen = value;
                 (Driver as DriverImpl)?.ResizeOutputBuffer (value.Width, value.Height);
-            }
-            else
-            {
-                // Fullscreen: sync with Driver.Screen (resizes both terminal tracking and buffer).
-                _screen = null;
-                Driver?.SetScreenSize (value.Width, value.Height);
+
+                RaiseScreenChangedEvent (value);
+
+                return;
             }
 
-            RaiseScreenChangedEvent (Screen);
+            _screen = null;
+
+            if (Driver is null)
+            {
+                RaiseScreenChangedEvent (Screen);
+
+                return;
+            }
+
+            // Fullscreen: sync with Driver.Screen (resizes both terminal tracking and buffer).
+            // Driver_SizeChanged will raise ScreenChanged and invalidate layout.
+            Driver.SetScreenSize (value.Width, value.Height);
         }
     }
 
