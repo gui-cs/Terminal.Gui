@@ -117,11 +117,12 @@ if (live)
 {
     // Live mode: run normally so tuirec can record the interaction.
     // Write a dot colored to match the agg monokai theme background (#272822 = RGB 39,40,34)
-    // before TG renders, then pause 500ms. This creates 2 visually distinct frames for
-    // tuirec's --trim without any visible preroll artifact.
+    // before TG renders, then briefly pause. This creates 2 visually distinct frames for
+    // tuirec's --trim without any visible preroll artifact. 50ms is enough for a distinct
+    // timestamp but too short to be perceptible in the GIF.
     Console.Write ("\x1b[2J\x1b[H\x1b[38;2;39;40;34m.\x1b[0m");
     Console.Out.Flush ();
-    Thread.Sleep (500);
+    Thread.Sleep (50);
 
     app.Driver!.SetScreenSize (80, 20);
     app.Run<ViewDemoWindow> ();
