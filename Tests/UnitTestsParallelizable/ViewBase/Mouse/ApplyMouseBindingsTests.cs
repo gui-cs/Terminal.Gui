@@ -139,7 +139,7 @@ public class ApplyMouseBindingsTests
         }
 
         // Applying a null layer should not change anything
-        view.TestApplyMouseBindings (null);
+        view.TestApplyMouseBindings ((Dictionary<Command, PlatformMouseBinding>?)null);
 
         int countAfter = 0;
 

@@ -646,14 +646,8 @@ internal sealed class Arranger : IDisposable
     /// <returns>True if the event was handled.</returns>
     internal bool HandleMouseEvent (Mouse mouseEvent)
     {
-        // Button pressed - start potential drag
-        if (!_dragPosition.HasValue && mouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
-        {
-            return HandleMousePressed (mouseEvent);
-        }
-
         // Dragging - update position
-        if (mouseEvent.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
+        if (mouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
             && _border.App is { }
             && _border.App.Mouse.IsGrabbed (_border)
             && _dragPosition.HasValue)
@@ -670,6 +664,24 @@ internal sealed class Arranger : IDisposable
         }
 
         return false;
+    }
+
+    /// <summary>
+    ///     Starts arrangement from a configured mouse binding.
+    /// </summary>
+    internal bool? HandleArrangeCommand (ICommandContext? context)
+    {
+        if (context?.Binding is not MouseBinding { MouseEvent: { } mouseEvent })
+        {
+            return false;
+        }
+
+        if (_dragPosition.HasValue)
+        {
+            return false;
+        }
+
+        return HandleMousePressed (mouseEvent);
     }
 
     /// <summary>

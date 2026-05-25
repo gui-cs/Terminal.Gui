@@ -45,7 +45,8 @@ public partial class BorderView : AdornmentView
 {
     /// <inheritdoc/>
     public BorderView ()
-    { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
+    {
+        SetupArrangeCommands ();
     }
 
     /// <inheritdoc/>
@@ -55,8 +56,13 @@ public partial class BorderView : AdornmentView
         if (border == null)
         {
             // Supports AllViews_Tests_All_Constructors which uses reflection
+            SetupArrangeCommands ();
+
             return;
         }
+
+        SetupArrangeCommands ();
+
         CanFocus = false;
         TabStop = TabBehavior.TabStop;
 
