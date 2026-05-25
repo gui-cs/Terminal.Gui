@@ -70,39 +70,39 @@ public class TuiConfigurationBuilder
     {
         IConfiguration config = Configuration;
 
-        // Bind ApplicationSettings
-        ApplicationSettings appSettings = new ();
-        config.GetSection ("Application").Bind (appSettings);
-        ApplicationSettings.Defaults = appSettings;
+        // SettingsScope POCOs
+        BindSection<ApplicationSettings> (config, "Application", s => ApplicationSettings.Defaults = s);
+        BindSection<DriverSettings> (config, "Driver", s => DriverSettings.Defaults = s);
+        BindSection<FileDialogSettings> (config, "FileDialog", s => FileDialogSettings.Defaults = s);
+        BindSection<FileDialogStyleSettings> (config, "FileDialogStyle", s => FileDialogStyleSettings.Defaults = s);
+        BindSection<KeySettings> (config, "Key", s => KeySettings.Defaults = s);
+        BindSection<TraceSettings> (config, "Trace", s => TraceSettings.Defaults = s);
 
-        // Bind DriverSettings
-        DriverSettings driverSettings = new ();
-        config.GetSection ("Driver").Bind (driverSettings);
-        DriverSettings.Defaults = driverSettings;
+        // ThemeScope POCOs
+        BindSection<ButtonSettings> (config, "Button", s => ButtonSettings.Defaults = s);
+        BindSection<CheckBoxSettings> (config, "CheckBox", s => CheckBoxSettings.Defaults = s);
+        BindSection<CharMapSettings> (config, "CharMap", s => CharMapSettings.Defaults = s);
+        BindSection<DialogSettings> (config, "Dialog", s => DialogSettings.Defaults = s);
+        BindSection<FrameViewSettings> (config, "FrameView", s => FrameViewSettings.Defaults = s);
+        BindSection<HexViewSettings> (config, "HexView", s => HexViewSettings.Defaults = s);
+        BindSection<LinearRangeSettings> (config, "LinearRange", s => LinearRangeSettings.Defaults = s);
+        BindSection<MenuBarSettings> (config, "MenuBar", s => MenuBarSettings.Defaults = s);
+        BindSection<MenuSettings> (config, "Menu", s => MenuSettings.Defaults = s);
+        BindSection<MessageBoxSettings> (config, "MessageBox", s => MessageBoxSettings.Defaults = s);
+        BindSection<NerdFontsSettings> (config, "NerdFonts", s => NerdFontsSettings.Defaults = s);
+        BindSection<PopoverMenuSettings> (config, "PopoverMenu", s => PopoverMenuSettings.Defaults = s);
+        BindSection<SelectorBaseSettings> (config, "SelectorBase", s => SelectorBaseSettings.Defaults = s);
+        BindSection<StatusBarSettings> (config, "StatusBar", s => StatusBarSettings.Defaults = s);
+        BindSection<TextFieldSettings> (config, "TextField", s => TextFieldSettings.Defaults = s);
+        BindSection<TextViewSettings> (config, "TextView", s => TextViewSettings.Defaults = s);
+        BindSection<WindowSettings> (config, "Window", s => WindowSettings.Defaults = s);
+        BindSection<GlyphSettings> (config, "Glyphs", s => GlyphSettings.Defaults = s);
+    }
 
-        // Bind ButtonSettings
-        ButtonSettings buttonSettings = new ();
-        config.GetSection ("Button").Bind (buttonSettings);
-        ButtonSettings.Defaults = buttonSettings;
-
-        // Bind DialogSettings
-        DialogSettings dialogSettings = new ();
-        config.GetSection ("Dialog").Bind (dialogSettings);
-        DialogSettings.Defaults = dialogSettings;
-
-        // Bind WindowSettings
-        WindowSettings windowSettings = new ();
-        config.GetSection ("Window").Bind (windowSettings);
-        WindowSettings.Defaults = windowSettings;
-
-        // Bind MessageBoxSettings
-        MessageBoxSettings messageBoxSettings = new ();
-        config.GetSection ("MessageBox").Bind (messageBoxSettings);
-        MessageBoxSettings.Defaults = messageBoxSettings;
-
-        // Bind CheckBoxSettings
-        CheckBoxSettings checkBoxSettings = new ();
-        config.GetSection ("CheckBox").Bind (checkBoxSettings);
-        CheckBoxSettings.Defaults = checkBoxSettings;
+    private static void BindSection<T> (IConfiguration config, string sectionName, Action<T> apply) where T : new ()
+    {
+        T settings = new ();
+        config.GetSection (sectionName).Bind (settings);
+        apply (settings);
     }
 }

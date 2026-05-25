@@ -293,7 +293,11 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     ///     This is a configuration property that affects all new <see cref="PopoverMenu"/> instances.
     /// </remarks>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key DefaultKey { get; set; } = Key.F10.WithShift;
+    public static Key DefaultKey
+    {
+        get => PopoverMenuSettings.Defaults.DefaultKey;
+        set => PopoverMenuSettings.Defaults.DefaultKey = value;
+    }
 
     /// <summary>
     ///     The mouse flags that will cause the popover menu to be visible. The default is

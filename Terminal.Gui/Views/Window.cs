@@ -16,9 +16,6 @@ namespace Terminal.Gui.Views;
 /// <seealso cref="FrameView"/>
 public class Window : Runnable
 {
-    private static ShadowStyles _defaultShadow = ShadowStyles.None; // Resources/config.json overrides
-    private static LineStyle _defaultBorderStyle = LineStyle.Single; // Resources/config.json overrides
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Window"/> class.
     /// </summary>
@@ -38,8 +35,8 @@ public class Window : Runnable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyles DefaultShadow
     {
-        get => _defaultShadow;
-        set => _defaultShadow = value;
+        get => WindowSettings.Defaults.DefaultShadow;
+        set => WindowSettings.Defaults.DefaultShadow = value;
     }
 
     // TODO: enable this
@@ -63,7 +60,7 @@ public class Window : Runnable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
-        get => _defaultBorderStyle;
-        set => _defaultBorderStyle = value;
+        get => WindowSettings.Defaults.DefaultBorderStyle;
+        set => WindowSettings.Defaults.DefaultBorderStyle = value;
     }
 }

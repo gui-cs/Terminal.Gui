@@ -53,9 +53,6 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public static class MessageBox
 {
-    private static LineStyle _defaultBorderStyle = LineStyle.Heavy; // Resources/config.json overrides
-    private static Alignment _defaultButtonAlignment = Alignment.Center; // Resources/config.json overrides
-
     /// <summary>
     ///     Defines the default border styling for <see cref="MessageBox"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
@@ -63,8 +60,8 @@ public static class MessageBox
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
-        get => _defaultBorderStyle;
-        set => _defaultBorderStyle = value;
+        get => MessageBoxSettings.Defaults.DefaultBorderStyle;
+        set => MessageBoxSettings.Defaults.DefaultBorderStyle = value;
     }
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
@@ -72,8 +69,8 @@ public static class MessageBox
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Alignment DefaultButtonAlignment
     {
-        get => _defaultButtonAlignment;
-        set => _defaultButtonAlignment = value;
+        get => MessageBoxSettings.Defaults.DefaultButtonAlignment;
+        set => MessageBoxSettings.Defaults.DefaultButtonAlignment = value;
     }
 
     /// <summary>

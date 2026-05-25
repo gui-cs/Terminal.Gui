@@ -17,8 +17,6 @@ namespace Terminal.Gui.Views;
 /// <seealso cref="Window"/>
 public class FrameView : View
 {
-    private static LineStyle _defaultBorderStyle = LineStyle.Rounded; // Resources/config.json overrides
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="FrameView"/> class.
     ///     layout.
@@ -44,7 +42,7 @@ public class FrameView : View
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
-        get => _defaultBorderStyle;
-        set => _defaultBorderStyle = value;
+        get => FrameViewSettings.Defaults.DefaultBorderStyle;
+        set => FrameViewSettings.Defaults.DefaultBorderStyle = value;
     }
 }

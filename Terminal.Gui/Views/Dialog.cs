@@ -64,25 +64,41 @@ public class Dialog : Dialog<int>
     ///     <see cref="ConfigurationManager"/> and theme files.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.Heavy;
+    public static LineStyle DefaultBorderStyle
+    {
+        get => DialogSettings.Defaults.DefaultBorderStyle;
+        set => DialogSettings.Defaults.DefaultBorderStyle = value;
+    }
 
     /// <summary>
     ///     The default button alignment for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment { get; set; } = Alignment.End;
+    public static Alignment DefaultButtonAlignment
+    {
+        get => DialogSettings.Defaults.DefaultButtonAlignment;
+        set => DialogSettings.Defaults.DefaultButtonAlignment = value;
+    }
 
     /// <summary>
     ///     The default button alignment modes for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static AlignmentModes DefaultButtonAlignmentModes { get; set; } = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems;
+    public static AlignmentModes DefaultButtonAlignmentModes
+    {
+        get => DialogSettings.Defaults.DefaultButtonAlignmentModes;
+        set => DialogSettings.Defaults.DefaultButtonAlignmentModes = value;
+    }
 
     /// <summary>
     ///     The default shadow style for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyles DefaultShadow { get; set; } = ShadowStyles.Transparent;
+    public static ShadowStyles DefaultShadow
+    {
+        get => DialogSettings.Defaults.DefaultShadow;
+        set => DialogSettings.Defaults.DefaultShadow = value;
+    }
 
     /// <summary>
     ///     Helper property that gets whether the dialog was canceled (Result is <see langword="null"/> or 1).

@@ -238,14 +238,14 @@ public static partial class Application
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static AppModel AppModel
     {
-        get;
+        get => ApplicationSettings.Defaults.AppModel;
         set
         {
-            AppModel oldValue = field;
-            field = value;
-            AppModelChanged?.Invoke (null, new ValueChangedEventArgs<AppModel> (oldValue, field));
+            AppModel oldValue = ApplicationSettings.Defaults.AppModel;
+            ApplicationSettings.Defaults.AppModel = value;
+            AppModelChanged?.Invoke (null, new ValueChangedEventArgs<AppModel> (oldValue, value));
         }
-    } = AppModel.FullScreen;
+    }
 
     /// <summary>
     ///     Gets or sets an override for the initial cursor position used in <see cref="AppModel.Inline"/> mode.
@@ -268,14 +268,14 @@ public static partial class Application
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver
     {
-        get;
+        get => ApplicationSettings.Defaults.ForceDriver;
         set
         {
-            string oldValue = field;
-            field = value;
-            ForceDriverChanged?.Invoke (null, new ValueChangedEventArgs<string> (oldValue, field));
+            string oldValue = ApplicationSettings.Defaults.ForceDriver;
+            ApplicationSettings.Defaults.ForceDriver = value;
+            ForceDriverChanged?.Invoke (null, new ValueChangedEventArgs<string> (oldValue, value));
         }
-    } = string.Empty;
+    }
 
     /// <summary>
     ///     Gets or sets the default key bindings for Application-level commands, optionally varying by platform.

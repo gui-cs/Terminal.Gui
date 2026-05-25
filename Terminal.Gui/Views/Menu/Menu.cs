@@ -51,7 +51,11 @@ public class Menu : Bar, IValue<MenuItem?>
     ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+    public static LineStyle DefaultBorderStyle
+    {
+        get => MenuSettings.Defaults.DefaultBorderStyle;
+        set => MenuSettings.Defaults.DefaultBorderStyle = value;
+    }
 
     /// <inheritdoc/>
     public Menu () : this ([]) { }

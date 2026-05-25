@@ -6,7 +6,7 @@ namespace Terminal.Gui.Configuration;
 public class FrameViewSettings
 {
     /// <summary>Gets or sets the default border style for frame views.</summary>
-    public LineStyle DefaultBorderStyle { get; set; } = LineStyle.Single;
+    public LineStyle DefaultBorderStyle { get; set; } = LineStyle.Rounded;
 
     /// <summary>
     ///     The static facade instance. Always contains the current effective values.

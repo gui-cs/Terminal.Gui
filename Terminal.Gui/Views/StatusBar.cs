@@ -9,8 +9,6 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class StatusBar : Bar, IDesignable
 {
-    private static LineStyle _defaultSeparatorLineStyle = LineStyle.Single; // Resources/config.json overrides
-
     /// <inheritdoc/>
     public StatusBar () : this ([]) { }
 
@@ -59,8 +57,8 @@ public class StatusBar : Bar, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultSeparatorLineStyle
     {
-        get => _defaultSeparatorLineStyle;
-        set => _defaultSeparatorLineStyle = value;
+        get => StatusBarSettings.Defaults.DefaultSeparatorLineStyle;
+        set => StatusBarSettings.Defaults.DefaultSeparatorLineStyle = value;
     }
 
     /// <inheritdoc />
