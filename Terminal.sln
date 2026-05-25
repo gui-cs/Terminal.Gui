@@ -127,6 +127,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerformanceTests", "Tests\P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAotSmoke", "Tests\NativeAotSmoke\NativeAotSmoke.csproj", "{EDCF263F-2BB3-4AE4-ADCD-7DB9A9AB08A8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Terminal.Gui.Interop.Spectre", "Terminal.Gui.Interop.Spectre\Terminal.Gui.Interop.Spectre.csproj", "{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -329,6 +331,18 @@ Global
 		{EDCF263F-2BB3-4AE4-ADCD-7DB9A9AB08A8}.Release|x64.Build.0 = Release|Any CPU
 		{EDCF263F-2BB3-4AE4-ADCD-7DB9A9AB08A8}.Release|x86.ActiveCfg = Release|Any CPU
 		{EDCF263F-2BB3-4AE4-ADCD-7DB9A9AB08A8}.Release|x86.Build.0 = Release|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Debug|x64.Build.0 = Debug|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Debug|x86.Build.0 = Debug|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Release|x64.ActiveCfg = Release|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Release|x64.Build.0 = Release|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Release|x86.ActiveCfg = Release|Any CPU
+		{9F70B0A0-8CC2-4384-93FE-359C0D6A0BD6}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
