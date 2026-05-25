@@ -3,10 +3,10 @@ using UnitTests;
 
 namespace ViewsTests;
 
-// Claude - Opus 4.7
+// Copilot
 
 /// <summary>
-///     Diagnostic tests for issue #5356 — tabbed redraw/layout fan-out.
+///     Diagnostic tests for issue #5357 — tabbed redraw/layout fan-out.
 /// </summary>
 /// <remarks>
 ///     <para>

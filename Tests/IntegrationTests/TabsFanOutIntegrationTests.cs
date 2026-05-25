@@ -3,13 +3,13 @@ using AppTestHelpers;
 
 namespace IntegrationTests;
 
-// Claude - Opus 4.7
+// Copilot
 
 /// <summary>
 ///     Integration counterpart to <c>TabsFanOutDiagnosticTests</c>. Drives the active tab via real
 ///     key injection through the driver's input processor → command dispatch → main-loop
 ///     <c>LayoutAndDraw</c> path, instead of mutating <see cref="View.Viewport"/> directly. This
-///     verifies the fan-out from issue #4973 / #5356 is observable end-to-end, not just under
+///     verifies the fan-out from issue #4973 / #5357 is observable end-to-end, not just under
 ///     synthetic <see cref="View.Layout()"/> / <see cref="View.Draw"/> calls.
 /// </summary>
 /// <remarks>

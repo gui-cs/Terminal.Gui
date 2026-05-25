@@ -1,6 +1,6 @@
 namespace ViewBaseTests.Layout;
 
-// Claude - Opus 4.7
+// Copilot
 
 /// <summary>
 ///     Tests for the split between downward subtree invalidation and upward ancestor-only
