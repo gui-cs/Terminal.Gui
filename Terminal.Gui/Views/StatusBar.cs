@@ -1,3 +1,5 @@
+#pragma warning disable CS0618 // Obsolete - StatusBar still uses ConfigurationManager.Applied during transition
+
 namespace Terminal.Gui.Views;
 
 /// <summary>

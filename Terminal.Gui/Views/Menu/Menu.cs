@@ -1,5 +1,7 @@
 using Terminal.Gui.Tracing;
 
+#pragma warning disable CS0618 // Obsolete - Menu still uses ConfigurationManager.Applied during transition
+
 namespace Terminal.Gui.Views;
 
 /// <summary>

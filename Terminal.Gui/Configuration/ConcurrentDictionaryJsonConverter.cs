@@ -3,6 +3,8 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+#pragma warning disable CS0618 // Obsolete - JSON converter still uses ConfigurationManager.SerializerContext during transition
+
 namespace Terminal.Gui.Configuration;
 
 internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDictionary<string, T>>

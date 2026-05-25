@@ -6,6 +6,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
+#pragma warning disable CS0618 // Obsolete - ScopeJsonConverter still uses ConfigurationManager internally during transition
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>

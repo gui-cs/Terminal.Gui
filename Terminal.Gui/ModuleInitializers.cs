@@ -1,6 +1,8 @@
 using System.Runtime.CompilerServices;
 using Terminal.Gui.Configuration;
 
+#pragma warning disable CS0618 // Obsolete - ConfigurationManager still used internally during transition
+
 namespace Terminal.Gui;
 
 /// <summary>
@@ -32,3 +34,5 @@ internal static class ModuleInitializers
         // via InitializeConfigurationManagement()
     }
 }
+
+#pragma warning restore CS0618

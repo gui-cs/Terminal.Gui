@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
+#pragma warning disable CS0618 // Obsolete - AppSettingsScope references ConfigurationPropertyAttribute in docs
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>The <see cref="Scope{T}"/> class for application-defined configuration settings.</summary>

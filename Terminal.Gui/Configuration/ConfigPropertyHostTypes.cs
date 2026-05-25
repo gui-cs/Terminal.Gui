@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable CS0618 // Obsolete - ConfigPropertyHostTypes references ConfigurationPropertyAttribute during transition
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
@@ -25,6 +27,7 @@ namespace Terminal.Gui.Configuration;
 ///         consumer apps.
 ///     </para>
 /// </remarks>
+[Obsolete ("Being replaced by Microsoft.Extensions.Configuration. Will be removed in a future version.")]
 internal static class ConfigPropertyHostTypes
 {
     private const DynamicallyAccessedMemberTypes PRESERVED_MEMBERS = DynamicallyAccessedMemberTypes.PublicProperties;

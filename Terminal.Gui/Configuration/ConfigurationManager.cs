@@ -8,6 +8,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Trace = Terminal.Gui.Tracing.Trace;
 
+#pragma warning disable CS0618 // Obsolete - ConfigurationManager uses ConfigProperty/SettingsScope/ThemeScope internally
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
@@ -46,6 +48,7 @@ namespace Terminal.Gui.Configuration;
 ///         See the UICatalog example for a complete example of how to use ConfigurationManager.
 ///     </para>
 /// </summary>
+[Obsolete ("ConfigurationManager is being replaced by Microsoft.Extensions.Configuration. Use TuiConfigurationBuilder instead. Will be removed in a future version.")]
 public static class ConfigurationManager
 {
     private static readonly Lock _appNameLock = new ();

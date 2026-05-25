@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using Terminal.Gui.Tracing;
 
+#pragma warning disable CS0618 // Obsolete - MenuBar still uses ConfigurationManager.Applied during transition
+
 namespace Terminal.Gui.Views;
 
 /// <summary>

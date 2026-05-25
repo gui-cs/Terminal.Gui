@@ -5,6 +5,8 @@ using System.Reflection;
 using System.Text.Json;
 using Trace = Terminal.Gui.Tracing.Trace;
 
+#pragma warning disable CS0618 // Obsolete - SourcesManager still uses ConfigurationManager internally during transition
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>

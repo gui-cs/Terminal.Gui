@@ -4,7 +4,9 @@
 
 global using Attribute = Terminal.Gui.Drawing.Attribute;
 global using Color = Terminal.Gui.Drawing.Color;
+#pragma warning disable CS0618 // Obsolete - ConfigurationManager alias and ConfigurationPropertyAttribute still used internally during transition
 global using CM = Terminal.Gui.Configuration.ConfigurationManager;
+#pragma warning restore CS0618
 global using Terminal.Gui.App;
 global using Terminal.Gui.Testing;
 global using Terminal.Gui.Time;
@@ -21,6 +23,8 @@ using System.Globalization;
 using System.Reflection;
 using System.Resources;
 using Terminal.Gui.Tracing;
+
+#pragma warning disable CS0618 // Obsolete - Application still uses ConfigurationPropertyAttribute/SettingsScope during transition
 
 namespace Terminal.Gui.App;
 

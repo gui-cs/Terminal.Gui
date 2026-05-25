@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 
+#pragma warning disable CS0618 // Obsolete - LineCanvas still uses ConfigurationManager.Applied during transition
+
 namespace Terminal.Gui.Drawing;
 
 /// <summary>
