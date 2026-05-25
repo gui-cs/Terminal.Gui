@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
@@ -151,6 +152,8 @@ public class TuiConfigurationBuilder
     /// <param name="sectionName">The JSON section name to bind from.</param>
     /// <param name="apply">Action to apply the bound settings (typically update a static Defaults property).</param>
     /// <returns>This builder for chaining.</returns>
+    [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050", Justification = "Settings POCOs are simple types; no generic instantiation needed at runtime.")]
     public TuiConfigurationBuilder BindAppSettings<T> (string sectionName, Action<T> apply) where T : new ()
     {
         T settings = new ();
@@ -160,6 +163,8 @@ public class TuiConfigurationBuilder
         return this;
     }
 
+    [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050", Justification = "Settings POCOs are simple types; no generic instantiation needed at runtime.")]
     private static void BindSection<T> (IConfiguration config, string sectionName, Action<T> apply) where T : new ()
     {
         T settings = new ();

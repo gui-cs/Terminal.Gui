@@ -7,8 +7,10 @@ public class ScopeJsonConverterTests
 {
     [Theory]
     [InlineData ("\"ConfigurationManager.ThrowOnJsonErrors\":true")]
+    [InlineData ("\"Key.Separator\":\"@\"")]
     [InlineData ("\"Themes\":[]")]
     [InlineData ("\"Themes\":[{\"themeName\":{}}]")]
+    [InlineData ("\"Themes\":[{\"themeName\":{\"Dialog.DefaultButtonAlignment\":\"End\"}}]")]
     public void RoundTripConversion_Property_Positive (string configPropertyJson)
     {
         // Arrange

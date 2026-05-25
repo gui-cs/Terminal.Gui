@@ -31,8 +31,8 @@
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
         <IsTrimmable>true</IsTrimmable>
         <IsAotCompatible>true</IsAotCompatible>
-        <!-- Suppress IL2026 warnings - all JSON converters are AOT-compatible via source generation -->
-        <NoWarn>$(NoWarn);IL2026</NoWarn>
+        <!-- Suppress IL2026/IL3050 warnings - all JSON converters are AOT-compatible via source generation -->
+        <NoWarn>$(NoWarn);IL2026;IL3050</NoWarn>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <DefineDebug>true</DefineDebug>

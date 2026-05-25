@@ -141,10 +141,8 @@ internal class ScopeJsonConverter<
                 }
                 else
                 {
-                    // Unknown property - skip it for forward/backward compatibility.
-                    // Properties migrated from CM to MEC no longer carry [ConfigurationProperty]
-                    // but may still appear in config files during the transition period.
-                    reader.Skip ();
+                    // Unknown property
+                    throw new JsonException ($"{propertyName}: Unknown property name.");
                 }
             }
         }

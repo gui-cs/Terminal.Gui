@@ -28,6 +28,7 @@ public class Glyphs
 
     /// <summary>Unicode replacement character; used by Drivers when rendering in cases where a wide glyph can't
     /// be output because it would be clipped. Defaults to ' ' (Space).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune WideGlyphReplacement
     {
         get => GlyphSettings.Defaults.WideGlyphReplacement;
@@ -35,6 +36,7 @@ public class Glyphs
     }
 
     /// <summary>File icon.  Defaults to â˜° (Trigram For Heaven)</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune File
     {
         get => GlyphSettings.Defaults.File;
@@ -42,6 +44,7 @@ public class Glyphs
     }
 
     /// <summary>Folder icon.  Defaults to ê¤‰ (Kayah Li Digit Nine)</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Folder
     {
         get => GlyphSettings.Defaults.Folder;
@@ -49,6 +52,7 @@ public class Glyphs
     }
 
     /// <summary>Horizontal Ellipsis - â€¦ U+2026</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HorizontalEllipsis
     {
         get => GlyphSettings.Defaults.HorizontalEllipsis;
@@ -56,6 +60,7 @@ public class Glyphs
     }
 
     /// <summary>Vertical Four Dots - âž U+205e</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VerticalFourDots
     {
         get => GlyphSettings.Defaults.VerticalFourDots;
@@ -65,6 +70,7 @@ public class Glyphs
     #region ----------------- Single Glyphs -----------------
 
     /// <summary>Null symbol ('â€')</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Null
     {
         get => GlyphSettings.Defaults.Null;
@@ -72,6 +78,7 @@ public class Glyphs
     }
 
     /// <summary>Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CheckStateChecked // 'â˜‘' is colored
     {
         get => GlyphSettings.Defaults.CheckStateChecked;
@@ -79,6 +86,7 @@ public class Glyphs
     }
 
     /// <summary>Not Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CheckStateUnChecked
     {
         get => GlyphSettings.Defaults.CheckStateUnChecked;
@@ -86,6 +94,7 @@ public class Glyphs
     }
 
     /// <summary>Null Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CheckStateNone // TODO: Verify this works as broadly as possible
     {
         get => GlyphSettings.Defaults.CheckStateNone;
@@ -93,6 +102,7 @@ public class Glyphs
     }
 
     /// <summary>Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="OptionSelector"/>).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Selected
     {
         get => GlyphSettings.Defaults.Selected;
@@ -100,6 +110,7 @@ public class Glyphs
     }
 
     /// <summary>Not Selected indicator (e.g. for <see cref="ListView"/> and <see cref="OptionSelector"/>).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune UnSelected
     {
         get => GlyphSettings.Defaults.UnSelected;
@@ -107,6 +118,7 @@ public class Glyphs
     }
 
     /// <summary>Horizontal arrow.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightArrow
     {
         get => GlyphSettings.Defaults.RightArrow;
@@ -114,6 +126,7 @@ public class Glyphs
     }
 
     /// <summary>Left arrow.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftArrow
     {
         get => GlyphSettings.Defaults.LeftArrow;
@@ -121,6 +134,7 @@ public class Glyphs
     }
 
     /// <summary>Down arrow.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune DownArrow
     {
         get => GlyphSettings.Defaults.DownArrow;
@@ -128,6 +142,7 @@ public class Glyphs
     }
 
     /// <summary>Vertical arrow.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune UpArrow
     {
         get => GlyphSettings.Defaults.UpArrow;
@@ -135,6 +150,7 @@ public class Glyphs
     }
 
     /// <summary>Left default indicator (e.g. for <see cref="Button"/>.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftDefaultIndicator
     {
         get => GlyphSettings.Defaults.LeftDefaultIndicator;
@@ -142,6 +158,7 @@ public class Glyphs
     }
 
     /// <summary>Horizontal default indicator (e.g. for <see cref="Button"/>.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightDefaultIndicator
     {
         get => GlyphSettings.Defaults.RightDefaultIndicator;
@@ -149,6 +166,7 @@ public class Glyphs
     }
 
     /// <summary>Left Bracket (e.g. for <see cref="Button"/>. Default is (U+005B) - [.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftBracket
     {
         get => GlyphSettings.Defaults.LeftBracket;
@@ -156,6 +174,7 @@ public class Glyphs
     }
 
     /// <summary>Horizontal Bracket (e.g. for <see cref="Button"/>. Default is (U+005D) - ].</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightBracket
     {
         get => GlyphSettings.Defaults.RightBracket;
@@ -163,6 +182,7 @@ public class Glyphs
     }
 
     /// <summary>Half block meter segment (e.g. for <see cref="ProgressBar"/>).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BlocksMeterSegment
     {
         get => GlyphSettings.Defaults.BlocksMeterSegment;
@@ -170,6 +190,7 @@ public class Glyphs
     }
 
     /// <summary>Continuous block meter segment (e.g. for <see cref="ProgressBar"/>).</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ContinuousMeterSegment
     {
         get => GlyphSettings.Defaults.ContinuousMeterSegment;
@@ -177,6 +198,7 @@ public class Glyphs
     }
 
     /// <summary>Stipple pattern (e.g. for <see cref="ScrollBar"/>). Default is Light Shade (U+2591) - â–‘.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Stipple
     {
         get => GlyphSettings.Defaults.Stipple;
@@ -184,6 +206,7 @@ public class Glyphs
     }
 
     /// <summary>Diamond. Default is Lozenge (U+25CA) - â—Š.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Diamond
     {
         get => GlyphSettings.Defaults.Diamond;
@@ -191,6 +214,7 @@ public class Glyphs
     }
 
     /// <summary>Close. Default is Heavy Ballot X (U+2718) - âœ˜.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Close
     {
         get => GlyphSettings.Defaults.Close;
@@ -198,6 +222,7 @@ public class Glyphs
     }
 
     /// <summary>Minimize. Default is Lower Horizontal Shadowed White Circle (U+274F) - â.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Minimize
     {
         get => GlyphSettings.Defaults.Minimize;
@@ -205,6 +230,7 @@ public class Glyphs
     }
 
     /// <summary>Maximize. Default is Upper Horizontal Shadowed White Circle (U+273D) - âœ½.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Maximize
     {
         get => GlyphSettings.Defaults.Maximize;
@@ -212,6 +238,7 @@ public class Glyphs
     }
 
     /// <summary>Dot. Default is (U+2219) - âˆ™.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Dot
     {
         get => GlyphSettings.Defaults.Dot;
@@ -219,6 +246,7 @@ public class Glyphs
     }
 
     /// <summary>Dotted Square - â¬š U+02b1aâ”</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune DottedSquare
     {
         get => GlyphSettings.Defaults.DottedSquare;
@@ -226,6 +254,7 @@ public class Glyphs
     }
 
     /// <summary>Black Circle . Default is (U+025cf) - â—.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BlackCircle // Black Circle - â— U+025cf
     {
         get => GlyphSettings.Defaults.BlackCircle;
@@ -233,6 +262,7 @@ public class Glyphs
     }
 
     /// <summary>Expand (e.g. for <see cref="TreeView"/>.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Expand
     {
         get => GlyphSettings.Defaults.Expand;
@@ -240,6 +270,7 @@ public class Glyphs
     }
 
     /// <summary>Expand (e.g. for <see cref="TreeView"/>.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Collapse
     {
         get => GlyphSettings.Defaults.Collapse;
@@ -247,6 +278,7 @@ public class Glyphs
     }
 
     /// <summary>Identical To (U+226)</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune IdenticalTo
     {
         get => GlyphSettings.Defaults.IdenticalTo;
@@ -254,6 +286,7 @@ public class Glyphs
     }
 
     /// <summary>Move indicator. Default is Lozenge (U+25CA) - â—Š.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Move
     {
         get => GlyphSettings.Defaults.Move;
@@ -261,6 +294,7 @@ public class Glyphs
     }
 
     /// <summary>Size Horizontally indicator. Default is â”¥Left Right Arrow - â†” U+02194</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune SizeHorizontal
     {
         get => GlyphSettings.Defaults.SizeHorizontal;
@@ -268,6 +302,7 @@ public class Glyphs
     }
 
     /// <summary>Size Vertical indicator. Default Up Down Arrow - â†• U+02195</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune SizeVertical
     {
         get => GlyphSettings.Defaults.SizeVertical;
@@ -275,6 +310,7 @@ public class Glyphs
     }
 
     /// <summary>Size Top Left indicator. North West Arrow - â†– U+02196</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune SizeTopLeft
     {
         get => GlyphSettings.Defaults.SizeTopLeft;
@@ -282,6 +318,7 @@ public class Glyphs
     }
 
     /// <summary>Size Top Right indicator. North East Arrow - â†— U+02197</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune SizeTopRight
     {
         get => GlyphSettings.Defaults.SizeTopRight;
@@ -289,6 +326,7 @@ public class Glyphs
     }
 
     /// <summary>Size Bottom Right indicator. South East Arrow - â†˜ U+02198</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune SizeBottomRight
     {
         get => GlyphSettings.Defaults.SizeBottomRight;
@@ -296,6 +334,7 @@ public class Glyphs
     }
 
     /// <summary>Size Bottom Left indicator. South West Arrow - â†™ U+02199</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune SizeBottomLeft
     {
         get => GlyphSettings.Defaults.SizeBottomLeft;
@@ -303,6 +342,7 @@ public class Glyphs
     }
 
     /// <summary>Apple (non-BMP). Because snek. And because it's an example of a non-BMP surrogate pair. See Issue #2610.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Apple // nonBMP
     {
         get => GlyphSettings.Defaults.Apple;
@@ -310,6 +350,7 @@ public class Glyphs
     }
 
     /// <summary>Apple (BMP). Because snek. See Issue #2610.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune AppleBMP
     {
         get => GlyphSettings.Defaults.AppleBMP;
@@ -317,6 +358,7 @@ public class Glyphs
     }
 
     /// <summary>Copy indicator. Two Joined Squares - â§‰ U+29C9. Used for code block copy buttons.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Copy
     {
         get => GlyphSettings.Defaults.Copy;
@@ -328,6 +370,7 @@ public class Glyphs
     #region ----------------- Lines -----------------
 
     /// <summary>Box Drawings Horizontal Line - Light (U+2500) - â”€</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLine
     {
         get => GlyphSettings.Defaults.HLine;
@@ -335,6 +378,7 @@ public class Glyphs
     }
 
     /// <summary>Box Drawings Vertical Line - Light (U+2502) - â”‚</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLine
     {
         get => GlyphSettings.Defaults.VLine;
@@ -342,6 +386,7 @@ public class Glyphs
     }
 
     /// <summary>Box Drawings Double Horizontal (U+2550) - â•</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLineDbl
     {
         get => GlyphSettings.Defaults.HLineDbl;
@@ -350,6 +395,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Double Vertical (U+2551) - â•‘</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineDbl
 
     {
@@ -362,6 +408,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Double Dash Horizontal (U+254D) - â•</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLineHvDa2
 
     {
@@ -373,6 +420,7 @@ public class Glyphs
     }
 
     /// <summary>Box Drawings Heavy Triple Dash Vertical (U+2507) - â”‡</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineHvDa3
     {
         get => GlyphSettings.Defaults.VLineHvDa3;
@@ -381,6 +429,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Triple Dash Horizontal (U+2505) - â”…</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLineHvDa3
 
     {
@@ -393,6 +442,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Quadruple Dash Horizontal (U+2509) - â”‰</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLineHvDa4
 
     {
@@ -405,6 +455,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Double Dash Vertical (U+254F) - â•</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineHvDa2
 
     {
@@ -417,6 +468,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Quadruple Dash Vertical (U+250B) - â”‹</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineHvDa4
 
     {
@@ -429,6 +481,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Double Dash Horizontal (U+254C) - â•Œ</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLineDa2
 
     {
@@ -441,6 +494,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Triple Dash Vertical (U+2506) - â”†</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineDa3
 
     {
@@ -453,6 +507,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Triple Dash Horizontal (U+2504) - â”„</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLineDa3
 
     {
@@ -465,6 +520,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Quadruple Dash Horizontal (U+2508) - â”ˆ</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLineDa4
 
     {
@@ -477,6 +533,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Double Dash Vertical (U+254E) - â•Ž</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineDa2
 
     {
@@ -489,6 +546,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Quadruple Dash Vertical (U+250A) - â”Š</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineDa4
 
     {
@@ -501,6 +559,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Horizontal (U+2501) - â”</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HLineHv
 
     {
@@ -513,6 +572,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Vertical (U+2503) - â”ƒ</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune VLineHv
 
     {
@@ -525,6 +585,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Left (U+2574) - â•´</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HalfLeftLine
 
     {
@@ -537,6 +598,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Vertical (U+2575) - â•µ</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HalfTopLine
 
     {
@@ -549,6 +611,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Horizontal (U+2576) - â•¶</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HalfRightLine
 
     {
@@ -561,6 +624,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Down (U+2577) - â•·</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HalfBottomLine
 
     {
@@ -573,6 +637,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Left (U+2578) - â•¸</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HalfLeftLineHv
 
     {
@@ -585,6 +650,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Vertical (U+2579) - â•¹</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HalfTopLineHv
 
     {
@@ -597,6 +663,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Horizontal (U+257A) - â•º</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HalfRightLineHv
 
     {
@@ -609,6 +676,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Vertical and Horizontal (U+257B) - â•»</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune HalfBottomLineLt
 
     {
@@ -621,6 +689,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Horizontal and Heavy Horizontal (U+257C) - â•¼</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightSideLineLtHv
 
     {
@@ -633,6 +702,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Light Vertical and Heavy Horizontal (U+257D) - â•½</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BottomSideLineLtHv
 
     {
@@ -645,6 +715,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Left and Light Horizontal (U+257E) - â•¾</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftSideLineHvLt
 
     {
@@ -657,6 +728,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Vertical and Light Horizontal (U+257F) - â•¿</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune TopSideLineHvLt
 
     {
@@ -673,6 +745,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Upper Left Corner - Light Vertical and Light Horizontal (U+250C) - â”Œ</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ULCorner
 
     {
@@ -685,6 +758,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Upper Left Corner -  Double (U+2554) - â•”</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ULCornerDbl
 
     {
@@ -697,6 +771,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Upper Left Corner - Light Arc Down and Horizontal (U+256D) - â•­</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ULCornerR
 
     {
@@ -709,6 +784,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Down and Horizontal (U+250F) - â”</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ULCornerHv
 
     {
@@ -721,6 +797,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Down Heavy and Horizontal Light (U+251E) - â”Ž</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ULCornerHvLt
 
     {
@@ -733,6 +810,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Down Light and Horizontal Heavy (U+250D) - â”Ž</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ULCornerLtHv
 
     {
@@ -745,6 +823,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Double Down and Single Horizontal (U+2553) - â•“</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ULCornerDblSingle
 
     {
@@ -757,6 +836,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Single Down and Double Horizontal (U+2552) - â•’</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ULCornerSingleDbl
 
     {
@@ -773,6 +853,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Left Corner - Light Vertical and Light Horizontal (U+2514) - â””</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LLCorner
 
     {
@@ -785,6 +866,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Vertical and Horizontal (U+2517) - â”—</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LLCornerHv
 
     {
@@ -797,6 +879,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Vertical and Horizontal Light (U+2516) - â”–</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LLCornerHvLt
 
     {
@@ -809,6 +892,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Vertical Light and Horizontal Heavy (U+2511) - â”•</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LLCornerLtHv
 
     {
@@ -821,6 +905,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Double Vertical and Double Left (U+255A) - â•š</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LLCornerDbl
 
     {
@@ -833,6 +918,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Single Vertical and Double Left (U+2558) - â•˜</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LLCornerSingleDbl
 
     {
@@ -845,6 +931,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Double Down and Single Left (U+2559) - â•™</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LLCornerDblSingle
 
     {
@@ -857,6 +944,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Upper Left Corner - Light Arc Down and Left (U+2570) - â•°</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LLCornerR
 
     {
@@ -873,6 +961,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Upper Horizontal Corner - Light Vertical and Light Horizontal (U+2510) - â”</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune URCorner
 
     {
@@ -885,6 +974,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Upper Horizontal Corner - Double Vertical and Double Horizontal (U+2557) - â•—</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune URCornerDbl
 
     {
@@ -897,6 +987,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Upper Horizontal Corner - Light Arc Vertical and Horizontal (U+256E) - â•®</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune URCornerR
 
     {
@@ -909,6 +1000,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Down and Left (U+2513) - â”“</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune URCornerHv
 
     {
@@ -921,6 +1013,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Heavy Vertical and Left Down Light (U+2511) - â”‘</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune URCornerHvLt
 
     {
@@ -933,6 +1026,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Down Light and Horizontal Heavy (U+2514) - â”’</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune URCornerLtHv
 
     {
@@ -945,6 +1039,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Double Vertical and Single Left (U+2556) - â•–</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune URCornerDblSingle
 
     {
@@ -957,6 +1052,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Single Vertical and Double Left (U+2555) - â••</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune URCornerSingleDbl
 
     {
@@ -973,6 +1069,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Right Corner - Light (U+2518) - â”˜</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LRCorner
 
     {
@@ -985,6 +1082,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Right Corner - Double (U+255D) - â•</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LRCornerDbl
 
     {
@@ -997,6 +1095,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Right Corner - Rounded (U+256F) - â•¯</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LRCornerR
 
     {
@@ -1009,6 +1108,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Right Corner - Heavy (U+251B) - â”›</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LRCornerHv
 
     {
@@ -1021,6 +1121,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Right Corner - Double Vertical and Single Horizontal (U+255C) - â•œ</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LRCornerDblSingle
 
     {
@@ -1033,6 +1134,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Right Corner - Single Vertical and Double Horizontal (U+255B) - â•›</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LRCornerSingleDbl
 
     {
@@ -1045,6 +1147,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Right Corner - Light Vertical and Heavy Horizontal (U+2519) - â”™</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LRCornerLtHv
 
     {
@@ -1057,6 +1160,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Lower Right Corner - Heavy Vertical and Light Horizontal (U+251A) - â”š</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LRCornerHvLt
 
     {
@@ -1073,6 +1177,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Left Tee - Single Vertical and Single Horizontal (U+251C) - â”œ</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftTee
 
     {
@@ -1085,6 +1190,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Left Tee - Single Vertical and Double Horizontal (U+255E) - â•ž</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftTeeDblH
 
     {
@@ -1097,6 +1203,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Left Tee - Double Vertical and Single Horizontal (U+255F) - â•Ÿ</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftTeeDblV
 
     {
@@ -1109,6 +1216,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Left Tee - Double Vertical and Double Horizontal (U+2560) - â• </summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftTeeDbl
 
     {
@@ -1121,6 +1229,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Left Tee - Heavy Horizontal and Light Vertical (U+2523) - â”</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftTeeHvH
 
     {
@@ -1133,6 +1242,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Left Tee - Light Horizontal and Heavy Vertical (U+252B) - â” </summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftTeeHvV
 
     {
@@ -1145,6 +1255,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Left Tee - Heavy Vertical and Heavy Horizontal (U+2527) - â”£</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune LeftTeeHvDblH
 
     {
@@ -1157,6 +1268,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Right Tee - Single Vertical and Single Horizontal (U+2524) - â”¤</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightTee
 
     {
@@ -1169,6 +1281,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Right Tee - Single Vertical and Double Horizontal (U+2561) - â•¡</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightTeeDblH
 
     {
@@ -1181,6 +1294,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Right Tee - Double Vertical and Single Horizontal (U+2562) - â•¢</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightTeeDblV
 
     {
@@ -1193,6 +1307,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Right Tee - Double Vertical and Double Horizontal (U+2563) - â•£</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightTeeDbl
 
     {
@@ -1205,6 +1320,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Right Tee - Heavy Horizontal and Light Vertical (U+2528) - â”¥</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightTeeHvH
 
     {
@@ -1217,6 +1333,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Right Tee - Light Horizontal and Heavy Vertical (U+2530) - â”¨</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightTeeHvV
 
     {
@@ -1229,6 +1346,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Right Tee - Heavy Vertical and Heavy Horizontal (U+252C) - â”«</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune RightTeeHvDblH
 
     {
@@ -1241,6 +1359,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Top Tee - Single Vertical and Single Horizontal (U+252C) - â”¬</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune TopTee
 
     {
@@ -1253,6 +1372,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Top Tee - Single Vertical and Double Horizontal (U+2564) - â•¤</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune TopTeeDblH
 
     {
@@ -1265,6 +1385,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Top Tee - Double Vertical and Single Horizontal  (U+2565) - â•¥</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune TopTeeDblV
 
     {
@@ -1277,6 +1398,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Top Tee - Double Vertical and Double Horizontal (U+2566) - â•¦</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune TopTeeDbl
 
     {
@@ -1289,6 +1411,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Top Tee - Heavy Horizontal and Light Vertical (U+252F) - â”¯</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune TopTeeHvH
 
     {
@@ -1301,6 +1424,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Top Tee - Light Horizontal and Heavy Vertical (U+2537) - â”°</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune TopTeeHvV
 
     {
@@ -1313,6 +1437,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Top Tee - Heavy Vertical and Heavy Horizontal (U+2533) - â”³</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune TopTeeHvDblH
 
     {
@@ -1325,6 +1450,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Bottom Tee - Single Vertical and Single Horizontal (U+2534) - â”´</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BottomTee
 
     {
@@ -1337,6 +1463,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Bottom Tee - Single Vertical and Double Horizontal (U+2567) - â•§</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BottomTeeDblH
 
     {
@@ -1349,6 +1476,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Bottom Tee - Double Vertical and Single Horizontal (U+2568) - â•¨</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BottomTeeDblV
 
     {
@@ -1361,6 +1489,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Bottom Tee - Double Vertical and Double Horizontal (U+2569) - â•©</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BottomTeeDbl
 
     {
@@ -1373,6 +1502,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Bottom Tee - Heavy Horizontal and Light Vertical (U+2535) - â”·</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BottomTeeHvH
 
     {
@@ -1385,6 +1515,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Bottom Tee - Light Horizontal and Heavy Vertical (U+253D) - â”¸</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BottomTeeHvV
 
     {
@@ -1397,6 +1528,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Bottom Tee - Heavy Vertical and Heavy Horizontal (U+2539) - â”»</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune BottomTeeHvDblH
 
     {
@@ -1413,6 +1545,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Cross - Single Vertical and Single Horizontal (U+253C) - â”¼</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune Cross
 
     {
@@ -1425,6 +1558,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Cross - Single Vertical and Double Horizontal (U+256A) - â•ª</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CrossDblH
 
     {
@@ -1437,6 +1571,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Cross - Double Vertical and Single Horizontal (U+256B) - â•«</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CrossDblV
 
     {
@@ -1449,6 +1584,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Cross - Double Vertical and Double Horizontal (U+256C) - â•¬</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CrossDbl
 
     {
@@ -1461,6 +1597,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Cross - Heavy Horizontal and Light Vertical (U+253F) - â”¿</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CrossHvH
 
     {
@@ -1473,6 +1610,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Cross - Light Horizontal and Heavy Vertical (U+2541) - â•‚</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CrossHvV
 
     {
@@ -1485,6 +1623,7 @@ public class Glyphs
 
     /// <summary>Box Drawings Cross - Heavy Vertical and Heavy Horizontal (U+254B) - â•‹</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune CrossHv
 
     {
@@ -1501,6 +1640,7 @@ public class Glyphs
 
     /// <summary>Shadow - Vertical Start - Left Half Block - â–Œ U+0258c</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ShadowVerticalStart // Half: '\u2596'  â––;
 
     {
@@ -1513,6 +1653,7 @@ public class Glyphs
 
     /// <summary>Shadow - Vertical - Left Half Block - â–Œ U+0258c</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ShadowVertical
 
     {
@@ -1525,6 +1666,7 @@ public class Glyphs
 
     /// <summary>Shadow - Horizontal Start - Upper Half Block - â–€ U+02580</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ShadowHorizontalStart // Half: â– U+0259d;
 
     {
@@ -1537,6 +1679,7 @@ public class Glyphs
 
     /// <summary>Shadow - Horizontal - Upper Half Block - â–€ U+02580</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ShadowHorizontal
 
     {
@@ -1549,6 +1692,7 @@ public class Glyphs
 
     /// <summary>Shadow - Horizontal End - Quadrant Upper Left - â–˜ U+02598</summary>
 
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune ShadowHorizontalEnd
 
     {
