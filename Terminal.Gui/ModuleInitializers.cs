@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using Terminal.Gui.Configuration;
 
 namespace Terminal.Gui;
 
@@ -20,6 +21,11 @@ internal static class ModuleInitializers
         // Initialize ConfigurationManager to ensure all configuration properties
         // are loaded deterministically
         ConfigurationManager.Initialize ();
+
+        // After CM initialization, also apply MEC-based settings.
+        // MEC values (from the same config files) take precedence over CM defaults.
+        TuiConfigurationBuilder mecBuilder = new ();
+        mecBuilder.ApplyToStaticFacades ();
 
         // Note: We're only initializing the config properties structure here,
         // not loading settings from files. That still happens during Application.Init()

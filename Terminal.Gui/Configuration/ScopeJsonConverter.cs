@@ -139,10 +139,10 @@ internal class ScopeJsonConverter<
                 }
                 else
                 {
-                    // Unknown property
-                    // TODO: To support forward compatibility, we should just ignore unknown properties?
-                    // TODO: Eg if we read an unknown property, it's possible that the property was added in a later version
-                    throw new JsonException ($"{propertyName}: Unknown property name.");
+                    // Unknown property - skip it for forward/backward compatibility.
+                    // Properties migrated from CM to MEC no longer carry [ConfigurationProperty]
+                    // but may still appear in config files during the transition period.
+                    reader.Skip ();
                 }
             }
         }

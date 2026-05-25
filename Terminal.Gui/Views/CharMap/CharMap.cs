@@ -53,7 +53,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
     /// <summary>
     ///     Gets or sets the default cursor style.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle
     {
         get => CharMapSettings.Defaults.DefaultCursorStyle;

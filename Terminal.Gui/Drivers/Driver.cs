@@ -12,7 +12,6 @@ public sealed class Driver
     ///     Determines if driver instances should use 16 colors instead of the default TrueColors.
     /// </summary>
     /// <seealso cref="IDriver.Force16Colors"/>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool Force16Colors
     {
         get => DriverSettings.Defaults.Force16Colors;
@@ -39,7 +38,6 @@ public sealed class Driver
     ///     size (e.g., over an SSH tunnel).
     /// </summary>
     /// <seealso cref="SizeDetectionMode"/>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static SizeDetectionMode SizeDetection
     {
         get => DriverSettings.Defaults.SizeDetection;
