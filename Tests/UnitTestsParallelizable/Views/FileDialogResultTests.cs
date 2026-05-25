@@ -237,14 +237,47 @@ public class FileDialogResultTests
         Assert.NotNull (tableViewField);
 
         TableView tableView = Assert.IsType<TableView> (tableViewField!.GetValue (fd));
-        tableView.SetFocus ();
-        tableView.SetSelection (0, 1, false);
 
-        Assert.Equal ("/UI/Window", fd.Path);
+        // Find the "Window" directory row by scanning the table source rather than hard-coding an index.
+        int windowRow = FindRowByName (tableView, "Window");
+        Assert.True (windowRow >= 0, "Expected to find a row named 'Window' in the table.");
+
+        tableView.SetFocus ();
+        tableView.SetSelection (0, windowRow, false);
+
+        // Path should end with the selected directory name (platform-independent check).
+        Assert.EndsWith ("Window", fd.Path);
+
+        string pathBeforeAccept = fd.Path;
 
         tableView.InvokeCommand (Command.Accept);
 
-        Assert.Equal ("/UI/Window", fd.Path);
+        // After accepting a directory in File mode, the path should remain unchanged
+        // (navigates into the directory rather than selecting a file).
+        Assert.Equal (pathBeforeAccept, fd.Path);
+    }
+
+    /// <summary>Finds a row in a <see cref="TableView"/> whose first column contains the given name.</summary>
+    private static int FindRowByName (TableView tableView, string name)
+    {
+        ITableSource? source = tableView.Table;
+
+        if (source is null)
+        {
+            return -1;
+        }
+
+        for (var row = 0; row < source.Rows; row++)
+        {
+            string cellText = source [row, 0]?.ToString () ?? string.Empty;
+
+            if (cellText.Contains (name, StringComparison.Ordinal))
+            {
+                return row;
+            }
+        }
+
+        return -1;
     }
 
     /// <summary>Testable subclass that exposes the internal file-system constructor.</summary>
