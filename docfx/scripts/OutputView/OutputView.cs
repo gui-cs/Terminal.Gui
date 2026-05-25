@@ -116,11 +116,10 @@ app.Init (DriverRegistry.Names.ANSI);
 if (live)
 {
     // Live mode: run normally so tuirec can record the interaction.
-    // Write a minimal visible character (block) before the app renders, then pause.
-    // This establishes a baseline frame for tuirec's --trim. After the pause, TG
-    // renders the view (overwriting the block), creating frame 2. This ensures --trim
-    // always produces 2+ GIF frames even for static views.
-    Console.Write ("\x1b[2J\x1b[H\x1b[8m.\x1b[0m");
+    // Write a dot colored to match the agg monokai theme background (#272822 = RGB 39,40,34)
+    // before TG renders, then pause 500ms. This creates 2 visually distinct frames for
+    // tuirec's --trim without any visible preroll artifact.
+    Console.Write ("\x1b[2J\x1b[H\x1b[38;2;39;40;34m.\x1b[0m");
     Console.Out.Flush ();
     Thread.Sleep (500);
 

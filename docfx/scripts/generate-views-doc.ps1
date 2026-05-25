@@ -109,9 +109,9 @@ foreach ($file in $viewFiles) {
                 $isStatic = [string]::IsNullOrEmpty($ks)
                 
                 if ($isStatic) {
-                    # No demo keystrokes — add a Tab to create a focus-change visual
-                    # so --trim produces 2+ frames (initial render + focus shift)
-                    $ks = "wait:1500,Tab,wait:1000"
+                    # No demo keystrokes — click the center to trigger any interactive
+                    # element (menus, popovers) and produce a visual change for --trim
+                    $ks = "wait:1500,click:40:10,wait:1000"
                 }
                 
                 # Append a pause (so final state is visible) then Escape to quit
