@@ -217,19 +217,20 @@ public class MenuItem : Shortcut, IValue
         if (App?.Mouse.LastMousePosition is { } screenPosition && App.TopRunnableView is { } topRunnableView)
         {
             List<View?> viewsUnderMouse = topRunnableView.GetViewsUnderLocation (screenPosition, ViewportSettingsFlags.TransparentMouse);
-            MenuItem? deepestMenuItem = null;
 
-            foreach (View? view in viewsUnderMouse)
+            // GetViewsUnderLocation returns views ordered by depth (deepest last),
+            // so walk from the end to find the deepest MenuItem.
+            for (int i = viewsUnderMouse.Count - 1; i >= 0; i--)
             {
-                if (view is MenuItem menuItem)
+                if (viewsUnderMouse [i] is MenuItem deepestMenuItem)
                 {
-                    deepestMenuItem = menuItem;
-                }
-            }
+                    if (deepestMenuItem != this)
+                    {
+                        return base.OnMouseEnter (eventArgs);
+                    }
 
-            if (deepestMenuItem is { } && deepestMenuItem != this)
-            {
-                return base.OnMouseEnter (eventArgs);
+                    break;
+                }
             }
         }
 
