@@ -108,6 +108,7 @@ if (queryKeyStrokes)
 
 ViewDemoWindow.ViewName = viewName;
 ViewDemoWindow.AddBorderFrame = addBorderFrame;
+ViewDemoWindow.IsLiveMode = live;
 
 IApplication app = Application.Create ();
 app.Init (DriverRegistry.Names.ANSI);
@@ -169,6 +170,7 @@ else
 internal class ViewDemoWindow : Runnable<string>
 {
     public static string? ViewName { get; set; }
+    public static bool IsLiveMode { get; set; }
 
     public ViewDemoWindow ()
     {
@@ -176,8 +178,17 @@ internal class ViewDemoWindow : Runnable<string>
         Width = 80;
         Height = 20;
 
-        // Use only white on black
-        SetScheme (new Scheme (new Attribute (ColorName16.White, ColorName16.Black)));
+        if (!IsLiveMode)
+        {
+            // Use only white on black for static HTML/ANSI capture
+            SetScheme (new Scheme (new Attribute (ColorName16.White, ColorName16.Black)));
+        }
+        else
+        {
+            // In live mode, don't let child Accept bubble up and stop the app
+            CommandsToBubbleUp = [];
+        }
+
         BorderStyle = LineStyle.None;
     }
 

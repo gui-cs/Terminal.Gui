@@ -281,7 +281,8 @@ After every recording, verify:
 | Wide glyphs misaligned in GIF | Emoji/CJK chars are 2-cell wide; agg renders per-cell | Avoid emoji/CJK categories; use single-width ranges (Arrows, Box Drawing, etc.) |
 | Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
 | App doesn't quit | Wrong quit key or key not delivered | Use `Escape` (the default quit key); check `--kitty-keyboard` interaction |
-| Blank frames at start | Startup too slow | Increase `--startup-delay` |
+| Blank frames at start/end | Pre/postroll not trimmed | `--trim` is on by default in v0.4.2+; ensure tuirec is up-to-date |
+| GIF validation: 1 frame | `--trim` removes all frames for static views | Use `--trim=false` for views with no visual change during demo |
 | Recording times out | App stuck / wrong keystrokes | Check with `--verbosity high`, fix script |
 | `--binary` permission error | Relative path on Windows | Use `./` prefix or absolute path with forward slashes |
 | Backtick text missing | PowerShell interpolation | Use single-quoted `$ks` variable |

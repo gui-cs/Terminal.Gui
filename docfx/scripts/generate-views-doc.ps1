@@ -106,20 +106,25 @@ foreach ($file in $viewFiles) {
                 Write-Host "  Querying keystrokes for $viewNameClean..." -ForegroundColor Gray
                 $ks = & dotnet $outputViewDll --view=$viewNameClean --keystrokes 2>$null
                 $ks = $ks.Trim()
+                $isStatic = [string]::IsNullOrEmpty($ks)
                 
-                if ([string]::IsNullOrEmpty($ks)) {
+                if ($isStatic) {
                     # No demo keystrokes — static 2s capture
                     $ks = "wait:2000"
                 }
                 
-                # Append Escape to quit
-                $ks = "$ks,Escape"
+                # Append a pause (so final state is visible) then Escape to quit
+                $ks = "$ks,wait:500,Escape"
                 
                 $gifFile = Join-Path $ImagePath "$viewNameClean.gif"
                 $castFile = Join-Path $ImagePath "$viewNameClean.cast"
                 
                 Write-Host "  Recording $viewNameClean with tuirec..." -ForegroundColor Cyan
                 Write-Host "    Keystrokes: $ks" -ForegroundColor Gray
+                
+                # Use --trim to remove preroll/postroll; fall back to --trim=false
+                # if validation fails (static views may produce only 1 frame after trim)
+                $trimFlag = if ($isStatic) { "--trim=false" } else { "--trim" }
                 
                 tuirec record `
                     --binary dotnet `
@@ -129,10 +134,29 @@ foreach ($file in $viewFiles) {
                     --keystrokes $ks `
                     --startup-delay 0 `
                     --drain 1000 `
+                    $trimFlag `
                     --cols 80 --rows 20 `
                     --output $gifFile `
                     --cast-output $castFile `
                     --verbosity quiet
+                
+                # Retry without trim if validation failed (1-frame GIF)
+                if ($LASTEXITCODE -ne 0 -and -not $isStatic) {
+                    Write-Host "    Retrying without trim..." -ForegroundColor Yellow
+                    tuirec record `
+                        --binary dotnet `
+                        --args "$outputViewDll,--view=$viewNameClean,--live,--frame" `
+                        --name $viewNameClean `
+                        --title $viewNameClean `
+                        --keystrokes $ks `
+                        --startup-delay 0 `
+                        --drain 1000 `
+                        --trim=false `
+                        --cols 80 --rows 20 `
+                        --output $gifFile `
+                        --cast-output $castFile `
+                        --verbosity quiet
+                }
                 
                 if ($LASTEXITCODE -eq 0 -and (Test-Path $gifFile)) {
                     $gifSize = (Get-Item $gifFile).Length
