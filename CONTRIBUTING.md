@@ -306,6 +306,7 @@ foreach (Rune rune in text.EnumerateRunes ())
 - `UnitTestsParallelizable/` - Parallel tests (no static dependencies) - **Preferred**
 - `IntegrationTests/` - Integration tests
 - `StressTests/` - Long-running stress tests (scheduled daily)
+- `NativeAotSmoke/` - AOT smoke-test app used in CI validation
 - `coverlet.runsettings` - Code coverage configuration
 
 **`/Examples/`**:

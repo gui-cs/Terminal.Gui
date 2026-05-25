@@ -16,6 +16,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 - Build Debug: `dotnet build --configuration Debug --no-restore -property:NoWarn=0618%3B0612`
 - Build Release (library): `dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force -property:NoWarn=0618%3B0612`
 - Pack Release: `dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612`
+- Publish `Tests/NativeAotSmoke` with AOT and run `--smoke-test`
 - Build Release solution
 
 ### 2) Build & Run Unit Tests (`.github/workflows/unit-tests.yml`)

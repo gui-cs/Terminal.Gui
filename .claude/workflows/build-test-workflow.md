@@ -80,9 +80,14 @@ dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet te
 
 ## Common Build Issues
 
-### Issue: Restores fail after example repository split
+### Issue: AOT validation failures
 
-**Solution:** Ensure your local clone does not reference removed in-repo example projects.
+**Solution:** Build and publish the in-repo AOT smoke app:
+
+```bash
+dotnet publish ./Tests/NativeAotSmoke/NativeAotSmoke.csproj --configuration Release --output ./aot-publish
+./aot-publish/NativeAotSmoke --smoke-test
+```
 
 ## Build Order Best Practice
 
