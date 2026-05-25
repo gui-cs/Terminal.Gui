@@ -8,8 +8,39 @@ namespace Terminal.Gui.Configuration;
 ///     in the correct precedence order.
 /// </summary>
 /// <remarks>
-///     This is the MEC-based equivalent of the legacy <see cref="SourcesManager"/>.
-///     It is additive — it does not replace or remove the existing CM during the transition period.
+///     <para>
+///         This is the MEC-based replacement for the legacy <see cref="ConfigurationManager"/>.
+///         It provides the same multi-source precedence (library defaults → app defaults → user files
+///         → environment variables → runtime config) using standard Microsoft.Extensions.Configuration.
+///     </para>
+///     <para><b>App Developer Usage:</b></para>
+///     <code>
+///     // Define your app settings POCO:
+///     public class MyAppSettings
+///     {
+///         public string Title { get; set; } = "My App";
+///         public bool DarkMode { get; set; }
+///         public static MyAppSettings Defaults { get; set; } = new ();
+///     }
+///
+///     // In your app startup:
+///     var builder = new TuiConfigurationBuilder ("MyApp");
+///     builder.BindAppSettings&lt;MyAppSettings&gt; ("MyApp", s =&gt; MyAppSettings.Defaults = s);
+///     builder.ApplyToStaticFacades ();
+///
+///     // Access settings:
+///     string title = MyAppSettings.Defaults.Title;
+///     </code>
+///     <para>
+///         To add custom configuration sources, use the MEC extension methods directly:
+///     </para>
+///     <code>
+///     IConfigurationBuilder configBuilder = new ConfigurationBuilder ()
+///         .AddTuiLibraryDefaults ()
+///         .AddTuiUserFiles ("MyApp")
+///         .AddJsonFile ("custom-settings.json", optional: true);
+///     IConfiguration config = configBuilder.Build ();
+///     </code>
 /// </remarks>
 public class TuiConfigurationBuilder
 {
@@ -110,6 +141,23 @@ public class TuiConfigurationBuilder
         BindSection<TextViewSettings> (config, "TextView", s => TextViewSettings.Defaults = s);
         BindSection<WindowSettings> (config, "Window", s => WindowSettings.Defaults = s);
         BindSection<GlyphSettings> (config, "Glyphs", s => GlyphSettings.Defaults = s);
+    }
+
+    /// <summary>
+    ///     Binds a custom application settings section from the configuration to a POCO instance.
+    ///     This is the MEC replacement for the legacy <see cref="AppSettingsScope"/>.
+    /// </summary>
+    /// <typeparam name="T">The settings POCO type.</typeparam>
+    /// <param name="sectionName">The JSON section name to bind from.</param>
+    /// <param name="apply">Action to apply the bound settings (typically update a static Defaults property).</param>
+    /// <returns>This builder for chaining.</returns>
+    public TuiConfigurationBuilder BindAppSettings<T> (string sectionName, Action<T> apply) where T : new ()
+    {
+        T settings = new ();
+        Configuration.GetSection (sectionName).Bind (settings);
+        apply (settings);
+
+        return this;
     }
 
     private static void BindSection<T> (IConfiguration config, string sectionName, Action<T> apply) where T : new ()

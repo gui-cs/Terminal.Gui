@@ -23,6 +23,7 @@ namespace Terminal.Gui.Configuration;
 ///    },
 ///  </code>
 /// </example>
+[Obsolete ("Use Microsoft.Extensions.Configuration with TuiConfigurationBuilder instead. See TuiConfigurationBuilder docs for migration guide.")]
 [JsonConverter (typeof (ScopeJsonConverter<AppSettingsScope>))]
 public class AppSettingsScope : Scope<AppSettingsScope>
 { }
