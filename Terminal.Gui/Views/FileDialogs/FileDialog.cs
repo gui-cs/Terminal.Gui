@@ -315,6 +315,11 @@ public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
             _typeFilterDropDown?.Visible = true;
             _typeFilterDropDown?.Source = new ListWrapper<string> (new ObservableCollection<string> (AllowedTypes.Select (a => a.ToString ()!).ToList ()));
             _typeFilterDropDown?.Value = AllowedTypes [0].ToString () ?? string.Empty;
+
+            if (State is { })
+            {
+                RefreshState ();
+            }
         }
 
         // if no path has been provided
