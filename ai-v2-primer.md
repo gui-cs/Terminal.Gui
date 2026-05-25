@@ -202,5 +202,5 @@ view.KeyBindings.Add (Key.F5, Command.Refresh);
 | Deep-dive docs | `docfx/docs/` |
 | Common UI patterns | `.claude/cookbook/common-patterns.md` |
 | App building guide | `.claude/tasks/build-app.md` |
-| Working examples | `Examples/Example/` (minimal), `Examples/UICatalog/` (comprehensive) |
+| Working examples | `Examples/UICatalog/`, `Examples/ScenarioRunner/`, and [gui-cs/Examples](https://github.com/gui-cs/Examples) |
 | Full agent instructions | `AGENTS.md` |

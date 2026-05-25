@@ -728,7 +728,7 @@ v2 ensures compatibility with Ahead-of-Time compilation:
 - Single-file deployment support
 - Faster startup, reduced runtime overhead
 
-**Example**: See `Examples/NativeAot` for AOT deployment
+**Example**: See [gui-cs/Examples](https://github.com/gui-cs/Examples) for AOT deployment examples.
 
 ### Enhanced Unicode Support
 

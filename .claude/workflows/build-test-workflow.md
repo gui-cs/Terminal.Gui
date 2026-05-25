@@ -80,14 +80,9 @@ dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet te
 
 ## Common Build Issues
 
-### Issue: NativeAot/SelfContained Build Failures
+### Issue: Restores fail after example repository split
 
-**Solution:** Restore these projects explicitly:
-
-```bash
-dotnet restore ./Examples/NativeAot/NativeAot.csproj -f
-dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
-```
+**Solution:** Ensure your local clone does not reference removed in-repo example projects.
 
 ## Build Order Best Practice
 
