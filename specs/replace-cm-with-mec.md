@@ -47,7 +47,7 @@ Analysis of the NativeAot example (PR #5243) shows that a simple login-form app 
 | `Assembly.GetTypes()` reflection scan | `ConfigProperty.cs` | Prevents any type from being trimmed; worst-case AOT pattern |
 | `Activator.CreateInstance` | `DeepCloner.cs` | Prevents trimming of cloned types |
 | `MakeGenericType` | `DeepCloner.cs`, `ScopeJsonConverter.cs` | Prevents trimming of generic instantiations |
-| ~195 `[ConfigurationProperty]` attributes | Throughout codebase (144 on `Glyphs` alone) | Each roots a property |
+| ~188 `[ConfigurationProperty]` attributes | Throughout codebase (144 on `Glyphs` alone) | Each roots a property |
 
 Disabling CM at runtime (`ConfigurationManager.IsEnabled == false`) has **zero impact on binary size** because the rooting annotations are compile-time, not runtime.
 
@@ -133,7 +133,7 @@ public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get;
 **JSON representation:**
 ```json
 {
-  "Application.ForceDriver": "Fake",
+  "Application.ForceDriver": "ansi",
   "Driver.Force16Colors": true
 }
 ```
@@ -145,17 +145,19 @@ public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get;
 - `Application.ForceDriver`
 - `Application.DefaultKeyBindings`
 - `Application.IsMouseDisabled`
+- `Color.Colors16` *(OmitClassName — maps ColorName16 to string)*
 - `ConfigurationManager.ThrowOnJsonErrors`
 - `Driver.Force16Colors`
-- `Driver.ForceMaxColors`
+- `Driver.SizeDetection`
 - `Key.Separator`
-- `MenuBar.UseKeysUpDownAsKeysLeftRight`
+- `MenuBar.DefaultKey` *(F10)*
 - `PopoverMenu.DefaultKey`
 - `FileDialog.DefaultOpenMode`
 - `FileDialogStyle.DefaultSearchMatcher`
 - `FileDialogStyle.PreferResultFromOpenMode`
 - `Trace.EnabledCategories`
 - `View.DefaultKeyBindings` *(keyboard bindings for all Views)*
+- `View.ViewKeyBindings` *(per-View-type keyboard bindings)*
 
 ---
 
@@ -172,7 +174,7 @@ public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get;
 public static ShadowStyles DefaultShadow { get; set; } = ShadowStyles.Opaque;
 
 [ConfigurationProperty(Scope = typeof(ThemeScope))]
-public static HighlightStyle DefaultHighlightStyle { get; set; } = HighlightStyle.PressedOutside | HighlightStyle.Pressed;
+public static MouseState DefaultMouseHighlightStates { get; set; } = MouseState.In | MouseState.Pressed | MouseState.PressedOutside;
 
 // In Glyphs.cs (144 of these)
 [ConfigurationProperty(Scope = typeof(ThemeScope))]
@@ -194,15 +196,16 @@ public static Rune CheckStateChecked { get; set; } = (Rune)'☑';
 ```
 
 **Full list of ThemeScope property host types (as of writing):**
-- `Glyphs` (~144 glyph Runes: CheckStateChecked, CheckStateUnChecked, CheckStateNone, all border/line drawing runes, all scrollbar runes, all arrow glyphs, FileOpen, HorizontalEllipsis, etc.)
-- `Button.DefaultShadow`, `Button.DefaultHighlightStyle`
-- `CheckBox.DefaultCheckState`
-- `Dialog.DefaultShadow`, `Dialog.DefaultBorderStyle`, `Dialog.DefaultMinimumWidth`, `Dialog.DefaultMinimumHeight`
+- `Glyphs` (~130+ glyph Runes: CheckStateChecked, CheckStateUnChecked, CheckStateNone, all border/line drawing runes, all scrollbar runes, all arrow glyphs, FileOpen, HorizontalEllipsis, etc.)
+- `Button.DefaultShadow`, `Button.DefaultMouseHighlightStates`
+- `CheckBox.DefaultMouseHighlightStates`
+- `Dialog.DefaultShadow`, `Dialog.DefaultBorderStyle`, `Dialog.DefaultButtonAlignment`, `Dialog.DefaultButtonAlignmentModes`
 - `FrameView.DefaultBorderStyle`
 - `HexView.DefaultBorderStyle`
 - `Menu.DefaultBorderStyle`
 - `MenuBar.DefaultBorderStyle`
-- `MessageBox.DefaultShadow`, `MessageBox.DefaultBorderStyle`
+- `MessageBox.DefaultBorderStyle`, `MessageBox.DefaultButtonAlignment`
+- `NerdFonts.Enable`
 - `SelectorBase.DefaultBorderStyle`
 - `StatusBar.DefaultBorderStyle`
 - `TextField.DefaultBorderStyle`
@@ -338,7 +341,7 @@ ConfigurationManager.Enable(ConfigLocations.HardCoded);
 // Override a setting programmatically (used in UICatalog's Runner for force-driver):
 ConfigurationManager.RuntimeConfig = """
   {
-    "Application.ForceDriver": "FakeDriver",
+    "Application.ForceDriver": "ansi",
     "Driver.Force16Colors": true
   }
   """;
@@ -378,13 +381,9 @@ ConcurrentDictionary<string, ThemeScope> allThemes = ThemeManager.Themes!;
 - Dark
 - Light
 - TurboPascal 5
-- Catppuccin Mocha
-- Dracula
-- Nord
-- Solarized Dark
-- Solarized Light
-- Gruvbox Dark
-- *(+ others, see config.json)*
+- Anders
+- Green Phosphor
+- Amber Phosphor
 
 **JSON format:**
 ```json
@@ -780,8 +779,8 @@ Each group of related configuration properties becomes a POCO ("Settings class")
 public class ButtonSettings
 {
     public ShadowStyles DefaultShadow { get; set; } = ShadowStyles.Opaque;
-    public HighlightStyle DefaultHighlightStyle { get; set; } =
-        HighlightStyle.PressedOutside | HighlightStyle.Pressed;
+    public MouseState DefaultMouseHighlightStates { get; set; } =
+        MouseState.In | MouseState.Pressed | MouseState.PressedOutside;
 }
 
 // Terminal.Gui/Configuration/Settings/GlyphsSettings.cs
@@ -964,9 +963,9 @@ public class Button : View
 2. **Static facade for defaults** — `ButtonSettings.Defaults` is a static singleton POCO. The parameterless constructor reads from it. The DI path injects a live monitor. The facade is updated by the MEC binding.
 3. **Ambient DI resolution** — Use `Application.Services.GetService<IOptionsMonitor<ButtonSettings>>()` internally when no explicit injection is provided. Familiar to ASP.NET Core developers; an antipattern in library code.
 
-**Implications:** Options 2 and 3 retain the static-ness in a different form. Only option 1 is fully instance-isolated. However, option 1 is a **significant breaking change** for all Terminal.Gui app developers.
+**Decision: Option 2 (Static facade).**
 
-**Constitution check:** _"Terminal.Gui is not opinionated about application architecture."_ Option 1 mandates DI. This is in tension with the constitution.
+**Rationale:** Views are independent objects that can be constructed before `Application.Create()` and without any DI container. Option 1 breaks this contract for all app developers. Option 3 also breaks it — if no `Application` exists yet, there is no service provider to resolve from, so it degrades to a static fallback anyway. Option 2 preserves the existing `new Button()` contract, is AOT-safe, and requires no ceremony in tests. Future multi-instance support (#4366) can be addressed by having each `IApplication.Init()` swap the static facade to its own values.
 
 ---
 
@@ -979,7 +978,9 @@ public class Button : View
 2. **Adopt nested format** — Break backward compatibility with existing user config files; provide a migration tool.
 3. **Support both** — Custom provider accepts both formats; flat keys are deprecated.
 
-**User impact:** Anyone with an existing `~/.tui/config.json` file or in-app `config.json` would need to migrate. This is a real-world breaking change for users of UICatalog and for library users who have published apps.
+**Decision: Option 3 (Support both; flat keys deprecated).**
+
+**Rationale:** Existing user config files continue to work without modification. The custom provider accepts both flat (`"Button.DefaultShadow"`) and nested (`"Button": { "DefaultShadow": ... }`) formats. Flat keys emit a deprecation warning at load time. New documentation and generated defaults use the nested MEC-native format. This avoids a breaking change while guiding users toward the standard format.
 
 ---
 
@@ -1214,41 +1215,45 @@ The following are explicitly **not** part of this proposal:
 | `Application` | `IsMouseDisabled` | `bool` | `false` |
 | `ConfigurationManager` | `ThrowOnJsonErrors` | `bool?` | `false` |
 | `Driver` | `Force16Colors` | `bool` | `false` |
-| `Driver` | `ForceMaxColors` | `int` | *(varies)* |
+| `Driver` | `SizeDetection` | `SizeDetectionMode` | `AnsiQuery` |
 | `Key` | `Separator` | `char` | `'+'` |
-| `MenuBar` | `UseKeysUpDownAsKeysLeftRight` | `bool` | `false` |
+| `MenuBar` | `DefaultKey` | `Key` | `F10` |
 | `PopoverMenu` | `DefaultKey` | `Key` | `Shift+F10` |
 | `FileDialog` | `DefaultOpenMode` | `OpenMode` | `Mixed` |
 | `FileDialogStyle` | `DefaultSearchMatcher` | `ISearchMatcher?` | `DefaultSearchMatcher` |
 | `FileDialogStyle` | `PreferResultFromOpenMode` | `bool` | `true` |
 | `Trace` | `EnabledCategories` | `TraceCategory` | `None` |
 | `View` | `DefaultKeyBindings` | `Dictionary<...>?` | Platform-specific |
+| `View` | `ViewKeyBindings` | `Dictionary<string, Dictionary<...>>?` | `null` |
+| `Color` | `Colors16` *(OmitClassName)* | `Dictionary<ColorName16, string>` | *(platform defaults)* |
 
 ### ThemeScope (per-theme)
 
 | Class | Property | Type | Hard-coded Default |
 |---|---|---|---|
 | `Button` | `DefaultShadow` | `ShadowStyles` | `Opaque` |
-| `Button` | `DefaultHighlightStyle` | `HighlightStyle` | `PressedOutside\|Pressed` |
-| `CheckBox` | `DefaultCheckState` | `CheckState` | `UnChecked` |
-| `Dialog` | `DefaultShadow` | `ShadowStyles` | `Opaque` |
-| `Dialog` | `DefaultBorderStyle` | `LineStyle` | `Single` |
-| `Dialog` | `DefaultMinimumWidth` | `int` | `40` |
-| `Dialog` | `DefaultMinimumHeight` | `int` | `5` |
+| `Button` | `DefaultMouseHighlightStates` | `MouseState` | `In\|Pressed\|PressedOutside` |
+| `CheckBox` | `DefaultMouseHighlightStates` | `MouseState` | `PressedOutside\|Pressed\|In` |
+| `Dialog` | `DefaultShadow` | `ShadowStyles` | `Transparent` |
+| `Dialog` | `DefaultBorderStyle` | `LineStyle` | `Heavy` |
+| `Dialog` | `DefaultButtonAlignment` | `Alignment` | `End` |
+| `Dialog` | `DefaultButtonAlignmentModes` | `AlignmentModes` | `StartToEnd\|AddSpaceBetweenItems` |
 | `FrameView` | `DefaultBorderStyle` | `LineStyle` | `Single` |
 | `HexView` | `DefaultBorderStyle` | `LineStyle` | `Single` |
 | `Menu` | `DefaultBorderStyle` | `LineStyle` | `Single` |
-| `MenuBar` | `DefaultBorderStyle` | `LineStyle` | `Single` |
-| `MessageBox` | `DefaultShadow` | `ShadowStyles` | `Opaque` |
-| `MessageBox` | `DefaultBorderStyle` | `LineStyle` | `Single` |
+| `MenuBar` | `DefaultBorderStyle` | `LineStyle` | `None` |
+| `MessageBox` | `DefaultBorderStyle` | `LineStyle` | `Heavy` |
+| `MessageBox` | `DefaultButtonAlignment` | `Alignment` | `Center` |
+| `NerdFonts` | `Enable` | `bool` | `false` |
 | `SelectorBase` | `DefaultBorderStyle` | `LineStyle` | `Single` |
 | `StatusBar` | `DefaultBorderStyle` | `LineStyle` | `None` |
 | `TextField` | `DefaultBorderStyle` | `LineStyle` | `Single` |
 | `TextView` | `DefaultBorderStyle` | `LineStyle` | `Single` |
 | `Window` | `DefaultBorderStyle` | `LineStyle` | `Single` |
-| `Window` | `DefaultShadow` | `ShadowStyles` | `Opaque` |
+| `Window` | `DefaultShadow` | `ShadowStyles` | `None` |
 | `CharMap` | `DefaultBorderStyle` | `LineStyle` | `Single` |
 | `LinearRangeDefaults` | *(multiple)* | *(various)* | *(see source)* |
+| `NerdFonts` | `Enable` | `bool` | `false` |
 | `SchemeManager` | `Schemes` | `Dictionary<string, Scheme?>?` | Built-in schemes |
 | `Glyphs` | `WideGlyphReplacement` | `Rune` | `(Rune)' '` |
 | `Glyphs` | `File` | `Rune` | `(Rune)'☰'` |
@@ -1266,7 +1271,7 @@ Defined by app developers. Terminal.Gui itself does not own any AppSettingsScope
 ### Terminal.Gui Library Resource: `config.json`
 
 Located at `Terminal.Gui/Resources/config.json`. Embedded in `Terminal.Gui.dll`. 1,501 lines. Defines:
-- All built-in themes (Dark, Light, TurboPascal 5, Catppuccin Mocha, Dracula, Nord, Solarized variants, Gruvbox Dark, etc.)
+- All built-in themes (Default, Dark, Light, TurboPascal 5, Anders, Green Phosphor, Amber Phosphor)
 - Each theme defines its Schemes (color/attribute pairs for Base, Dialog, Menu, Error, Accent, etc.)
 - Each theme optionally overrides ThemeScope properties (glyph sets, border styles, shadow styles)
 
