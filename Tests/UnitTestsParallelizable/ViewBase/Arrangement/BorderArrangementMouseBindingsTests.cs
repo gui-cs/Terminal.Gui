@@ -52,6 +52,32 @@ public class BorderArrangementMouseBindingsTests
         Assert.Equal (ViewArrangement.Movable, arranger.Arranging);
     }
 
+    [Fact]
+    public void BorderView_CustomMiddleButtonBinding_DragsWithMiddleButtonPositionReports ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Runnable root = new () { Width = 40, Height = 20 };
+        View view = CreateArrangeableView ();
+        root.Add (view);
+        app.Begin (root);
+
+        BorderView borderView = (BorderView)view.Border.View!;
+        borderView.MouseBindings.Remove (MouseFlags.LeftButtonPressed);
+        borderView.MouseBindings.Add (MouseFlags.MiddleButtonPressed | MouseFlags.Shift, Command.Arrange);
+
+        borderView.NewMouseEvent (CreateBorderPress (MouseFlags.MiddleButtonPressed | MouseFlags.Shift));
+        borderView.NewMouseEvent (new Mouse
+        {
+            Position = new Point (2, 0),
+            ScreenPosition = new Point (7, 5),
+            Flags = MouseFlags.MiddleButtonPressed | MouseFlags.Shift | MouseFlags.PositionReport
+        });
+
+        Assert.Equal (7, view.Frame.X);
+    }
+
     private static View CreateArrangeableView () =>
         new ()
         {

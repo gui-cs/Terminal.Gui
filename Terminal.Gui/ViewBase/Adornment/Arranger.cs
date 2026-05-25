@@ -25,6 +25,7 @@ internal sealed class Arranger : IDisposable
     internal bool IsArranging => Arranging != ViewArrangement.Fixed;
 
     private Point? _dragPosition;
+    private MouseFlags _dragButton;
 
     /// <summary>
     ///     Gets whether a mouse drag operation is in progress.
@@ -153,6 +154,7 @@ internal sealed class Arranger : IDisposable
 
         Arranging = ViewArrangement.Fixed;
         _dragPosition = null;
+        _dragButton = MouseFlags.None;
 
         _border.HotKeyBindings.Clear ();
 
@@ -647,7 +649,8 @@ internal sealed class Arranger : IDisposable
     internal bool HandleMouseEvent (Mouse mouseEvent)
     {
         // Dragging - update position
-        if (mouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
+        if (_dragButton != MouseFlags.None
+            && mouseEvent.Flags.FastHasFlags (_dragButton | MouseFlags.PositionReport)
             && _border.App is { }
             && _border.App.Mouse.IsGrabbed (_border)
             && _dragPosition.HasValue)
@@ -658,7 +661,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Button released - end drag
-        if (mouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonReleased) && _dragPosition.HasValue)
+        if (mouseEvent.IsReleased && _dragPosition.HasValue)
         {
             return ExitArrangeMode () is true;
         }
@@ -721,6 +724,7 @@ internal sealed class Arranger : IDisposable
         // Set the start grab point to the Frame coords
         GrabPoint = new Point (mouseEvent.Position.Value.X + _border.Frame.X, mouseEvent.Position.Value.Y + _border.Frame.Y);
         _dragPosition = mouseEvent.Position;
+        _dragButton = GetPressedButton (mouseEvent.Flags);
 
         // Grab mouse
         _border.App?.Mouse.GrabMouse (_border);
@@ -771,7 +775,36 @@ internal sealed class Arranger : IDisposable
     ///     Ends the current drag operation.
     ///     INTERNAL: Exposed for testing purposes.
     /// </summary>
-    internal void EndDrag () => _dragPosition = null;
+    internal void EndDrag ()
+    {
+        _dragPosition = null;
+        _dragButton = MouseFlags.None;
+    }
+
+    private static MouseFlags GetPressedButton (MouseFlags flags)
+    {
+        if (flags.FastHasFlags (MouseFlags.LeftButtonPressed))
+        {
+            return MouseFlags.LeftButtonPressed;
+        }
+
+        if (flags.FastHasFlags (MouseFlags.MiddleButtonPressed))
+        {
+            return MouseFlags.MiddleButtonPressed;
+        }
+
+        if (flags.FastHasFlags (MouseFlags.RightButtonPressed))
+        {
+            return MouseFlags.RightButtonPressed;
+        }
+
+        if (flags.FastHasFlags (MouseFlags.Button4Pressed))
+        {
+            return MouseFlags.Button4Pressed;
+        }
+
+        return MouseFlags.None;
+    }
 
     /// <summary>
     ///     Determines the arrangement mode based on where the mouse was clicked.
