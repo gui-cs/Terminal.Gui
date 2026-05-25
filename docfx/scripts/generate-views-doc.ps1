@@ -133,6 +133,7 @@ foreach ($file in $viewFiles) {
                     --startup-delay 0 `
                     --drain 1000 `
                     --trim `
+                    --mouse-pointer none `
                     --cols 80 --rows 20 `
                     --output $gifFile `
                     --cast-output $castFile `

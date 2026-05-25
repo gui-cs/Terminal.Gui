@@ -23,7 +23,7 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
     }
 
     /// <inheritdoc/>
-    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,CursorDown,wait:400,CursorDown,wait:400,CursorUp,wait:400,CursorUp,wait:800";
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,CursorDown,wait:400,CursorDown,wait:400,Space,wait:400,Space,wait:400,CursorDown,wait:400,Space,wait:800";
 
     /// <inheritdoc/>
     public bool EnableForDesign ()

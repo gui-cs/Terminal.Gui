@@ -584,6 +584,9 @@ public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
         }
     }
 
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Alt+T,wait:300,Shift+Tab,Shift+Tab,wait:300,CursorRight,wait:300,Tab,wait:300,Alt+T,wait:300,Alt+F,wait:300,`.md`,wait:800,Shift+Tab,wait:300,Enter,wait:800";
+
     bool IDesignable.EnableForDesign ()
     {
         OnIsRunningChanged (true);

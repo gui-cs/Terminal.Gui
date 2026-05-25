@@ -1094,7 +1094,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     /// <inheritdoc/>
-    public string? GetDemoKeyStrokes () => "wait:500,CursorRight,wait:800,CursorRight,wait:800,CursorLeft,wait:800";
+    public string? GetDemoKeyStrokes () => "wait:500,Alt+S,wait:500,Alt+I,wait:500,Alt+I,wait:500,Alt+I,wait:500,Alt+I,wait:500,Shift+Tab,Shift+Tab,wait:300," + string.Join (",", Enumerable.Repeat ("CursorDown", 10)) + ",wait:300,Space,wait:1000";
 
     #endregion
 

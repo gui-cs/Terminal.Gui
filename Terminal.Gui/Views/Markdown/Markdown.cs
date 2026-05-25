@@ -492,6 +492,9 @@ public partial class Markdown : View, IDesignable
     }
 
     /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:300," + string.Join (",", Enumerable.Repeat ("CursorDown,wait:80", 50)) + ",wait:800";
+
+    /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
         SyntaxHighlighter = new TextMateSyntaxHighlighter ();
