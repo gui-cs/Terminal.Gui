@@ -164,6 +164,12 @@ public enum Command
     /// <summary>Toggles the selection (or a specific element of the selection).</summary>
     ToggleExtend,
 
+    /// <summary>Starts extending a selection via pointing-device input.</summary>
+    StartSelection,
+
+    /// <summary>Starts extending a rectangular selection via pointing-device input.</summary>
+    StartRectangleSelection,
+
     #endregion
 
     #region Editing Commands

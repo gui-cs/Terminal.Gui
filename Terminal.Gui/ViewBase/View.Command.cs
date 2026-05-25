@@ -26,6 +26,9 @@ public partial class View // Command APIs
         // Paste - Default handler resolves payload (bracketed paste payload or clipboard),
         // sanitizes, raises Pasting/Pasted, and delegates insertion to OnPaste.
         AddCommand (Command.Paste, DefaultPasteHandler);
+
+        // Context - Base View has no default context behavior.
+        AddCommand (Command.Context, DefaultContextHandler);
     }
 
     #region Command Management
@@ -215,6 +218,8 @@ public partial class View // Command APIs
     #endregion Invoke
 
     #region Default Event Handlers
+
+    private bool? DefaultContextHandler (ICommandContext? ctx) => false;
 
     internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx)
     {
