@@ -78,7 +78,6 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         superView.Layout ();
         superView.Draw ();
-
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
                                               ┊╭────╮────╮────╮──          ┊
@@ -906,6 +905,51 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void Bottom_SelectedTabContentExceedsViewport_TabBorderRemainsVisible ()
+    {
+        IDriver driver = CreateTestDriver (30, 8);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill (), TabSide = Side.Bottom };
+        superView.Add (tabs);
+
+        View tab1 = new () { Title = "Tab1" };
+        tab1.Add (new View { Width = 40, Height = 10, Text = "Tab1 content" });
+        View tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
+        View tab3 = new () { Title = "Tab3", Text = "Tab3 content" };
+        View tab4 = new () { Title = "Tab4", Text = "Tab4 content" };
+        View tab5 = new () { Title = "Tab5", Text = "Tab5 content" };
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+        tabs.Value = tab1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊╭──────────────────────────╮┊
+                                              ┊│Tab1 content              │┊
+                                              ┊│                          │┊
+                                              ┊│    ╭────┬────┬────┬────┬─╯┊
+                                              ┊│Tab1│Tab2│Tab3│Tab4│Tab5│  ┊
+                                              ┊╰────╯────╯────╯────╯────╯  ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
     // Claude - Opus 4.6
     /// <summary>
     ///     When tabs overflow the available width with <see cref="Side.Bottom"/>, a forward scroll indicator
@@ -1228,6 +1272,61 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         superView.Add (tabs);
 
         View tab1 = new () { Title = "T1", Text = "Content" };
+        View tab2 = new () { Title = "T2", Text = "Content" };
+        View tab3 = new () { Title = "T3", Text = "Content" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Value = tab1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊╭────────────────╮┊
+                                              ┊│Content        T│┊
+                                              ┊│               1│┊
+                                              ┊│              ╭─╯┊
+                                              ┊│              │T│┊
+                                              ┊│              │2│┊
+                                              ┊│              ├─╯┊
+                                              ┊│              │T│┊
+                                              ┊│              │3│┊
+                                              ┊│              ├─╯┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊╰──────────────╯  ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Right_SelectedTabContentExceedsViewport_TabBorderRemainsVisible ()
+    {
+        IDriver driver = CreateTestDriver (20, 20);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill (), TabSide = Side.Right };
+        superView.Add (tabs);
+
+        View tab1 = new () { Title = "T1" };
+        tab1.Add (new View { Width = 30, Height = 30, Text = "Content" });
         View tab2 = new () { Title = "T2", Text = "Content" };
         View tab3 = new () { Title = "T3", Text = "Content" };
         tabs.Add (tab1, tab2, tab3);
