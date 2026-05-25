@@ -164,12 +164,6 @@ public enum Command
     /// <summary>Toggles the selection (or a specific element of the selection).</summary>
     ToggleExtend,
 
-    /// <summary>Starts extending a selection via pointing-device input.</summary>
-    StartSelection,
-
-    /// <summary>Starts extending a rectangular selection via pointing-device input.</summary>
-    StartRectangleSelection,
-
     #endregion
 
     #region Editing Commands
@@ -382,6 +376,16 @@ public enum Command
     ///     through <see cref="View.KeyBindings"/> or their configurable default key bindings.
     /// </summary>
     InsertCaretBelow,
+
+    #endregion
+
+    #region Mouse Selection Commands
+
+    /// <summary>Starts extending a selection via pointing-device input.</summary>
+    StartSelection,
+
+    /// <summary>Starts extending a rectangular selection via pointing-device input.</summary>
+    StartRectangleSelection,
 
     #endregion
 }

@@ -27,8 +27,11 @@ public partial class View // Command APIs
         // sanitizes, raises Pasting/Pasted, and delegates insertion to OnPaste.
         AddCommand (Command.Paste, DefaultPasteHandler);
 
-        // Context - Base View has no default context behavior.
-        AddCommand (Command.Context, DefaultContextHandler);
+        // Context - By default, route through the NotBound handler so that
+        // CommandNotBound fires (allowing subscribers to handle it). This keeps
+        // Command.Context as a "supported" command for mouse-binding purposes
+        // while not silently swallowing the invocation.
+        AddCommand (Command.Context, DefaultCommandNotBoundHandler);
     }
 
     #region Command Management
@@ -218,8 +221,6 @@ public partial class View // Command APIs
     #endregion Invoke
 
     #region Default Event Handlers
-
-    private bool? DefaultContextHandler (ICommandContext? ctx) => false;
 
     internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx)
     {

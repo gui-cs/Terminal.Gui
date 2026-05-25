@@ -66,6 +66,11 @@ public partial class View // Mouse APIs
     /// </summary>
     protected void ApplyMouseBindings (params Dictionary<Command, PlatformMouseBinding>? [] layers)
     {
+        if (layers is null)
+        {
+            return;
+        }
+
         HashSet<Command> supported = new (GetSupportedCommands ());
 
         foreach (Dictionary<Command, PlatformMouseBinding>? layer in layers)
