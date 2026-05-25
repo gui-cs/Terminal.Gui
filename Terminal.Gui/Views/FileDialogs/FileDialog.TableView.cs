@@ -160,8 +160,11 @@ public partial class FileDialog
         {
             Normal = new Attribute (foreground, background),
             HotNormal = new Attribute (foreground, background),
-            Focus = new Attribute (background, foreground),
-            HotFocus = new Attribute (background, foreground)
+            Focus = args.RowScheme.Focus,
+            HotFocus = args.RowScheme.HotFocus,
+            Active = args.RowScheme.Active,
+            HotActive = args.RowScheme.HotActive,
+            Disabled = args.RowScheme.Disabled
         };
     }
 
