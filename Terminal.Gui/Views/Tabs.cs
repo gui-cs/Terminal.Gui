@@ -7,6 +7,7 @@ namespace Terminal.Gui.Views;
 ///     <see cref="Border"/>. The currently focused SubView is the selected (front-most) tab.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Tabs.gif" alt="Tabs demo"/>
 ///     <para>
 ///         Add any <see cref="View"/> instances via <see cref="View.Add(View)"/>. Each added view is automatically
 ///         configured with <see cref="BorderSettings.Tab"/>, <see cref="ViewArrangement.Overlapped"/> arrangement,
@@ -1092,6 +1093,9 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
         }
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Alt+S,wait:500,Alt+I,wait:500,Alt+I,wait:500,Alt+I,wait:500,Alt+I,wait:500,Shift+Tab,Shift+Tab,wait:300," + string.Join (",", Enumerable.Repeat ("CursorDown", 10)) + ",wait:300,Space,wait:1000";
 
     #endregion
 

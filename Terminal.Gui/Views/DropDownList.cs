@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 ///     for selecting from a list of items.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/DropDownList.gif" alt="DropDownList demo"/>
 ///     <para>
 ///         <see cref="DropDownList"/> provides a modern dropdown control that can operate in two modes:
 ///     </para>
@@ -604,6 +605,9 @@ public class DropDownList : TextField
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public override string? GetDemoKeyStrokes () => "wait:500,F4,wait:600,CursorDown,wait:400,CursorDown,wait:400,Enter,wait:800";
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

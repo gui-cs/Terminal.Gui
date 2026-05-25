@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/NumericUpDown.gif" alt="NumericUpDown demo"/>
 ///     <para>
 ///         Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>
 ///         ,

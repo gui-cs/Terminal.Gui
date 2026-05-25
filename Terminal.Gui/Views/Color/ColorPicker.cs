@@ -7,6 +7,7 @@ namespace Terminal.Gui.Views;
 ///     sliders and color names from the <see cref="IColorNameResolver"/>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/ColorPicker.gif" alt="ColorPicker demo"/>
 ///     <para>Default mouse bindings:</para>
 ///     <list type="table">
 ///         <listheader>
@@ -407,6 +408,9 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
             SyncSubViewValues (false);
         }
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Tab,wait:400,CursorRight,wait:300,CursorRight,wait:300,CursorRight,wait:800";
 
     /// <inheritdoc/>
     public bool EnableForDesign ()

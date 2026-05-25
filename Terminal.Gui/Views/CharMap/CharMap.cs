@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///     A scrollable map of the Unicode codepoints.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/CharMap.gif" alt="CharMap demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>
@@ -1066,6 +1067,9 @@ public class CharMap : View, IDesignable, IValue<Rune>
     }
 
     #endregion Mouse Handling
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:300," + string.Join (",", Enumerable.Repeat ("PageDown,wait:100", 40)) + ",wait:500,Shift+F10,wait:1500";
 }
 
 /// <summary>

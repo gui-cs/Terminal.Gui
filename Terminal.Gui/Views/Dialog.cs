@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     is set to the button's index (0-based).
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Dialog.gif" alt="Dialog demo"/>
 ///     <para>
 ///         This is the standard dialog class for simple button-index-based results. For dialogs that need to return
 ///         custom result types, derive from <see cref="Dialog{TResult}"/> instead.
