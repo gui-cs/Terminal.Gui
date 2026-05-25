@@ -1,5 +1,0 @@
-{"version":2,"width":80,"height":20,"timestamp":1779743712,"title":"PopoverMenu","env":{"TERM":"xterm-256color"}}
-[0.0236238,"o","\u001b[?9001h\u001b[?1004h"]
-[0.1586617,"o","\u001b[?25l\u001b[2J\u001b[m\u001b[38;5;1m\u001b[HCould not execute because the specified command or file was not found.\u001b]0;C:\\Program Files\\dotnet\\dotnet.exe\u0007\u001b[?25h"]
-[0.1731471,"o","\u001b[m\r\nPossible reasons for this include:\r\n  * You misspelled a built-in dotnet command.\r\n  * You intended to execute a .NET program, but dotnet-scripts/OutputView/bin/Release/net10.0/OutputView.dll does not exist.\r\n  * You intended to run a global tool, but a dotnet-prefixed executable with this name could not be found on the PATH.\r\n"]
-[0.196303,"o","\u001b[?9001l\u001b[?1004l"]

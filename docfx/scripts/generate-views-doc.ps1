@@ -118,7 +118,6 @@ foreach ($file in $viewFiles) {
                 $ks = "$ks,wait:500,Escape"
                 
                 $gifFile = Join-Path $ImagePath "$viewNameClean.gif"
-                $castFile = Join-Path $ImagePath "$viewNameClean.cast"
                 
                 Write-Host "  Recording $viewNameClean with tuirec..." -ForegroundColor Cyan
                 Write-Host "    Keystrokes: $ks" -ForegroundColor Gray
@@ -136,7 +135,6 @@ foreach ($file in $viewFiles) {
                     --mouse-pointer none `
                     --cols 80 --rows 20 `
                     --output $gifFile `
-                    --cast-output $castFile `
                     --verbosity quiet
                 
                 # Retry without trim if validation failed (should not happen now that
@@ -152,9 +150,9 @@ foreach ($file in $viewFiles) {
                         --startup-delay 0 `
                         --drain 1000 `
                         --trim=false `
+                        --mouse-pointer none `
                         --cols 80 --rows 20 `
                         --output $gifFile `
-                        --cast-output $castFile `
                         --verbosity quiet
                 }
                 
