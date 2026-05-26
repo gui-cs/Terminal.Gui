@@ -3,6 +3,7 @@ name: Build and publish v2 API docs
 on:
   push:
     branches: [develop]
+  workflow_dispatch:
 
 permissions:
   id-token: write 
@@ -27,6 +28,11 @@ jobs:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
 
+    - name: Setup Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: stable
+
     - name: Restore dependencies
       run: dotnet restore
 
@@ -36,24 +42,38 @@ jobs:
     - name: Build EditorRef (for Terminal.Gui.Editor docs)
       run: dotnet build docfx/EditorRef/EditorRef.csproj --configuration Release
 
+    - name: Install documentation tools
+      run: |
+        dotnet tool install -g docfx
+        go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+        Add-Content $env:GITHUB_PATH "$(go env GOPATH)\bin"
+        Install-Module powershell-yaml -Scope CurrentUser -Force
+
+    - name: Generate API metadata and views docs
+      working-directory: docfx
+      run: |
+        $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
+        docfx metadata
+        ./scripts/generate-views-doc.ps1
+
     - name: DocFX Build
       working-directory: docfx
       run: |
-        dotnet tool install -g docfx
-        $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
-        docfx metadata
         docfx build
       continue-on-error: false
 
     - name: Setup Pages
+      if: github.event_name == 'push' && github.ref_name == 'develop'
       uses: actions/configure-pages@v6
-      
+       
     - name: Upload artifact
+      if: github.event_name == 'push' && github.ref_name == 'develop'
       uses: actions/upload-pages-artifact@v5
       with:
         path: docfx/_site
-       
+        
     - name: Deploy to GitHub Pages
+      if: github.event_name == 'push' && github.ref_name == 'develop'
       id: deployment
       uses: actions/deploy-pages@v5
       with:
