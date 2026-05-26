@@ -95,6 +95,7 @@ public partial class View // Layout APIs
             return false;
         }
 
+        Rectangle? oldFrame = _frame;
         var oldViewport = Rectangle.Empty;
 
         if (IsInitialized)
@@ -110,6 +111,17 @@ public partial class View // Layout APIs
 
         SetNeedsDraw ();
         SetNeedsLayout ();
+
+        // Issue #5358: when Frame shrinks or moves, the SuperView's old-frame area is now
+        // uncovered and must be cleared on the next draw. Invalidate the union of the old and
+        // new frames on the SuperView so its region-aware ClearViewport repaints just that area.
+        // This complements the same invalidation in View.Layout (which handles Frame changes
+        // that happen during a Pos/Dim-driven layout pass); SetFrame catches the direct-assignment
+        // path (e.g., view.Frame = newRect).
+        if (oldFrame is { } prev && SuperView is { })
+        {
+            SuperView.SetNeedsDraw (Rectangle.Union (prev, frame));
+        }
 
         // BUGBUG: When SetFrame is called from Frame_set, this event gets raised BEFORE OnResizeNeeded. Is that OK?
         OnFrameChanged (in frame);
