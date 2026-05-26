@@ -559,10 +559,13 @@ public partial class View // Layout APIs
     public bool Layout (Size contentSize)
     {
         bool needsDrawAfterLayout = _needsDrawAfterLayout;
+        _needsDrawAfterLayout = false;
         Rectangle originalFrame = Frame;
 
         if (!SetRelativeLayout (contentSize))
         {
+            _needsDrawAfterLayout = needsDrawAfterLayout;
+
             return false;
         }
 
@@ -575,11 +578,6 @@ public partial class View // Layout APIs
             // recomputed during dependency resolution. Draw after layout only when this view was
             // directly invalidated for layout or its resolved frame actually changed.
             SetNeedsDraw ();
-        }
-
-        if (!NeedsLayout)
-        {
-            _needsDrawAfterLayout = false;
         }
 
         return true;
@@ -694,7 +692,16 @@ public partial class View // Layout APIs
         {
             // Set the frame. Do NOT use `Frame = newFrame` as it overwrites X, Y, Width, and Height
             // SetFrame will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
-            SetFrame (newFrame);
+            _suppressNeedsDrawAfterLayout = true;
+
+            try
+            {
+                SetFrame (newFrame);
+            }
+            finally
+            {
+                _suppressNeedsDrawAfterLayout = false;
+            }
 
             // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
             // BUGBUG: other logic in the property setters does not get executed.  Specifically:
@@ -895,6 +902,7 @@ public partial class View // Layout APIs
     public bool NeedsLayout { get; internal set; } = true;
 
     private bool _needsDrawAfterLayout = true;
+    private bool _suppressNeedsDrawAfterLayout;
 
     /// <summary>
     ///     Sets <see cref="NeedsLayout"/> to return <see langword="true"/>, indicating this View and all of its subviews
@@ -908,7 +916,11 @@ public partial class View // Layout APIs
     /// </remarks>
     public void SetNeedsLayout ()
     {
-        _needsDrawAfterLayout = true;
+        if (!_suppressNeedsDrawAfterLayout)
+        {
+            _needsDrawAfterLayout = true;
+        }
+
         MarkSubtreeNeedsLayout ();
 
         TextFormatter.NeedsFormat = true;
@@ -978,10 +990,9 @@ public partial class View // Layout APIs
     }
 
     // Walks up the ancestor chain marking each ancestor as needing layout, without descending
-    // into the ancestor's regular SubViews tree. Adornment subview trees on each ancestor are
-    // still marked so adornment content re-lays-out when its parent does. Stops at any ancestor
-    // already marked, mirroring the early-exit guards in the original recursive call. See
-    // issue #5357.
+    // into the ancestor's regular SubViews tree or any uninvolved ancestor adornment subview
+    // trees. Stops at any ancestor already marked, mirroring the early-exit guards in the
+    // original recursive call. See issue #5357.
     private void MarkAncestorsNeedLayout ()
     {
         if (NeedsLayout)
@@ -991,7 +1002,6 @@ public partial class View // Layout APIs
 
         NeedsLayout = true;
         TextFormatter.NeedsFormat = true;
-        MarkAdornmentSubViewTrees ();
 
         if (SuperView is { NeedsLayout: false } superView)
         {

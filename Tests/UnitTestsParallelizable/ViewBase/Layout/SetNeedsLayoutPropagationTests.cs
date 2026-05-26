@@ -145,6 +145,32 @@ public class SetNeedsLayoutPropagationTests
     }
 
     [Fact]
+    public void SetNeedsLayout_OnSubView_Does_Not_Mark_Ancestor_Adornment_Subtree ()
+    {
+        View root = new () { Id = "root" };
+        View rootBorderSubView = new () { Id = "rootBorderSubView" };
+        root.Border.GetOrCreateView ().Add (rootBorderSubView);
+
+        View branch = new () { Id = "branch" };
+        View branchChild = new () { Id = "branchChild" };
+        branch.Add (branchChild);
+        root.Add (branch);
+
+        ClearAllNeedsLayout (root);
+
+        branchChild.SetNeedsLayout ();
+
+        Assert.True (branchChild.NeedsLayout);
+        Assert.True (branch.NeedsLayout);
+        Assert.True (root.NeedsLayout);
+
+        Assert.False (root.Border.View!.NeedsLayout, "Uninvolved ancestor adornment view must not be re-marked.");
+        Assert.False (rootBorderSubView.NeedsLayout, "Uninvolved ancestor adornment subtree must not be re-marked.");
+
+        root.Dispose ();
+    }
+
+    [Fact]
     public void SetNeedsLayout_Preserves_Adornment_SubView_Marking_On_Changed_View ()
     {
         View root = new () { Id = "root" };
