@@ -52,21 +52,7 @@
     <File Path="Examples/Config/windows.json" />
     <File Path="Examples/PowershellExample.ps1" />
     <Project Path="docfx/scripts/OutputView/OutputView.csproj" />
-    <Project Path="Examples/CommunityToolkitExample/CommunityToolkitExample.csproj" />
-    <Project Path="Examples/Example/Example.csproj" />
-    <Project Path="Examples/FluentExample/FluentExample.csproj" />
-    <Project Path="Examples/InlineCLI/InlineCLI.csproj" />
-    <Project Path="Examples/InlineColorPicker/InlineColorPicker.csproj" />
-    <Project Path="Examples/InlineSelect/InlineSelect.csproj" />
-    <Project Path="Examples/NativeAot/NativeAot.csproj">
-      <BuildDependency Project="Terminal.Gui/Terminal.Gui.csproj" />
-    </Project>
-    <Project Path="Examples/PromptExample/PromptExample.csproj" />
-    <Project Path="Examples/ReactiveExample/ReactiveExample.csproj" />
     <Project Path="Examples/ScenarioRunner/ScenarioRunner.csproj" />
-    <Project Path="Examples/SelfContained/SelfContained.csproj">
-      <BuildDependency Project="Terminal.Gui/Terminal.Gui.csproj" />
-    </Project>
     <Project Path="Examples/UICatalog/UICatalog.csproj" />
   </Folder>
   <Folder Name="/Solution Items/" />
@@ -111,6 +97,7 @@
     <Project Path="Tests/AppTestHelpers/AppTestHelpers.csproj" />
     <Project Path="Tests/Benchmarks/Benchmarks.csproj" />
     <Project Path="Tests/IntegrationTests/IntegrationTests.csproj" />
+    <Project Path="Tests/NativeAotSmoke/NativeAotSmoke.csproj" />
     <Project Path="Tests/PerformanceTests/PerformanceTests.csproj" />
     <Project Path="Tests/StressTests/StressTests.csproj" />
     <Project Path="Tests/UnitTests.Legacy/UnitTests.Legacy.csproj" />
