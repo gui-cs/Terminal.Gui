@@ -48,6 +48,8 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (ConcurrentDictionary<string, ThemeScope>))]
 [JsonSerializable (typeof (Scheme))]
 [JsonSerializable (typeof (Dictionary<string, Scheme>))]
+[JsonSerializable (typeof (ThemeDefinition))]
+[JsonSerializable (typeof (Dictionary<string, ThemeDefinition>))]
 
 [JsonSerializable (typeof (TraceCategory))]
 [JsonSerializable (typeof (SizeDetectionMode))]
