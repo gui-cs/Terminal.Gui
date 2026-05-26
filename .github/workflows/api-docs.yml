@@ -10,11 +10,8 @@ permissions:
   pages: write
 
 jobs:
-  deploy:
-    name: Build and Deploy v2 API docs to github-pages ${{ github.ref_name }}
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
+    name: Build v2 API docs ${{ github.ref_name }}
     runs-on: windows-latest
     steps:
     - name: Checkout
@@ -71,9 +68,17 @@ jobs:
       uses: actions/upload-pages-artifact@v5
       with:
         path: docfx/_site
-        
+
+  deploy:
+    name: Deploy v2 API docs to github-pages ${{ github.ref_name }}
+    if: github.event_name == 'push' && github.ref_name == 'develop'
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: windows-latest
+    steps:
     - name: Deploy to GitHub Pages
-      if: github.event_name == 'push' && github.ref_name == 'develop'
       id: deployment
       uses: actions/deploy-pages@v5
       with:
