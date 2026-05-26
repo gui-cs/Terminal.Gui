@@ -50,6 +50,9 @@ jobs:
     - name: Pack Release Terminal.Gui
       run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612
 
+    - name: Pack Release Terminal.Gui.Interop.Spectre
+      run: dotnet pack Terminal.Gui.Interop.Spectre/Terminal.Gui.Interop.Spectre.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612
+
     - name: AOT Publish Test App (catches trimming and reflection errors)
       run: dotnet publish ./Tests/NativeAotSmoke/NativeAotSmoke.csproj --configuration Release --output ./aot-publish -property:NoWarn=0618%3B0612
 

@@ -15,7 +15,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 - `dotnet restore`
 - Build Debug: `dotnet build --configuration Debug --no-restore -property:NoWarn=0618%3B0612`
 - Build Release (library): `dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release --no-incremental --force -property:NoWarn=0618%3B0612`
-- Pack Release: `dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612`
+- Pack Release packages: `dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612` and `dotnet pack Terminal.Gui.Interop.Spectre/Terminal.Gui.Interop.Spectre.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612`
 - Publish `Tests/NativeAotSmoke` with AOT and run `--smoke-test`
 - Build Release solution
 
@@ -67,7 +67,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 ### 5) Publish to NuGet (`.github/workflows/publish.yml`)
 
 - **Triggers**: push to `main`, `develop`, and tags `v*`(ignores `**.md`)
-- Uses GitVersion to compute SemVer, builds Release, packs with symbols, and pushes to NuGet.org using `NUGET_API_KEY`
+- Uses GitVersion to compute SemVer, builds Release, packs Terminal.Gui and Terminal.Gui.Interop.Spectre with symbols, and pushes both to NuGet.org using `NUGET_API_KEY`
 - **Automatically triggered** by the Create Release workflow when a new tag is pushed
 - **Additional actions on main branch**:
   - Delists old NuGet packages to keep package list clean:
