@@ -94,6 +94,12 @@ jobs:
       run: |
         ./scripts/generate-views-doc.ps1
 
+    - name: DocFX Build
+      working-directory: docfx
+      run: |
+        docfx build
+      continue-on-error: false
+
     - name: Commit regenerated views assets
       if: github.event_name == 'workflow_dispatch' && steps.view-docs.outputs.should_generate == 'true'
       shell: pwsh
@@ -109,12 +115,6 @@ jobs:
 
         git commit -m "Regenerate docfx view GIF assets via CI"
         git push
-
-    - name: DocFX Build
-      working-directory: docfx
-      run: |
-        docfx build
-      continue-on-error: false
 
     - name: Setup Pages
       if: github.event_name == 'push' && github.ref_name == 'develop'
