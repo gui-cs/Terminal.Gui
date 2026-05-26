@@ -222,6 +222,36 @@ public class FileDialogResultTests
     }
 
     [Fact]
+    public void FileDialog_MixedMode_PathSetBeforeEndInit_RespectsAllowedTypes ()
+    {
+        // Copilot
+        MockFileSystem fs = new ();
+        fs.AddDirectory ("/testdir");
+        fs.AddDirectory ("/testdir/subdir");
+        fs.AddFile ("/testdir/allowed.Designer.cs", new MockFileData ("allowed"));
+        fs.AddFile ("/testdir/blocked.txt", new MockFileData ("blocked"));
+        using FileDialog fd = new TestableFileDialog (fs)
+        {
+            OpenMode = OpenMode.Mixed,
+            AllowedTypes = [new AllowedType ("View", ".Designer.cs")]
+        };
+
+        fd.Path = "/testdir";
+        fd.EndInit ();
+
+        Assert.NotNull (fd.CurrentFilter);
+        Assert.NotNull (fd.State);
+
+        List<string> visibleEntries = fd.State!.Children
+                                       .Where (c => !c.IsParent)
+                                       .Select (c => c.Name)
+                                       .OrderBy (name => name)
+                                       .ToList ();
+
+        Assert.Equal (["allowed.Designer.cs", "subdir"], visibleEntries);
+    }
+
+    [Fact]
     public void FileDialog_Accepting_Directory_From_Table_Keeps_Path_On_Opened_Directory ()
     {
         // Copilot
