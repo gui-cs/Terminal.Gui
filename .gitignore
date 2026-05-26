@@ -82,3 +82,9 @@ log.*
 .mcp.json
 .env
 tmpclaude-*-cwd
+
+# tuirec artifacts
+artifacts/
+docfx/artifacts/
+local_packages/
+*.cast

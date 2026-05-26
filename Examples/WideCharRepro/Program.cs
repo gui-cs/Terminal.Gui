@@ -96,6 +96,7 @@ Console.WriteLine ("│ABCDEFGHIJKLMNOPQRST│ <- 20 narrow (20×1=20)");
 Console.WriteLine ("│😀😁😂😃😄😅😆😇😈😉│ <- 10 emoji  (10×2=20)");
 Console.WriteLine ("│你好世界测试宽字符验│ <- 10 CJK    (10×2=20)");
 Console.WriteLine ("│AB😀CD😁EF😂GH😃IJ😄│ <- mixed   (10×1 + 5×2=20)");
+Console.WriteLine ("│👩‍💻👨‍👩‍👧‍👦🧑‍🚀🧑‍🍳🧑‍🔬🧑‍🎤🧑‍🎨🧑‍🦽🏳️‍🌈🏳️‍⚧️│ <- 10 use ZWJ(10×2=20)");
 Console.WriteLine ("└────────────────────┘");
 Console.WriteLine ();
 

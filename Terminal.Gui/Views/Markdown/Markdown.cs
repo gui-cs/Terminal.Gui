@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 ///     more.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Markdown.gif" alt="Markdown demo"/>
 ///     <para>
 ///         Set the <see cref="Text"/> property to supply content. The view parses the Markdown,
 ///         performs word-wrap layout, and draws styled output. Fenced code blocks receive a
@@ -490,6 +491,9 @@ public partial class Markdown : View, IDesignable
 
         return slug.Trim ('-');
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:300," + string.Join (",", Enumerable.Repeat ("CursorDown,wait:80", 50)) + ",wait:800";
 
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()

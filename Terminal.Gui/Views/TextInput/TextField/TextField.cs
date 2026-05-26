@@ -2,6 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Single-line text editor.</summary>
 /// <remarks>
+/// <img src="../images/views/TextField.gif" alt="TextField demo"/>
 ///     <para>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</para>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
@@ -254,6 +255,9 @@ public partial class TextField : View, IDesignable, IValue<string>
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public virtual string? GetDemoKeyStrokes () => "wait:300,Home,wait:300,`Hello `,wait:800,End,wait:300,` World`,wait:1000";
 
     #region IValue<string> Implementation
 

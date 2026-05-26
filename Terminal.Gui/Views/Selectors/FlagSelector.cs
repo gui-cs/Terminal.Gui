@@ -16,6 +16,9 @@ namespace Terminal.Gui.Views;
 ///     <see cref="FlagSelector{TFlagsEnum}"/> provides a type-safe version where a `[Flags]` <see langword="enum"/> can be
 ///     provided.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/FlagSelector.gif" alt="FlagSelector demo"/>
+/// </remarks>
 public class FlagSelector : SelectorBase, IDesignable
 {
     /// <summary>
@@ -305,6 +308,9 @@ public class FlagSelector : SelectorBase, IDesignable
             SetLayout ();
         }
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,Space,wait:600,CursorDown,wait:400,Space,wait:800";
 
     /// <inheritdoc/>
     public bool EnableForDesign ()

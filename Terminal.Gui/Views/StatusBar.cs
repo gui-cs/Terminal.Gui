@@ -7,6 +7,9 @@ namespace Terminal.Gui.Views;
 ///     to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a
 ///     new instance of a status bar.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/StatusBar.gif" alt="StatusBar demo"/>
+/// </remarks>
 public class StatusBar : Bar, IDesignable
 {
     private static LineStyle _defaultSeparatorLineStyle = LineStyle.Single; // Resources/config.json overrides
@@ -168,6 +171,9 @@ public class StatusBar : Bar, IDesignable
 
         void OnButtonClicked (object? sender, EventArgs? e) { MessageBox.Query (App!, "Hi", $"You clicked {sender}"); }
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Tab,wait:500,Tab,wait:500,Tab,wait:800";
 
     /// <inheritdoc />
     protected override void Dispose (bool disposing)

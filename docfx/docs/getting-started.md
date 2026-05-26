@@ -49,5 +49,5 @@ When run the application looks as follows:
 ## Building the Library and Running the Examples
 
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
-* Windows - Open `Terminal.sln` with Visual Studio 202x.
+* Windows - Open `Terminal.slnx` with Visual Studio 2022 (17.10+).
 

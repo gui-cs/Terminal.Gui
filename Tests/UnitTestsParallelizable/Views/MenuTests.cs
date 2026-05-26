@@ -1774,6 +1774,63 @@ public class MenuTests (ITestOutputHelper output)
         ((View)runnable).Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void SubMenu_OverlappingMouseMove_DoesNotHideSubMenu ()
+    {
+        VirtualTimeProvider time = new ();
+        using IApplication app = Application.Create (time);
+        app.Init (DriverRegistry.Names.ANSI);
+        IRunnable runnable = new Runnable ();
+
+        MenuItem subItem1 = new () { Title = "SubMenu item one with wide title" };
+        MenuItem subItem2 = new () { Title = "SubMenu item two with wide title" };
+        MenuItem subItem3 = new () { Title = "SubMenu item three with wide title" };
+        Menu subMenu = new ([subItem1, subItem2, subItem3]) { Id = "subMenu" };
+
+        MenuItem rootParent = new () { Title = "_Open", SubMenu = subMenu, Id = "rootParent" };
+        MenuItem rootLeaf1 = new () { Title = "Leaf One", Id = "rootLeaf1" };
+        MenuItem rootLeaf2 = new () { Title = "Leaf Two", Id = "rootLeaf2" };
+        Menu rootMenu = new ([rootParent, rootLeaf1, rootLeaf2]) { Id = "rootMenu", X = 40, Y = 1 };
+
+        View hostView = new () { Id = "host", CanFocus = true, Width = 80, Height = 25 };
+        hostView.Add (rootMenu);
+        ((View)runnable).Add (hostView);
+        app.Begin (runnable);
+
+        subMenu.App = app;
+
+        if (!subMenu.IsInitialized)
+        {
+            subMenu.BeginInit ();
+            subMenu.EndInit ();
+        }
+
+        hostView.Add (subMenu);
+        subMenu.Visible = true;
+        subMenu.X = 34;
+        subMenu.Y = 1;
+
+        ((View)runnable).Layout ();
+
+        rootParent.SetFocus ();
+
+        Rectangle overlap = Rectangle.Intersect (subItem2.FrameToScreen (), rootLeaf1.FrameToScreen ());
+
+        Assert.True (overlap.Width > 0, "The submenu should overlap the base menu item.");
+        Assert.True (overlap.Height > 0, "The submenu should overlap the base menu item.");
+
+        Point overlapPoint = new (overlap.Left + (overlap.Width / 2), overlap.Top + (overlap.Height / 2));
+
+        app.InjectMouse (new Mouse { ScreenPosition = overlapPoint, Flags = MouseFlags.PositionReport });
+
+        Assert.True (subMenu.Visible);
+        Assert.True (subItem2.HasFocus);
+        Assert.False (rootLeaf1.HasFocus);
+
+        ((View)runnable).Dispose ();
+    }
+
     #endregion SubMenu Bridging
 
     #region PopoverMenu Bridging (next layer up)

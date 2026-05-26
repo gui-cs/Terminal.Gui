@@ -19,7 +19,8 @@ public partial class TextView
     {
         if (mouse is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
             && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
-            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Alt)
+            && !IsMouseCommandBound (mouse, Command.StartSelection)
+            && !IsMouseCommandBound (mouse, Command.StartRectangleSelection)
             && !mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Alt)
             && ContextMenu is { }
             && !mouse.Flags.HasFlag (ContextMenu.MouseFlags))
@@ -39,6 +40,9 @@ public partial class TextView
         {
             return true;
         }
+
+        bool startedRectangleSelection = TryInvokeMouseCommand (mouse, Command.StartRectangleSelection);
+        bool startedSelection = startedRectangleSelection || TryInvokeMouseCommand (mouse, Command.StartSelection);
 
         if (mouse.Flags == MouseFlags.LeftButtonClicked)
         {
@@ -108,14 +112,8 @@ public partial class TextView
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Alt))
+        else if (startedSelection)
         {
-            if (!_shiftSelecting)
-            {
-                _isButtonShift = true;
-                StartSelecting ();
-            }
-
             ProcessMouseClick (mouse, out _);
             PositionCursor ();
             _lastWasKill = false;
@@ -320,5 +318,30 @@ public partial class TextView
 
         line = r!;
         ProcessAutocomplete ();
+    }
+
+    private bool IsMouseCommandBound (Mouse mouse, Command command)
+    {
+        if (!MouseBindings.TryGet (mouse.Flags, out MouseBinding binding))
+        {
+            return false;
+        }
+
+        return binding.Commands.Contains (command);
+    }
+
+    private bool TryInvokeMouseCommand (Mouse mouse, Command command)
+    {
+        if (!MouseBindings.TryGet (mouse.Flags, out MouseBinding binding))
+        {
+            return false;
+        }
+
+        if (!binding.Commands.Contains (command))
+        {
+            return false;
+        }
+
+        return InvokeCommand (command, binding with { MouseEvent = mouse, Source = new WeakReference<View> (this) }) == true;
     }
 }
