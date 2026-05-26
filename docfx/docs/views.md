@@ -88,14 +88,6 @@ Lets the user pick a date from a visual calendar.
 ![DatePicker](../images/views/DatePicker.gif)
 
 
-## [Dialog\<T\>](xref:Terminal.Gui.Views.Dialog`1)
-
-A generic modal dialog window with buttons across the bottom. Derive from this class to create dialogs that return custom result types.
-
-
-![Dialog-1](../images/views/Dialog.gif)
-
-
 ## [Dialog](xref:Terminal.Gui.Views.Dialog)
 
 A modal dialog window with buttons across the bottom. When a button is pressed, <xref:Terminal.Gui.App.IRunnable%601.Result> is set to the button's index (0-based).
@@ -104,12 +96,12 @@ A modal dialog window with buttons across the bottom. When a button is pressed, 
 ![Dialog](../images/views/Dialog.gif)
 
 
-## [DropDownList\<T\>](xref:Terminal.Gui.Views.DropDownList`1)
+## [Dialog\<T\>](xref:Terminal.Gui.Views.Dialog`1)
 
-A type-safe dropdown control for selecting a single value from an enum. Provides the same interface as <xref:Terminal.Gui.Views.OptionSelector%601> but rendered as a compact dropdown list.
+A generic modal dialog window with buttons across the bottom. Derive from this class to create dialogs that return custom result types.
 
 
-![DropDownList-1](../images/views/DropDownList.gif)
+![Dialog-1](../images/views/Dialog.gif)
 
 
 ## [DropDownList](xref:Terminal.Gui.Views.DropDownList)
@@ -120,6 +112,14 @@ A dropdown/combo-box control that combines a <xref:Terminal.Gui.Views.TextField>
 ![DropDownList](../images/views/DropDownList.gif)
 
 
+## [DropDownList\<T\>](xref:Terminal.Gui.Views.DropDownList`1)
+
+A type-safe dropdown control for selecting a single value from an enum. Provides the same interface as <xref:Terminal.Gui.Views.OptionSelector%601> but rendered as a compact dropdown list.
+
+
+![DropDownList-1](../images/views/DropDownList.gif)
+
+
 ## [FileDialog](xref:Terminal.Gui.Views.FileDialog)
 
 The base-class for <xref:Terminal.Gui.Views.OpenDialog> and <xref:Terminal.Gui.Views.SaveDialog>
@@ -128,20 +128,20 @@ The base-class for <xref:Terminal.Gui.Views.OpenDialog> and <xref:Terminal.Gui.V
 ![FileDialog](../images/views/FileDialog.gif)
 
 
-## [FlagSelector\<T\>](xref:Terminal.Gui.Views.FlagSelector`1)
-
-Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way. <xref:Terminal.Gui.Views.FlagSelector> provides a non-type-safe version. `TFlagsEnum` must be a valid enum type with the '[Flags]' attribute.
-
-
-![FlagSelector-1](../images/views/FlagSelector.gif)
-
-
 ## [FlagSelector](xref:Terminal.Gui.Views.FlagSelector)
 
 Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary. <xref:Terminal.Gui.Views.FlagSelector%601> provides a type-safe version where a `[Flags]` enum can be provided.
 
 
 ![FlagSelector](../images/views/FlagSelector.gif)
+
+
+## [FlagSelector\<T\>](xref:Terminal.Gui.Views.FlagSelector`1)
+
+Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way. <xref:Terminal.Gui.Views.FlagSelector> provides a non-type-safe version. `TFlagsEnum` must be a valid enum type with the '[Flags]' attribute.
+
+
+![FlagSelector-1](../images/views/FlagSelector.gif)
 
 
 ## [FrameView](xref:Terminal.Gui.Views.FrameView)
@@ -200,14 +200,6 @@ Draws a single line using the <xref:Terminal.Gui.Drawing.LineStyle> specified by
 ![Line](../images/views/Line.gif)
 
 
-## [LinearMultiSelector\<T\>](xref:Terminal.Gui.Views.LinearMultiSelector`1)
-
-A linear range view that allows selection of zero or more options from a typed list.
-
-
-![LinearMultiSelector-1](../images/views/LinearMultiSelector.gif)
-
-
 ## [LinearMultiSelector](xref:Terminal.Gui.Views.LinearMultiSelector)
 
 Convenience non-generic <xref:Terminal.Gui.Views.LinearMultiSelector%601> closed over <xref:System.String>. Allows designer scenarios (e.g. `AllViewsTester`) and reflection-based instantiation to discover and create the view without supplying a type argument.
@@ -216,12 +208,12 @@ Convenience non-generic <xref:Terminal.Gui.Views.LinearMultiSelector%601> closed
 ![LinearMultiSelector](../images/views/LinearMultiSelector.gif)
 
 
-## [LinearRange\<T\>](xref:Terminal.Gui.Views.LinearRange`1)
+## [LinearMultiSelector\<T\>](xref:Terminal.Gui.Views.LinearMultiSelector`1)
 
-A linear range view representing a contiguous range of options. The current value is a <xref:Terminal.Gui.Views.LinearRangeSpan%601> whose <xref:Terminal.Gui.Views.LinearRangeSpan%601.Kind> is one of <xref:Terminal.Gui.Views.LinearRangeSpanKind.None>, <xref:Terminal.Gui.Views.LinearRangeSpanKind.LeftBounded>, <xref:Terminal.Gui.Views.LinearRangeSpanKind.RightBounded>, or <xref:Terminal.Gui.Views.LinearRangeSpanKind.Closed>.
+A linear range view that allows selection of zero or more options from a typed list.
 
 
-![LinearRange-1](../images/views/LinearRange.gif)
+![LinearMultiSelector-1](../images/views/LinearMultiSelector.gif)
 
 
 ## [LinearRange](xref:Terminal.Gui.Views.LinearRange)
@@ -232,18 +224,18 @@ Convenience non-generic <xref:Terminal.Gui.Views.LinearRange%601> closed over <x
 ![LinearRange](../images/views/LinearRange.gif)
 
 
+## [LinearRange\<T\>](xref:Terminal.Gui.Views.LinearRange`1)
+
+A linear range view representing a contiguous range of options. The current value is a <xref:Terminal.Gui.Views.LinearRangeSpan%601> whose <xref:Terminal.Gui.Views.LinearRangeSpan%601.Kind> is one of <xref:Terminal.Gui.Views.LinearRangeSpanKind.None>, <xref:Terminal.Gui.Views.LinearRangeSpanKind.LeftBounded>, <xref:Terminal.Gui.Views.LinearRangeSpanKind.RightBounded>, or <xref:Terminal.Gui.Views.LinearRangeSpanKind.Closed>.
+
+
+![LinearRange-1](../images/views/LinearRange.gif)
+
+
 ## [LinearRangeViewBase\<T\>](xref:Terminal.Gui.Views.LinearRangeViewBase`2)
 
 Abstract base for linear range views (<xref:Terminal.Gui.Views.LinearSelector%601>, <xref:Terminal.Gui.Views.LinearMultiSelector%601>, <xref:Terminal.Gui.Views.LinearRange%601>) that present a list of typed options navigable by keyboard or mouse, and expose the current selection as a strongly-typed value via <xref:Terminal.Gui.ViewBase.IValue%601>.
 
-
-
-## [LinearSelector\<T\>](xref:Terminal.Gui.Views.LinearSelector`1)
-
-A linear range view that allows selection of a single option from a typed list of options.
-
-
-![LinearSelector-1](../images/views/LinearSelector.gif)
 
 
 ## [LinearSelector](xref:Terminal.Gui.Views.LinearSelector)
@@ -254,6 +246,14 @@ Convenience non-generic <xref:Terminal.Gui.Views.LinearSelector%601> closed over
 ![LinearSelector](../images/views/LinearSelector.gif)
 
 
+## [LinearSelector\<T\>](xref:Terminal.Gui.Views.LinearSelector`1)
+
+A linear range view that allows selection of a single option from a typed list of options.
+
+
+![LinearSelector-1](../images/views/LinearSelector.gif)
+
+
 ## [Link](xref:Terminal.Gui.Views.Link)
 
 Displays a clickable hyperlink with optional display text and a target URL.
@@ -262,20 +262,20 @@ Displays a clickable hyperlink with optional display text and a target URL.
 ![Link](../images/views/Link.gif)
 
 
-## [ListView\<T\>](xref:Terminal.Gui.Views.ListView`1)
-
-Provides a scrollable list of data where each item can be activated to perform an action, with a strongly-typed <xref:Terminal.Gui.Views.ListView%601.Value> property that returns the selected object of type <code class="typeparamref">T</code> from the underlying <xref:System.Collections.ObjectModel.ObservableCollection%601>.
-
-
-![ListView-1](../images/views/ListView.gif)
-
-
 ## [ListView](xref:Terminal.Gui.Views.ListView)
 
 Provides a scrollable list of data where each item can be activated to perform an action.
 
 
 ![ListView](../images/views/ListView.gif)
+
+
+## [ListView\<T\>](xref:Terminal.Gui.Views.ListView`1)
+
+Provides a scrollable list of data where each item can be activated to perform an action, with a strongly-typed <xref:Terminal.Gui.Views.ListView%601.Value> property that returns the selected object of type <code class="typeparamref">T</code> from the underlying <xref:System.Collections.ObjectModel.ObservableCollection%601>.
+
+
+![ListView-1](../images/views/ListView.gif)
 
 
 ## [Markdown](xref:Terminal.Gui.Views.Markdown)
@@ -334,20 +334,20 @@ A <xref:Terminal.Gui.Views.Shortcut>-derived item for use in a <xref:Terminal.Gu
 ![MenuItem](../images/views/MenuItem.gif)
 
 
-## [NumericUpDown\<T\>](xref:Terminal.Gui.Views.NumericUpDown`1)
-
-Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
-
-
-![NumericUpDown-1](../images/views/NumericUpDown.gif)
-
-
 ## [NumericUpDown](xref:Terminal.Gui.Views.NumericUpDown)
 
 Enables the user to increase or decrease an int by clicking on the up or down buttons.
 
 
 ![NumericUpDown](../images/views/NumericUpDown.gif)
+
+
+## [NumericUpDown\<T\>](xref:Terminal.Gui.Views.NumericUpDown`1)
+
+Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
+
+
+![NumericUpDown-1](../images/views/NumericUpDown.gif)
 
 
 ## [OpenDialog](xref:Terminal.Gui.Views.OpenDialog)
@@ -358,20 +358,20 @@ Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or 
 ![OpenDialog](../images/views/OpenDialog.gif)
 
 
-## [OptionSelector\<T\>](xref:Terminal.Gui.Views.OptionSelector`1)
-
-Provides a user interface for displaying and selecting a single item from a list of options in a type-safe way. Each option is represented by a checkbox, but only one can be selected at a time. <xref:Terminal.Gui.Views.OptionSelector> provides a non-type-safe version.
-
-
-![OptionSelector-1](../images/views/OptionSelector.gif)
-
-
 ## [OptionSelector](xref:Terminal.Gui.Views.OptionSelector)
 
 Provides a user interface for displaying and selecting a single item from a list of options. Each option is represented by a checkbox, but only one can be selected at a time. <xref:Terminal.Gui.Views.OptionSelector%601> provides a type-safe version where a enum can be provided.
 
 
 ![OptionSelector](../images/views/OptionSelector.gif)
+
+
+## [OptionSelector\<T\>](xref:Terminal.Gui.Views.OptionSelector`1)
+
+Provides a user interface for displaying and selecting a single item from a list of options in a type-safe way. Each option is represented by a checkbox, but only one can be selected at a time. <xref:Terminal.Gui.Views.OptionSelector> provides a non-type-safe version.
+
+
+![OptionSelector-1](../images/views/OptionSelector.gif)
 
 
 ## [PopoverMenu](xref:Terminal.Gui.Views.PopoverMenu)
@@ -396,20 +396,20 @@ A dialog that wraps any <xref:Terminal.Gui.ViewBase.View> with Ok/Cancel buttons
 ![Prompt-2](../images/views/Prompt-2.gif)
 
 
-## [Runnable\<T\>](xref:Terminal.Gui.Views.Runnable`1)
-
-Base implementation of <xref:Terminal.Gui.App.IRunnable%601> for views that can be run as blocking sessions.
-
-
-![Runnable-1](../images/views/Runnable.gif)
-
-
 ## [Runnable](xref:Terminal.Gui.Views.Runnable)
 
 Base implementation of <xref:Terminal.Gui.App.IRunnable> for views that can be run as blocking sessions without returning a result.
 
 
 ![Runnable](../images/views/Runnable.gif)
+
+
+## [Runnable\<T\>](xref:Terminal.Gui.Views.Runnable`1)
+
+Base implementation of <xref:Terminal.Gui.App.IRunnable%601> for views that can be run as blocking sessions.
+
+
+![Runnable-1](../images/views/Runnable.gif)
 
 
 ## [RunnableWrapper\<T\>](xref:Terminal.Gui.Views.RunnableWrapper`2)
@@ -528,20 +528,20 @@ Provides time editing functionality using <xref:Terminal.Gui.Views.TextValidateF
 ![TimeEditor](../images/views/TimeEditor.gif)
 
 
-## [TreeView\<T\>](xref:Terminal.Gui.Views.TreeView`1)
-
-Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined <xref:Terminal.Gui.Views.ITreeBuilder%601>. See TreeView Deep Dive for more information.
-
-
-![TreeView-1](../images/views/TreeView.gif)
-
-
 ## [TreeView](xref:Terminal.Gui.Views.TreeView)
 
 Convenience implementation of generic <xref:Terminal.Gui.Views.TreeView%601> for any tree were all nodes implement <xref:Terminal.Gui.Views.ITreeNode>. See TreeView Deep Dive for more information.
 
 
 ![TreeView](../images/views/TreeView.gif)
+
+
+## [TreeView\<T\>](xref:Terminal.Gui.Views.TreeView`1)
+
+Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined <xref:Terminal.Gui.Views.ITreeBuilder%601>. See TreeView Deep Dive for more information.
+
+
+![TreeView-1](../images/views/TreeView.gif)
 
 
 ## [Window](xref:Terminal.Gui.Views.Window)

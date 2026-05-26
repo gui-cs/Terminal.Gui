@@ -11,6 +11,7 @@ on:
         default: true
 
 permissions:
+  contents: write
   id-token: write 
   pages: write
 
@@ -98,6 +99,22 @@ jobs:
       run: |
         docfx build
       continue-on-error: false
+
+    - name: Commit regenerated views assets
+      if: github.event_name == 'workflow_dispatch' && steps.view-docs.outputs.should_generate == 'true'
+      shell: pwsh
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add docfx/docs/views.md docfx/images/views
+
+        if (git diff --cached --quiet) {
+          Write-Host "No regenerated view assets to commit."
+          exit 0
+        }
+
+        git commit -m "Regenerate docfx view GIF assets via CI"
+        git push
 
     - name: Setup Pages
       if: github.event_name == 'push' && github.ref_name == 'develop'
