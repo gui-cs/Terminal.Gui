@@ -156,7 +156,7 @@ public class SourcesManager
             stream.Position = 0;
             Debug.Assert (json != null);
 #endif
-            SettingsScope? scope = JsonSerializer.Deserialize (stream, ConfigurationManager.SerializerContext.SettingsScope);
+            SettingsScope? scope = JsonSerializer.Deserialize (stream, TuiSerializerContext.Instance.SettingsScope);
 
             if (scope is null)
             {
@@ -303,7 +303,7 @@ public class SourcesManager
     /// <param name="scope"></param>
     internal string ToJson (SettingsScope? scope)
     {
-        return JsonSerializer.Serialize (scope, ConfigurationManager.SerializerContext.SettingsScope);
+        return JsonSerializer.Serialize (scope, TuiSerializerContext.Instance.SettingsScope);
     }
 
     /// <summary>
@@ -312,7 +312,7 @@ public class SourcesManager
     /// <param name="scope"></param>
     internal Stream ToStream (SettingsScope? scope)
     {
-        string json = JsonSerializer.Serialize (scope, ConfigurationManager.SerializerContext.SettingsScope);
+        string json = JsonSerializer.Serialize (scope, TuiSerializerContext.Instance.SettingsScope);
 
         // turn it into a stream
         var stream = new MemoryStream ();

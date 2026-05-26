@@ -1,8 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-#pragma warning disable CS0618 // Obsolete - JSON converter still uses ConfigurationManager.SerializerContext during transition
-
 namespace Terminal.Gui.Configuration;
 
 /// <summary>Json converter from the <see cref="Attribute"/> class.</summary>
@@ -73,11 +71,11 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
                 switch (propertyName?.ToLower ())
                 {
                     case "foreground":
-                        foreground = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Color);
+                        foreground = JsonSerializer.Deserialize (ref reader, TuiSerializerContext.Instance.Color);
 
                         break;
                     case "background":
-                        background = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Color);
+                        background = JsonSerializer.Deserialize (ref reader, TuiSerializerContext.Instance.Color);
 
                         break;
                     case "style":

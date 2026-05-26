@@ -2,8 +2,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-#pragma warning disable CS0618 // Obsolete - JSON converter still uses ConfigurationManager.SerializerContext during transition
-
 namespace Terminal.Gui.Configuration;
 
 internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
@@ -35,7 +33,7 @@ internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
                 {
                     string key = reader.GetString ();
                     reader.Read ();
-                    object value = JsonSerializer.Deserialize (ref reader, typeof (T), ConfigurationManager.SerializerContext);
+                    object value = JsonSerializer.Deserialize (ref reader, typeof (T), TuiSerializerContext.Instance);
                     dictionary.Add (key, (T)value);
                 }
             }
@@ -58,7 +56,7 @@ internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
 
             //writer.WriteString (item.Key, item.Key);
             writer.WritePropertyName (item.Key);
-            JsonSerializer.Serialize (writer, item.Value, typeof (T), ConfigurationManager.SerializerContext);
+            JsonSerializer.Serialize (writer, item.Value, typeof (T), TuiSerializerContext.Instance);
             writer.WriteEndObject ();
         }
 

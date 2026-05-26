@@ -1,8 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-#pragma warning disable CS0618 // Obsolete - JSON converter still uses ConfigurationManager.SerializerContext during transition
-
 namespace Terminal.Gui.Configuration;
 
 // ReSharper disable StringLiteralTypo
@@ -36,7 +34,7 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
             reader.Read ();
 
             // Make sure attributes are marked as explicitly set when deserialized
-            object? attrObj = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Attribute);
+            object? attrObj = JsonSerializer.Deserialize (ref reader, TuiSerializerContext.Instance.Attribute);
 
             if (attrObj is not Attribute attribute)
             {

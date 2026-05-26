@@ -717,28 +717,7 @@ public static class ConfigurationManager
     // `Sources` - A source is a location where a configuration can be stored. Sources are defined in the `ConfigLocations` enum.
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static readonly SourceGenerationContext SerializerContext = new (new JsonSerializerOptions
-    {
-        // Be relaxed
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        PropertyNameCaseInsensitive = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = true,
-        AllowTrailingCommas = true,
-        Converters =
-        {
-            // We override the standard Rune converter to support specifying Glyphs in
-            // a flexible way
-            new RuneJsonConverter (),
-
-            // Override Key to support "Ctrl+Q" format.
-            new KeyJsonConverter ()
-        },
-
-        // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        TypeInfoResolver = SourceGenerationContext.Default
-    });
+    internal static readonly SourceGenerationContext SerializerContext = TuiSerializerContext.Instance;
 
     private static SourcesManager? _sourcesManager = new ();
     private static readonly object _sourcesManagerLock = new ();

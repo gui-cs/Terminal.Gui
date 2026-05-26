@@ -3,8 +3,6 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-#pragma warning disable CS0618 // Obsolete - JSON converter still uses ConfigurationManager.SerializerContext during transition
-
 namespace Terminal.Gui.Configuration;
 
 internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDictionary<string, T>>
@@ -36,7 +34,7 @@ internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDi
                 {
                     string key = reader.GetString ();
                     reader.Read ();
-                    object value = JsonSerializer.Deserialize (ref reader, typeof (T), ConfigurationManager.SerializerContext);
+                    object value = JsonSerializer.Deserialize (ref reader, typeof (T), TuiSerializerContext.Instance);
 
                     if (!dictionary.TryAdd (key, (T)value))
                     {
@@ -62,7 +60,7 @@ internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDi
             writer.WriteStartObject();
 
             writer.WritePropertyName(item.Key);
-            JsonSerializer.Serialize(writer, item.Value, typeof(T), ConfigurationManager.SerializerContext);
+            JsonSerializer.Serialize(writer, item.Value, typeof(T), TuiSerializerContext.Instance);
             writer.WriteEndObject();
         }
 

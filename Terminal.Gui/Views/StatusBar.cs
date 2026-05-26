@@ -1,4 +1,4 @@
-#pragma warning disable CS0618 // Obsolete - StatusBar still uses ConfigurationManager.Applied during transition
+#pragma warning disable CS0618 // Obsolete - StatusBar uses [ConfigurationProperty] for DefaultSeparatorLineStyle during transition
 
 namespace Terminal.Gui.Views;
 
@@ -33,7 +33,7 @@ public class StatusBar : Bar, IDesignable
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
-        ConfigurationManager.Applied += OnConfigurationManagerApplied;
+        ThemeChanges.ThemeChanged += OnThemeChanged;
     }
 
     /// <inheritdoc />
@@ -45,10 +45,10 @@ public class StatusBar : Bar, IDesignable
             // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
             // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
             // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+            ThemeChanges.ThemeChanged -= OnThemeChanged;
         }
     }
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    private void OnThemeChanged (object? sender, App.EventArgs<string> e)
     {
         if (Border is { })
         {
@@ -180,6 +180,6 @@ public class StatusBar : Bar, IDesignable
     {
         base.Dispose (disposing);
 
-        ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+        ThemeChanges.ThemeChanged -= OnThemeChanged;
     }
 }

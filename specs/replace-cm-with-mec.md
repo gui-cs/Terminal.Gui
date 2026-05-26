@@ -1148,6 +1148,21 @@ With POCOs, "hard-coded defaults" are simply the default property values of each
 
 **Definition of done for PR #5411:** complex-type behavior is fully MEC-driven (with compatibility shims still present), and all migration tests pass.
 
+#### Phase 3A.x — Internal subscriber rewiring (landed in #5411)
+
+The following items were pulled forward from the planned post-#5411 removal work because they make the MEC story coherent without requiring CM deletion:
+
+- **A1 — `IThemeManager.ThemeChanged` event.** Added an `EventHandler<EventArgs<string>>` to `IThemeManager`. `MecThemeManager` subscribes to legacy `ThemeManager.ThemeChanged` in its constructor and forwards. The runtime theme/scheme dictionary still lives in legacy `ConfigurationManager.Settings["Themes"]`; Mec presents the API + event surface. Full Mec ownership of theme/scheme data (Phase A2) is deferred to #5416, where deletion of `ScopeJsonConverter` and the array-of-single-key-object JSON shape can be addressed together.
+- **B — `ThemeChanges` static facade.** New `Terminal.Gui.Configuration.ThemeChanges` static class exposes a single `ThemeChanged` event that bridges both `ConfigurationManager.Applied` and `ThemeManager.ThemeChanged`. The four internal view subscribers — `Menu`, `MenuBar`, `StatusBar`, `LineCanvas` — now subscribe to `ThemeChanges.ThemeChanged` instead of `ConfigurationManager.Applied`. `ConfigurationManager.Applied` remains public and `[Obsolete]` for external consumers; #5416 can delete it once external migration windows close.
+- **C — `TuiSerializerContext` extraction.** The configured `SourceGenerationContext` instance (with `RuneJsonConverter`, `KeyJsonConverter`, `JavaScriptEncoder.UnsafeRelaxedJsonEscaping`, comment-skip, trailing commas, etc.) now lives in a non-obsolete `internal static class TuiSerializerContext` with a single `Instance` field. The obsolete `ConfigurationManager.SerializerContext` is preserved as a thin delegator (`= TuiSerializerContext.Instance`) for back-compat. All seven internal JSON-converter consumers reference `TuiSerializerContext.Instance` directly, eliminating several `#pragma warning disable CS0618` blocks (`AttributeJsonConverter`, `SchemeJsonConverter`, `DictionaryJsonConverter`, `ConcurrentDictionaryJsonConverter`) and narrowing the rationale on the remaining three (`DeepCloner`, `ScopeJsonConverter`, `SourcesManager` — still need the pragma for other obsolete CM uses).
+
+The following items were considered for #5411 but deferred to #5416 with documented reasons:
+
+- **A2 — Mec actually owns theme/scheme runtime data.** Requires either D-02 (config.json nested-shape migration) or a MEC-compatible parser for the array-of-single-key-object format. Out of scope for #5411 because it would force a JSON schema decision; that decision belongs in the deletion PR where `ScopeJsonConverter` is also being removed.
+- **Phase D — `config.json` flat → nested migration.** CM's read path still exists in #5411 and would break on a nested-format resource file. Must be paired with `ScopeJsonConverter` deletion in #5416.
+- **Phase E — Delete CM types.** The whole point of marking them `[Obsolete]` in #5411 is to provide a one-release shim window.
+- **`PrintJsonErrors()` removal / `OnLoadException` wiring.** Behavior-preserving replacement is possible via `JsonConfigurationSource.OnLoadException` (sets `ctx.Ignored = true` to swallow parse errors and aggregate them for deferred display). Out of scope for #5411 to avoid expanding the diff further; folded into #5416's scope with the explicit note that fail-fast vs. deferred-error parity is preservable.
+
 ### Phase 4 — Remove [ConfigurationProperty] Static Statics
 
 **Goal:** Remove the reflection-based CM machinery. Static properties become plain statics that are only updated by MEC.

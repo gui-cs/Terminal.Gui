@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using Terminal.Gui.Tracing;
 
-#pragma warning disable CS0618 // Obsolete - MenuBar still uses ConfigurationManager.Applied during transition
+#pragma warning disable CS0618 // Obsolete - MenuBar uses [ConfigurationProperty] for DefaultBorderStyle/DefaultKey during transition
 
 namespace Terminal.Gui.Views;
 
@@ -120,7 +120,7 @@ public class MenuBar : Menu, IDesignable
 
         BorderStyle = DefaultBorderStyle;
 
-        ConfigurationManager.Applied += OnConfigurationManagerApplied;
+        ThemeChanges.ThemeChanged += OnThemeChanged;
 
         return;
 
@@ -596,7 +596,7 @@ public class MenuBar : Menu, IDesignable
 
         if (disposing)
         {
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+            ThemeChanges.ThemeChanged -= OnThemeChanged;
         }
     }
 
@@ -790,7 +790,7 @@ public class MenuBar : Menu, IDesignable
             // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
             // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
             // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+            ThemeChanges.ThemeChanged -= OnThemeChanged;
         }
     }
 
@@ -872,7 +872,7 @@ public class MenuBar : Menu, IDesignable
         return false;
     }
 
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e) => BorderStyle = DefaultBorderStyle;
+    private void OnThemeChanged (object? sender, App.EventArgs<string> e) => BorderStyle = DefaultBorderStyle;
 
     private void OnEntryMenuOpenChanged (object? sender, ValueChangedEventArgs<bool> e)
     {

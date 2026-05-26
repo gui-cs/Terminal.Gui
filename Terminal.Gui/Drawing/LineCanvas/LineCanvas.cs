@@ -1,7 +1,5 @@
 using System.Runtime.InteropServices;
 
-#pragma warning disable CS0618 // Obsolete - LineCanvas still uses ConfigurationManager.Applied during transition
-
 namespace Terminal.Gui.Drawing;
 
 /// <summary>
@@ -64,10 +62,8 @@ public class LineCanvas : IDisposable
     /// <summary>Creates a new instance.</summary>
     public LineCanvas () =>
 
-        // TODO: Refactor ConfigurationManager to not use an event handler for this.
-        // Instead, have it call a method on any class appropriately attributed
-        // to update the cached values. See Issue #2871
-        ConfigurationManager.Applied += ConfigurationManager_Applied;
+        // Subscribes to theme changes so cached glyphs/attributes can be refreshed. See Issue #2871.
+        ThemeChanges.ThemeChanged += OnThemeChanged;
 
     private readonly List<StraightLine> _lines = [];
 
@@ -703,7 +699,7 @@ public class LineCanvas : IDisposable
         return true;
     }
 
-    private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
+    private void OnThemeChanged (object? sender, App.EventArgs<string> e)
     {
         foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in _runeResolvers)
         {
@@ -1258,7 +1254,7 @@ public class LineCanvas : IDisposable
     /// <inheritdoc/>
     public void Dispose ()
     {
-        ConfigurationManager.Applied -= ConfigurationManager_Applied;
+        ThemeChanges.ThemeChanged -= OnThemeChanged;
         GC.SuppressFinalize (this);
     }
 }

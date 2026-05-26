@@ -1,6 +1,6 @@
 using Terminal.Gui.Tracing;
 
-#pragma warning disable CS0618 // Obsolete - Menu still uses ConfigurationManager.Applied during transition
+#pragma warning disable CS0618 // Obsolete - Menu uses [ConfigurationProperty] for DefaultBorderStyle during transition
 
 namespace Terminal.Gui.Views;
 
@@ -85,10 +85,10 @@ public class Menu : Bar, IValue<MenuItem?>
         KeyBindings.Clear ();
         MouseBindings.Clear ();
 
-        ConfigurationManager.Applied += OnConfigurationManagerApplied;
+        ThemeChanges.ThemeChanged += OnThemeChanged;
     }
 
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    private void OnThemeChanged (object? sender, App.EventArgs<string> e)
     {
         if (SuperView is { })
         {
@@ -513,7 +513,7 @@ public class Menu : Bar, IValue<MenuItem?>
 
         if (disposing)
         {
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+            ThemeChanges.ThemeChanged -= OnThemeChanged;
         }
     }
 }

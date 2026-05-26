@@ -1,9 +1,12 @@
+#pragma warning disable CS0618 // Obsolete - MecThemeManager forwards from legacy ThemeManager during transition
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     MEC-backed implementation of <see cref="IThemeManager"/>.
-///     During the transition period, this delegates to the existing static <see cref="ThemeManager"/>
-///     for theme data while providing the new interface.
+///     During the transition period (PR #5411), this delegates writes to the legacy static <see cref="ThemeManager"/>
+///     because the runtime theme/scheme dictionary is still owned by <see cref="ConfigurationManager.Settings"/>.
+///     The Phase A2 work in #5416 will let this type own the theme/scheme data directly.
 /// </summary>
 public class MecThemeManager : IThemeManager
 {
@@ -13,7 +16,13 @@ public class MecThemeManager : IThemeManager
     public MecThemeManager (TuiConfigurationBuilder builder)
     {
         _builder = builder;
+
+        // Forward legacy ThemeManager.ThemeChanged into the IThemeManager.ThemeChanged event so
+        // consumers of the new API see every theme change, regardless of which API triggered it.
+        ThemeManager.ThemeChanged += OnLegacyThemeChanged;
     }
+
+    private void OnLegacyThemeChanged (object? sender, App.EventArgs<string> e) => ThemeChanged?.Invoke (this, e);
 
     /// <inheritdoc/>
     public string CurrentThemeName => ThemeSettings.Defaults.Theme;
@@ -36,6 +45,9 @@ public class MecThemeManager : IThemeManager
     }
 
     /// <inheritdoc/>
+    public event EventHandler<App.EventArgs<string>>? ThemeChanged;
+
+    /// <inheritdoc/>
     public bool SwitchTheme (string themeName)
     {
         if (string.IsNullOrEmpty (themeName))
@@ -49,7 +61,8 @@ public class MecThemeManager : IThemeManager
             return false;
         }
 
-        // During transition, also update the existing ThemeManager
+        // During transition, also update the existing ThemeManager. Its setter raises
+        // ThemeManager.ThemeChanged, which is forwarded via OnLegacyThemeChanged above.
         try
         {
             ThemeManager.Theme = themeName;

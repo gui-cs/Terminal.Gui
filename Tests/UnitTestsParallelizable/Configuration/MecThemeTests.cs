@@ -1,5 +1,6 @@
 // Copilot
 
+using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 
 namespace ConfigurationTests;
@@ -82,5 +83,43 @@ public class MecThemeTests
         TuiConfigurationBuilder builder = new ();
         ISchemeManager manager = builder.SchemeManager;
         Assert.IsType<MecSchemeManager> (manager);
+    }
+
+    // Copilot - Claude Opus 4.7
+    [Fact]
+    public void IThemeManager_ThemeChanged_EventCanBeSubscribedAndUnsubscribed ()
+    {
+        TuiConfigurationBuilder builder = new ();
+        IThemeManager manager = builder.ThemeManager;
+        bool fired = false;
+        EventHandler<EventArgs<string>> handler = (_, _) => fired = true;
+
+        manager.ThemeChanged += handler;
+        manager.ThemeChanged -= handler;
+
+        Assert.False (fired);
+    }
+
+    // Copilot - Claude Opus 4.7
+    [Fact]
+    public void ThemeChanges_ThemeChanged_EventCanBeSubscribedAndUnsubscribed ()
+    {
+        bool fired = false;
+        EventHandler<EventArgs<string>> handler = (_, _) => fired = true;
+
+        ThemeChanges.ThemeChanged += handler;
+        ThemeChanges.ThemeChanged -= handler;
+
+        Assert.False (fired);
+    }
+
+    // Copilot - Claude Opus 4.7
+    [Fact]
+    public void ThemeChanges_ThemeChanged_StaticClassIsPublic ()
+    {
+        // Phase B contract: views can reach a static facade without DI.
+        Type t = typeof (ThemeChanges);
+        Assert.True (t.IsAbstract && t.IsSealed, "ThemeChanges must be a static class");
+        Assert.NotNull (t.GetEvent ("ThemeChanged"));
     }
 }

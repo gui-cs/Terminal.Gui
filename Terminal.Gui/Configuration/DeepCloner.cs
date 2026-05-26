@@ -173,7 +173,7 @@ public static class DeepCloner
             // In AOT, try using the JsonSerializer if available
             if (IsAotEnvironment ())
             {
-                JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (type);
+                JsonTypeInfo? jsonTypeInfo = TuiSerializerContext.Instance.GetTypeInfo (type);
 
                 if (jsonTypeInfo is not null)
                 {
@@ -414,7 +414,7 @@ public static class DeepCloner
         // to a crash from a trimmed constructor.
         try
         {
-            JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (dictType);
+            JsonTypeInfo? jsonTypeInfo = TuiSerializerContext.Instance.GetTypeInfo (dictType);
 
             if (jsonTypeInfo is not null)
             {
