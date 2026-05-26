@@ -56,6 +56,7 @@ public class ProgressBar : View, IDesignable
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         CanFocus = false;
         _fraction = 0;
+        SetTextDirect ("0%");
     }
 
     /// <summary>
@@ -73,6 +74,7 @@ public class ProgressBar : View, IDesignable
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
+            SetTextDirect ($"{_fraction * 100:F0}%");
             UpdateTerminalProgress ();
             SetNeedsDraw ();
         }
@@ -155,16 +157,15 @@ public class ProgressBar : View, IDesignable
     ///     <see cref="ProgressBarFormat"/> is <see cref="ProgressBarFormat.SimplePlusPercentage"/> the percentage will be
     ///     displayed. If <see cref="ProgressBarStyle"/> is a marquee style, the text will be displayed.
     /// </summary>
-    public override string Text
+    protected override bool OnTextChanging (string newText)
     {
-        get => string.IsNullOrEmpty (base.Text) ? $"{_fraction * 100:F0}%" : base.Text;
-        set
+        // Only allow text to be set externally in marquee mode
+        if (ProgressBarStyle is not (ProgressBarStyle.MarqueeBlocks or ProgressBarStyle.MarqueeContinuous))
         {
-            if (ProgressBarStyle is ProgressBarStyle.MarqueeBlocks or ProgressBarStyle.MarqueeContinuous)
-            {
-                base.Text = value;
-            }
+            return true;
         }
+
+        return base.OnTextChanging (newText);
     }
 
     ///<inheritdoc/>

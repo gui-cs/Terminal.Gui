@@ -48,9 +48,9 @@ public class LoginView : Window, IViewFor<LoginViewModel>
                     .BindTo (unInput, x => x.Text)
                     .DisposeWith (_disposable);
 
-                unInput
-                    .Events ()
-                    .TextChanged
+                Observable.FromEventPattern (
+                        h => unInput.TextChanged += h,
+                        h => unInput.TextChanged -= h)
                     .Select (_ => unInput.Text)
                     .DistinctUntilChanged ()
                     .BindTo (ViewModel, x => x.Username)
@@ -79,9 +79,9 @@ public class LoginView : Window, IViewFor<LoginViewModel>
                     .BindTo (pwInput, x => x.Text)
                     .DisposeWith (_disposable);
 
-                pwInput
-                    .Events ()
-                    .TextChanged
+                Observable.FromEventPattern (
+                        h => pwInput.TextChanged += h,
+                        h => pwInput.TextChanged -= h)
                     .Select (_ => pwInput.Text)
                     .DistinctUntilChanged ()
                     .BindTo (ViewModel, x => x.Password)
