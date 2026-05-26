@@ -7,6 +7,9 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     The base-class for <see cref="OpenDialog"/> and <see cref="SaveDialog"/>
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/FileDialog.gif" alt="FileDialog demo"/>
+/// </remarks>
 public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
 {
     /// <summary>Gets the Path separators for the operating system</summary>
@@ -587,6 +590,9 @@ public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
                                 });
         }
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Alt+T,wait:300,Shift+Tab,Shift+Tab,wait:300,CursorRight,wait:300,Tab,wait:300,Alt+T,wait:300,Alt+F,wait:300,`.md`,wait:800,Shift+Tab,wait:300,Enter,wait:800";
 
     bool IDesignable.EnableForDesign ()
     {

@@ -4,6 +4,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Fully featured multi-line text editor.</summary>
 /// <remarks>
+/// <img src="../images/views/TextView.gif" alt="TextView demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>
@@ -327,6 +328,9 @@ public partial class TextView : View, IDesignable
 
     /// <summary>Get the Context Menu.</summary>
     public PopoverMenu? ContextMenu { get; private set; }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,End,wait:300,` Editing`,wait:400,` text!`,wait:800";
 
     /// <inheritdoc/>
     public bool EnableForDesign ()

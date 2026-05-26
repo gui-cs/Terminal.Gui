@@ -4,6 +4,7 @@ namespace Terminal.Gui.Views;
 ///     An overlapped container for other views with a border and optional title.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Window.gif" alt="Window demo"/>
 ///     <para>
 ///         Window has <see cref="View.BorderStyle"/> set to <see cref="float"/>, <see cref="View.Arrangement"/>
 ///         set to <see cref="ViewArrangement.Overlapped"/>, and

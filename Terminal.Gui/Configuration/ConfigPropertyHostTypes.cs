@@ -46,6 +46,7 @@ internal static class ConfigPropertyHostTypes
         typeof (NerdFonts),
         typeof (Trace),
         typeof (View),
+        typeof (BorderView),
         typeof (Button),
         typeof (CharMap),
         typeof (CheckBox),
@@ -77,6 +78,7 @@ internal static class ConfigPropertyHostTypes
     [DynamicDependency (PRESERVED_MEMBERS, typeof (NerdFonts))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Trace))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (View))]
+    [DynamicDependency (PRESERVED_MEMBERS, typeof (BorderView))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Button))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (CharMap))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (CheckBox))]

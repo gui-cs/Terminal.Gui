@@ -378,4 +378,14 @@ public enum Command
     InsertCaretBelow,
 
     #endregion
+
+    #region Mouse Selection Commands
+
+    /// <summary>Starts extending a selection via pointing-device input.</summary>
+    StartSelection,
+
+    /// <summary>Starts extending a rectangular selection via pointing-device input.</summary>
+    StartRectangleSelection,
+
+    #endregion
 }
