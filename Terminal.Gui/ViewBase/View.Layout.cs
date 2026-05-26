@@ -578,6 +578,16 @@ public partial class View // Layout APIs
             // recomputed during dependency resolution. Draw after layout only when this view was
             // directly invalidated for layout or its resolved frame actually changed.
             SetNeedsDraw ();
+
+            // Issue #5358: when the Frame shrinks or moves, the SuperView's old-frame area is
+            // now uncovered and must be cleared on the next draw. Invalidate the union of the
+            // old and new frames on the SuperView so its region-aware ClearViewport repaints
+            // just that area. Without this, stale content (e.g. an old shadow) remains visible
+            // after a view shrinks.
+            if (frameChanged && SuperView is { })
+            {
+                SuperView.SetNeedsDraw (Rectangle.Union (originalFrame, Frame));
+            }
         }
 
         return true;
