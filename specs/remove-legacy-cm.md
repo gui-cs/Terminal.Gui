@@ -9,30 +9,33 @@
 
 ## 1. Purpose
 
-PR #5411 completed the **functional** CM → MEC migration:
+PR #5411 completed the **functional** CM → MEC migration plus the cross-cutting cleanup that did not require deleting CM itself:
 
 - Per‑component Settings POCOs with static `Defaults` facades.
 - `TuiConfigurationBuilder` + `TuiConfigurationExtensions` providing the MEC-based source chain.
-- `IThemeManager` / `ISchemeManager` services (currently thin wrappers over legacy static managers).
+- `IThemeManager` / `ISchemeManager` services. `IThemeManager.ThemeChanged` exists and is wired (A1 done).
+- `Terminal.Gui.Configuration.ThemeChanges` static facade — bridges both `ConfigurationManager.Applied` (because `CM.Apply()` writes `ConfigProperty` values directly, bypassing C# setters) and `IThemeManager.ThemeChanged` into a single observer-friendly event. All four internal view subscribers (`Menu`, `MenuBar`, `StatusBar`, `LineCanvas`) have migrated off `ConfigurationManager.Applied`.
+- `Terminal.Gui.Configuration.TuiSerializerContext` — internal, non-obsolete holder of the configured `SourceGenerationContext` instance with all custom converters and JSON options. All 7 internal JSON converter consumers reference `TuiSerializerContext.Instance` directly; their `#pragma warning disable CS0618` blocks are gone. `ConfigurationManager.SerializerContext` is now a one-line delegator.
 - All `[ConfigurationProperty(...)]` attributes removed from production view/option properties (only the attribute *class* still exists).
 - `ConfigurationManager`, `SourcesManager`, `ConfigProperty`, `Scope<T>`, `DeepCloner`, `ScopeJsonConverter` marked `[Obsolete]` and only referenced internally during the transition.
 
-This PR finishes the migration by **deleting** every legacy CM type, the embedded flat-key `Resources/config.json` format, the residual CM-backed wiring inside the MEC managers, and all CM-specific tests. The result is the AOT size reduction and parallel-test unlock that motivated #4943 in the first place.
+This PR finishes the migration by **deleting** every legacy CM type, **migrating** the embedded `Resources/config.json` to a MEC-compatible shape, **promoting** `MecThemeManager`/`MecSchemeManager` from event-bridging wrappers to data owners (A2), and **removing** all CM-specific tests. The result is the AOT size reduction and parallel-test unlock that motivated #4943.
 
-This corresponds to **Phases 4, 5, and 6** of the predecessor spec, executed as a single stacked PR.
+This corresponds to **Phases 4, 5, and 6** of the predecessor spec, executed as a single stacked PR. See the `Phase 3A.x — Internal subscriber rewiring (landed in #5411)` subsection of [`specs/replace-cm-with-mec.md`](./replace-cm-with-mec.md) for the authoritative record of what shipped in the parent PR.
 
 ---
 
 ## 2. Goals
 
-1. **Delete every legacy CM type and attribute** (no `[Obsolete]` shim period — they were already shimmed in #5411).
-2. **Replace CM-backed `ThemeManager` / `SchemeManager` internals** with POCO + `IOptionsMonitor<ThemeSettings>` storage so `MecThemeManager` / `MecSchemeManager` are no longer thin wrappers over the static legacy types.
+1. **Complete Phase A2** — Migrate runtime theme/scheme data ownership from `ConfigurationManager.Settings["Themes"]` (parsed by `ScopeJsonConverter`) into `IOptionsMonitor<ThemeSettings>`. This is the gating prerequisite for deleting `ScopeJsonConverter` and is tightly coupled to the D-02 resource-shape decision (see §5.4).
+2. **Delete every legacy CM type and attribute** (no `[Obsolete]` shim period — they were already shimmed in #5411).
 3. **Eliminate CM-related anti-trim patterns**: `ConfigPropertyHostTypes.GetTypes()`, `[DynamicDependency]` on 29 host types, `Assembly.GetTypes()` reflection scan, `DeepCloner` reflection, `MakeGenericType` usage.
-4. **Drop the `ConfigurationManager.Applied` event subscription pattern** used by `Menu`, `MenuBar`, `StatusBar`, `LineCanvas` and replace with `IOptionsMonitor<T>.OnChange` (or direct theme-manager events).
-5. **Migrate the embedded `Terminal.Gui/Resources/config.json`** from the legacy flat-key `Themes: [ { Name: { "Class.Prop": ... } } ]` layout to the MEC-native nested `Themes:{ Name:{ Class:{ Prop:... } } }` layout (per D-02 Option 3 ⇒ now Option 2 since flat keys are no longer parsed).
-6. **Delete all CM-only tests** (`ConfigurationMangerTests`, `ConfigPropertyAssemblyScanTests`, `ConfigPropertyTests`, `ConfigPropertyHostTypesTests`, `DeepClonerTests`, `ScopeJsonConverterTests`, `ScopeTests`, `SettingsScopeTests`, `ThemeScopeTests`, `ConfigurationPropertyAttributeTests`, legacy `SourcesManagerTests`). Keep MEC equivalents.
-7. **Measure and record the NativeAOT binary-size delta** in PR #5416 so the stated motivation in #4943 is verifiable.
-8. **Update `docfx/docs/config.md`** so the documented contract matches the shipped contract (Constitution: *Documentation Is the Spec*).
+4. **Migrate the embedded `Terminal.Gui/Resources/config.json`** from the legacy flat-key `Themes: [ { Name: { "Class.Prop": ... } } ]` layout to a MEC-readable shape. Either nested-only with a one-release migration helper, **or** a custom MEC source that parses the legacy shape directly — see D-02 in §5.4.
+5. **Delete the four-line `ConfigurationManager.Applied` bridge** inside `ThemeChanges` once `ConfigurationManager` is gone. Keep `ThemeChanges` itself as the supported public observer facade.
+6. **Delete the `ConfigurationManager.SerializerContext` delegator** (one field). All real consumers already reference `TuiSerializerContext.Instance`.
+7. **Delete all CM-only tests** (`ConfigurationMangerTests`, `ConfigPropertyAssemblyScanTests`, `ConfigPropertyTests`, `ConfigPropertyHostTypesTests`, `DeepClonerTests`, `ScopeJsonConverterTests`, `ScopeTests`, `SettingsScopeTests`, `ThemeScopeTests`, `ConfigurationPropertyAttributeTests`, legacy `SourcesManagerTests`). Keep MEC equivalents.
+8. **Measure and record the NativeAOT binary-size delta** in PR #5416 so the stated motivation in #4943 is verifiable.
+9. **Update `docfx/docs/config.md`** so the documented contract matches the shipped contract (Constitution: *Documentation Is the Spec*).
 
 ### Non‑goals
 
@@ -81,12 +84,14 @@ The exhaustive inventory of what still has to go. Discovered by `grep`ping the w
 
 | File | Action |
 |------|--------|
-| `SourceGenerationContext.cs` | Keep. Re-audit `[JsonSerializable]` entries — remove any that referenced `SettingsScope` / `ThemeScope` / `AppSettingsScope`. Add `ThemeSettings` and the per-component settings POCOs. |
-| `AttributeJsonConverter.cs`, `SchemeJsonConverter.cs`, `RuneJsonConverter.cs`, `KeyJsonConverter.cs`, `ColorJsonConverter.cs`, `TraceCategoryJsonConverter.cs` | Keep. Replace internal references to `ConfigurationManager.SerializerContext` with `SourceGenerationContext.Default` (the source‑generated context). Remove the `#pragma warning disable CS0618` blocks. |
+| `TuiSerializerContext.cs` | **Already exists post-#5411.** No change. This is the canonical JSON context for the MEC era. |
+| `SourceGenerationContext.cs` | Keep. Re-audit `[JsonSerializable]` entries — remove any that reference `SettingsScope` / `ThemeScope` / `AppSettingsScope`. Add `ThemeSettings` and the per-component settings POCOs. |
+| `ThemeChanges.cs` | **Already exists post-#5411.** Keep as the supported observer facade. In this PR: remove the `ConfigurationManager.Applied` bridge inside it (one branch of an `OR`) once `ConfigurationManager` is deleted. |
+| `AttributeJsonConverter.cs`, `SchemeJsonConverter.cs`, `RuneJsonConverter.cs`, `KeyJsonConverter.cs`, `ColorJsonConverter.cs`, `TraceCategoryJsonConverter.cs`, `DictionaryJsonConverter.cs`, `ConcurrentDictionaryJsonConverter.cs` | Keep. **Already point at `TuiSerializerContext.Instance` post-#5411.** No further work. |
 | `Settings/*Settings.cs` (all 30+) | Keep. These are the POCOs that became the source of truth in #5411. |
 | `Settings/TuiConfigurationBuilder.cs` | Keep. Becomes the **only** configuration entry point. |
 | `Settings/TuiConfigurationExtensions.cs` | Keep. |
-| `Settings/IThemeManager.cs`, `Settings/IThemeManager.cs`, `Settings/MecThemeManager.cs`, `Settings/MecSchemeManager.cs` | Keep but rewrite internals (see §5.2). |
+| `Settings/IThemeManager.cs`, `Settings/ISchemeManager.cs`, `Settings/MecThemeManager.cs`, `Settings/MecSchemeManager.cs` | Keep. **A1 (event plumbing) is done post-#5411.** A2 (data ownership) is this PR's work — see §5.2. |
 
 ### 4.3 Types to **rename** (drop the `Mec` prefix once the legacy peers are gone)
 
@@ -104,15 +109,16 @@ The legacy `SchemeManager` / `ThemeManager` are deleted in §4.1; the rename is 
 
 | File | Current dependency | Replacement |
 |------|--------------------|-------------|
-| `ModuleInitializers.cs` | Calls `ConfigurationManager.Initialize ()` then `mecBuilder.ApplyToStaticFacades ()` | Single call to `TuiConfigurationBuilder.ApplyToStaticFacades ()`. Delete the dual-init suppression. |
-| `App/ApplicationImpl.Lifecycle.cs` | `ConfigurationManager.PrintJsonErrors ()` | Delete the call. MEC throws on parse error; STJ errors go through `Logging`. |
+| `ModuleInitializers.cs` | Calls `ConfigurationManager.Initialize ()` then `mecBuilder.ApplyToStaticFacades ()` | Single call to `TuiConfigurationBuilder.ApplyToStaticFacades ()`. Delete the dual-init suppression. Gated by A2 completion. |
+| `App/ApplicationImpl.Lifecycle.cs` | `ConfigurationManager.PrintJsonErrors ()` | Replace with an equivalent aggregated-error printer fed by `JsonConfigurationSource.OnLoadException`. See §5.4 and §6 Phase D. |
 | `App/Application.cs` | Several `ConfigurationManager.*` references in xmldoc/method bodies | Replace with `TuiConfigurationBuilder` references or delete. |
 | `App/Tracing/Trace.cs` | One CM reference | Replace with `TraceSettings.Defaults.EnabledCategories`. |
-| `Views/Menu/Menu.cs`, `Views/Menu/MenuBar.cs`, `Views/StatusBar.cs`, `Drawing/LineCanvas/LineCanvas.cs` | Subscribe/unsubscribe to `ConfigurationManager.Applied` to re-read theme-driven defaults | Subscribe to `IOptionsMonitor<ThemeSettings>.OnChange` (exposed via a small `ThemeChanges.Observed` helper, or via `IThemeManager.ThemeChanged`). Drop the `#pragma warning disable CS0618` suppressions. |
 | `Drawing/Scheme.cs` | xmldoc references CM in a comment | Update wording. |
 | `Drawing/Glyphs.cs` | (None — already POCO-backed via `GlyphSettings.Defaults`.) | No change. Confirm via grep after removal. |
 | `Input/CommandBindingsBase.cs` | Comment refers to `ConfigurationManager.Apply` / `DeepMemberWiseCopy` | Update comment; the dictionary‑copy workaround stays because the underlying race is now in `IOptionsMonitor` callbacks. |
-| `Views/Menu/PopoverMenu.cs`, `Views/Selectors/SelectorBase.cs`, `Views/Window.cs`, `Views/Dialog.cs`, `Views/FrameView.cs`, `Views/MessageBox.cs`, `Views/HexView.cs`, `Views/CharMap/CharMap.cs`, `Views/CheckBox.cs`, `Views/Button.cs`, `Views/FileDialogs/FileDialog.cs`, `Views/FileDialogs/FileDialogStyle.cs`, `Views/LinearRange/LinearRangeDefaults.cs`, `Views/LinearRange/LinearRangeViewBase.cs`, `Views/TextInput/TextField/TextField.cs`, `Views/TextInput/TextView/TextView.cs`, `Views/TreeView/TreeViewT.cs`, `ViewBase/View.Keyboard.cs`, `ViewBase/Mouse/View.Mouse.cs`, `ViewBase/Adornment/BorderView.Arrangement.cs`, `Text/NerdFonts.cs`, `FileServices/FileSystemIconProvider.cs`, `Drawing/Color/Color.cs`, `Input/Keyboard/Key.cs`, `Drivers/Driver.cs`, `App/Legacy/Application.Mouse.cs` | Each contains one or two stale doc-comment references to `ConfigurationManager`, `SettingsScope`, or `ThemeScope` (no live code dependency confirmed by grep `[ConfigurationProperty(` returning only the attribute file). | Sweep comments only. |
+| Stale `using Terminal.Gui.Configuration;` / xmldoc references in: `Views/Menu/PopoverMenu.cs`, `Views/Selectors/SelectorBase.cs`, `Views/Window.cs`, `Views/Dialog.cs`, `Views/FrameView.cs`, `Views/MessageBox.cs`, `Views/HexView.cs`, `Views/CharMap/CharMap.cs`, `Views/CheckBox.cs`, `Views/Button.cs`, `Views/FileDialogs/FileDialog.cs`, `Views/FileDialogs/FileDialogStyle.cs`, `Views/LinearRange/LinearRangeDefaults.cs`, `Views/LinearRange/LinearRangeViewBase.cs`, `Views/TextInput/TextField/TextField.cs`, `Views/TextInput/TextView/TextView.cs`, `Views/TreeView/TreeViewT.cs`, `ViewBase/View.Keyboard.cs`, `ViewBase/Mouse/View.Mouse.cs`, `ViewBase/Adornment/BorderView.Arrangement.cs`, `Text/NerdFonts.cs`, `FileServices/FileSystemIconProvider.cs`, `Drawing/Color/Color.cs`, `Input/Keyboard/Key.cs`, `Drivers/Driver.cs`, `App/Legacy/Application.Mouse.cs` | No live code dependency (verified — `[ConfigurationProperty(` grep returns only the attribute file itself). | Mechanical comment sweep. |
+
+**Already rewired in #5411 (no action in this PR):** `Views/Menu/Menu.cs`, `Views/Menu/MenuBar.cs`, `Views/StatusBar.cs`, `Drawing/LineCanvas/LineCanvas.cs` all subscribe to `ThemeChanges.ThemeChanged` instead of `ConfigurationManager.Applied`.
 
 ### 4.5 Resource files
 
@@ -193,20 +199,24 @@ TuiConfigurationBuilder.ApplyToStaticFacades()
 
 `ButtonSettings.Defaults` (and peers) remain the **static facade** used by all views per D‑01. The only change versus #5411 is that the facade is now updated *only* by the MEC monitor — never by `ConfigurationManager.Apply`.
 
-### 5.2 ThemeManager / SchemeManager: from wrapper to owner
+### 5.2 ThemeManager / SchemeManager: from event-bridging wrapper to data owner (A2)
 
-`MecThemeManager` and `MecSchemeManager` currently delegate to the legacy static `ThemeManager` / `SchemeManager`. Once the legacy types are deleted, they become the owners:
+Post-#5411 status (**A1 — done**): `IThemeManager.ThemeChanged` exists; `MecThemeManager` subscribes to the legacy static `ThemeManager.ThemeChanged` in its constructor and forwards. `ThemeChanges.ThemeChanged` is the public observer facade used by internal views; it bridges both `ConfigurationManager.Applied` *and* `IThemeManager.ThemeChanged` because `CM.Apply()` writes `ConfigProperty` values directly and bypasses the C# setter, so `ThemeChanged` alone would miss most theme switches today.
+
+This PR's work (**A2**): make `MecThemeManager` / `MecSchemeManager` the **owners** of theme and scheme runtime data, so the `ConfigurationManager.Applied` half of the `ThemeChanges` bridge can be deleted along with `ConfigurationManager` itself.
+
+Today the runtime theme/scheme dictionary lives in `ConfigurationManager.Settings["Themes"]`, parsed by `ScopeJsonConverter`. The target shape:
 
 ```csharp
 public sealed class ThemeManager : IThemeManager
 {
     private readonly IOptionsMonitor<ThemeSettings> _monitor;
-    private readonly object _switchLock = new ();
+    private IDisposable? _subscription;
 
     public ThemeManager (IOptionsMonitor<ThemeSettings> monitor)
     {
         _monitor = monitor;
-        _monitor.OnChange (HandleChanged);
+        _subscription = _monitor.OnChange (HandleChanged);
     }
 
     public string ActiveTheme
@@ -219,25 +229,40 @@ public sealed class ThemeManager : IThemeManager
 
     public event EventHandler<string>? ThemeChanged;
 
-    public void SwitchTheme (string name) { /* update + raise */ }
+    public void SwitchTheme (string name) { /* mutate in-memory provider + reload */ }
 
-    private void HandleChanged (ThemeSettings settings, string? name) => ThemeChanged?.Invoke (this, settings.ActiveTheme);
+    private void HandleChanged (ThemeSettings settings, string? name)
+        => ThemeChanged?.Invoke (this, settings.ActiveTheme);
 }
 ```
 
-`SchemeManager` becomes an instance class fronting `ThemeSettings.Schemes`. The static `SchemeManager.GetScheme(string)` API used in many views is kept as a **static convenience facade** that forwards to the registered service (via a static `Application.Services` accessor) or to a process-wide fallback when no app has been created — same shape as `XxxSettings.Defaults`.
+A2 is the **gating prerequisite** for deleting `ScopeJsonConverter` and is tied to the D-02 resource-shape decision: the MEC binder cannot bind `ThemeSettings` from the legacy flat-key `Themes: [ { Name: { "Class.Prop": ... } } ]` shape without a custom source. Either:
 
-### 5.3 Event replacement table
+- **Option α (recommended):** Rewrite `Terminal.Gui/Resources/config.json` to the MEC-native nested shape, ship `TuiConfigMigrator` for user files. `ScopeJsonConverter` deletes cleanly.
+- **Option β:** Keep the legacy shape and write a `LegacyTuiConfigurationSource : IConfigurationSource` that re-emits flat keys as nested MEC keys at load time. Smaller user blast radius; larger ongoing maintenance.
 
-| Old subscription | New subscription | File(s) affected |
-|------------------|------------------|------------------|
-| `ConfigurationManager.Applied += handler` (to re-read theme glyphs/border styles) | `ThemeChanges.Observed += handler` (small static event raised once after MEC apply finishes), OR `IThemeManager.ThemeChanged` | `Menu.cs`, `MenuBar.cs`, `StatusBar.cs`, `LineCanvas.cs`, `UICatalogRunnable.cs` |
-| `ConfigurationManager.Updated += handler` | Delete — there is no MEC "loaded but not applied" state. |
-| `ThemeManager.ThemeChanged` (legacy) | `IThemeManager.ThemeChanged` |
+§5.4 carries the analysis.
 
-### 5.4 JSON config: flat → nested key migration
+`SchemeManager` becomes an instance class fronting `ThemeSettings.Schemes`. The static `SchemeManager.GetScheme(string)` API used pervasively in views is kept as a **static convenience facade** that forwards to the registered service (via a static `Application.Services` accessor) or to a process-wide fallback when no app has been created — same shape as the `XxxSettings.Defaults` pattern adopted in #5411.
 
-**Library `config.json`** is rewritten. Example snippet:
+### 5.3 `ThemeChanges` bridge cleanup
+
+`ThemeChanges` currently raises its event in response to **either**:
+
+1. `ConfigurationManager.Applied` (legacy CM apply path), or
+2. `IThemeManager.ThemeChanged` (MEC path, post‑A1).
+
+After A2 lands, (1) is dead — every theme switch goes through `MecThemeManager.SwitchTheme` ⇒ `IOptionsMonitor<ThemeSettings>.OnChange` ⇒ `IThemeManager.ThemeChanged` ⇒ `ThemeChanges.ThemeChanged`. The `ConfigurationManager.Applied` subscription inside `ThemeChanges` deletes alongside `ConfigurationManager`.
+
+No view-side changes are required — `ThemeChanges` is the public surface and stays.
+
+### 5.4 Library `config.json`: resolving D-02
+
+A2 cannot land until the MEC binder can produce a populated `ThemeSettings` from `Terminal.Gui/Resources/config.json`. Two viable paths:
+
+**Option α — Nested-only with `TuiConfigMigrator` helper (recommended).**
+
+Rewrite the library resource:
 
 Before (flat):
 ```json
@@ -247,9 +272,7 @@ Before (flat):
       "Default": {
         "Button.DefaultShadow": "Opaque",
         "Glyphs.CheckStateChecked": "☑",
-        "Schemes": [
-          { "Base": { "Normal": { "Foreground": "White", "Background": "Black" } } }
-        ]
+        "Schemes": [ { "Base": { "Normal": { "Foreground": "White", "Background": "Black" } } } ]
       }
     }
   ]
@@ -261,23 +284,36 @@ After (nested, MEC-native):
 {
   "Themes": {
     "Default": {
-      "Button": { "DefaultShadow": "Opaque" },
-      "Glyphs": { "CheckStateChecked": "☑" },
-      "Schemes": {
-        "Base": { "Normal": { "Foreground": "White", "Background": "Black" } }
-      }
+      "Button":  { "DefaultShadow": "Opaque" },
+      "Glyphs":  { "CheckStateChecked": "☑" },
+      "Schemes": { "Base": { "Normal": { "Foreground": "White", "Background": "Black" } } }
     }
   }
 }
 ```
 
-**Breaking change for users with hand-authored `~/.tui/config.json` files.** A small migration helper (`TuiConfigMigrator.MigrateFlatToNested(string json)`) is shipped in `Terminal.Gui` for one release; the UICatalog `ConfigurationEditor` scenario gains a "Migrate" button. After one major version the helper is removed.
+User config files in the legacy shape break. Mitigations:
 
-(This supersedes predecessor spec D‑02 Option 3. Continuing to accept flat keys requires keeping `ScopeJsonConverter`, which is the largest AOT-hostile blob in the Configuration namespace. The cost/benefit no longer favors dual format support after #5411 makes the nested format viable.)
+- Ship `TuiConfigMigrator.MigrateFlatToNested(string json)` in `Terminal.Gui` for one release.
+- UICatalog `ConfigurationEditor` scenario gets a "Migrate" button.
+- Release notes + `docfx/docs/migrate-cm-to-mec.md` migration guide.
+
+Trade-off: maximal AOT win (`ScopeJsonConverter` deletes), one-time pain for users with hand-authored configs.
+
+**Option β — Custom `LegacyTuiConfigurationSource`.**
+
+Implement `IConfigurationSource` + `IConfigurationProvider` that parses the legacy flat-key shape (using the existing `RuneJsonConverter` / `KeyJsonConverter` / `SchemeJsonConverter` from `TuiSerializerContext`) and surfaces the result as MEC-native nested keys. Insert it before the standard `JsonStream` provider for `config.json`.
+
+Trade-off: zero user-side breakage; keep a custom configuration provider plus the flat-key parser indefinitely. The custom provider is still smaller and more AOT-friendly than `ScopeJsonConverter`, but the maintenance debt is permanent.
+
+**Recommendation:** Option α. The whole point of #4943 is to delete CM-shaped artifacts; keeping a flat-key parser indefinitely defeats it. A one-release migration helper is a fair user-facing cost. If feedback during the alpha cycle is severe, fall back to Option β as a hotfix.
 
 ### 5.5 Source generation context cleanup
 
-`SourceGenerationContext` currently lists `SettingsScope`, `ThemeScope`, `AppSettingsScope`, and various dictionary closures. Replace with the per-component POCOs:
+`TuiSerializerContext` (created in #5411) already configures all custom converters and `JsonSerializerOptions`. Remaining work in this PR:
+
+- Audit `SourceGenerationContext`'s `[JsonSerializable]` entries. Remove anything that references `SettingsScope` / `ThemeScope` / `AppSettingsScope` (those types are being deleted).
+- Ensure every Settings POCO actively bound by `TuiConfigurationBuilder` is registered:
 
 ```csharp
 [JsonSerializable (typeof (ThemeSettings))]
@@ -291,17 +327,14 @@ After (nested, MEC-native):
 [JsonSerializable (typeof (Color))]
 [JsonSerializable (typeof (Dictionary<string, Scheme>))]
 [JsonSerializable (typeof (Dictionary<string, ThemeDefinition>))]
-[JsonSourceGenerationOptions (Converters = new[] {
-    typeof (RuneJsonConverter), typeof (KeyJsonConverter),
-    typeof (ColorJsonConverter), typeof (AttributeJsonConverter),
-    typeof (SchemeJsonConverter), typeof (TraceCategoryJsonConverter)
-})]
 internal partial class SourceGenerationContext : JsonSerializerContext { }
 ```
 
-This is what unlocks the AOT-friendly path: every type STJ touches is statically known, no `MakeGenericType`, no `Assembly.GetTypes()`.
+The converter registration is owned by `TuiSerializerContext` and does not move.
 
 ### 5.6 ModuleInitializer simplification
+
+After A2 + the legacy CM deletion:
 
 ```csharp
 [ModuleInitializer]
@@ -314,37 +347,54 @@ internal static void InitializeTuiConfiguration ()
 
 Single call. No `ConfigurationManager.Initialize ()`, no `#pragma warning disable CS0618`.
 
+### 5.7 `PrintJsonErrors` replacement (behavior-preserving)
+
+The v2 contract is "don't fail-fast on bad config.json; collect errors and print at shutdown." MEC supports this via `JsonConfigurationSource.OnLoadException`:
+
+```csharp
+builder.AddJsonStream (stream, source =>
+{
+    source.OnLoadException = ctx =>
+    {
+        TuiJsonErrors.Add ($"{ctx.Source}: {ctx.Exception.Message}");
+        ctx.Ignored = true;
+    };
+});
+```
+
+Wire the same hook on every JSON source registered by `TuiConfigurationExtensions`. `ApplicationImpl.Lifecycle.Shutdown` calls `TuiJsonErrors.Print ()` (or routes through `Logging`) in place of the current `ConfigurationManager.PrintJsonErrors ()` call.
+
+Caveat: `OnLoadException` covers file/parse errors only. Bind/POCO validation errors (`OptionsValidationException`) don't have an equivalent hook in MEC and will throw on first `IOptions<T>.Value` access. This is acceptable — bind errors are programmer-level (POCO shape mismatch), not user-level (typo in JSON).
+
 ---
 
 ## 6. Implementation Phases (within this PR)
 
-Each phase is one or more commits. Tests must build and pass at every commit.
+Each phase is one or more commits. Tests must build and pass at every commit. **Phases A1, B, and the JSON-converter half of C landed in #5411 and are not repeated here.**
 
-### Phase A — Make `MecThemeManager` / `MecSchemeManager` self-sufficient
-- Move theme/scheme storage from the legacy static `ThemeManager` / `SchemeManager` into `ThemeSettings` (already exists; populate it from `IOptionsMonitor<ThemeSettings>`).
-- Update `MecThemeManager` / `MecSchemeManager` to read/write the POCO directly.
+### Phase D — Library `config.json` rewrite + migration helper *(blocks Phase A2)*
+- Rewrite `Terminal.Gui/Resources/config.json` in the nested MEC-native shape (Option α of §5.4).
+- Add `TuiConfigMigrator.MigrateFlatToNested(string)` and parallelizable tests.
+- Update `Examples/Config/example_config.json`.
+- File a follow-up issue to update the hosted JSON schema (Q‑03).
+- Wire `JsonConfigurationSource.OnLoadException` per §5.7 so v2 deferred-error behavior is preserved.
+
+### Phase A2 — Mec managers own runtime theme/scheme data
+- Have `MecThemeManager` / `MecSchemeManager` read theme and scheme dictionaries from `IOptionsMonitor<ThemeSettings>.CurrentValue` instead of delegating to the legacy static `ThemeManager` / `SchemeManager`.
+- `SwitchTheme` mutates the underlying in-memory MEC source and triggers `IOptionsMonitor.OnChange`.
+- Confirm `ThemeChanges.ThemeChanged` is now raised exclusively through the `IThemeManager.ThemeChanged` path; verify no `ConfigurationManager.Applied` round-trip happens at runtime.
 - Add tests in `MecThemeTests` for switch / add / remove scheme paths that previously delegated to the legacy code.
 
-### Phase B — Replace `ConfigurationManager.Applied` subscribers
-- Introduce `Terminal.Gui.Configuration.ThemeChanges` (or expose `IThemeManager.ThemeChanged` via a static convenience accessor).
-- Rewire `Menu`, `MenuBar`, `StatusBar`, `LineCanvas` to the new event.
-- Delete the `#pragma warning disable CS0618` suppressions in those files.
-- Update tests that assert the subscription chain.
-
-### Phase C — JSON converter / `SourceGenerationContext` decoupling
-- Replace all `ConfigurationManager.SerializerContext` references in `AttributeJsonConverter`, `SchemeJsonConverter`, `Concurrent/DictionaryJsonConverter`, `DeepCloner` (the last one is being deleted anyway) with `SourceGenerationContext.Default`.
-- Audit `SourceGenerationContext` entries and replace scope types with the POCOs (§5.5).
-
-### Phase D — Library `config.json` rewrite + migration helper
-- Rewrite `Terminal.Gui/Resources/config.json` in nested format.
-- Add `TuiConfigMigrator.MigrateFlatToNested(string)` and tests.
-- Update `Examples/Config/example_config.json`.
-- Update the JSON schema if hosted (file follow-up issue).
+### Phase C-finish — `SourceGenerationContext` POCO audit
+- Remove `SettingsScope` / `ThemeScope` / `AppSettingsScope` from `[JsonSerializable]` list.
+- Add per-component POCOs and `Dictionary<string, Scheme>` / `Dictionary<string, ThemeDefinition>` per §5.5.
+- Delete the `ConfigurationManager.SerializerContext` one-line delegator field (kept post-#5411 purely to avoid an obsolete-attr breaking change in the parent PR).
 
 ### Phase E — Delete legacy CM types + tests
 - Delete every file listed in §4.1 and every test listed in §4.6.
 - Delete `ModuleInitializers.cs`'s `ConfigurationManager.Initialize ()` call (§5.6).
-- Delete `ConfigurationManager.PrintJsonErrors ()` from `ApplicationImpl.Lifecycle.cs`.
+- Replace `ApplicationImpl.Lifecycle`'s `ConfigurationManager.PrintJsonErrors ()` call with `TuiJsonErrors.Print ()` per §5.7.
+- Delete the `ConfigurationManager.Applied` branch inside `ThemeChanges` per §5.3.
 - Sweep stale doc-comment references (§4.4 last row).
 
 ### Phase F — Rename `MecThemeManager`/`MecSchemeManager` → `ThemeManager`/`SchemeManager`
@@ -354,10 +404,11 @@ Each phase is one or more commits. Tests must build and pass at every commit.
 ### Phase G — Update examples (Runner, UICatalog, NativeAot, etc.)
 - §4.8 sweep.
 
-### Phase H — Update `docfx/docs/config.md`
-- Rewrite to reflect the MEC contract.
+### Phase H — Update `docfx/docs/config.md` + migration guide
+- Rewrite `config.md` to reflect the MEC contract.
 - Remove every reference to `ConfigurationManager.Enable`, `ConfigLocations`, `ConfigurationProperty`, `SettingsScope`, `ThemeScope`, `AppSettingsScope`.
-- Document `TuiConfigurationBuilder`, `IThemeManager`, `ISchemeManager`, the nested JSON schema, the migration helper.
+- Document `TuiConfigurationBuilder`, `IThemeManager`, `ISchemeManager`, the nested JSON schema, the migration helper, `ThemeChanges`, `TuiSerializerContext`.
+- Add `docfx/docs/migrate-cm-to-mec.md` cheatsheet.
 
 ### Phase I — Verification
 - Run full test matrix (`UnitTestsParallelizable`, `UnitTests.NonParallelizable`, `IntegrationTests`).
@@ -400,10 +451,11 @@ A separate `docfx/docs/migrate-cm-to-mec.md` is added in Phase H with a side-by-
 | Risk | Mitigation |
 |------|------------|
 | Hidden third-party consumers still call obsolete CM API | They received an `[Obsolete]` warning in #5411 with the message pointing at `TuiConfigurationBuilder`. One release window has elapsed by the time this PR ships. |
-| Nested JSON breaks every existing user config file | Ship `TuiConfigMigrator` + UICatalog "Migrate" button + clear release-note + `migrate-cm-to-mec.md` guide. |
+| Nested JSON breaks every existing user config file | Ship `TuiConfigMigrator` + UICatalog "Migrate" button + clear release-note + `migrate-cm-to-mec.md` guide. If alpha-cycle feedback is severe, fall back to §5.4 Option β (custom legacy source). |
 | Renaming `MecThemeManager` → `ThemeManager` clashes with the deleted legacy `ThemeManager` if a partial revert lands | Phase F runs only after Phase E commits; if reverted, the rename is reverted with it. |
 | AOT size delta is smaller than predicted | Acceptable. The parallel-test and decoupling wins still justify the change. Record actual delta in the PR. |
 | `IOptionsMonitor<T>.OnChange` is not invoked in NativeAOT due to missing trim roots | Verified in #5411. Re-verify with a smoke test in `Examples/NativeAot` as part of Phase I. |
+| Bind-time (`OptionsValidationException`) errors are not aggregated like file-parse errors | Accepted. Bind errors are programmer-level (POCO shape mismatch). The user-level "typo in JSON" path is fully preserved via `JsonConfigurationSource.OnLoadException` (§5.7). |
 
 ---
 
