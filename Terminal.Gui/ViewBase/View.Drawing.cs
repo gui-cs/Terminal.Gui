@@ -279,13 +279,41 @@ public partial class View // Drawing APIs
             return;
         }
 
-        // Get screen-relative coords
+        // Get screen-relative coords of the full visible viewport.
         Rectangle toClear = ViewportToScreen (Viewport with { Location = new Point (0, 0) });
 
         if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.ClearContentOnly))
         {
             Rectangle visibleContent = ViewportToScreen (new Rectangle (new Point (-Viewport.X, -Viewport.Y), GetContentSize ()));
             toClear = Rectangle.Intersect (toClear, visibleContent);
+        }
+
+        // Issue #5358: narrow the clear to just the dirty region when NeedsDrawRect is set AND
+        // genuinely smaller than the viewport. SetNeedsDraw() (no-arg) sets NeedsDrawRect to
+        // the current Viewport (meaning "everything visible is dirty"); we don't want to narrow
+        // in that case, nor when the rect is stale-after-scroll (still sized to old Viewport).
+        // Only narrow when an explicit partial region has been set via SetNeedsDraw(Rectangle) —
+        // e.g., the SuperView invalidation on Frame change below in View.Layout.cs.
+        bool narrowToDirty = !NeedsDrawRect.IsEmpty
+                             && (NeedsDrawRect.Width < Viewport.Width || NeedsDrawRect.Height < Viewport.Height);
+
+        if (narrowToDirty)
+        {
+            // NeedsDrawRect is in this view's content coords (same coord system as subview.Frame).
+            // Subtract the scroll offset (Viewport.X/Y) to get viewport-local coords, then
+            // convert to screen and intersect with toClear.
+            Rectangle dirtyLocal = new (
+                                        NeedsDrawRect.X - Viewport.X,
+                                        NeedsDrawRect.Y - Viewport.Y,
+                                        NeedsDrawRect.Width,
+                                        NeedsDrawRect.Height);
+            Rectangle dirtyScreen = ViewportToScreen (dirtyLocal);
+            toClear = Rectangle.Intersect (toClear, dirtyScreen);
+        }
+
+        if (toClear.IsEmpty)
+        {
+            return;
         }
 
         Driver.FillRect (toClear);
@@ -297,7 +325,18 @@ public partial class View // Drawing APIs
         // Dim.Fill) to exclude the entire frame and prevent peer SubViews from drawing.
         _lastClearedViewport = toClear;
 
-        SetNeedsDraw ();
+        // Issue #5358: cascade SetNeedsDraw with the narrowed region (in content coords) so
+        // only subviews intersecting the cleared cells are invalidated. When we narrowed the
+        // clear, narrow the cascade too. Otherwise SetNeedsDraw() no-arg passes the full
+        // Viewport — preserving backward compatibility with tests like ClearViewport_SetsNeedsDraw.
+        if (narrowToDirty)
+        {
+            SetNeedsDraw (NeedsDrawRect);
+        }
+        else
+        {
+            SetNeedsDraw ();
+        }
     }
 
     /// <summary>
