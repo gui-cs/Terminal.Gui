@@ -34,6 +34,8 @@ var ansi = false;
 var addBorderFrame = false;
 var live = false;
 var queryKeyStrokes = false;
+var cols = 80;
+var rows = 20;
 
 for (var i = 0; i < commandArgs.Length; i++)
 {
@@ -69,6 +71,22 @@ for (var i = 0; i < commandArgs.Length; i++)
     {
         queryKeyStrokes = true;
     }
+    else if (commandArgs [i].StartsWith ("--cols=", StringComparison.OrdinalIgnoreCase))
+    {
+        cols = int.Parse (commandArgs [i] ["--cols=".Length..]);
+    }
+    else if (commandArgs [i] == "--cols" && i + 1 < commandArgs.Length)
+    {
+        cols = int.Parse (commandArgs [i + 1]);
+    }
+    else if (commandArgs [i].StartsWith ("--rows=", StringComparison.OrdinalIgnoreCase))
+    {
+        rows = int.Parse (commandArgs [i] ["--rows=".Length..]);
+    }
+    else if (commandArgs [i] == "--rows" && i + 1 < commandArgs.Length)
+    {
+        rows = int.Parse (commandArgs [i + 1]);
+    }
 }
 
 if (string.IsNullOrEmpty (viewName))
@@ -91,7 +109,14 @@ if (queryKeyStrokes)
         return;
     }
 
-    View? view = (View?)Activator.CreateInstance (type);
+    View? view = ViewDemoWindow.CreateView (type);
+
+    if (view is null)
+    {
+        Console.WriteLine ("");
+
+        return;
+    }
 
     if (view is IDesignable designable)
     {
@@ -109,22 +134,15 @@ if (queryKeyStrokes)
 ViewDemoWindow.ViewName = viewName;
 ViewDemoWindow.AddBorderFrame = addBorderFrame;
 ViewDemoWindow.IsLiveMode = live;
+ViewDemoWindow.Cols = cols;
+ViewDemoWindow.Rows = rows;
 
 IApplication app = Application.Create ();
 app.Init (DriverRegistry.Names.ANSI);
 
 if (live)
 {
-    // Live mode: run normally so tuirec can record the interaction.
-    // Write a dot colored to match the agg monokai theme background (#272822 = RGB 39,40,34)
-    // before TG renders, then briefly pause. This creates 2 visually distinct frames for
-    // tuirec's --trim without any visible preroll artifact. 50ms is enough for a distinct
-    // timestamp but too short to be perceptible in the GIF.
-    Console.Write ("\x1b[2J\x1b[H\x1b[38;2;39;40;34m.\x1b[0m");
-    Console.Out.Flush ();
-    Thread.Sleep (50);
-
-    app.Driver!.SetScreenSize (80, 20);
+    app.Driver!.SetScreenSize (cols, rows);
     app.Run<ViewDemoWindow> ();
     app.Dispose ();
 }
@@ -133,7 +151,7 @@ else
     // Original mode: stop after first iteration and capture output
     app.StopAfterFirstIteration = true;
     app.Driver!.Force16Colors = !ansi;
-    app.Driver!.SetScreenSize (80, 20);
+    app.Driver!.SetScreenSize (cols, rows);
 
     var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
 
@@ -179,12 +197,13 @@ internal class ViewDemoWindow : Runnable<string>
 {
     public static string? ViewName { get; set; }
     public static bool IsLiveMode { get; set; }
+    public static int Cols { get; set; } = 80;
+    public static int Rows { get; set; } = 20;
 
     public ViewDemoWindow ()
     {
-        // Limit the size of the window to 80x20, which works good for most views
-        Width = 80;
-        Height = 20;
+        Width = Cols;
+        Height = Rows;
 
         if (!IsLiveMode)
         {
@@ -207,8 +226,10 @@ internal class ViewDemoWindow : Runnable<string>
     /// </summary>
     public static Type? ResolveViewType (string viewName)
     {
+        string normalizedViewName = NormalizeDocfxGenericName (viewName);
+
         // Try direct resolution first
-        Type? type = Type.GetType ($"Terminal.Gui.Views.{viewName}, Terminal.Gui", false, true);
+        Type? type = Type.GetType ($"Terminal.Gui.Views.{normalizedViewName}, Terminal.Gui", false, true);
 
         if (type is not null)
         {
@@ -222,7 +243,26 @@ internal class ViewDemoWindow : Runnable<string>
                   .FirstOrDefault (t => t.IsClass
                                         && !t.IsAbstract
                                         && t.IsSubclassOf (typeof (View))
-                                        && string.Equals (t.Name, viewName, StringComparison.OrdinalIgnoreCase));
+                                        && string.Equals (t.Name, normalizedViewName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string NormalizeDocfxGenericName (string viewName)
+    {
+        int suffixSeparator = viewName.LastIndexOf ('-');
+
+        if (suffixSeparator < 0)
+        {
+            return viewName;
+        }
+
+        string suffix = viewName [(suffixSeparator + 1)..];
+
+        if (!int.TryParse (suffix, out _))
+        {
+            return viewName;
+        }
+
+        return $"{viewName [..suffixSeparator]}`{suffix}";
     }
 
     /// <inheritdoc/>
@@ -261,13 +301,21 @@ internal class ViewDemoWindow : Runnable<string>
         Add (view);
 
         Layout ();
-        App?.Driver?.SetScreenSize (view.Frame.Width, view.Frame.Height);
+
+        if (!IsLiveMode)
+        {
+            App?.Driver?.SetScreenSize (view.Frame.Width, view.Frame.Height);
+        }
     }
 
-    private static View? CreateView (Type type)
+    public static View? CreateView (Type type)
     {
+        if (type.IsGenericTypeDefinition && type == typeof (Prompt<,>))
+        {
+            type = type.MakeGenericType (typeof (TextField), typeof (string));
+        }
         // If we are to create a generic Type
-        if (type.IsGenericType)
+        else if (type.IsGenericTypeDefinition)
         {
             // For each of the <T> arguments
             List<Type> typeArguments = new ();
@@ -298,11 +346,15 @@ internal class ViewDemoWindow : Runnable<string>
         }
 
         // Instantiate view
-        var view = (View)Activator.CreateInstance (type)!;
+        View view = (View)Activator.CreateInstance (type)!;
 
-        if (view is IDesignable designable)
+        if (view.GetType ().IsGenericType && view.GetType ().GetGenericTypeDefinition () == typeof (Prompt<,>))
         {
-            var demoText = "This is some demo text.";
+            ConfigurePrompt (view);
+        }
+        else if (view is IDesignable designable)
+        {
+            string demoText = "This is some demo text.";
             designable.EnableForDesign (ref demoText);
         }
         else
@@ -310,9 +362,31 @@ internal class ViewDemoWindow : Runnable<string>
             view.Text = "This is some demo text.";
         }
 
+        if (view is FileDialog)
+        {
+            view.Width = Dim.Fill ();
+            view.Height = Dim.Fill ();
+        }
+
         //view.Title = $"View: {type.Name}";
 
         return view;
+    }
+
+    private static void ConfigurePrompt (View view)
+    {
+        view.Title = "Prompt";
+
+        System.Reflection.MethodInfo? getWrappedView = view.GetType ().GetMethod ("GetWrappedView");
+        View? wrappedView = getWrappedView?.Invoke (view, null) as View;
+
+        if (wrappedView is null)
+        {
+            return;
+        }
+
+        wrappedView.Text = "What is your name?";
+        wrappedView.Width = 32;
     }
 
     private static void ViewInitialized (object? sender, EventArgs e)

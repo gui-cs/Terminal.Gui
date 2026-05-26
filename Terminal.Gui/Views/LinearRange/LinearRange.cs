@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     and create the view without supplying a type argument.
 /// </summary>
 /// <remarks>
+///     <img src="../images/views/LinearRange.gif" alt="LinearRange demo"/>
 ///     <para>
 ///         To work with non-string option types, use <see cref="LinearRange{T}"/> directly.
 ///     </para>
