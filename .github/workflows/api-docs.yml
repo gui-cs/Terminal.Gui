@@ -3,6 +3,7 @@ name: Build and publish v2 API docs
 on:
   push:
     branches: [develop]
+  workflow_dispatch:
 
 permissions:
   id-token: write 
@@ -36,12 +37,26 @@ jobs:
     - name: Build EditorRef (for Terminal.Gui.Editor docs)
       run: dotnet build docfx/EditorRef/EditorRef.csproj --configuration Release
 
+    - name: Setup Go
+      uses: actions/setup-go@v6
+      with:
+        go-version: stable
+
+    - name: Install tuirec
+      shell: pwsh
+      run: |
+        go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+        $env:PATH="$env:PATH;$(go env GOPATH)\bin"
+        tuirec --version
+
     - name: DocFX Build
       working-directory: docfx
       run: |
         dotnet tool install -g docfx
+        $env:PATH="$env:PATH;$(go env GOPATH)\bin"
         $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
         docfx metadata
+        ./scripts/generate-views-doc.ps1
         docfx build
       continue-on-error: false
 
