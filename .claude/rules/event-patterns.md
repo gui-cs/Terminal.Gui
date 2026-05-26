@@ -69,13 +69,13 @@ void OnTextChanged (object sender, EventArgs e) { }
 
 ## Local Function Naming
 
-**Use camelCase for local functions:**
+**Use PascalCase for local functions** (the `.editorconfig` `local_functions_rule` enforces `upper_camel_case_style` at `warning` severity):
 
 ```csharp
 // CORRECT
-void textViewDrawContent (object? sender, DrawEventArgs e) { }
+void TextViewDrawContent (object? sender, DrawEventArgs e) { }
 
 // WRONG
 void TextView_DrawContent (object? sender, DrawEventArgs e) { }
-void TextViewDrawContent (object? sender, DrawEventArgs e) { }
+void textViewDrawContent (object? sender, DrawEventArgs e) { }
 ```
