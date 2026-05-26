@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using UnitTests;
 
@@ -35,6 +36,25 @@ public class CharMapTests : TestDriverBase
         int expectedContentHeight = maxRow + 1 - surrogateRows + 1;
 
         Assert.Equal (expectedContentHeight, charMap.GetContentHeight ());
+    }
+
+    // Copilot
+    [Fact]
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public void ShowUnicodeCategory_Rebuilds_Filtered_Index_And_Can_Clear_Filter ()
+    {
+        using CharMap charMap = new () { SelectedCodePoint = 'a' };
+        int defaultContentHeight = charMap.GetContentHeight ();
+
+        charMap.ShowUnicodeCategory = UnicodeCategory.UppercaseLetter;
+
+        Assert.True (charMap.GetContentHeight () < defaultContentHeight);
+        Assert.Equal (UnicodeCategory.UppercaseLetter, CharUnicodeInfo.GetUnicodeCategory (charMap.SelectedCodePoint));
+
+        charMap.ShowUnicodeCategory = null;
+
+        Assert.Equal (defaultContentHeight, charMap.GetContentHeight ());
     }
 
     /// <summary>
