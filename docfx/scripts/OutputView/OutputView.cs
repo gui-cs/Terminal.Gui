@@ -34,6 +34,7 @@ var ansi = false;
 var addBorderFrame = false;
 var live = false;
 var queryKeyStrokes = false;
+var skipBaselineFrame = false;
 var cols = 80;
 var rows = 20;
 
@@ -70,6 +71,10 @@ for (var i = 0; i < commandArgs.Length; i++)
     else if (commandArgs [i] == "--keystrokes" || commandArgs [i] == "-k")
     {
         queryKeyStrokes = true;
+    }
+    else if (commandArgs [i] == "--skip-baseline-frame")
+    {
+        skipBaselineFrame = true;
     }
     else if (commandArgs [i].StartsWith ("--cols=", StringComparison.OrdinalIgnoreCase))
     {
@@ -135,14 +140,17 @@ app.Init (DriverRegistry.Names.ANSI);
 
 if (live)
 {
-    // Live mode: run normally so tuirec can record the interaction.
-    // Write a dot colored to match the agg monokai theme background (#272822 = RGB 39,40,34)
-    // before TG renders, then briefly pause. This creates 2 visually distinct frames for
-    // tuirec's --trim without any visible preroll artifact. 50ms is enough for a distinct
-    // timestamp but too short to be perceptible in the GIF.
-    Console.Write ("\x1b[2J\x1b[H\x1b[38;2;39;40;34m.\x1b[0m");
-    Console.Out.Flush ();
-    Thread.Sleep (50);
+    if (!skipBaselineFrame)
+    {
+        // Live mode: run normally so tuirec can record the interaction.
+        // Write a dot colored to match the agg monokai theme background (#272822 = RGB 39,40,34)
+        // before TG renders, then briefly pause. This creates 2 visually distinct frames for
+        // tuirec's --trim without any visible preroll artifact. 50ms is enough for a distinct
+        // timestamp but too short to be perceptible in the GIF.
+        Console.Write ("\x1b[2J\x1b[H\x1b[38;2;39;40;34m.\x1b[0m");
+        Console.Out.Flush ();
+        Thread.Sleep (50);
+    }
 
     app.Driver!.SetScreenSize (cols, rows);
     app.Run<ViewDemoWindow> ();
@@ -329,6 +337,12 @@ internal class ViewDemoWindow : Runnable<string>
         else
         {
             view.Text = "This is some demo text.";
+        }
+
+        if (view is FileDialog)
+        {
+            view.Width = Dim.Fill ();
+            view.Height = Dim.Fill ();
         }
 
         //view.Title = $"View: {type.Name}";

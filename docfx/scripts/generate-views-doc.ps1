@@ -101,11 +101,15 @@ foreach ($file in $viewFiles) {
         $viewNameClean = $file.BaseName -replace "^Terminal\.Gui\.Views\.", ""
         $cols = 80
         $rows = 20
+        $outputViewArgs = "$outputViewDll,--view=$viewNameClean,--live,--frame"
 
         if ($viewNameClean -in @("FileDialog", "OpenDialog", "SaveDialog")) {
-            $cols = 120
-            $rows = 30
+            $cols = 94
+            $rows = 23
+            $outputViewArgs = "$outputViewArgs,--skip-baseline-frame"
         }
+
+        $outputViewArgs = "$outputViewArgs,--cols=$cols,--rows=$rows"
         
         if (-not $SkipGifs) {
             try {
@@ -132,7 +136,7 @@ foreach ($file in $viewFiles) {
                 # Always use --trim to remove preroll/postroll (v0.4.2+)
                 tuirec record `
                     --binary dotnet `
-                    --args "$outputViewDll,--view=$viewNameClean,--live,--frame,--cols=$cols,--rows=$rows" `
+                    --args $outputViewArgs `
                     --name $viewNameClean `
                     --title $viewNameClean `
                     --keystrokes $ks `
@@ -150,7 +154,7 @@ foreach ($file in $viewFiles) {
                     Write-Host "    WARNING: --trim failed (exit $LASTEXITCODE), retrying without trim..." -ForegroundColor Yellow
                     tuirec record `
                         --binary dotnet `
-                        --args "$outputViewDll,--view=$viewNameClean,--live,--frame,--cols=$cols,--rows=$rows" `
+                        --args $outputViewArgs `
                         --name $viewNameClean `
                         --title $viewNameClean `
                         --keystrokes $ks `
