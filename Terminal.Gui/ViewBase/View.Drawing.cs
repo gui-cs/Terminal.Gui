@@ -91,8 +91,12 @@ public partial class View // Drawing APIs
 
         Region? originalClip = GetClip ();
 
-        // TODO: This can be further optimized by checking NeedsDraw below and only
-        // TODO: clearing, drawing text, drawing content, etc. if it is true.
+        // Capture whether THIS view's own content needs redrawing BEFORE DoDrawAdornments
+        // escalates NeedsDrawRect (see View.Drawing.Adornments.cs DoDrawAdornments).
+        // When only SubViewNeedsDraw is true, needsDrawSelf is false and we skip
+        // ClearViewport/DrawText/DrawContent so child-only invalidations stay narrow.
+        bool needsDrawSelf = NeedsDraw;
+
         if (NeedsDraw || SubViewNeedsDraw)
         {
             // ------------------------------------
@@ -122,8 +126,11 @@ public partial class View // Drawing APIs
             // per-adornment DrawContexts for the same reason.
             _localDrawContext = new DrawContext ();
 
-            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
-            DoClearViewport (context);
+            if (needsDrawSelf)
+            {
+                SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
+                DoClearViewport (context);
+            }
 
             // ------------------------------------
             // Draw the SubViews first (order matters: SubViews, Text, Content)
@@ -142,20 +149,23 @@ public partial class View // Drawing APIs
                 _lastClearedViewport = null;
             }
 
-            // ------------------------------------
-            // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
-            Trace.Draw (this.ToIdentifyingString (), "Text");
-            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
-            DoDrawText (_localDrawContext);
+            if (needsDrawSelf)
+            {
+                // ------------------------------------
+                // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
+                Trace.Draw (this.ToIdentifyingString (), "Text");
+                SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
+                DoDrawText (_localDrawContext);
 
-            // ------------------------------------
-            // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
-            Trace.Draw (this.ToIdentifyingString (), "Content");
-            DoDrawContent (_localDrawContext);
+                // ------------------------------------
+                // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
+                Trace.Draw (this.ToIdentifyingString (), "Content");
+                DoDrawContent (_localDrawContext);
 
-            // Merge this view's own draws into the shared context so the SuperView
-            // can track the aggregate for clip exclusion.
-            context.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
+                // Merge this view's own draws into the shared context so the SuperView
+                // can track the aggregate for clip exclusion.
+                context.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
+            }
 
             // ------------------------------------
             // Draw adornment SubViews BEFORE rendering LineCanvas so their lines
