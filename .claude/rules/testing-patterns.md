@@ -48,7 +48,6 @@
 - ~10 min timeout
 - Uses `Application.Init` and static state
 - Cannot run in parallel
-- Includes `--diagnostic` flag for logging
 
 **Command:**
 ```bash
@@ -86,7 +85,7 @@ dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
 
 - `xunit.runner.json` - Per-project xUnit configuration (parallelization, etc.)
 - `Tests/TestEnvironmentSetup.cs` - Compiled into every test project; its `[ModuleInitializer]` sets `DisableRealDriverIO=1` before any test code runs
-- Coverage is collected via the `coverlet.collector` package referenced by each test project. `.runsettings` files are ignored by Microsoft Testing Platform (MTP).
+- Coverage tooling: each test project references the `coverlet.collector` package, but coverage is not actively collected in CI yet (see "Code Coverage" above — pending an MTP-compatible solution). `.runsettings` files are ignored by Microsoft Testing Platform (MTP).
 
 ## Example Test Pattern
 
