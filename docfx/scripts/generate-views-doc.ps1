@@ -99,6 +99,13 @@ foreach ($file in $viewFiles) {
         # Record GIF with tuirec
         $gifOutput = ""
         $viewNameClean = $file.BaseName -replace "^Terminal\.Gui\.Views\.", ""
+        $cols = 80
+        $rows = 20
+
+        if ($viewNameClean -in @("FileDialog", "OpenDialog", "SaveDialog")) {
+            $cols = 120
+            $rows = 30
+        }
         
         if (-not $SkipGifs) {
             try {
@@ -125,7 +132,7 @@ foreach ($file in $viewFiles) {
                 # Always use --trim to remove preroll/postroll (v0.4.2+)
                 tuirec record `
                     --binary dotnet `
-                    --args "$outputViewDll,--view=$viewNameClean,--live,--frame" `
+                    --args "$outputViewDll,--view=$viewNameClean,--live,--frame,--cols=$cols,--rows=$rows" `
                     --name $viewNameClean `
                     --title $viewNameClean `
                     --keystrokes $ks `
@@ -133,7 +140,7 @@ foreach ($file in $viewFiles) {
                     --drain 1000 `
                     --trim `
                     --mouse-pointer none `
-                    --cols 80 --rows 20 `
+                    --cols $cols --rows $rows `
                     --output $gifFile `
                     --verbosity quiet
                 
@@ -143,7 +150,7 @@ foreach ($file in $viewFiles) {
                     Write-Host "    WARNING: --trim failed (exit $LASTEXITCODE), retrying without trim..." -ForegroundColor Yellow
                     tuirec record `
                         --binary dotnet `
-                        --args "$outputViewDll,--view=$viewNameClean,--live,--frame" `
+                        --args "$outputViewDll,--view=$viewNameClean,--live,--frame,--cols=$cols,--rows=$rows" `
                         --name $viewNameClean `
                         --title $viewNameClean `
                         --keystrokes $ks `
@@ -151,7 +158,7 @@ foreach ($file in $viewFiles) {
                         --drain 1000 `
                         --trim=false `
                         --mouse-pointer none `
-                        --cols 80 --rows 20 `
+                        --cols $cols --rows $rows `
                         --output $gifFile `
                         --verbosity quiet
                 }

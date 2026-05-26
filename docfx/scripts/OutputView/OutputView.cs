@@ -34,6 +34,8 @@ var ansi = false;
 var addBorderFrame = false;
 var live = false;
 var queryKeyStrokes = false;
+var cols = 80;
+var rows = 20;
 
 for (var i = 0; i < commandArgs.Length; i++)
 {
@@ -68,6 +70,22 @@ for (var i = 0; i < commandArgs.Length; i++)
     else if (commandArgs [i] == "--keystrokes" || commandArgs [i] == "-k")
     {
         queryKeyStrokes = true;
+    }
+    else if (commandArgs [i].StartsWith ("--cols=", StringComparison.OrdinalIgnoreCase))
+    {
+        cols = int.Parse (commandArgs [i] ["--cols=".Length..]);
+    }
+    else if (commandArgs [i] == "--cols" && i + 1 < commandArgs.Length)
+    {
+        cols = int.Parse (commandArgs [i + 1]);
+    }
+    else if (commandArgs [i].StartsWith ("--rows=", StringComparison.OrdinalIgnoreCase))
+    {
+        rows = int.Parse (commandArgs [i] ["--rows=".Length..]);
+    }
+    else if (commandArgs [i] == "--rows" && i + 1 < commandArgs.Length)
+    {
+        rows = int.Parse (commandArgs [i + 1]);
     }
 }
 
@@ -109,6 +127,8 @@ if (queryKeyStrokes)
 ViewDemoWindow.ViewName = viewName;
 ViewDemoWindow.AddBorderFrame = addBorderFrame;
 ViewDemoWindow.IsLiveMode = live;
+ViewDemoWindow.Cols = cols;
+ViewDemoWindow.Rows = rows;
 
 IApplication app = Application.Create ();
 app.Init (DriverRegistry.Names.ANSI);
@@ -124,7 +144,7 @@ if (live)
     Console.Out.Flush ();
     Thread.Sleep (50);
 
-    app.Driver!.SetScreenSize (80, 20);
+    app.Driver!.SetScreenSize (cols, rows);
     app.Run<ViewDemoWindow> ();
     app.Dispose ();
 }
@@ -133,7 +153,7 @@ else
     // Original mode: stop after first iteration and capture output
     app.StopAfterFirstIteration = true;
     app.Driver!.Force16Colors = !ansi;
-    app.Driver!.SetScreenSize (80, 20);
+    app.Driver!.SetScreenSize (cols, rows);
 
     var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
 
@@ -179,12 +199,13 @@ internal class ViewDemoWindow : Runnable<string>
 {
     public static string? ViewName { get; set; }
     public static bool IsLiveMode { get; set; }
+    public static int Cols { get; set; } = 80;
+    public static int Rows { get; set; } = 20;
 
     public ViewDemoWindow ()
     {
-        // Limit the size of the window to 80x20, which works good for most views
-        Width = 80;
-        Height = 20;
+        Width = Cols;
+        Height = Rows;
 
         if (!IsLiveMode)
         {
