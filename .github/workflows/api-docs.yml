@@ -4,6 +4,11 @@ on:
   push:
     branches: [develop]
   workflow_dispatch:
+    inputs:
+      regenerate-views:
+        description: Regenerate views.md and view GIF assets
+        type: boolean
+        default: true
 
 permissions:
   id-token: write 
@@ -25,10 +30,30 @@ jobs:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
 
-    - name: Setup Go
-      uses: actions/setup-go@v6
-      with:
-        go-version: stable
+    - name: Detect view docs changes
+      id: view-docs
+      shell: pwsh
+      run: |
+        $shouldGenerate = $false
+
+        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+          $shouldGenerate = "${{ inputs.regenerate-views }}" -eq "true"
+        } else {
+          $before = "${{ github.event.before }}"
+
+          if ($before -match "^0+$") {
+            $before = "HEAD~1"
+          }
+
+          $changedFiles = git diff --name-only $before "${{ github.sha }}"
+          $shouldGenerate = [bool]($changedFiles | Where-Object {
+            $_ -match "^Terminal\.Gui/Views/" -or
+            $_ -match "^docfx/scripts/OutputView/" -or
+            $_ -match "^docfx/scripts/generate-views-doc\.ps1$"
+          } | Select-Object -First 1)
+        }
+
+        "should_generate=$($shouldGenerate.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
 
     - name: Restore dependencies
       run: dotnet restore
@@ -39,18 +64,33 @@ jobs:
     - name: Build EditorRef (for Terminal.Gui.Editor docs)
       run: dotnet build docfx/EditorRef/EditorRef.csproj --configuration Release
 
-    - name: Install documentation tools
+    - name: Install DocFX
       run: |
         dotnet tool install -g docfx
+
+    - name: Setup Go
+      if: steps.view-docs.outputs.should_generate == 'true'
+      uses: actions/setup-go@v6
+      with:
+        go-version: stable
+
+    - name: Install views docs tools
+      if: steps.view-docs.outputs.should_generate == 'true'
+      run: |
         go install github.com/gui-cs/tuirec/cmd/tuirec@latest
         Add-Content $env:GITHUB_PATH "$(go env GOPATH)\bin"
         Install-Module powershell-yaml -Scope CurrentUser -Force
 
-    - name: Generate API metadata and views docs
+    - name: Generate API metadata
       working-directory: docfx
       run: |
         $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
         docfx metadata
+
+    - name: Generate views docs
+      if: steps.view-docs.outputs.should_generate == 'true'
+      working-directory: docfx
+      run: |
         ./scripts/generate-views-doc.ps1
 
     - name: DocFX Build

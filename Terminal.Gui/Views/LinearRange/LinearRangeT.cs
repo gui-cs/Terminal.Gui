@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <typeparam name="T">The data type of the options.</typeparam>
 /// <remarks>
+///     <img src="../images/views/LinearRange.gif" alt="LinearRange demo"/>
 ///     <para>
 ///         To switch between left-bounded, right-bounded, and closed range modes, set
 ///         <see cref="RangeKind"/>. Setting <see cref="RangeKind"/> migrates the current

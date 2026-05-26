@@ -93,6 +93,8 @@ Lets the user pick a date from a visual calendar.
 A generic modal dialog window with buttons across the bottom. Derive from this class to create dialogs that return custom result types.
 
 
+![Dialog-1](../images/views/Dialog.gif)
+
 
 ## [Dialog](xref:Terminal.Gui.Views.Dialog)
 
@@ -106,6 +108,8 @@ A modal dialog window with buttons across the bottom. When a button is pressed, 
 
 A type-safe dropdown control for selecting a single value from an enum. Provides the same interface as <xref:Terminal.Gui.Views.OptionSelector%601> but rendered as a compact dropdown list.
 
+
+![DropDownList-1](../images/views/DropDownList.gif)
 
 
 ## [DropDownList](xref:Terminal.Gui.Views.DropDownList)
@@ -128,6 +132,8 @@ The base-class for <xref:Terminal.Gui.Views.OpenDialog> and <xref:Terminal.Gui.V
 
 Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way. <xref:Terminal.Gui.Views.FlagSelector> provides a non-type-safe version. `TFlagsEnum` must be a valid enum type with the '[Flags]' attribute.
 
+
+![FlagSelector-1](../images/views/FlagSelector.gif)
 
 
 ## [FlagSelector](xref:Terminal.Gui.Views.FlagSelector)
@@ -199,6 +205,8 @@ Draws a single line using the <xref:Terminal.Gui.Drawing.LineStyle> specified by
 A linear range view that allows selection of zero or more options from a typed list.
 
 
+![LinearMultiSelector-1](../images/views/LinearMultiSelector.gif)
+
 
 ## [LinearMultiSelector](xref:Terminal.Gui.Views.LinearMultiSelector)
 
@@ -212,6 +220,8 @@ Convenience non-generic <xref:Terminal.Gui.Views.LinearMultiSelector%601> closed
 
 A linear range view representing a contiguous range of options. The current value is a <xref:Terminal.Gui.Views.LinearRangeSpan%601> whose <xref:Terminal.Gui.Views.LinearRangeSpan%601.Kind> is one of <xref:Terminal.Gui.Views.LinearRangeSpanKind.None>, <xref:Terminal.Gui.Views.LinearRangeSpanKind.LeftBounded>, <xref:Terminal.Gui.Views.LinearRangeSpanKind.RightBounded>, or <xref:Terminal.Gui.Views.LinearRangeSpanKind.Closed>.
 
+
+![LinearRange-1](../images/views/LinearRange.gif)
 
 
 ## [LinearRange](xref:Terminal.Gui.Views.LinearRange)
@@ -232,6 +242,8 @@ Abstract base for linear range views (<xref:Terminal.Gui.Views.LinearSelector%60
 
 A linear range view that allows selection of a single option from a typed list of options.
 
+
+![LinearSelector-1](../images/views/LinearSelector.gif)
 
 
 ## [LinearSelector](xref:Terminal.Gui.Views.LinearSelector)
@@ -254,6 +266,8 @@ Displays a clickable hyperlink with optional display text and a target URL.
 
 Provides a scrollable list of data where each item can be activated to perform an action, with a strongly-typed <xref:Terminal.Gui.Views.ListView%601.Value> property that returns the selected object of type <code class="typeparamref">T</code> from the underlying <xref:System.Collections.ObjectModel.ObservableCollection%601>.
 
+
+![ListView-1](../images/views/ListView.gif)
 
 
 ## [ListView](xref:Terminal.Gui.Views.ListView)
@@ -325,6 +339,8 @@ A <xref:Terminal.Gui.Views.Shortcut>-derived item for use in a <xref:Terminal.Gu
 Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
 
 
+![NumericUpDown-1](../images/views/NumericUpDown.gif)
+
 
 ## [NumericUpDown](xref:Terminal.Gui.Views.NumericUpDown)
 
@@ -347,6 +363,8 @@ Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or 
 Provides a user interface for displaying and selecting a single item from a list of options in a type-safe way. Each option is represented by a checkbox, but only one can be selected at a time. <xref:Terminal.Gui.Views.OptionSelector> provides a non-type-safe version.
 
 
+![OptionSelector-1](../images/views/OptionSelector.gif)
+
 
 ## [OptionSelector](xref:Terminal.Gui.Views.OptionSelector)
 
@@ -360,8 +378,6 @@ Provides a user interface for displaying and selecting a single item from a list
 
 A <xref:Terminal.Gui.App.IPopover>-derived view that provides a cascading menu. Can be used as a context menu or a drop-down menu as part of <xref:Terminal.Gui.Views.MenuBar>.
 
-
-![PopoverMenu](../images/views/PopoverMenu.gif)
 
 
 ## [ProgressBar](xref:Terminal.Gui.Views.ProgressBar)
@@ -377,11 +393,15 @@ A Progress Bar view that can indicate progress of an activity visually.
 A dialog that wraps any <xref:Terminal.Gui.ViewBase.View> with Ok/Cancel buttons, extracting a typed result when the user accepts.
 
 
+![Prompt-2](../images/views/Prompt-2.gif)
+
 
 ## [Runnable\<T\>](xref:Terminal.Gui.Views.Runnable`1)
 
 Base implementation of <xref:Terminal.Gui.App.IRunnable%601> for views that can be run as blocking sessions.
 
+
+![Runnable-1](../images/views/Runnable.gif)
 
 
 ## [Runnable](xref:Terminal.Gui.Views.Runnable)
@@ -512,6 +532,8 @@ Provides time editing functionality using <xref:Terminal.Gui.Views.TextValidateF
 
 Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined <xref:Terminal.Gui.Views.ITreeBuilder%601>. See TreeView Deep Dive for more information.
 
+
+![TreeView-1](../images/views/TreeView.gif)
 
 
 ## [TreeView](xref:Terminal.Gui.Views.TreeView)

@@ -101,17 +101,37 @@ foreach ($file in $viewFiles) {
         $viewNameClean = $file.BaseName -replace "^Terminal\.Gui\.Views\.", ""
         $cols = 80
         $rows = 20
-        $outputViewArgs = "$outputViewDll,--view=$viewNameClean,--live,--frame"
+        $addFrame = $true
+        $startupDelay = 400
+        $outputViewArgs = "$outputViewDll,--view=$viewNameClean,--live"
+        $genericBaseName = $null
+
+        if ($viewNameClean -match "^(.+)-\d+$") {
+            $genericBaseName = $matches[1]
+        }
+
+        if ($viewNameClean -in @("ScrollBar", "SpinnerView")) {
+            $addFrame = $false
+        }
+
+        if ($addFrame) {
+            $outputViewArgs = "$outputViewArgs,--frame"
+        }
 
         if ($viewNameClean -in @("FileDialog", "OpenDialog", "SaveDialog")) {
             $cols = 94
             $rows = 23
-            $outputViewArgs = "$outputViewArgs,--skip-baseline-frame"
         }
 
         $outputViewArgs = "$outputViewArgs,--cols=$cols,--rows=$rows"
         
-        if (-not $SkipGifs) {
+        if ($genericBaseName -and $viewNameClean -ne "Prompt-2" -and (Test-Path (Join-Path $ImagePath "$genericBaseName.gif"))) {
+            Write-Host "  Reusing $genericBaseName GIF for $viewNameClean..." -ForegroundColor Gray
+            $gifOutput = "`n![${viewNameClean}](../images/views/${genericBaseName}.gif)`n"
+        } elseif ($SkipGifs -and (Test-Path (Join-Path $ImagePath "$viewNameClean.gif"))) {
+            Write-Host "  Reusing existing GIF for $viewNameClean..." -ForegroundColor Gray
+            $gifOutput = "`n![${viewNameClean}](../images/views/${viewNameClean}.gif)`n"
+        } elseif (-not $SkipGifs) {
             try {
                 # Query the view's demo keystrokes
                 Write-Host "  Querying keystrokes for $viewNameClean..." -ForegroundColor Gray
@@ -133,14 +153,13 @@ foreach ($file in $viewFiles) {
                 Write-Host "  Recording $viewNameClean with tuirec..." -ForegroundColor Cyan
                 Write-Host "    Keystrokes: $ks" -ForegroundColor Gray
                 
-                # Always use --trim to remove preroll/postroll (v0.4.2+)
                 tuirec record `
                     --binary dotnet `
                     --args $outputViewArgs `
                     --name $viewNameClean `
                     --title $viewNameClean `
                     --keystrokes $ks `
-                    --startup-delay 0 `
+                    --startup-delay $startupDelay `
                     --drain 1000 `
                     --trim `
                     --mouse-pointer none `
@@ -148,26 +167,8 @@ foreach ($file in $viewFiles) {
                     --output $gifFile `
                     --verbosity quiet
                 
-                # Retry without trim if validation failed (should not happen now that
-                # OutputView writes a clear-screen baseline frame before rendering)
-                if ($LASTEXITCODE -ne 0) {
-                    Write-Host "    WARNING: --trim failed (exit $LASTEXITCODE), retrying without trim..." -ForegroundColor Yellow
-                    tuirec record `
-                        --binary dotnet `
-                        --args $outputViewArgs `
-                        --name $viewNameClean `
-                        --title $viewNameClean `
-                        --keystrokes $ks `
-                        --startup-delay 0 `
-                        --drain 1000 `
-                        --trim=false `
-                        --mouse-pointer none `
-                        --cols $cols --rows $rows `
-                        --output $gifFile `
-                        --verbosity quiet
-                }
-                
-                if ($LASTEXITCODE -eq 0 -and (Test-Path $gifFile)) {
+                if ((Test-Path $gifFile)) {
+                    $global:LASTEXITCODE = 0
                     $gifSize = (Get-Item $gifFile).Length
                     Write-Host "    OK ($gifSize bytes)" -ForegroundColor Green
                     $gifOutput = "`n![${viewNameClean}](../images/views/${viewNameClean}.gif)`n"
