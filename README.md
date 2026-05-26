@@ -69,7 +69,7 @@ window.Add (label);
 app.Run (window);
 ```
 
-See the [Examples](Examples/README.md) for more.
+See [Examples/README.md](Examples/README.md) for details about the in-repository examples and links to the moved examples repository.
 
 # Showcase
 

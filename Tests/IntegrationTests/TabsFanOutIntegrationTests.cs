@@ -3,13 +3,13 @@ using AppTestHelpers;
 
 namespace IntegrationTests;
 
-// Claude - Opus 4.7
+// Copilot
 
 /// <summary>
 ///     Integration counterpart to <c>TabsFanOutDiagnosticTests</c>. Drives the active tab via real
 ///     key injection through the driver's input processor → command dispatch → main-loop
 ///     <c>LayoutAndDraw</c> path, instead of mutating <see cref="View.Viewport"/> directly. This
-///     verifies the fan-out from issue #4973 / #5356 is observable end-to-end, not just under
+///     verifies the fan-out from issue #4973 / #5357 is observable end-to-end, not just under
 ///     synthetic <see cref="View.Layout()"/> / <see cref="View.Draw"/> calls.
 /// </summary>
 /// <remarks>
@@ -67,12 +67,12 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
     }
 
     /// <summary>
-    ///     End-to-end fan-out check: a real <see cref="Key.PageDown"/> on the active tab causes
-    ///     layout/draw activity on inactive tabs.
+    ///     End-to-end check: a real <see cref="Key.PageDown"/> on the active tab still produces
+    ///     draw fan-out on inactive tabs, but layout work stays on the active tab.
     /// </summary>
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
-    public void Integration_RealPageDown_OnActiveTab_FansOutToInactiveTabs (string driverName)
+    public void Integration_RealPageDown_OnActiveTab_DoesNotFanOutLayoutToInactiveTabs (string driverName)
     {
         const int TabCount = 4;
 
@@ -164,16 +164,15 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
         outputHelper.WriteLine ($"Sum inactive DrawComplete = {inactiveDraws}");
         outputHelper.WriteLine ($"Sum inactive SubViewsLaidOut = {inactiveLayouts}");
 
-        // CURRENT BEHAVIOR (issue #4973): inactive tabs receive draw and layout work when active scrolls,
-        // even through the real input → command → main-loop path. After #4973 lands, flip these to == 0.
+        // CURRENT BEHAVIOR: draw fan-out still exists through the real input → command → main-loop path,
+        // but layout fan-out should now be eliminated.
         Assert.True (
                      inactiveDraws > 0,
                      $"Documents issue #4973 (integration-level): inactive_total DrawComplete={inactiveDraws}. " +
                      "Flip to Assert.Equal(0, inactiveDraws) after fix lands.");
 
-        Assert.True (
-                     inactiveLayouts > 0,
-                     $"Documents issue #4973 (integration-level): inactive_total SubViewsLaidOut={inactiveLayouts}. " +
-                     "Flip to Assert.Equal(0, inactiveLayouts) after fix lands.");
+        Assert.Equal (
+                      0,
+                      inactiveLayouts);
     }
 }

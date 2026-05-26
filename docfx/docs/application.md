@@ -1042,8 +1042,7 @@ Color? result = app.Run (wrapper).Result;
 
 ### Examples
 
-- `Examples/InlineCLI/` — prompt + `ListView` that grows as items are added.
-- `Examples/InlineColorPicker/` — `ColorPicker` in inline mode; returns selected color name.
+- See [gui-cs/Examples](https://github.com/gui-cs/Examples) for inline mode samples and additional application examples.
 
 ## See Also
 

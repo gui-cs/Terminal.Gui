@@ -1,13 +1,7 @@
-// Native AOT test application for Terminal.Gui.
+﻿// Native AOT smoke test application for Terminal.Gui.
 //
-// This is an AOT-safe equivalent of UICatalog's AllViewsTester. It statically instantiates
-// every IDesignable view and calls EnableForDesign() to populate demo data — exercising the
-// config-property deep-cloning, JSON serialization, and dictionary construction paths that
-// are most sensitive to AOT trimming.
-//
-// Unlike AllViewsView (which uses Activator.CreateInstance and MakeGenericType), this file
-// constructs every view explicitly, making it safe for native AOT compilation.
-
+// This app is an AOT-safe equivalent of UICatalog's AllViewsTester. It statically instantiates
+// every IDesignable view and calls EnableForDesign () to populate demo data.
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -15,7 +9,7 @@ using Terminal.Gui.Configuration;
 using Terminal.Gui.Editor;
 using UICatalog.Scenarios;
 
-namespace NativeAot;
+namespace NativeAotSmoke;
 
 public static class Program
 {
@@ -34,7 +28,7 @@ public static class Program
 
         ConfigurationManager.Enable (ConfigLocations.All);
 
-        IApplication app = Application.Create ().Init ();
+        using IApplication app = Application.Create ().Init ();
 
         #region Localization sanity check
 
@@ -54,22 +48,16 @@ public static class Program
         {
             ExerciseDictionaryDeepCloning ();
 
-            // CI smoke test: run the full app lifecycle with a timeout
             using CancellationTokenSource cts = new (TimeSpan.FromSeconds (5));
             await app.RunAsync<AotAllViewsWindow> (cts.Token);
-            app.Dispose ();
             Console.WriteLine ("AOT smoke test passed: full app lifecycle completed successfully.");
 
             return;
         }
 
         app.Run<AotAllViewsWindow> ();
-        app.Dispose ();
     }
 
-    /// <summary>
-    ///     To validate AOT compatibility of dictionary deep cloning, call DeepClone on key dictionaries.
-    /// </summary>
     private static void ExerciseDictionaryDeepCloning ()
     {
         _ = DeepCloner.DeepClone (Color.Colors16);
@@ -81,11 +69,6 @@ public static class Program
     }
 }
 
-/// <summary>
-///     AOT-safe mini AllViewsTester. Statically constructs every <see cref="IDesignable"/> view
-///     and calls <see cref="IDesignable.EnableForDesign()"/> to populate demo data, then displays
-///     them in a scrollable list of titled frames.
-/// </summary>
 public sealed class AotAllViewsWindow : Runnable
 {
     private const int MAX_HEIGHT = 12;
@@ -94,7 +77,6 @@ public sealed class AotAllViewsWindow : Runnable
     {
         Title = $"AOT All Views ({Application.GetDefaultKey (Command.Quit)} to quit)";
 
-        // ── MenuBar (config host: MenuBar, Menu) ─────────────────────
         MenuBar menuBar = new ()
         {
             Menus =
@@ -104,10 +86,8 @@ public sealed class AotAllViewsWindow : Runnable
             ]
         };
 
-        // ── StatusBar (config host: StatusBar) ───────────────────────
         StatusBar statusBar = new ();
 
-        // ── ViewPropertiesEditor (linked from UICatalog — no reflection, AOT-safe) ──
         ViewPropertiesEditor propsEditor = new ()
         {
             Title = "Properties",
@@ -119,7 +99,6 @@ public sealed class AotAllViewsWindow : Runnable
             BorderStyle = LineStyle.Dotted
         };
 
-        // ── Scrollable container for all views ───────────────────────
         View container = new () { Y = Pos.Bottom (menuBar), Width = Dim.Fill (propsEditor), Height = Dim.Fill (statusBar), CanFocus = true };
 
         container.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
@@ -132,7 +111,6 @@ public sealed class AotAllViewsWindow : Runnable
                                          }
                                      };
 
-        // Scope auto-select to views within the container
         propsEditor.AutoSelectSuperView = container;
 
         View? previous = null;
@@ -163,20 +141,15 @@ public sealed class AotAllViewsWindow : Runnable
             previous = frame;
         }
 
-        Shortcut quitShortcut = new () { Text = "Quit", Key = Application.GetDefaultKey(Command.Quit), Action = RequestStop };
+        Shortcut quitShortcut = new () { Text = "Quit", Key = Application.GetDefaultKey (Command.Quit), Action = RequestStop };
 
         statusBar.Add (quitShortcut);
 
         Add (menuBar, container, propsEditor, statusBar);
     }
 
-    /// <summary>
-    ///     Statically creates every <see cref="IDesignable"/> view. No reflection, no
-    ///     CreateInstance — fully AOT-safe.
-    /// </summary>
     private static IEnumerable<(string Name, View View)> CreateAllViews ()
     {
-        // ── Core controls (IDesignable — EnableForDesign populates demo data) ──
         yield return Design (new Button ());
         yield return Design (new ColorPicker ());
         yield return Design (new DropDownList ());
@@ -196,7 +169,6 @@ public sealed class AotAllViewsWindow : Runnable
         yield return Design (new Editor ());
         yield return Design (new TreeView ());
 
-        // ── Views without IDesignable (still AOT-relevant as config hosts or common views) ──
         yield return (nameof (CharMap), new CharMap ());
         yield return (nameof (CheckBox), new CheckBox { Text = "Check me" });
         yield return (nameof (DatePicker), new DatePicker ());
