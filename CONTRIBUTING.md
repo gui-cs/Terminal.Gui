@@ -277,7 +277,7 @@ foreach (Rune rune in text.EnumerateRunes ())
 
 ### Root Directory Files
 
-- `Terminal.sln` - Main solution file
+- `Terminal.slnx` - Main solution file
 - `Terminal.sln.DotSettings` - ReSharper code style settings
 - `.editorconfig` - Code formatting rules (111KB, extensive)
 - `global.json` - .NET SDK version pinning

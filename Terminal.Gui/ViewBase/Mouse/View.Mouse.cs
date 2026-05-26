@@ -11,17 +11,116 @@ public partial class View // Mouse APIs
     /// </summary>
     public MouseBindings MouseBindings { get; internal set; } = null!;
 
+    /// <summary>
+    ///     Gets or sets the default mouse bindings shared across all views. Only commands that a view supports
+    ///     (via <see cref="GetSupportedCommands"/>) are actually bound when <see cref="ApplyMouseBindings"/> is called.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<Command, PlatformMouseBinding>? DefaultMouseBindings
+    {
+        get;
+        set
+        {
+            field = value;
+            Trace.Configuration ("DefaultMouseBindings", "View Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
+        }
+    } = new ()
+    {
+        [Command.Activate] = BindMouse.All (MouseFlags.LeftButtonReleased),
+        [Command.Context] = BindMouse.All (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl),
+        [Command.StartSelection] = BindMouse.Platform (windows: [MouseFlags.LeftButtonPressed | MouseFlags.Alt],
+                                                       linux: [MouseFlags.LeftButtonPressed | MouseFlags.Shift],
+                                                       macos: [MouseFlags.LeftButtonPressed | MouseFlags.Shift]),
+        [Command.StartRectangleSelection] = BindMouse.Platform (windows: [MouseFlags.LeftButtonPressed | MouseFlags.Alt | MouseFlags.Ctrl],
+                                                                linux: [MouseFlags.LeftButtonPressed | MouseFlags.Shift | MouseFlags.Ctrl],
+                                                                macos: [MouseFlags.LeftButtonPressed | MouseFlags.Shift | MouseFlags.Ctrl])
+    };
+
+    /// <summary>
+    ///     Gets or sets per-view mouse binding overrides from configuration. The outer key is the view type name
+    ///     (e.g., "TextView"), the inner dictionary maps commands to platform mouse bindings.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, Dictionary<Command, PlatformMouseBinding>>? ViewMouseBindings { get; set; }
+
     private void SetupMouse ()
     {
         MouseBindings = new MouseBindings ();
-
-        // By default, left button release activates (aligns with industry standards - allows cancellation).
-        // Users can press, see visual feedback, drag away, and release outside to cancel.
-        MouseBindings.Add (MouseFlags.LeftButtonReleased, Command.Activate);
-        MouseBindings.Add (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl, Command.Context);
+        ApplyMouseBindings (DefaultMouseBindings);
 
         // Released bindings are added/removed dynamically when MouseHoldRepeat changes
         // See OnMouseHoldRepeatChanged
+    }
+
+    /// <summary>
+    ///     Applies layered mouse bindings from the provided dictionaries. Only commands that the view supports
+    ///     (via <see cref="GetSupportedCommands"/>) are bound. Mouse flags already bound are not overwritten.
+    /// </summary>
+    protected void ApplyMouseBindings (params Dictionary<Command, PlatformMouseBinding>? [] layers)
+    {
+        if (layers is null)
+        {
+            return;
+        }
+
+        HashSet<Command> supported = new (GetSupportedCommands ());
+
+        foreach (Dictionary<Command, PlatformMouseBinding>? layer in layers)
+        {
+            if (layer is null)
+            {
+                continue;
+            }
+
+            ApplyMouseLayer (layer, supported);
+        }
+
+        string typeName = GetType ().Name;
+        int backtick = typeName.IndexOf ('`');
+
+        if (backtick >= 0)
+        {
+            typeName = typeName [..backtick];
+        }
+
+        if (ViewMouseBindings?.TryGetValue (typeName, out Dictionary<Command, PlatformMouseBinding>? overrides) == true)
+        {
+            ApplyMouseLayer (overrides, supported);
+        }
+    }
+
+    private void ApplyMouseLayer (Dictionary<Command, PlatformMouseBinding> layer, HashSet<Command> supported)
+    {
+        foreach ((Command command, PlatformMouseBinding platformMouseFlags) in layer)
+        {
+            if (!supported.Contains (command))
+            {
+                continue;
+            }
+
+            foreach (MouseFlags mouseFlags in platformMouseFlags.GetCurrentPlatformMouseFlags ())
+            {
+                if (mouseFlags == MouseFlags.None)
+                {
+                    continue;
+                }
+
+                if (MouseBindings.TryGet (mouseFlags, out _))
+                {
+                    continue;
+                }
+
+                MouseBindings.Add (mouseFlags, command);
+            }
+        }
     }
 
     #region MouseEnterLeave

@@ -409,4 +409,50 @@ public class FileDialogTests : TestsAllDrivers
 
         c.Stop ();
     }
+
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void SaveFileDialog_TableView_EnterOnDirectory_PreserveFilenameOnDirectoryChanges_True (string d)
+    {
+        // Copilot
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+
+        using AppTestHelper c = With.A (() =>
+                                        {
+                                            IRunnable r = NewSaveDialog (out sd, out fs);
+                                            sd.Style.PreserveFilenameOnDirectoryChanges = true;
+                                            sd.AllowedTypes = [new AllowedType ("C# File", ".cs")];
+
+                                            return r;
+                                        }, 100, 20, d)
+                                    .Then (_ =>
+                                          {
+                                              sd!.Path = fs!.Path.Combine (GetFileSystemRoot (fs), "hello.cs");
+                                          })
+                                    .ScreenShot ("Save dialog with filename", _out)
+                                    .Focus<TableView> (_ => true)
+                                    .KeyDown (Key.CursorDown)
+                                    .ScreenShot ("After selecting logs directory", _out)
+                                    .KeyDown (Key.Enter)
+                                    .ScreenShot ("After entering logs directory", _out)
+                                    .Then (_ =>
+                                          {
+                                              Assert.True (sd!.IsRunning);
+                                              Assert.True (sd.Canceled);
+                                              Assert.Contains ("logs", sd.Path);
+                                              Assert.EndsWith ("hello.cs", sd.Path);
+                                          })
+                                    .KeyDown (Key.Enter)
+                                    .ScreenShot ("After entering parent directory row", _out)
+                                    .Then (_ =>
+                                          {
+                                              Assert.True (sd!.IsRunning);
+                                              Assert.True (sd.Canceled);
+                                              Assert.DoesNotContain ("logs", sd.Path);
+                                              Assert.EndsWith ("hello.cs", sd.Path);
+                                          });
+
+        c.Stop ();
+    }
 }

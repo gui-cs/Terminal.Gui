@@ -2,6 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Shows a checkbox that can be cycled between two or three states.</summary>
 /// <remarks>
+/// <img src="../images/views/CheckBox.gif" alt="CheckBox demo"/>
 ///     <para>
 ///         <see cref="RadioStyle"/> is used to display radio button style glyphs (●) instead of checkbox style glyphs (☑).
 ///     </para>

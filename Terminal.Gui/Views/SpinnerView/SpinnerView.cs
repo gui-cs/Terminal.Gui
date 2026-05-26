@@ -2,6 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Displays a spinning glyph or combinations of glyphs to indicate progress or activity</summary>
 /// <remarks>
+/// <img src="../images/views/SpinnerView.gif" alt="SpinnerView demo"/>
 ///     By default, animation only occurs when you call <see cref="SpinnerView.AdvanceAnimation(bool)"/>. Use
 ///     <see cref="AutoSpin"/> to make the automate calls to <see cref="SpinnerView.AdvanceAnimation(bool)"/>.
 /// </remarks>
@@ -355,4 +356,7 @@ public class SpinnerView : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:3000";
 }

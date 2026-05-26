@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using AnsiConsoleToHtml;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
@@ -33,6 +32,8 @@ string? outputFile = null;
 string [] commandArgs = Environment.GetCommandLineArgs ();
 var ansi = false;
 var addBorderFrame = false;
+var live = false;
+var queryKeyStrokes = false;
 
 for (var i = 0; i < commandArgs.Length; i++)
 {
@@ -60,6 +61,14 @@ for (var i = 0; i < commandArgs.Length; i++)
     {
         ansi = true;
     }
+    else if (commandArgs [i] == "--live" || commandArgs [i] == "-l")
+    {
+        live = true;
+    }
+    else if (commandArgs [i] == "--keystrokes" || commandArgs [i] == "-k")
+    {
+        queryKeyStrokes = true;
+    }
 }
 
 if (string.IsNullOrEmpty (viewName))
@@ -69,58 +78,107 @@ if (string.IsNullOrEmpty (viewName))
     return;
 }
 
+// If --keystrokes, just query the view's demo keystrokes and exit
+if (queryKeyStrokes)
+{
+    Type? type = ViewDemoWindow.ResolveViewType (viewName);
+
+    if (type is null)
+    {
+        Console.Error.WriteLine ($"`{viewName}` type is not a valid Terminal.Gui View type.");
+        Environment.Exit (1);
+
+        return;
+    }
+
+    View? view = (View?)Activator.CreateInstance (type);
+
+    if (view is IDesignable designable)
+    {
+        string? keystrokes = designable.GetDemoKeyStrokes ();
+        Console.WriteLine (keystrokes ?? "");
+    }
+    else
+    {
+        Console.WriteLine ("");
+    }
+
+    return;
+}
+
 ViewDemoWindow.ViewName = viewName;
 ViewDemoWindow.AddBorderFrame = addBorderFrame;
+ViewDemoWindow.IsLiveMode = live;
 
 IApplication app = Application.Create ();
 app.Init (DriverRegistry.Names.ANSI);
 
-// Force 16 colors and end after first iteration
-app.StopAfterFirstIteration = true;
-app.Driver!.Force16Colors = !ansi;
-app.Driver!.SetScreenSize (80, 20);
-
-var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
-
-if (result is { })
+if (live)
 {
-    Console.WriteLine (result);
+    // Live mode: run normally so tuirec can record the interaction.
+    // Write a dot colored to match the agg monokai theme background (#272822 = RGB 39,40,34)
+    // before TG renders, then briefly pause. This creates 2 visually distinct frames for
+    // tuirec's --trim without any visible preroll artifact. 50ms is enough for a distinct
+    // timestamp but too short to be perceptible in the GIF.
+    Console.Write ("\x1b[2J\x1b[H\x1b[38;2;39;40;34m.\x1b[0m");
+    Console.Out.Flush ();
+    Thread.Sleep (50);
 
-    return;
-}
-
-// Run it again, since it set the Screen size to just fit
-app.Run<ViewDemoWindow> ().GetResult<string> ();
-
-string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
-app.Dispose ();
-
-if (string.IsNullOrEmpty (output))
-{
-    Console.WriteLine (@"No output was generated.");
-
-    return;
-}
-
-if (ansi)
-{
-    output = AnsiConsole.ToHtml (output);
-}
-
-// Write to file or console
-if (!string.IsNullOrEmpty (outputFile))
-{
-    File.WriteAllText (outputFile, output);
+    app.Driver!.SetScreenSize (80, 20);
+    app.Run<ViewDemoWindow> ();
+    app.Dispose ();
 }
 else
 {
-    Console.WriteLine (output);
+    // Original mode: stop after first iteration and capture output
+    app.StopAfterFirstIteration = true;
+    app.Driver!.Force16Colors = !ansi;
+    app.Driver!.SetScreenSize (80, 20);
+
+    var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+
+    if (result is { })
+    {
+        Console.WriteLine (result);
+        app.Dispose ();
+
+        return;
+    }
+
+    // Run it again, since it set the Screen size to just fit
+    app.Run<ViewDemoWindow> ().GetResult<string> ();
+
+    string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
+    app.Dispose ();
+
+    if (string.IsNullOrEmpty (output))
+    {
+        Console.WriteLine (@"No output was generated.");
+
+        return;
+    }
+
+    if (ansi)
+    {
+        output = AnsiConsoleToHtml.AnsiConsole.ToHtml (output);
+    }
+
+    // Write to file or console
+    if (!string.IsNullOrEmpty (outputFile))
+    {
+        File.WriteAllText (outputFile, output);
+    }
+    else
+    {
+        Console.WriteLine (output);
+    }
 }
 
 // Defines a top-level window with border and title
 internal class ViewDemoWindow : Runnable<string>
 {
     public static string? ViewName { get; set; }
+    public static bool IsLiveMode { get; set; }
 
     public ViewDemoWindow ()
     {
@@ -128,12 +186,44 @@ internal class ViewDemoWindow : Runnable<string>
         Width = 80;
         Height = 20;
 
-        // Use only white on black
-        SetScheme (new Scheme (new Attribute (ColorName16.White, ColorName16.Black)));
+        if (!IsLiveMode)
+        {
+            // Use only white on black for static HTML/ANSI capture
+            SetScheme (new Scheme (new Attribute (ColorName16.White, ColorName16.Black)));
+        }
+        else
+        {
+            // In live mode, don't let child Accept bubble up and stop the app
+            CommandsToBubbleUp = [];
+        }
+
         BorderStyle = LineStyle.None;
     }
 
     public static bool AddBorderFrame { get; set; }
+
+    /// <summary>
+    ///     Resolves a view type name to its <see cref="Type"/>, handling generic types like "ListView`1".
+    /// </summary>
+    public static Type? ResolveViewType (string viewName)
+    {
+        // Try direct resolution first
+        Type? type = Type.GetType ($"Terminal.Gui.Views.{viewName}, Terminal.Gui", false, true);
+
+        if (type is not null)
+        {
+            return type;
+        }
+
+        // Search the assembly for types matching by name (handles generics)
+        System.Reflection.Assembly asm = typeof (View).Assembly;
+
+        return asm.GetTypes ()
+                  .FirstOrDefault (t => t.IsClass
+                                        && !t.IsAbstract
+                                        && t.IsSubclassOf (typeof (View))
+                                        && string.Equals (t.Name, viewName, StringComparison.OrdinalIgnoreCase));
+    }
 
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsRunning)
@@ -146,7 +236,7 @@ internal class ViewDemoWindow : Runnable<string>
         }
 
         // Convert ViewName to type that's in the Terminal.Gui assembly:
-        var type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
+        Type? type = ResolveViewType (ViewName!);
 
         if (type is null)
         {

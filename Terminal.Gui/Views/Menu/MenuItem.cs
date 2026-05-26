@@ -214,6 +214,26 @@ public class MenuItem : Shortcut, IValue
     {
         // When the mouse enters a menuitem, we set focus to it automatically.
 
+        if (App?.Mouse.LastMousePosition is { } screenPosition && App.TopRunnableView is { } topRunnableView)
+        {
+            List<View?> viewsUnderMouse = topRunnableView.GetViewsUnderLocation (screenPosition, ViewportSettingsFlags.TransparentMouse);
+
+            // GetViewsUnderLocation returns views ordered by depth (deepest last),
+            // so walk from the end to find the deepest MenuItem.
+            for (int i = viewsUnderMouse.Count - 1; i >= 0; i--)
+            {
+                if (viewsUnderMouse [i] is MenuItem deepestMenuItem)
+                {
+                    if (deepestMenuItem != this)
+                    {
+                        return base.OnMouseEnter (eventArgs);
+                    }
+
+                    break;
+                }
+            }
+        }
+
         // Logging.Trace($"OnEnter {this.ToIdentifyingString ()}");
         SetFocus ();
 
