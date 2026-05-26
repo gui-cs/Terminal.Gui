@@ -1,6 +1,6 @@
 # Spec: Replace ConfigurationManager (CM) with Microsoft.Extensions.Configuration (MEC)
 
-> **Status:** Draft — awaiting review and debate before any implementation begins.
+> **Status:** In Progress — MEC migration is implemented; current focus is finishing complex-type migration in PR #5411.
 > **Tracking Issue:** [#4943](https://github.com/gui-cs/Terminal.Gui/issues/4943)
 > **Related analysis:** See [@tig's AOT binary-size comment](https://github.com/gui-cs/Terminal.Gui/issues/4943#issuecomment-XXXXXX)
 
@@ -1082,7 +1082,7 @@ With POCOs, "hard-coded defaults" are simply the default property values of each
 
 ## 8. Implementation Phases
 
-> **IMPORTANT:** These phases are a proposal only. No implementation work begins until Phase 0 is complete.
+> **Status note:** Implementation is already underway. This section now serves as the execution plan and remaining-work tracker.
 
 ### Phase 0 — Spec Review and Debate Resolution (Current Phase)
 
@@ -1123,6 +1123,31 @@ With POCOs, "hard-coded defaults" are simply the default property values of each
 4. Preserve JSON schema compatibility for built-in `config.json` (resolve D-02).
 5. **Tests:** Verify theme switching triggers `SetNeedsDisplay()` on affected views.
 
+### Phase 3A — Finish Complex-Type Migration (Current #5411 focus)
+
+**Goal:** Complete the functional CM→MEC migration for complex CM-owned types so effective runtime behavior is MEC-based before CM removal.
+
+1. **Theme graph migration**
+   - Ensure `"Theme"` scalar binding and reset semantics are correct (no stale state across rebuilds).
+   - Ensure `"Themes"` definitions bind correctly for active theme selection and fallback behavior.
+2. **Scheme dictionary migration**
+   - Ensure current-theme schemes are sourced from MEC-bound data.
+   - Preserve existing built-in scheme names and lookup behavior.
+3. **Key-binding migration**
+   - Ensure `Application.DefaultKeyBindings`, `View.DefaultKeyBindings`, and `View.ViewKeyBindings` load from MEC config.
+   - Preserve command/key parsing behavior with existing key converters.
+4. **Color dictionary migration**
+   - Ensure `Color.Colors16` is loaded from MEC with existing key/value semantics.
+5. **Mixed-format compatibility**
+   - Support both nested MEC sections and legacy flat dotted keys during migration.
+   - In mixed configs, preserve provider precedence (higher-precedence keys must win).
+6. **Tests and acceptance criteria**
+   - Add focused tests for themes, schemes, key-binding dictionaries, and `Colors16`.
+   - Add regression tests for mixed nested+dotted config overlays and scalar reset behavior.
+   - Keep full UnitTestsParallelizable and CI green.
+
+**Definition of done for PR #5411:** complex-type behavior is fully MEC-driven (with compatibility shims still present), and all migration tests pass.
+
 ### Phase 4 — Remove [ConfigurationProperty] Static Statics
 
 **Goal:** Remove the reflection-based CM machinery. Static properties become plain statics that are only updated by MEC.
@@ -1150,6 +1175,8 @@ With POCOs, "hard-coded defaults" are simply the default property values of each
 1. Mark `ConfigurationManager` class as `[Obsolete]`.
 2. Remove in the next major version.
 3. Final binary size measurement on the NativeAot example.
+
+**Planned follow-up:** This cleanup/removal work is tracked in stacked PR #5416 so #5411 can complete functional migration first.
 
 ---
 
