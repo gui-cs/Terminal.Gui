@@ -258,11 +258,13 @@ No view-side changes are required — `ThemeChanges` is the public surface and s
 
 ### 5.4 Library `config.json`: resolving D-02
 
-A2 cannot land until the MEC binder can produce a populated `ThemeSettings` from `Terminal.Gui/Resources/config.json`. Two viable paths:
+**Resolution: α-lite (detect + warn, no library-side migration).**
 
-**Option α — Nested-only with `TuiConfigMigrator` helper (recommended).**
+The MEC read path is pure-nested. `TuiConfigurationBuilder.AddTuiJsonFile` (and the equivalent extension overloads) peek the JSON before binding and, if they detect pre-MEC shapes — top-level keys containing `.`, or `Themes` as a JSON array — emit a single `WARN`-level log identifying the file path and pointing at the migration documentation URL. The legacy shape is **not** parsed; affected settings fall through to defaults.
 
-Rewrite the library resource:
+**Rationale.** v2 is GA, so silent breakage (γ) is inappropriate. But hand-edited `config.json` usage is rare and concentrated in app authors who control their own upgrade timing, so a perpetual translation layer (β `LegacyTuiConfigurationSource`) or a full bidirectional migrator (α `TuiConfigMigrator`) buys little and costs permanent library surface. α-lite is the minimal GA-appropriate response: ~20 LOC of detection + one log line — no parsing of the legacy shape, no auto-migration, no round-trip tests, no deprecation cycle to engineer.
+
+**Library resource rewrite (one-time, in this PR).** `Terminal.Gui/Resources/config.json` is regenerated in the nested MEC-native shape:
 
 Before (flat):
 ```json
@@ -292,21 +294,24 @@ After (nested, MEC-native):
 }
 ```
 
-User config files in the legacy shape break. Mitigations:
+`Examples/Config/example_config.json` and every UICatalog/example config file gets the same treatment.
 
-- Ship `TuiConfigMigrator.MigrateFlatToNested(string json)` in `Terminal.Gui` for one release.
-- UICatalog `ConfigurationEditor` scenario gets a "Migrate" button.
-- Release notes + `docfx/docs/migrate-cm-to-mec.md` migration guide.
+**Detection heuristic (implementation note).** Single `JsonDocument` walk, no schema knowledge required:
 
-Trade-off: maximal AOT win (`ScopeJsonConverter` deletes), one-time pain for users with hand-authored configs.
+- *Flat key* = any top-level property name in the root object whose name contains `.`.
+- *Array themes* = the `Themes` property exists and its `ValueKind == JsonValueKind.Array`.
 
-**Option β — Custom `LegacyTuiConfigurationSource`.**
+Both checks together: < 20 LOC, no allocation beyond the `JsonDocument`. The warn message names the file and links to `docfx/docs/migrate-cm-to-mec.md` (and the migration tool below).
 
-Implement `IConfigurationSource` + `IConfigurationProvider` that parses the legacy flat-key shape (using the existing `RuneJsonConverter` / `KeyJsonConverter` / `SchemeJsonConverter` from `TuiSerializerContext`) and surfaces the result as MEC-native nested keys. Insert it before the standard `JsonStream` provider for `config.json`.
+**Migration aid.** A standalone `Tools/MigrateConfig/` console app (~50 LOC) lives in the repo but is **not** shipped in `Terminal.Gui.dll` and **not** added to any solution that ships. The detection warning references it. The tool is deletable any time without a deprecation cycle.
 
-Trade-off: zero user-side breakage; keep a custom configuration provider plus the flat-key parser indefinitely. The custom provider is still smaller and more AOT-friendly than `ScopeJsonConverter`, but the maintenance debt is permanent.
+**Cleanup horizon.** The detection-and-warn code itself can be deleted in a future minor when issue volume indicates no remaining users hit it. It is small enough to keep indefinitely if preferred — the decision is non-coupled to anything in this PR.
 
-**Recommendation:** Option α. The whole point of #4943 is to delete CM-shaped artifacts; keeping a flat-key parser indefinitely defeats it. A one-release migration helper is a fair user-facing cost. If feedback during the alpha cycle is severe, fall back to Option β as a hotfix.
+**Explicitly rejected alternatives** (recorded so reviewers don't re-litigate):
+
+- ❌ *"Keep both shapes forever, just document both."* Combines β's permanent maintenance cost with α's user confusion cost. No upside.
+- ❌ *"Silently translate legacy shapes."* Opaque failure mode if translation is wrong; GA-inappropriate.
+- ❌ *"Throw on legacy shape."* Too aggressive for a non-malformed JSON file. Warn-and-ignore is the right contract — the file is still valid JSON, it just no longer matches our schema.
 
 ### 5.5 Source generation context cleanup
 
@@ -372,12 +377,18 @@ Caveat: `OnLoadException` covers file/parse errors only. Bind/POCO validation er
 
 Each phase is one or more commits. Tests must build and pass at every commit. **Phases A1, B, and the JSON-converter half of C landed in #5411 and are not repeated here.**
 
-### Phase D — Library `config.json` rewrite + migration helper *(blocks Phase A2)*
-- Rewrite `Terminal.Gui/Resources/config.json` in the nested MEC-native shape (Option α of §5.4).
-- Add `TuiConfigMigrator.MigrateFlatToNested(string)` and parallelizable tests.
-- Update `Examples/Config/example_config.json`.
-- File a follow-up issue to update the hosted JSON schema (Q‑03).
-- Wire `JsonConfigurationSource.OnLoadException` per §5.7 so v2 deferred-error behavior is preserved.
+### Phase D — Library `config.json` rewrite + α-lite detection *(blocks Phase A2)*
+Scope (per §5.4 resolution):
+1. Rewrite `Terminal.Gui/Resources/config.json` in the nested MEC-native shape.
+2. Add the ~20 LOC peek-and-warn to `TuiConfigurationBuilder.AddTuiJsonFile` (and any sibling overloads). Detection heuristic: flat top-level keys containing `.`, or `Themes` as a JSON array.
+3. Delete `Terminal.Gui/Configuration/ScopeJsonConverter.cs` (with the legacy parser gone, nothing reads the legacy shape inside `Terminal.Gui.dll`).
+4. Rewrite `Examples/Config/example_config.json` and every UICatalog / example config to nested.
+5. Add `Tools/MigrateConfig/` — standalone console app (~50 LOC), separate csproj, not in any shipping solution.
+6. Add CHANGELOG entry pointing at the tool and the migration guide URL.
+7. Wire `JsonConfigurationSource.OnLoadException` per §5.7 so v2 deferred-error behavior is preserved.
+8. File a follow-up issue to update the hosted JSON schema (Q-03).
+
+Tests for Phase D: **two** parallelizable tests — one asserts the warning fires on a flat-key sample, one asserts it fires on an array-themes sample. No translation logic to test, so no round-trip tests are required.
 
 ### Phase A2 — Mec managers own runtime theme/scheme data
 - Have `MecThemeManager` / `MecSchemeManager` read theme and scheme dictionaries from `IOptionsMonitor<ThemeSettings>.CurrentValue` instead of delegating to the legacy static `ThemeManager` / `SchemeManager`.
@@ -438,7 +449,7 @@ The following public surface is **removed**. Source-incompatible for any consume
 
 ### JSON file breaking change
 
-User config files in the legacy flat-key format (`"Button.DefaultShadow": "..."`) must be migrated. A migration helper ships for one release.
+User config files in the legacy flat-key format (`"Button.DefaultShadow": "..."`) or array-themes format are **not parsed** by the new pipeline; affected settings fall through to defaults. A `WARN`-level log identifies offending files and points at the migration documentation + standalone migration tool (`Tools/MigrateConfig/`). No library-side auto-migration ships (per §5.4 α-lite resolution).
 
 ### Migration guide
 
@@ -451,7 +462,7 @@ A separate `docfx/docs/migrate-cm-to-mec.md` is added in Phase H with a side-by-
 | Risk | Mitigation |
 |------|------------|
 | Hidden third-party consumers still call obsolete CM API | They received an `[Obsolete]` warning in #5411 with the message pointing at `TuiConfigurationBuilder`. One release window has elapsed by the time this PR ships. |
-| Nested JSON breaks every existing user config file | Ship `TuiConfigMigrator` + UICatalog "Migrate" button + clear release-note + `migrate-cm-to-mec.md` guide. If alpha-cycle feedback is severe, fall back to §5.4 Option β (custom legacy source). |
+| Nested JSON breaks existing user config files | α-lite (§5.4): detect-and-warn at load time, fall through to defaults rather than fail. Standalone `Tools/MigrateConfig/` console app + `migrate-cm-to-mec.md` guide give users a one-shot fix path. If issue volume after release indicates more help is needed, β (`LegacyTuiConfigurationSource`) remains a viable hotfix. |
 | Renaming `MecThemeManager` → `ThemeManager` clashes with the deleted legacy `ThemeManager` if a partial revert lands | Phase F runs only after Phase E commits; if reverted, the rename is reverted with it. |
 | AOT size delta is smaller than predicted | Acceptable. The parallel-test and decoupling wins still justify the change. Record actual delta in the PR. |
 | `IOptionsMonitor<T>.OnChange` is not invoked in NativeAOT due to missing trim roots | Verified in #5411. Re-verify with a smoke test in `Examples/NativeAot` as part of Phase I. |

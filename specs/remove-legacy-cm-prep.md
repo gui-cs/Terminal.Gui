@@ -199,19 +199,25 @@ positive (likely `Settings` substring). No action.
 
 ---
 
-## 5. Next Executable Step (when unblocked)
+## 5. Next Executable Step (now unblocked)
 
-Once D-02 is decided:
+D-02 resolved to **α-lite** (detect + warn; no library-side migration).
+See `remove-legacy-cm.md` §5.4 and Phase D for the full scope. Concretely:
 
-1. **If α (nested + migrator):** rewrite `Terminal.Gui/Resources/config.json`
-   to the nested MEC shape; implement `TuiConfigMigrator.MigrateFlatToNested`;
-   add round-trip tests; wire `OnLoadException → TuiJsonErrors` aggregator
-   in `TuiConfigurationExtensions`.
-2. **If β (legacy source):** implement
-   `LegacyTuiConfigurationSource : IConfigurationSource` +
-   `LegacyTuiConfigurationProvider : ConfigurationProvider` that maps
-   `"X.Y.Z"` flat keys to nested `IConfiguration` paths. Keep `config.json`
-   unchanged.
+1. Rewrite `Terminal.Gui/Resources/config.json` once (flat → nested,
+   array-themes → dict-themes).
+2. Add ~20 LOC peek-and-warn to `TuiConfigurationBuilder.AddTuiJsonFile`
+   (detect top-level keys containing `.` or `Themes` as a JSON array;
+   emit one `WARN` log per offending file).
+3. Delete `Terminal.Gui/Configuration/ScopeJsonConverter.cs` — nothing
+   left in the library reads the legacy shape.
+4. Wire `JsonConfigurationSource.OnLoadException → TuiJsonErrors`
+   aggregator in `TuiConfigurationExtensions` (spec §5.7).
+5. Rewrite every `Examples/.../config.json` to nested.
+6. Add `Tools/MigrateConfig/` console app (~50 LOC, separate csproj,
+   not in any shipping solution).
+7. Two parallelizable tests: one asserts the warning fires on a
+   flat-key sample, one on an array-themes sample. **No translation
+   logic to test.**
 
-Either path unblocks Phase A2 (Mec managers consuming the parsed config
-directly instead of via `Settings["Themes"]`).
+Once Phase D lands, Phase A2 (Mec managers consume `IOptionsMonitor<ThemeSettings>.CurrentValue` directly) unblocks.
