@@ -248,7 +248,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
         KeystrokeNavigator.Matcher = new TreeViewCollectionNavigatorMatcher<T> (this);
 
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
-        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     /// <summary>

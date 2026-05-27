@@ -265,107 +265,108 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
                                                driver);
     }
 
-    // Copilot
-    [Fact]
-    public void CheckboxMode_MouseClick_OnCheckbox_Toggles_Check_Only ()
-    {
-        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
-        tree.CheckboxMode = true;
-
-        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (2, 0) });
-
-        Assert.False (tree.IsExpanded (f));
-        Assert.Equal (CheckState.Checked, tree.GetCheckState (f));
-        Assert.Same (f, tree.SelectedObject);
-    }
-
     // Copilot - Opus 4.6
     [Fact]
-    public void CheckboxMode_MouseClick_Works_When_SelectedObject_Is_Null ()
+    public void CheckboxMode_MouseClick_OnCheckbox_Toggles_Check ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
-        tree.CheckboxMode = true;
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
 
-        // Explicitly null out SelectedObject to simulate first interaction
-        tree.SelectedObject = null;
-
-        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (2, 0) });
-
-        Assert.Equal (CheckState.Checked, tree.GetCheckState (f));
-        Assert.Same (f, tree.SelectedObject);
-    }
-
-    // Copilot - Opus 4.6
-    [Fact]
-    public void CheckboxMode_MouseClick_OnCheckbox_ExpandableTree_Toggles_Check ()
-    {
-        // Use TreeView (non-generic) which uses TreeNodeBuilder where CanExpand works
-        TreeView tree = new ();
+        TreeView tree = new () { Width = 20, Height = 5 };
         tree.CheckboxMode = true;
 
         TreeNode root = new () { Text = "Root" };
         root.Children.Add (new TreeNode { Text = "Child1" });
-        root.Children.Add (new TreeNode { Text = "Child2" });
         tree.AddObject (root);
 
-        // Root is expandable (has children), collapsed by default
-        // Layout: ├ + ☐ · R o o t
-        // Pos:    0 1 2 3 4 5 6 7
-        // Checkbox is at position 2 (prefix count 1 + expand symbol width 1)
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
 
-        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (2, 0) });
+        // Layout (no border): └ + ☐ · R o o t
+        // Pos:                  0 1 2 3 4 5 6 7
+        // Checkbox is at screen position x=2
+
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (2, 0)));
 
         Assert.False (tree.IsExpanded (root));
         Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
     }
 
     // Copilot - Opus 4.6
     [Fact]
     public void MouseClick_OnExpandSymbol_Expands_Node ()
     {
-        TreeView tree = new ();
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
 
         TreeNode root = new () { Text = "Root" };
         root.Children.Add (new TreeNode { Text = "Child1" });
         tree.AddObject (root);
 
-        // Root is expandable and collapsed
-        // Layout: ├ + R o o t
-        // Pos:    0 1 2 3 4 5
-        // Expand symbol is at position 1 (prefix count = 1)
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
 
-        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (1, 0) });
+        // Layout (no border): └ + R o o t
+        // Pos:                  0 1 2 3 4 5
+        // Expand symbol at position 1
+
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (1, 0)));
 
         Assert.True (tree.IsExpanded (root));
+
+        top.Dispose ();
+        app.Dispose ();
     }
 
     // Copilot - Opus 4.6
     [Fact]
     public void CheckboxMode_MouseClick_OnExpandSymbol_Expands_Not_Toggles_Check ()
     {
-        TreeView tree = new ();
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
         tree.CheckboxMode = true;
 
         TreeNode root = new () { Text = "Root" };
         root.Children.Add (new TreeNode { Text = "Child1" });
         tree.AddObject (root);
 
-        // Layout: ├ + ☐ · R o o t
-        // Pos:    0 1 2 3 4 5 6 7
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Layout (no border): └ + ☐ · R o o t
+        // Pos:                  0 1 2 3 4 5 6 7
         // Expand symbol at position 1, checkbox at position 2
 
-        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (1, 0) });
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (1, 0)));
 
         Assert.True (tree.IsExpanded (root));
         Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
     }
 
     // Copilot - Opus 4.6
     [Fact]
     public void CheckboxMode_Indeterminate_Parent_Shows_None_Glyph ()
     {
-        IDriver driver = CreateTestDriver ();
-        TreeView tree = new () { Driver = driver };
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
         tree.CheckboxMode = true;
 
         TreeNode root = new () { Text = "Root" };
@@ -381,14 +382,19 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
 
         Assert.Equal (CheckState.None, tree.GetCheckState (root));
 
-        tree.Frame = new Rectangle (0, 0, 20, 4);
-        tree.Draw ();
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
 
         // Verify the indeterminate glyph is rendered (not unchecked)
-        string output = driver.ToString ()!;
-        string firstLine = output.Replace ("\r\n", "\n").Split ('\n') [0];
+        string driverOutput = app.Driver!.ToString ()!;
+        string firstLine = driverOutput.Replace ("\r\n", "\n").Split ('\n') [0];
         Assert.Contains (Glyphs.CheckStateNone.ToString (), firstLine);
         Assert.DoesNotContain (Glyphs.CheckStateUnChecked.ToString (), firstLine);
+
+        top.Dispose ();
+        app.Dispose ();
     }
 
     [Fact]
