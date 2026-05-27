@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text;
 using UnitTests;
 
@@ -9,6 +10,53 @@ namespace ViewsTests;
 /// </summary>
 public class CharMapTests : TestDriverBase
 {
+    // Copilot
+    [Fact]
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public void Constructor_Default_Does_Not_Preallocate_Visible_Row_Index ()
+    {
+        using (new CharMap ())
+        { }
+
+        GC.Collect ();
+        GC.WaitForPendingFinalizers ();
+        GC.Collect ();
+
+        long before = GC.GetAllocatedBytesForCurrentThread ();
+        using CharMap charMap = new ();
+        long allocated = GC.GetAllocatedBytesForCurrentThread () - before;
+
+        Assert.True (allocated < 1_000_000, $"Expected CharMap construction to allocate less than 1 MB, but allocated {allocated:N0} bytes.");
+
+        int maxRow = UnicodeRange.Ranges.Max (r => r.End) / 16;
+        int surrogateRowStart = 0xD800 / 16;
+        int surrogateRowEnd = 0xDFFF / 16;
+        int surrogateRows = Math.Min (maxRow, surrogateRowEnd) - surrogateRowStart + 1;
+        int expectedContentHeight = maxRow + 1 - surrogateRows + 1;
+
+        Assert.Equal (expectedContentHeight, charMap.GetContentHeight ());
+    }
+
+    // Copilot
+    [Fact]
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public void ShowUnicodeCategory_Rebuilds_Filtered_Index_And_Can_Clear_Filter ()
+    {
+        using CharMap charMap = new () { SelectedCodePoint = 'a' };
+        int defaultContentHeight = charMap.GetContentHeight ();
+
+        charMap.ShowUnicodeCategory = UnicodeCategory.UppercaseLetter;
+
+        Assert.True (charMap.GetContentHeight () < defaultContentHeight);
+        Assert.Equal (UnicodeCategory.UppercaseLetter, CharUnicodeInfo.GetUnicodeCategory (charMap.SelectedCodePoint));
+
+        charMap.ShowUnicodeCategory = null;
+
+        Assert.Equal (defaultContentHeight, charMap.GetContentHeight ());
+    }
+
     /// <summary>
     ///     Verifies that <see cref="CharMap.ValueChangedUntyped"/> is raised when <see cref="CharMap.SelectedCodePoint"/> changes.
     /// </summary>
