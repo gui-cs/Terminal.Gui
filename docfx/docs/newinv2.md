@@ -728,7 +728,7 @@ v2 ensures compatibility with Ahead-of-Time compilation:
 - Single-file deployment support
 - Faster startup, reduced runtime overhead
 
-**Example**: See `Examples/NativeAot` for AOT deployment
+**Example**: See `Tests/NativeAotSmoke` for the in-repo AOT smoke validation app.
 
 ### Enhanced Unicode Support
 

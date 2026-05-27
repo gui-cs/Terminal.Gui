@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     Displays a clickable hyperlink with optional display text and a target URL.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Link.gif" alt="Link demo"/>
 ///     <para>
 ///         <see cref="Link"/> has three independent text-related properties:
 ///     </para>
@@ -448,6 +449,9 @@ public class Link : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
 
 
 }

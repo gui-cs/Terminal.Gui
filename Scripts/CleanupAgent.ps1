@@ -89,7 +89,7 @@ function Invoke-ReSharperCleanup {
 
     # Run cleanup on specific file using --include parameter
     # Note: May show exceptions in output, but cleanup still completes successfully
-    jb cleanupcode "$RepoRoot\Terminal.sln" `
+    jb cleanupcode "$RepoRoot\Terminal.slnx" `
         --profile="Full Cleanup" `
         --include="$relativePath" `
         --no-build `
@@ -115,7 +115,7 @@ function Get-ReSharperWarningCount {
 
     Write-Status "Running ReSharper InspectCode to count warnings..."
 
-    jb inspectcode "$RepoRoot\Terminal.sln" `
+    jb inspectcode "$RepoRoot\Terminal.slnx" `
         --output="$tempXml" `
         --include="$includeList" `
         --severity=WARNING `
@@ -149,7 +149,7 @@ function Get-BuildWarnings {
 
     Write-Status "Analyzing build warnings..."
 
-    $buildOutput = dotnet build "$RepoRoot\Terminal.sln" --no-restore --configuration Debug --verbosity normal 2>&1 | Out-String
+    $buildOutput = dotnet build "$RepoRoot\Terminal.slnx" --no-restore --configuration Debug --verbosity normal 2>&1 | Out-String
 
     if ($LASTEXITCODE -ne 0) {
         Write-Status "Build failed" "Red"
@@ -308,7 +308,7 @@ function Add-CWPTodoComments {
 function Invoke-RebuildSolution {
     Write-Status "Rebuilding solution..."
 
-    dotnet build "$RepoRoot\Terminal.sln" --no-restore --configuration Debug --verbosity quiet 2>&1 | Out-Null
+    dotnet build "$RepoRoot\Terminal.slnx" --no-restore --configuration Debug --verbosity quiet 2>&1 | Out-Null
 
     if ($LASTEXITCODE -ne 0) {
         Write-Status "Build failed" "Red"

@@ -221,6 +221,95 @@ public class FileDialogResultTests
         Assert.Equal (insertionPointBefore, tbPath.InsertionPoint);
     }
 
+    [Fact]
+    public void FileDialog_MixedMode_PathSetBeforeEndInit_RespectsAllowedTypes ()
+    {
+        // Copilot
+        MockFileSystem fs = new ();
+        fs.AddDirectory ("/testdir");
+        fs.AddDirectory ("/testdir/subdir");
+        fs.AddFile ("/testdir/allowed.Designer.cs", new MockFileData ("allowed"));
+        fs.AddFile ("/testdir/blocked.txt", new MockFileData ("blocked"));
+        using FileDialog fd = new TestableFileDialog (fs)
+        {
+            OpenMode = OpenMode.Mixed,
+            AllowedTypes = [new AllowedType ("View", ".Designer.cs")]
+        };
+
+        fd.Path = "/testdir";
+        fd.EndInit ();
+
+        Assert.NotNull (fd.CurrentFilter);
+        Assert.NotNull (fd.State);
+
+        List<string> visibleEntries = fd.State!.Children
+                                       .Where (c => !c.IsParent)
+                                       .Select (c => c.Name)
+                                       .OrderBy (name => name)
+                                       .ToList ();
+
+        Assert.Equal (["allowed.Designer.cs", "subdir"], visibleEntries);
+    }
+
+    [Fact]
+    public void FileDialog_Accepting_Directory_From_Table_Keeps_Path_On_Opened_Directory ()
+    {
+        // Copilot
+        MockFileSystem fs = new ();
+        fs.AddDirectory ("/UI");
+        fs.AddDirectory ("/UI/Window");
+        fs.AddFile ("/UI/Window/file1.txt", new MockFileData ("hello"));
+
+        using FileDialog fd = new TestableFileDialog (fs) { OpenMode = OpenMode.File };
+        fd.Path = "/UI";
+
+        FieldInfo? tableViewField = typeof (FileDialog).GetField ("_tableView", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull (tableViewField);
+
+        TableView tableView = Assert.IsType<TableView> (tableViewField!.GetValue (fd));
+
+        // Find the "Window" directory row by scanning the table source rather than hard-coding an index.
+        int windowRow = FindRowByName (tableView, "Window");
+        Assert.True (windowRow >= 0, "Expected to find a row named 'Window' in the table.");
+
+        tableView.SetFocus ();
+        tableView.SetSelection (0, windowRow, false);
+
+        // Path should end with the selected directory name (platform-independent check).
+        Assert.EndsWith ("Window", fd.Path);
+
+        string pathBeforeAccept = fd.Path;
+
+        tableView.InvokeCommand (Command.Accept);
+
+        // After accepting a directory in File mode, the path should remain unchanged
+        // (navigates into the directory rather than selecting a file).
+        Assert.Equal (pathBeforeAccept, fd.Path);
+    }
+
+    /// <summary>Finds a row in a <see cref="TableView"/> whose first column contains the given name.</summary>
+    private static int FindRowByName (TableView tableView, string name)
+    {
+        ITableSource? source = tableView.Table;
+
+        if (source is null)
+        {
+            return -1;
+        }
+
+        for (var row = 0; row < source.Rows; row++)
+        {
+            string cellText = source [row, 0]?.ToString () ?? string.Empty;
+
+            if (cellText.Contains (name, StringComparison.Ordinal))
+            {
+                return row;
+            }
+        }
+
+        return -1;
+    }
+
     /// <summary>Testable subclass that exposes the internal file-system constructor.</summary>
     private sealed class TestableFileDialog : FileDialog
     {

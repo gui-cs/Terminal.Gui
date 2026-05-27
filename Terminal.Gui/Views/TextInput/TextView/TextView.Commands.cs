@@ -92,6 +92,8 @@ public partial class TextView
         AddCommand (Command.Start, () => MoveTopHome ());
         AddCommand (Command.StartExtend, () => MoveTopHomeExtend ());
         AddCommand (Command.ToggleExtend, () => ToggleSelecting ());
+        AddCommand (Command.StartSelection, () => StartMouseSelecting ());
+        AddCommand (Command.StartRectangleSelection, () => StartMouseRectangleSelecting ());
 
         // Editing
         AddCommand (Command.SelectAll, () => ProcessSelectAll ());
@@ -120,6 +122,7 @@ public partial class TextView
 
         // Apply configurable key bindings (base layer + TextView-specific layer)
         ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+        ApplyMouseBindings (View.DefaultMouseBindings);
 
         KeyBindings.Remove (Key.Space);
 
@@ -304,6 +307,19 @@ public partial class TextView
 
         return true;
     }
+
+    private bool StartMouseSelecting ()
+    {
+        if (!_shiftSelecting)
+        {
+            _isButtonShift = true;
+            StartSelecting ();
+        }
+
+        return true;
+    }
+
+    private bool StartMouseRectangleSelecting () => StartMouseSelecting ();
 
     /// <summary>Deletes all text.</summary>
     public bool DeleteAll ()

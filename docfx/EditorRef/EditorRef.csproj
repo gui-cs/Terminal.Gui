@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Terminal.Gui.Editor" />
+    <PackageReference Include="Terminal.Gui.Editor" VersionOverride="*" />
   </ItemGroup>
 
 </Project>

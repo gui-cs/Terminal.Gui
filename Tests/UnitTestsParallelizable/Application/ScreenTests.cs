@@ -411,6 +411,41 @@ public class ScreenTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 100, 50), app.Screen);
     }
 
+    // Copilot
+    [Fact]
+    public void Screen_Property_Setting_Before_Begin_Raises_ScreenChanged_Once ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        int eventCount = 0;
+        Rectangle? newScreen = null;
+
+        EventHandler<EventArgs<Rectangle>> handler = (_, args) =>
+                                                     {
+                                                         eventCount++;
+                                                         newScreen = args.Value;
+                                                     };
+
+        app.ScreenChanged += handler;
+
+        try
+        {
+            // Act
+            app.Screen = new (0, 0, 100, 50);
+
+            // Assert
+            Assert.Equal (1, eventCount);
+            Assert.Equal (new (0, 0, 100, 50), newScreen);
+            Assert.Equal (new (0, 0, 100, 50), app.Screen);
+        }
+        finally
+        {
+            app.ScreenChanged -= handler;
+        }
+    }
+
     [Fact]
     public void Screen_Property_Setting_Raises_ScreenChanged_Event ()
     {
@@ -478,6 +513,44 @@ public class ScreenTests (ITestOutputHelper output)
     }
 
     #endregion Screen Property Tests
+
+    // Copilot
+    [Fact]
+    public void Screen_Setter_Before_Driver_Init_Fires_ScreenChanged_Without_Delegating_To_Driver ()
+    {
+        // Arrange — Create app but do NOT call Init, so Driver remains null.
+        using IApplication app = Application.Create ();
+
+        // Verify precondition: Driver is null before Init.
+        Assert.Null (app.Driver);
+
+        var eventCount = 0;
+        Rectangle? reported = null;
+
+        EventHandler<EventArgs<Rectangle>> handler = (_, args) =>
+                                                     {
+                                                         eventCount++;
+                                                         reported = args.Value;
+                                                     };
+
+        app.ScreenChanged += handler;
+
+        try
+        {
+            // Act — setting Screen with no Driver should still raise ScreenChanged.
+            app.Screen = new (0, 0, 120, 40);
+
+            // Assert — event fired exactly once with the default getter value (2048x2048)
+            // because _screen is reset to null in fullscreen mode and Driver is null.
+            Assert.Equal (1, eventCount);
+            Assert.NotNull (reported);
+            Assert.Equal (new (0, 0, 2048, 2048), reported.Value);
+        }
+        finally
+        {
+            app.ScreenChanged -= handler;
+        }
+    }
 
     #region Inline Mode Screen Tests
 

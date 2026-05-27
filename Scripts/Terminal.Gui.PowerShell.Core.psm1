@@ -1,8 +1,8 @@
 <#
   .SYNOPSIS
-  (Windows Only) Opens Visual Studio and loads Terminal.sln.
+  (Windows Only) Opens Visual Studio and loads Terminal.slnx.
   .DESCRIPTION
-  (Windows Only) Opens Visual Studio and loads Terminal.sln.
+  (Windows Only) Opens Visual Studio and loads Terminal.slnx.
   .PARAMETER SolutionFilePath
   (Optional) If specified, the path to the solution file. Typically unnecessary to supply this parameter.
   .INPUTS
@@ -31,9 +31,9 @@ Function Open-Solution {
 
 <#
   .SYNOPSIS
-  (Windows Only) Closes Visual Studio processes with Terminal.sln loaded.
+  (Windows Only) Closes Visual Studio processes with Terminal.slnx loaded.
   .DESCRIPTION
-  (Windows Only) Closes Visual Studio processes with Terminal.sln loaded by finding any VS processes launched with the solution file or with 'Terminal' in their main window titles.
+  (Windows Only) Closes Visual Studio processes with Terminal.slnx loaded by finding any VS processes launched with the solution file or with 'Terminal' in their main window titles.
   .INPUTS
   None
   .OUTPUTS
@@ -66,7 +66,7 @@ Function Set-PowerShellEnvironment {
   # Set up some common globals
   New-Variable -Name ScriptsDirectory -Value $PSScriptRoot -Option ReadOnly -Scope Global -Visibility Public
   New-Variable -Name RepositoryRootDirectory -Value (Join-Path -Resolve $ScriptsDirectory "..") -Option ReadOnly -Scope Global -Visibility Public
-  New-Variable -Name SolutionFilePath -Value (Join-Path -Resolve $RepositoryRootDirectory "Terminal.sln") -Option ReadOnly -Scope Global -Visibility Public
+  New-Variable -Name SolutionFilePath -Value (Join-Path -Resolve $RepositoryRootDirectory "Terminal.slnx") -Option ReadOnly -Scope Global -Visibility Public
   New-Variable -Name TerminalGuiProjectDirectory -Value (Join-Path -Resolve $RepositoryRootDirectory "Terminal.Gui") -Option ReadOnly -Scope Global -Visibility Public
   New-Variable -Name TerminalGuiProjectFilePath -Value (Join-Path -Resolve $TerminalGuiProjectDirectory "Terminal.Gui.csproj") -Option ReadOnly -Scope Global -Visibility Public
 

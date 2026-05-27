@@ -29,9 +29,27 @@ dotnet new install Terminal.Gui.Templates@2.0.*
 
 ## Sample Usage in C#
 
-The following example shows a basic Terminal.Gui application using the modern instance-based model (this is `./Example/Example.cs`):
+The following example shows a basic Terminal.Gui application using the modern instance-based model:
 
-[!code-csharp[Program.cs](../../Examples/Example/Example.cs)]
+```csharp
+using Terminal.Gui.App;
+using Terminal.Gui.ViewBase;
+using Terminal.Gui.Views;
+
+using IApplication app = Application.Create ();
+app.Init ();
+
+using Window window = new () { Title = "Hello World (Esc to quit)" };
+Label label = new ()
+{
+    Text = "Hello, Terminal.Gui v2!",
+    X = Pos.Center (),
+    Y = Pos.Center ()
+};
+window.Add (label);
+
+app.Run (window);
+```
 
 ### Key aspects of the modern model:
 
@@ -49,5 +67,5 @@ When run the application looks as follows:
 ## Building the Library and Running the Examples
 
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
-* Windows - Open `Terminal.sln` with Visual Studio 202x.
-
+* Additional examples are available in [gui-cs/Examples](https://github.com/gui-cs/Examples).
+* Windows - Open `Terminal.slnx` with Visual Studio 2022 (17.10+).

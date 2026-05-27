@@ -1,5 +1,5 @@
 ## Development and Design-Time PowerShell Modules
-This directory contains PowerShell modules for use when working with Terminal.sln
+This directory contains PowerShell modules for use when working with Terminal.slnx
 
 ### Purpose
 These modules will be modifed and extended as time goes on, whenever someone decides to add something to make life easier.

@@ -75,7 +75,7 @@ public static class AnsiMouseEncoder
     ///             <description>Add 64 for wheel (64=up, 65=down, 68=left, 69=right)</description>
     ///         </item>
     ///         <item>
-    ///             <description>Modifiers: +8 for Alt, +16 for Ctrl, special handling for Shift</description>
+    ///             <description>Modifiers: +4 for Shift, +8 for Alt, +16 for Ctrl</description>
     ///         </item>
     ///     </list>
     /// </remarks>
@@ -109,33 +109,29 @@ public static class AnsiMouseEncoder
             return 65;
         }
 
-        // Determine base button (0, 1, 2)
-        int baseButton;
+        int buttonCode;
 
         if (flags.FastHasFlags (MouseFlags.LeftButtonPressed) || flags.FastHasFlags (MouseFlags.LeftButtonReleased))
         {
-            baseButton = 0;
+            buttonCode = 0;
         }
         else if (flags.FastHasFlags (MouseFlags.MiddleButtonPressed) || flags.FastHasFlags (MouseFlags.MiddleButtonReleased))
         {
-            baseButton = 1;
+            buttonCode = 1;
         }
         else if (flags.FastHasFlags (MouseFlags.RightButtonPressed) || flags.FastHasFlags (MouseFlags.RightButtonReleased))
         {
-            baseButton = 2;
+            buttonCode = 2;
         }
         else if (flags.FastHasFlags (MouseFlags.PositionReport))
         {
             // Motion without button
-            baseButton = 35;
+            buttonCode = 3;
         }
         else
         {
-            baseButton = 0; // Default to left
+            buttonCode = 0; // Default to left
         }
-
-        // Start with base button
-        int buttonCode = baseButton;
 
         // Check if it's a drag event (position report with button pressed)
         bool isDrag = flags.FastHasFlags (MouseFlags.PositionReport)
@@ -145,8 +141,13 @@ public static class AnsiMouseEncoder
 
         if (isDrag)
         {
-            // Drag events use codes 32-34
-            return 32 + baseButton;
+            // Drag events use button codes with the motion bit set.
+            buttonCode += 32;
+        }
+        else if (flags.FastHasFlags (MouseFlags.PositionReport))
+        {
+            // Motion without a button uses code 35 before modifiers.
+            buttonCode = 35;
         }
 
         // Add modifiers
@@ -154,7 +155,12 @@ public static class AnsiMouseEncoder
         bool hasCtrl = flags.FastHasFlags (MouseFlags.Ctrl);
         bool hasShift = flags.FastHasFlags (MouseFlags.Shift);
 
-        // Standard modifier encoding: Alt=+8, Ctrl=+16
+        // Standard modifier encoding: Shift=+4, Alt=+8, Ctrl=+16
+        if (hasShift)
+        {
+            buttonCode += 4;
+        }
+
         if (hasAlt)
         {
             buttonCode += 8;
@@ -163,44 +169,6 @@ public static class AnsiMouseEncoder
         if (hasCtrl)
         {
             buttonCode += 16;
-        }
-
-        // Shift is trickier - looking at AnsiMouseParser switch statement:
-        // - Codes 14, 22, 30, 36-37, 45-46, 53-54, 61-62 include Shift
-        // - Pattern is not simply +4, it depends on other modifiers
-        // For Ctrl+Shift: codes are 22 (right), 53-54 (motion+ctrl+shift)
-        // For Alt+Shift: codes are 14 (right), 45-46 (motion+alt+shift), 47 (motion)
-        // For position reports with shift: 36-37, 45-46, 53-54, 61-62
-
-        if (hasShift)
-        {
-            if (flags.FastHasFlags (MouseFlags.PositionReport))
-            {
-                // Position report with shift
-                buttonCode = 36 + baseButton; // Base for motion+shift
-            }
-            else if (hasCtrl && hasAlt)
-            {
-                // Ctrl+Alt+Shift: code 30 (for right) + offset
-                buttonCode += 6; //  Makes 24+6=30
-            }
-            else if (hasCtrl)
-            {
-                // Ctrl+Shift: code 22 for right button
-                // 16+2+4 = 22 for right, but we want pattern
-                buttonCode += 6; // Makes 16+0+6=22 for left+ctrl+shift
-            }
-            else if (hasAlt)
-            {
-                // Alt+Shift: code 14 for right
-                buttonCode += 6; // Makes 8+0+6=14 for left+alt+shift
-            }
-            else
-            {
-                // Just shift (for motion events this is handled above)
-                // For button events, shift isn't typically sent alone
-                buttonCode += 4; // Approximation
-            }
         }
 
         return buttonCode;

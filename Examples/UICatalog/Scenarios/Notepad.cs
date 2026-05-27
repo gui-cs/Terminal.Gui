@@ -325,7 +325,7 @@ public class Notepad : Scenario
 
     /// <summary>
     ///     Walks up the directory tree from the current directory looking for the repository root
-    ///     (identified by Terminal.sln).
+    ///     (identified by Terminal.slnx).
     /// </summary>
     private static string? FindRepoRoot ()
     {
@@ -333,7 +333,7 @@ public class Notepad : Scenario
 
         while (dir is { })
         {
-            if (File.Exists (Path.Combine (dir.FullName, "Terminal.sln")))
+            if (File.Exists (Path.Combine (dir.FullName, "Terminal.slnx")))
             {
                 return dir.FullName;
             }

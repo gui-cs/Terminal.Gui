@@ -15,6 +15,14 @@ try {
 
     dotnet tool update -g docfx
 
+    # Build Terminal.Gui in Release so docfx can find the DLL
+    Write-Host "Building Terminal.Gui (Release)..." -ForegroundColor Cyan
+    dotnet build ../Terminal.Gui/Terminal.Gui.csproj -c Release --no-restore -v quiet
+
+    # Build EditorRef in Release to pull the Terminal.Gui.Editor NuGet DLL
+    Write-Host "Building EditorRef (Release)..." -ForegroundColor Cyan
+    dotnet build EditorRef/EditorRef.csproj -c Release -v quiet
+
     # Force delete metadata
     Remove-Item ./api -Recurse -Force -ErrorAction SilentlyContinue
 
