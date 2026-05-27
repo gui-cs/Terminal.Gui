@@ -426,7 +426,9 @@ public class Wizard : Dialog, IDesignable
             return;
         }
 
-        e.Handled = GoNext ();
+        // Always mark handled so accept does not bubble to the dialog if navigation is canceled
+        e.Handled = true;
+        GoNext ();
     }
 
     private void UpdateButtonsAndTitle ()
