@@ -95,6 +95,11 @@ internal class Branch<T> where T : class
         string expansion = GetExpandableSymbol ();
         string lineBody = _tree.AspectGetter (Model);
 
+        if (_tree.CheckboxMode)
+        {
+            lineBody = $"{_tree.GetCheckGlyph (Model)} {lineBody}";
+        }
+
         _tree.Move (0, y);
 
         // if we have scrolled to the right then bits of the prefix will have disappeared off the screen
@@ -174,7 +179,7 @@ internal class Branch<T> where T : class
         }
         else
         {
-            indexOfModelText = cells.Count;
+            indexOfModelText = cells.Count + (_tree.CheckboxMode ? 2 : 0);
         }
 
         // If body of line is too long
@@ -296,7 +301,10 @@ internal class Branch<T> where T : class
     /// </summary>
     /// <returns></returns>
     public virtual int GetWidth () =>
-        GetLinePrefix ().Sum (r => r.GetColumns ()) + GetExpandableSymbol ().GetColumns () + _tree.AspectGetter (Model).GetColumns ();
+        GetLinePrefix ().Sum (r => r.GetColumns ())
+        + GetExpandableSymbol ().GetColumns ()
+        + (_tree.CheckboxMode ? 2 : 0)
+        + _tree.AspectGetter (Model).GetColumns ();
 
     /// <summary>Refreshes cached knowledge in this branch e.g. what children an object has.</summary>
     /// <param name="startAtTop">True to also refresh all <see cref="Parent"/> branches (starting with the root).</param>
@@ -461,6 +469,11 @@ internal class Branch<T> where T : class
 
         return false;
     }
+
+    /// <summary>Returns true if the given x offset on the branch line is the checkbox glyph.</summary>
+    /// <param name="x">The x offset on the branch line.</param>
+    /// <returns><see langword="true"/> if checkbox mode is enabled and <paramref name="x"/> hits the checkbox glyph.</returns>
+    internal bool IsHitOnCheckbox (int x) => _tree.CheckboxMode && x == GetLinePrefix ().Count () + GetExpandableSymbol ().GetColumns ();
 
     /// <summary>Calls <see cref="Refresh(bool)"/> on the current branch and all expanded children.</summary>
     internal void Rebuild ()

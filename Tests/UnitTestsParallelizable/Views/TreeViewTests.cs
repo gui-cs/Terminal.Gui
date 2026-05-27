@@ -217,6 +217,68 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         tree.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void CheckboxMode_Space_Toggles_Checked_State_Not_Expansion ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
+        tree.CheckboxMode = true;
+        tree.SelectedObject = f;
+
+        var eventCount = 0;
+        tree.CheckedChanged += (_, e) =>
+                               {
+                                   eventCount++;
+                                   Assert.Same (f, e.Object);
+                                   Assert.Equal (CheckState.UnChecked, e.OldValue);
+                                   Assert.Equal (CheckState.Checked, e.NewValue);
+                               };
+
+        tree.NewKeyDownEvent (Key.Space);
+
+        Assert.False (tree.IsExpanded (f));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (f));
+        Assert.Equal ([f], tree.GetCheckedObjects ());
+        Assert.Equal (1, eventCount);
+    }
+
+    // Copilot
+    [Fact]
+    public void CheckboxMode_Draws_Checkbox_Glyphs_And_Indeterminate_Parent ()
+    {
+        IDriver driver = CreateTestDriver ();
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        tree.Driver = driver;
+        tree.CheckboxMode = true;
+        tree.Frame = new Rectangle (0, 0, 20, 3);
+        tree.Expand (f);
+
+        tree.SetChecked (car1, CheckState.Checked);
+        tree.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ($"""
+                                               └-{Glyphs.CheckStateNone} Factory
+                                                 ├─{Glyphs.CheckStateChecked} 
+                                                 └─{Glyphs.CheckStateUnChecked} 
+                                               """,
+                                               output,
+                                               driver);
+    }
+
+    // Copilot
+    [Fact]
+    public void CheckboxMode_MouseClick_OnCheckbox_Toggles_Check_Only ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
+        tree.CheckboxMode = true;
+
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonClicked, Position = new Point (2, 0) });
+
+        Assert.False (tree.IsExpanded (f));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (f));
+        Assert.Same (f, tree.SelectedObject);
+    }
+
     [Fact]
     public void ContentWidth_BiggerAfterExpand ()
     {

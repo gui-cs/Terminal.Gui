@@ -248,6 +248,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
         KeystrokeNavigator.Matcher = new TreeViewCollectionNavigatorMatcher<T> (this);
 
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     /// <summary>
@@ -295,6 +296,26 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     <see langword="null"/> (no filtering).
     /// </summary>
     public ITreeViewFilter<T>? Filter { get; set; } = null;
+
+    /// <summary>Enables built-in checkbox rendering and toggling for tree nodes.</summary>
+    public bool CheckboxMode
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            UpdateContentSize ();
+            SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>Raised when a node check state changes.</summary>
+    public event EventHandler<CheckedChangedEventArgs<T>>? CheckedChanged;
 
     /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
     public bool AllowLetterBasedNavigation { get; set; } = true;
@@ -393,6 +414,9 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
     private readonly Stack<TreeSelection<T>> _multiSelectedRegions = new ();
 
+    /// <summary>Explicit check states for nodes in checkbox mode.</summary>
+    private readonly Dictionary<T, CheckState> _checkedStates = new ();
+
     /// <summary>Removes all objects from the tree and clears <see cref="SelectedObject"/>.</summary>
     public void ClearObjects ()
     {
@@ -429,7 +453,20 @@ public partial class TreeView<T> : View, ITreeView where T : class
 
             SelectedObject = clickedBranch.Model;
 
+            if (clickedBranch.IsHitOnCheckbox (mouseBinding.MouseEvent.Position!.Value.X))
+            {
+                ToggleChecked (clickedBranch.Model);
+
+                return;
+            }
+
             isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (mouseBinding.MouseEvent.Position!.Value.X);
+        }
+        else if (CheckboxMode)
+        {
+            ToggleChecked (o);
+
+            return;
         }
 
         if (isExpandToggleAttempt)
