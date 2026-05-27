@@ -6,19 +6,23 @@ namespace ViewBaseTests.Draw;
 
 // Claude - Opus 4.7
 /// <summary>
-///     Issue #5358: ClearViewport narrows the clear to NeedsDrawRect when an explicit partial
-///     region has been set (via SetNeedsDraw(Rectangle)), and otherwise preserves the existing
-///     full-clear contract. View.Layout invalidates the SuperView for the union of the old and
-///     new Frame when Frame changes, so stale uncovered cells get cleared.
+///     Issue #5358: the framework's DoClearViewport narrows the clear to NeedsDrawRect when an
+///     explicit partial region has been set AND the view is not itself scrolled. The public
+///     ClearViewport API always does a full clear (preserves the contract used by
+///     Code.OnClearingViewport, MarkdownCodeBlock, direct test callers). View.SetFrame
+///     invalidates the SuperView for the union of the old and new Frame when Frame changes,
+///     so stale uncovered cells get cleared on the next pass.
 /// </summary>
 public class RegionAwareClearViewportTests : TestDriverBase
 {
     /// <summary>
-    ///     Direct caller (NeedsDrawRect empty) gets the full-clear contract — backward compatible
-    ///     with ClearViewport_FillsViewportArea and code paths like Code.OnClearingViewport.
+    ///     Public ClearViewport always does a full clear regardless of NeedsDrawRect state —
+    ///     this is the backward-compatible contract used by Code.OnClearingViewport,
+    ///     MarkdownCodeBlock.OnClearingViewport, and direct test callers like
+    ///     ClearViewport_FillsViewportArea.
     /// </summary>
     [Fact]
-    public void DirectCaller_EmptyNeedsDrawRect_ClearsFullViewport ()
+    public void PublicClearViewport_AlwaysClearsFullViewport ()
     {
         IDriver driver = CreateTestDriver (40, 20);
         driver.Clip = new Region (driver.Screen);
@@ -27,11 +31,13 @@ public class RegionAwareClearViewportTests : TestDriverBase
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();
-        view.Draw ();
-
-        Assert.True (view.NeedsDrawRect.IsEmpty);
 
         driver.FillRect (driver.Screen, new Rune ('X'));
+
+        // Even with a partial NeedsDrawRect, public ClearViewport must clear the full viewport.
+        view.ClearNeedsDraw ();
+        view.SetNeedsDraw (new Rectangle (1, 1, 3, 2));
+        Assert.Equal (new Rectangle (1, 1, 3, 2), view.NeedsDrawRect);
 
         view.ClearViewport ();
 
@@ -50,11 +56,13 @@ public class RegionAwareClearViewportTests : TestDriverBase
     }
 
     /// <summary>
-    ///     When NeedsDrawRect is set to a strictly smaller region, ClearViewport narrows the
-    ///     clear to that region — cells outside the dirty region are not touched.
+    ///     The framework's draw pipeline (Draw → DoClearViewport) narrows the clear to the
+    ///     dirty region when the view has a partial NeedsDrawRect and is not itself scrolled.
+    ///     Verifies by invoking Draw() and observing that cells outside the dirty region keep
+    ///     their pre-fill 'X' value.
     /// </summary>
     [Fact]
-    public void PartialNeedsDrawRect_ClearsOnlyDirtyRegion ()
+    public void FrameworkDraw_PartialNeedsDrawRect_ClearsOnlyDirtyRegion ()
     {
         IDriver driver = CreateTestDriver (40, 20);
         driver.Clip = new Region (driver.Screen);
@@ -63,22 +71,22 @@ public class RegionAwareClearViewportTests : TestDriverBase
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();
+        view.Draw ();
 
-        driver.FillRect (driver.Screen, new Rune ('X'));
-
-        // Sanity: FillRect filled the view area with 'X'.
-        Assert.Equal ("X", driver.Contents [5, 5].Grapheme);
-
-        // Reset NeedsDrawRect to Empty so SetNeedsDraw below sets it to exactly the partial
-        // region (otherwise the init/layout-time NeedsDraw accumulates and we don't get a
-        // strictly-smaller-than-viewport rect to trigger narrowing).
-        view.ClearNeedsDraw ();
         Assert.True (view.NeedsDrawRect.IsEmpty);
 
+        // Re-set clip after Draw (DoDrawComplete excludes the view's frame from the clip,
+        // which would prevent the next FillRect from reaching cells inside the view's area).
+        driver.Clip = new Region (driver.Screen);
+        driver.FillRect (driver.Screen, new Rune ('X'));
+        Assert.Equal ("X", driver.Contents [5, 5].Grapheme);
+
+        // Invalidate just a 3×2 region — strictly smaller than the 10×5 viewport.
         view.SetNeedsDraw (new Rectangle (1, 1, 3, 2));
         Assert.Equal (new Rectangle (1, 1, 3, 2), view.NeedsDrawRect);
 
-        view.ClearViewport ();
+        // Drive the framework's DoClearViewport via the normal draw path.
+        view.Draw ();
 
         // The dirty region (viewport-local (1,1,3,2) → screen (6,6,3,2)) is cleared.
         for (var y = 6; y < 8; y++)
@@ -98,12 +106,12 @@ public class RegionAwareClearViewportTests : TestDriverBase
     }
 
     /// <summary>
-    ///     SetNeedsDraw() (no-arg) sets NeedsDrawRect = Viewport. ClearViewport must still
+    ///     SetNeedsDraw() (no-arg) sets NeedsDrawRect = Viewport. The framework must still
     ///     clear the full viewport in this case — narrowing only fires when the rect is
     ///     strictly smaller than the viewport.
     /// </summary>
     [Fact]
-    public void FullViewportNeedsDrawRect_ClearsFullViewport ()
+    public void FrameworkDraw_FullViewportNeedsDrawRect_ClearsFullViewport ()
     {
         IDriver driver = CreateTestDriver (40, 20);
         driver.Clip = new Region (driver.Screen);
@@ -116,16 +124,64 @@ public class RegionAwareClearViewportTests : TestDriverBase
 
         Assert.True (view.NeedsDrawRect.IsEmpty);
 
+        driver.Clip = new Region (driver.Screen);
         driver.FillRect (driver.Screen, new Rune ('X'));
 
         // SetNeedsDraw() no-arg sets NeedsDrawRect to Viewport (full).
         view.SetNeedsDraw ();
         Assert.Equal (view.Viewport, view.NeedsDrawRect);
 
-        view.ClearViewport ();
+        view.Draw ();
 
         Rectangle screen = view.ViewportToScreen (view.Viewport with { Location = new Point (0, 0) });
 
+        for (int y = screen.Y; y < screen.Y + screen.Height; y++)
+        {
+            for (int x = screen.X; x < screen.X + screen.Width; x++)
+            {
+                Assert.Equal (" ", driver.Contents [y, x].Grapheme);
+            }
+        }
+
+        view.Dispose ();
+        driver.Dispose ();
+    }
+
+    /// <summary>
+    ///     Review feedback item 1: narrowing must NOT fire when the view is itself scrolled,
+    ///     because SetNeedsDraw(Rectangle) cascades to subviews using frame-local coordinates
+    ///     while the no-arg version passes content-coord Viewport. Until that convention is
+    ///     normalized, the framework falls back to a full clear for scrolled views.
+    /// </summary>
+    [Fact]
+    public void FrameworkDraw_ScrolledView_FallsBackToFullClear ()
+    {
+        IDriver driver = CreateTestDriver (40, 20);
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new () { Driver = driver, X = 5, Y = 5, Width = 10, Height = 5 };
+        view.SetContentSize (new Size (100, 100));
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+        view.Draw ();
+
+        // Scroll so Viewport.Location is non-empty.
+        view.Viewport = view.Viewport with { Y = 5 };
+        Assert.Equal (new Point (0, 5), view.Viewport.Location);
+
+        view.Draw ();
+        driver.Clip = new Region (driver.Screen);
+        driver.FillRect (driver.Screen, new Rune ('X'));
+
+        // Set a partial dirty rect (which would narrow if the view weren't scrolled).
+        view.ClearNeedsDraw ();
+        view.SetNeedsDraw (new Rectangle (1, 6, 3, 2));
+
+        view.Draw ();
+
+        // Full viewport should be cleared (narrowing must not fire on scrolled view).
+        Rectangle screen = view.ViewportToScreen (view.Viewport with { Location = new Point (0, 0) });
         for (int y = screen.Y; y < screen.Y + screen.Height; y++)
         {
             for (int x = screen.X; x < screen.X + screen.Width; x++)

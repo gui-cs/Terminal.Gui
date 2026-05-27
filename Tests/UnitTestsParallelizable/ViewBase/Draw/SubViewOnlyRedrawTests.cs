@@ -185,4 +185,57 @@ public class SubViewOnlyRedrawTests : TestDriverBase
         parent.Dispose ();
         driver.Dispose ();
     }
+
+    /// <summary>
+    ///     Review feedback item 2: a transparent parent with TransparentMouse must keep its
+    ///     CachedDrawnRegion populated across child-only redraws. Before the fix, the
+    ///     unconditional `_localDrawContext = new DrawContext()` reset combined with skipping
+    ///     DoDrawText / DoDrawContent on child-only passes meant DoDrawComplete wrote an
+    ///     empty region into CachedDrawnRegion, breaking mouse hit-testing until the next
+    ///     full self-redraw.
+    /// </summary>
+    [Fact]
+    public void TransparentMouseParent_ChildOnlyDirty_PreservesCachedDrawnRegion ()
+    {
+        IDriver driver = CreateTestDriver (40, 20);
+
+        View parent = new ()
+        {
+            Driver = driver,
+            Width = 20,
+            Height = 10,
+            ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse
+        };
+        View child = new () { Width = 10, Height = 5, X = 1, Y = 1 };
+        parent.Add (child);
+
+        // Force the parent to actually draw something so CachedDrawnRegion is populated
+        // (transparent views only cache cells they actually touched).
+        parent.DrawingContent += (_, e) =>
+        {
+            parent.FillRect (new Rectangle (0, 0, 5, 3), new System.Text.Rune ('P'));
+            e.DrawContext?.AddDrawnRectangle (parent.ViewportToScreen (new Rectangle (0, 0, 5, 3)));
+        };
+
+        parent.Layout ();
+        parent.Draw ();
+
+        Region? cachedAfterFullDraw = parent.CachedDrawnRegion;
+        Assert.NotNull (cachedAfterFullDraw);
+        Assert.False (cachedAfterFullDraw.GetBounds ().IsEmpty);
+
+        // Child-only invalidation: only the child becomes dirty, parent stays clean.
+        child.SetNeedsDraw ();
+        Assert.False (parent.NeedsDraw);
+
+        parent.Draw ();
+
+        // After the child-only redraw, parent's cache must still reflect the previously-drawn
+        // region. If we naively wiped it, transparent-parent mouse hit-testing would break.
+        Assert.NotNull (parent.CachedDrawnRegion);
+        Assert.False (parent.CachedDrawnRegion.GetBounds ().IsEmpty);
+
+        parent.Dispose ();
+        driver.Dispose ();
+    }
 }

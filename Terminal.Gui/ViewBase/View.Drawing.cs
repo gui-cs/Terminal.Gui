@@ -124,7 +124,16 @@ public partial class View // Drawing APIs
             // SuperView's ClearViewport or peer SubViews' content.
             // This follows the same pattern as DrawAdornments(), which creates
             // per-adornment DrawContexts for the same reason.
-            _localDrawContext = new DrawContext ();
+            //
+            // Issue #5358 (review feedback item 2): only recreate _localDrawContext when
+            // we actually intend to redraw self-content this pass. On child-only passes
+            // (needsDrawSelf=false), we must preserve the prior context so DoDrawComplete
+            // doesn't overwrite CachedDrawnRegion with an empty region and break
+            // TransparentMouse hit-testing until the next full self-redraw.
+            if (needsDrawSelf)
+            {
+                _localDrawContext = new DrawContext ();
+            }
 
             if (needsDrawSelf)
             {
@@ -231,9 +240,83 @@ public partial class View // Drawing APIs
             return;
         }
 
-        ClearViewport (context);
+        // Issue #5358: narrow the framework's clear to NeedsDrawRect when it's a true
+        // partial region AND this view is not itself scrolled. Narrowing in the public
+        // ClearViewport API would silently change the contract for direct callers
+        // (Code.OnClearingViewport, MarkdownCodeBlock, direct test calls) that expect
+        // a full fill of the viewport background — see review feedback items 1, 3.
+        //
+        // The "this view is not itself scrolled" guard sidesteps a separate coordinate-
+        // space inconsistency: SetNeedsDraw(Rectangle) cascades to subviews using
+        // frame-local coordinates (subtracts subview.Frame.X/Y), while the no-arg
+        // SetNeedsDraw passes Viewport (content-coord). For an unscrolled view those
+        // coincide; for a scrolled view they don't, and the narrowing math would shift
+        // the clear off-screen. Until that convention is normalized (out of scope here),
+        // only narrow when Viewport.Location is the origin.
+        if (CanNarrowClearToNeedsDrawRect (out Rectangle narrowedScreen))
+        {
+            Driver?.FillRect (narrowedScreen);
+            _lastClearedViewport = narrowedScreen;
+            SetNeedsDraw (NeedsDrawRect);
+        }
+        else
+        {
+            ClearViewport (context);
+        }
+
         OnClearedViewport ();
         ClearedViewport?.Invoke (this, new DrawEventArgs (Viewport, Viewport, null));
+    }
+
+    /// <summary>
+    ///     Determines whether the framework's <see cref="DoClearViewport"/> can safely narrow
+    ///     the clear to just <see cref="NeedsDrawRect"/>. See <see cref="DoClearViewport"/> for
+    ///     the rationale.
+    /// </summary>
+    private bool CanNarrowClearToNeedsDrawRect (out Rectangle narrowedScreen)
+    {
+        narrowedScreen = Rectangle.Empty;
+
+        if (Driver is null)
+        {
+            return false;
+        }
+
+        if (NeedsDrawRect.IsEmpty)
+        {
+            return false;
+        }
+
+        Rectangle viewport = Viewport;
+
+        // Only narrow when this view is NOT itself scrolled — see DoClearViewport comment.
+        if (viewport.Location != Point.Empty)
+        {
+            return false;
+        }
+
+        // Only narrow when NeedsDrawRect is strictly smaller than the viewport. SetNeedsDraw()
+        // (no-arg) sets NeedsDrawRect to the current Viewport, meaning "everything is dirty";
+        // we don't want to narrow in that case.
+        if (NeedsDrawRect.Width >= viewport.Width && NeedsDrawRect.Height >= viewport.Height)
+        {
+            return false;
+        }
+
+        // ClearContentOnly: skip narrowing; the existing visible-content intersection is
+        // already a content-area optimization and combining the two correctly is non-trivial.
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.ClearContentOnly))
+        {
+            return false;
+        }
+
+        // NeedsDrawRect is in this view's coords; for an unscrolled view those equal viewport-
+        // local coords (origin (0,0) = top-left of visible area). Convert to screen.
+        Rectangle dirtyScreen = ViewportToScreen (NeedsDrawRect);
+        Rectangle toClear = ViewportToScreen (viewport with { Location = Point.Empty });
+        narrowedScreen = Rectangle.Intersect (toClear, dirtyScreen);
+
+        return !narrowedScreen.IsEmpty;
     }
 
     /// <summary>
@@ -279,41 +362,13 @@ public partial class View // Drawing APIs
             return;
         }
 
-        // Get screen-relative coords of the full visible viewport.
+        // Get screen-relative coords
         Rectangle toClear = ViewportToScreen (Viewport with { Location = new Point (0, 0) });
 
         if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.ClearContentOnly))
         {
             Rectangle visibleContent = ViewportToScreen (new Rectangle (new Point (-Viewport.X, -Viewport.Y), GetContentSize ()));
             toClear = Rectangle.Intersect (toClear, visibleContent);
-        }
-
-        // Issue #5358: narrow the clear to just the dirty region when NeedsDrawRect is set AND
-        // genuinely smaller than the viewport. SetNeedsDraw() (no-arg) sets NeedsDrawRect to
-        // the current Viewport (meaning "everything visible is dirty"); we don't want to narrow
-        // in that case, nor when the rect is stale-after-scroll (still sized to old Viewport).
-        // Only narrow when an explicit partial region has been set via SetNeedsDraw(Rectangle) —
-        // e.g., the SuperView invalidation on Frame change below in View.Layout.cs.
-        bool narrowToDirty = !NeedsDrawRect.IsEmpty
-                             && (NeedsDrawRect.Width < Viewport.Width || NeedsDrawRect.Height < Viewport.Height);
-
-        if (narrowToDirty)
-        {
-            // NeedsDrawRect is in this view's content coords (same coord system as subview.Frame).
-            // Subtract the scroll offset (Viewport.X/Y) to get viewport-local coords, then
-            // convert to screen and intersect with toClear.
-            Rectangle dirtyLocal = new (
-                                        NeedsDrawRect.X - Viewport.X,
-                                        NeedsDrawRect.Y - Viewport.Y,
-                                        NeedsDrawRect.Width,
-                                        NeedsDrawRect.Height);
-            Rectangle dirtyScreen = ViewportToScreen (dirtyLocal);
-            toClear = Rectangle.Intersect (toClear, dirtyScreen);
-        }
-
-        if (toClear.IsEmpty)
-        {
-            return;
         }
 
         Driver.FillRect (toClear);
@@ -325,18 +380,7 @@ public partial class View // Drawing APIs
         // Dim.Fill) to exclude the entire frame and prevent peer SubViews from drawing.
         _lastClearedViewport = toClear;
 
-        // Issue #5358: cascade SetNeedsDraw with the narrowed region (in content coords) so
-        // only subviews intersecting the cleared cells are invalidated. When we narrowed the
-        // clear, narrow the cascade too. Otherwise SetNeedsDraw() no-arg passes the full
-        // Viewport — preserving backward compatibility with tests like ClearViewport_SetsNeedsDraw.
-        if (narrowToDirty)
-        {
-            SetNeedsDraw (NeedsDrawRect);
-        }
-        else
-        {
-            SetNeedsDraw ();
-        }
+        SetNeedsDraw ();
     }
 
     /// <summary>
