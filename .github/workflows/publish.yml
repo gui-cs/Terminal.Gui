@@ -10,6 +10,9 @@ on:
     paths-ignore:
       - '**.md'
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     name: Build and Publish to Nuget.org
@@ -41,11 +44,16 @@ jobs:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
 
-    - name: Build Release Terminal.Gui
-      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
+    - name: Build Release Terminal.Gui packages
+      run: |
+        dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
+        dotnet build Terminal.Gui.Interop.Spectre/Terminal.Gui.Interop.Spectre.csproj --no-incremental --nologo --force --configuration Release
 
     - name: Pack Release Terminal.Gui ${{ steps.gitversion.outputs.SemVer }} for Nuget
       run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols --no-build
+
+    - name: Pack Release Terminal.Gui.Interop.Spectre ${{ steps.gitversion.outputs.SemVer }} for Nuget
+      run: dotnet pack Terminal.Gui.Interop.Spectre/Terminal.Gui.Interop.Spectre.csproj -c Release --include-symbols --no-build
 
     # - name: Test to generate Code Coverage Report
     #   run: |
@@ -71,6 +79,9 @@ jobs:
         
     - name: Publish Terminal.Gui.${{ steps.gitversion.outputs.SemVer }} to NuGet.org
       run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}
+
+    - name: Publish Terminal.Gui.Interop.Spectre.${{ steps.gitversion.outputs.SemVer }} to NuGet.org
+      run: dotnet nuget push Terminal.Gui.Interop.Spectre/bin/Release/Terminal.Gui.Interop.Spectre.${{ steps.gitversion.outputs.SemVer }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}
 
     # Deterministic version handoff to notify-clet.yml. Avoids the NuGet
     # search-API indexing lag that caused gui-cs/clet to skip TG develop.37
