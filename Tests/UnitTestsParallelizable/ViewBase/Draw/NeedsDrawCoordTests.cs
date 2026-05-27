@@ -174,16 +174,19 @@ public class NeedsDrawCoordTests : TestDriverBase
     }
 
     /// <summary>
-    ///     When the subview itself is scrolled, the cascade translates into subview-viewport-
-    ///     local correctly (subtracting subview.Viewport.Location on top of the frame offset).
+    ///     When the subview itself is scrolled, the cascade lands the dirty rect at the
+    ///     correct VIEWPORT-LOCAL position — viewport-local coords are scroll-INDEPENDENT
+    ///     ((0, 0) is always the top-left visible cell regardless of which content cell the
+    ///     scroll maps there). We propagate the dirty ON-SCREEN cells, not the content cells
+    ///     they happen to be showing.
     ///
     ///     Setup: parent (20×10), subview Frame (0, 0, 10, 5) with content (100, 100) and
     ///     subview is scrolled to (4, 1). Parent invalidation at viewport-local (2, 2, 4, 2).
-    ///     Subview-frame-local: (2, 2, 4, 2). Subtract subview's scroll (4, 1):
-    ///     (-2, 1, 4, 2). Clip to subview viewport bounds (0, 0, 10, 5): (0, 1, 2, 2).
+    ///     Subview-frame-local: (2, 2, 4, 2). No adornment offset, no scroll subtraction:
+    ///     subview-viewport-local: (2, 2, 4, 2). Clip to (0, 0, 10, 5): (2, 2, 4, 2).
     /// </summary>
     [Fact]
-    public void SetNeedsDraw_ScrolledSubview_CascadesIntoSubviewViewportAccountingForScroll ()
+    public void SetNeedsDraw_ScrolledSubview_CascadesIntoSubviewViewportAtCorrectOnScreenPosition ()
     {
         IDriver driver = CreateTestDriver (40, 20);
 
@@ -204,7 +207,7 @@ public class NeedsDrawCoordTests : TestDriverBase
 
         parent.SetNeedsDraw (new Rectangle (2, 2, 4, 2));
 
-        Assert.Equal (new Rectangle (0, 1, 2, 2), subview.NeedsDrawRect);
+        Assert.Equal (new Rectangle (2, 2, 4, 2), subview.NeedsDrawRect);
 
         parent.Dispose ();
         driver.Dispose ();
@@ -320,6 +323,60 @@ public class NeedsDrawCoordTests : TestDriverBase
         Assert.Equal (Rectangle.Empty, view.NeedsDrawRect);
 
         view.Dispose ();
+    }
+
+    /// <summary>
+    ///     When a subview's Frame changes and the SuperView is itself scrolled, SetFrame's
+    ///     SuperView invalidation must translate the union(old, new) rect from SuperView
+    ///     CONTENT coords to SuperView VIEWPORT-LOCAL coords. Without the translation, the
+    ///     invalidation lands at the wrong on-screen position.
+    ///
+    ///     Setup: superView (20×10) scrolled by (5, 3). subview at Frame (10, 8, 7, 4) in
+    ///     superView's content coords. Shrink subview Frame to (10, 8, 3, 2). SetFrame
+    ///     invalidates with union(old, new) = (10, 8, 7, 4) (content coords). Translation
+    ///     to superView viewport-local: subtract (5, 3) → (5, 5, 7, 4). superView's
+    ///     NeedsDrawRect must contain this rect (it may be larger due to union with previously
+    ///     accumulated dirty regions, but must contain (5, 5, 7, 4)).
+    /// </summary>
+    [Fact]
+    public void SetFrame_ScrolledSuperView_TranslatesInvalidationToViewportLocal ()
+    {
+        IDriver driver = CreateTestDriver (40, 20);
+
+        View superView = new () { Driver = driver, X = 0, Y = 0, Width = 20, Height = 10 };
+        superView.SetContentSize (new Size (100, 100));
+
+        View subview = new () { X = 10, Y = 8, Width = 7, Height = 4 };
+        superView.Add (subview);
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.LayoutSubViews ();
+        superView.Draw ();
+
+        superView.Viewport = superView.Viewport with { Location = new Point (5, 3) };
+        Assert.Equal (new Point (5, 3), superView.Viewport.Location);
+
+        superView.Draw ();
+        superView.ClearNeedsDraw ();
+        Assert.Equal (Rectangle.Empty, superView.NeedsDrawRect);
+
+        // Shrink subview's Frame. SetFrame invalidates SuperView with union(old, new) =
+        // (10, 8, 7, 4) in superView CONTENT coords; the translation subtracts the scroll
+        // (5, 3) to produce viewport-local (5, 5, 7, 4).
+        subview.Frame = new Rectangle (10, 8, 3, 2);
+
+        Assert.True (superView.NeedsDrawRect.Contains (new Rectangle (5, 5, 7, 4)),
+                     $"Expected superView.NeedsDrawRect to contain viewport-local (5, 5, 7, 4); got {superView.NeedsDrawRect}.");
+
+        // Sanity: the rect must NOT have left the scroll offset baked in. If translation
+        // were skipped, NeedsDrawRect would contain content-coord (10, 8, ...) which has
+        // X >= 10.
+        Assert.True (superView.NeedsDrawRect.X < 10,
+                     $"NeedsDrawRect.X = {superView.NeedsDrawRect.X}; if scroll wasn't subtracted it would be >= 10 (content-coord X of the subview).");
+
+        superView.Dispose ();
+        driver.Dispose ();
     }
 
     /// <summary>

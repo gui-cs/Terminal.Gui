@@ -135,11 +135,14 @@ public partial class View
         //      this view's content coords by adding Viewport.Location (the scroll offset).
         //   2. subview.Frame is in this view's content coords; intersect there.
         //   3. Translate the intersection to subview-frame-local (subtract Frame.Location).
-        //   4. Translate to subview-VIEWPORT-local by also subtracting the subview's adornment
-        //      offset (Padding inset) and the subview's own Viewport.Location.
+        //   4. Translate to subview-VIEWPORT-local by subtracting the subview's adornment
+        //      offset (Padding inset). Do NOT also subtract the subview's Viewport.Location:
+        //      viewport-local coords are scroll-INDEPENDENT — (0, 0) is always the top-left
+        //      visible cell regardless of which content cell the scroll maps there. The dirty
+        //      ON-SCREEN cells are what we propagate, not the content cells they're showing.
         //   5. Clip to the subview's visible viewport bounds; anything outside is in adornment
-        //      or scrolled-off territory. If nothing is left, fall back to a full subview
-        //      invalidation so the subview at least redraws itself safely.
+        //      territory. If nothing is left, fall back to a full subview invalidation so the
+        //      subview at least redraws itself safely (and flags its adornments).
         Point thisScroll = Viewport.Location;
         Rectangle contentRegion = viewPortRelativeRegion;
         contentRegion.Offset (thisScroll.X, thisScroll.Y);
@@ -155,18 +158,16 @@ public partial class View
             subviewFrameRegion.Offset (-subview.Frame.X, -subview.Frame.Y);
 
             Point subviewAdornmentOffset = subview.GetViewportOffsetFromFrame ();
-            Point subviewScroll = subview.Viewport.Location;
-            subviewFrameRegion.Offset (-subviewAdornmentOffset.X - subviewScroll.X,
-                                       -subviewAdornmentOffset.Y - subviewScroll.Y);
+            subviewFrameRegion.Offset (-subviewAdornmentOffset.X, -subviewAdornmentOffset.Y);
 
             Rectangle subviewViewportBounds = new (Point.Empty, subview.Viewport.Size);
             Rectangle subviewViewportRegion = Rectangle.Intersect (subviewViewportBounds, subviewFrameRegion);
 
             if (subviewViewportRegion.IsEmpty)
             {
-                // Dirty region overlaps the subview's frame but only its adornment/scrolled-off
-                // area. The subview's own viewport isn't dirty; a no-arg SetNeedsDraw is the
-                // safe fallback (also flags adornments so any border/padding the dirty region
+                // Dirty region overlaps the subview's frame but only its adornment area. The
+                // subview's own viewport isn't dirty; a no-arg SetNeedsDraw is the safe
+                // fallback (also flags adornments so any border/padding the dirty region
                 // touched gets repainted).
                 subview.SetNeedsDraw ();
 
