@@ -422,6 +422,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     {
         SelectedObject = null;
         _multiSelectedRegions.Clear ();
+        _checkedStates.Clear ();
         Roots = new Dictionary<T, Branch<T>> ();
         InvalidateLineMap ();
         SetNeedsDraw ();
@@ -596,6 +597,11 @@ public partial class TreeView<T> : View, ITreeView where T : class
         if (Roots is null || !Roots.ContainsKey (o))
         {
             return;
+        }
+
+        foreach (T model in EnumerateKnownObjects (o, [], 0))
+        {
+            _checkedStates.Remove (model);
         }
 
         Roots.Remove (o);
