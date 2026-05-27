@@ -83,8 +83,8 @@ public class HexView : View, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle
     {
-        get => HexViewSettings.Defaults.DefaultCursorStyle;
-        set => HexViewSettings.Defaults.DefaultCursorStyle = value;
+        get => HexViewSettings.Current.DefaultCursorStyle;
+        set => HexViewSettings.Current = HexViewSettings.Current with { DefaultCursorStyle = value };
     }
 
     /// <summary>

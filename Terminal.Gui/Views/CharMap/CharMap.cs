@@ -57,8 +57,8 @@ public class CharMap : View, IDesignable, IValue<Rune>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle
     {
-        get => CharMapSettings.Defaults.DefaultCursorStyle;
-        set => CharMapSettings.Defaults.DefaultCursorStyle = value;
+        get => CharMapSettings.Current.DefaultCursorStyle;
+        set => CharMapSettings.Current = CharMapSettings.Current with { DefaultCursorStyle = value };
     }
 
     private const int COLUMN_WIDTH = 3; // Width of each column of glyphs

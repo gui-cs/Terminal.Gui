@@ -62,8 +62,8 @@ public class StatusBar : Bar, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultSeparatorLineStyle
     {
-        get => StatusBarSettings.Defaults.DefaultSeparatorLineStyle;
-        set => StatusBarSettings.Defaults.DefaultSeparatorLineStyle = value;
+        get => StatusBarSettings.Current.DefaultSeparatorLineStyle;
+        set => StatusBarSettings.Current = StatusBarSettings.Current with { DefaultSeparatorLineStyle = value };
     }
 
     /// <inheritdoc />

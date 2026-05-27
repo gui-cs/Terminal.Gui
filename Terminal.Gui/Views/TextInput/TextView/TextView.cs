@@ -107,8 +107,8 @@ public partial class TextView : View, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle
     {
-        get => TextViewSettings.Defaults.DefaultCursorStyle;
-        set => TextViewSettings.Defaults.DefaultCursorStyle = value;
+        get => TextViewSettings.Current.DefaultCursorStyle;
+        set => TextViewSettings.Current = TextViewSettings.Current with { DefaultCursorStyle = value };
     }
 
     private CultureInfo? _currentCulture;

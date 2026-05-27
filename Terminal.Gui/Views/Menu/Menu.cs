@@ -55,8 +55,8 @@ public class Menu : Bar, IValue<MenuItem?>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
-        get => MenuSettings.Defaults.DefaultBorderStyle;
-        set => MenuSettings.Defaults.DefaultBorderStyle = value;
+        get => MenuSettings.Current.DefaultBorderStyle;
+        set => MenuSettings.Current = MenuSettings.Current with { DefaultBorderStyle = value };
     }
 
     /// <inheritdoc/>

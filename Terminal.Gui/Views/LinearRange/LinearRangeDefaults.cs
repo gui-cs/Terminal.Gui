@@ -11,7 +11,7 @@ public static class LinearRangeDefaults
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle
     {
-        get => LinearRangeSettings.Defaults.DefaultCursorStyle;
-        set => LinearRangeSettings.Defaults.DefaultCursorStyle = value;
+        get => LinearRangeSettings.Current.DefaultCursorStyle;
+        set => LinearRangeSettings.Current = LinearRangeSettings.Current with { DefaultCursorStyle = value };
     }
 }

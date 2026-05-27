@@ -123,24 +123,25 @@ public class TuiConfigurationBuilder
         BindSection<KeySettings> (config, "Key", s => KeySettings.Defaults = s);
         BindSection<TraceSettings> (config, "Trace", s => TraceSettings.Defaults = s);
 
-        // ThemeScope POCOs
-        BindSection<ButtonSettings> (config, "Button", s => ButtonSettings.Defaults = s);
-        BindSection<CheckBoxSettings> (config, "CheckBox", s => CheckBoxSettings.Defaults = s);
-        BindSection<CharMapSettings> (config, "CharMap", s => CharMapSettings.Defaults = s);
-        BindSection<DialogSettings> (config, "Dialog", s => DialogSettings.Defaults = s);
-        BindSection<FrameViewSettings> (config, "FrameView", s => FrameViewSettings.Defaults = s);
-        BindSection<HexViewSettings> (config, "HexView", s => HexViewSettings.Defaults = s);
-        BindSection<LinearRangeSettings> (config, "LinearRange", s => LinearRangeSettings.Defaults = s);
-        BindSection<MenuBarSettings> (config, "MenuBar", s => MenuBarSettings.Defaults = s);
-        BindSection<MenuSettings> (config, "Menu", s => MenuSettings.Defaults = s);
-        BindSection<MessageBoxSettings> (config, "MessageBox", s => MessageBoxSettings.Defaults = s);
-        BindSection<NerdFontsSettings> (config, "NerdFonts", s => NerdFontsSettings.Defaults = s);
-        BindSection<PopoverMenuSettings> (config, "PopoverMenu", s => PopoverMenuSettings.Defaults = s);
-        BindSection<SelectorBaseSettings> (config, "SelectorBase", s => SelectorBaseSettings.Defaults = s);
-        BindSection<StatusBarSettings> (config, "StatusBar", s => StatusBarSettings.Defaults = s);
-        BindSection<TextFieldSettings> (config, "TextField", s => TextFieldSettings.Defaults = s);
-        BindSection<TextViewSettings> (config, "TextView", s => TextViewSettings.Defaults = s);
-        BindSection<WindowSettings> (config, "Window", s => WindowSettings.Defaults = s);
+        // ThemeScope POCOs: two-pass overlay (root section + Themes:<active>:<section>) writes Current.
+        string activeTheme = ThemeSettings.Defaults.Theme;
+        BindThemeScope<ButtonSettings> (config, "Button", activeTheme, s => ButtonSettings.Current = s);
+        BindThemeScope<CheckBoxSettings> (config, "CheckBox", activeTheme, s => CheckBoxSettings.Current = s);
+        BindThemeScope<CharMapSettings> (config, "CharMap", activeTheme, s => CharMapSettings.Current = s);
+        BindThemeScope<DialogSettings> (config, "Dialog", activeTheme, s => DialogSettings.Current = s);
+        BindThemeScope<FrameViewSettings> (config, "FrameView", activeTheme, s => FrameViewSettings.Current = s);
+        BindThemeScope<HexViewSettings> (config, "HexView", activeTheme, s => HexViewSettings.Current = s);
+        BindThemeScope<LinearRangeSettings> (config, "LinearRange", activeTheme, s => LinearRangeSettings.Current = s);
+        BindThemeScope<MenuBarSettings> (config, "MenuBar", activeTheme, s => MenuBarSettings.Current = s);
+        BindThemeScope<MenuSettings> (config, "Menu", activeTheme, s => MenuSettings.Current = s);
+        BindThemeScope<MessageBoxSettings> (config, "MessageBox", activeTheme, s => MessageBoxSettings.Current = s);
+        BindThemeScope<NerdFontsSettings> (config, "NerdFonts", activeTheme, s => NerdFontsSettings.Current = s);
+        BindThemeScope<PopoverMenuSettings> (config, "PopoverMenu", activeTheme, s => PopoverMenuSettings.Current = s);
+        BindThemeScope<SelectorBaseSettings> (config, "SelectorBase", activeTheme, s => SelectorBaseSettings.Current = s);
+        BindThemeScope<StatusBarSettings> (config, "StatusBar", activeTheme, s => StatusBarSettings.Current = s);
+        BindThemeScope<TextFieldSettings> (config, "TextField", activeTheme, s => TextFieldSettings.Current = s);
+        BindThemeScope<TextViewSettings> (config, "TextView", activeTheme, s => TextViewSettings.Current = s);
+        BindThemeScope<WindowSettings> (config, "Window", activeTheme, s => WindowSettings.Current = s);
         BindSection<GlyphSettings> (config, "Glyphs", s => GlyphSettings.Defaults = s);
     }
 
@@ -169,6 +170,21 @@ public class TuiConfigurationBuilder
     {
         T settings = new ();
         config.GetSection (sectionName).Bind (settings);
+        apply (settings);
+    }
+
+    /// <summary>
+    ///     Two-pass overlay bind for ThemeScope POCOs. Binds the root section, then overlays
+    ///     <c>Themes:<paramref name="activeTheme"/>:<paramref name="sectionName"/></c>. Properties not present in the
+    ///     overlay JSON retain the root value (property-level merge — matches legacy CM <c>Scope.Apply</c> semantics).
+    /// </summary>
+    [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050", Justification = "Settings POCOs are simple types; no generic instantiation needed at runtime.")]
+    private static void BindThemeScope<T> (IConfiguration config, string sectionName, string activeTheme, Action<T> apply) where T : new ()
+    {
+        T settings = new ();
+        config.GetSection (sectionName).Bind (settings);
+        config.GetSection ($"Themes:{activeTheme}:{sectionName}").Bind (settings);
         apply (settings);
     }
 }

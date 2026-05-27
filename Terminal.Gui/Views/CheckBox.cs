@@ -27,8 +27,8 @@ public class CheckBox : View, IValue<CheckState>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static MouseState DefaultMouseHighlightStates
     {
-        get => CheckBoxSettings.Defaults.DefaultMouseHighlightStates;
-        set => CheckBoxSettings.Defaults.DefaultMouseHighlightStates = value;
+        get => CheckBoxSettings.Current.DefaultMouseHighlightStates;
+        set => CheckBoxSettings.Current = CheckBoxSettings.Current with { DefaultMouseHighlightStates = value };
     }
 
     /// <summary>

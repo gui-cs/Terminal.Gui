@@ -28,8 +28,8 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static MouseState DefaultMouseHighlightStates
     {
-        get => SelectorBaseSettings.Defaults.DefaultMouseHighlightStates;
-        set => SelectorBaseSettings.Defaults.DefaultMouseHighlightStates = value;
+        get => SelectorBaseSettings.Current.DefaultMouseHighlightStates;
+        set => SelectorBaseSettings.Current = SelectorBaseSettings.Current with { DefaultMouseHighlightStates = value };
     }
 
     /// <summary>

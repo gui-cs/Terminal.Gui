@@ -67,8 +67,8 @@ public class Dialog : Dialog<int>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
-        get => DialogSettings.Defaults.DefaultBorderStyle;
-        set => DialogSettings.Defaults.DefaultBorderStyle = value;
+        get => DialogSettings.Current.DefaultBorderStyle;
+        set => DialogSettings.Current = DialogSettings.Current with { DefaultBorderStyle = value };
     }
 
     /// <summary>
@@ -77,8 +77,8 @@ public class Dialog : Dialog<int>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Alignment DefaultButtonAlignment
     {
-        get => DialogSettings.Defaults.DefaultButtonAlignment;
-        set => DialogSettings.Defaults.DefaultButtonAlignment = value;
+        get => DialogSettings.Current.DefaultButtonAlignment;
+        set => DialogSettings.Current = DialogSettings.Current with { DefaultButtonAlignment = value };
     }
 
     /// <summary>
@@ -87,8 +87,8 @@ public class Dialog : Dialog<int>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static AlignmentModes DefaultButtonAlignmentModes
     {
-        get => DialogSettings.Defaults.DefaultButtonAlignmentModes;
-        set => DialogSettings.Defaults.DefaultButtonAlignmentModes = value;
+        get => DialogSettings.Current.DefaultButtonAlignmentModes;
+        set => DialogSettings.Current = DialogSettings.Current with { DefaultButtonAlignmentModes = value };
     }
 
     /// <summary>
@@ -97,8 +97,8 @@ public class Dialog : Dialog<int>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyles DefaultShadow
     {
-        get => DialogSettings.Defaults.DefaultShadow;
-        set => DialogSettings.Defaults.DefaultShadow = value;
+        get => DialogSettings.Current.DefaultShadow;
+        set => DialogSettings.Current = DialogSettings.Current with { DefaultShadow = value };
     }
 
     /// <summary>

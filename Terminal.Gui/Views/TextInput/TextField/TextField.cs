@@ -82,8 +82,8 @@ public partial class TextField : View, IDesignable, IValue<string>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle
     {
-        get => TextFieldSettings.Defaults.DefaultCursorStyle;
-        set => TextFieldSettings.Defaults.DefaultCursorStyle = value;
+        get => TextFieldSettings.Current.DefaultCursorStyle;
+        set => TextFieldSettings.Current = TextFieldSettings.Current with { DefaultCursorStyle = value };
     }
 
     /// <summary>

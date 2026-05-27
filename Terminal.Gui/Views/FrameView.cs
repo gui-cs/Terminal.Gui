@@ -43,7 +43,7 @@ public class FrameView : View
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
-        get => FrameViewSettings.Defaults.DefaultBorderStyle;
-        set => FrameViewSettings.Defaults.DefaultBorderStyle = value;
+        get => FrameViewSettings.Current.DefaultBorderStyle;
+        set => FrameViewSettings.Current = FrameViewSettings.Current with { DefaultBorderStyle = value };
     }
 }

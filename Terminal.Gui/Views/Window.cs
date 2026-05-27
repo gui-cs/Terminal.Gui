@@ -36,8 +36,8 @@ public class Window : Runnable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static ShadowStyles DefaultShadow
     {
-        get => WindowSettings.Defaults.DefaultShadow;
-        set => WindowSettings.Defaults.DefaultShadow = value;
+        get => WindowSettings.Current.DefaultShadow;
+        set => WindowSettings.Current = WindowSettings.Current with { DefaultShadow = value };
     }
 
     // TODO: enable this
@@ -61,7 +61,7 @@ public class Window : Runnable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
-        get => WindowSettings.Defaults.DefaultBorderStyle;
-        set => WindowSettings.Defaults.DefaultBorderStyle = value;
+        get => WindowSettings.Current.DefaultBorderStyle;
+        set => WindowSettings.Current = WindowSettings.Current with { DefaultBorderStyle = value };
     }
 }

@@ -60,8 +60,8 @@ public static class MessageBox
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultBorderStyle
     {
-        get => MessageBoxSettings.Defaults.DefaultBorderStyle;
-        set => MessageBoxSettings.Defaults.DefaultBorderStyle = value;
+        get => MessageBoxSettings.Current.DefaultBorderStyle;
+        set => MessageBoxSettings.Current = MessageBoxSettings.Current with { DefaultBorderStyle = value };
     }
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
@@ -69,8 +69,8 @@ public static class MessageBox
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Alignment DefaultButtonAlignment
     {
-        get => MessageBoxSettings.Defaults.DefaultButtonAlignment;
-        set => MessageBoxSettings.Defaults.DefaultButtonAlignment = value;
+        get => MessageBoxSettings.Current.DefaultButtonAlignment;
+        set => MessageBoxSettings.Current = MessageBoxSettings.Current with { DefaultButtonAlignment = value };
     }
 
     /// <summary>

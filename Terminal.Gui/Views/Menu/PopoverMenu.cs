@@ -295,8 +295,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey
     {
-        get => PopoverMenuSettings.Defaults.DefaultKey;
-        set => PopoverMenuSettings.Defaults.DefaultKey = value;
+        get => PopoverMenuSettings.Current.DefaultKey;
+        set => PopoverMenuSettings.Current = PopoverMenuSettings.Current with { DefaultKey = value };
     }
 
     /// <summary>

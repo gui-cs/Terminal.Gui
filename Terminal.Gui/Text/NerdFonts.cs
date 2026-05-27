@@ -18,8 +18,8 @@ internal class NerdFonts
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static bool Enable
     {
-        get => NerdFontsSettings.Defaults.Enable;
-        set => NerdFontsSettings.Defaults.Enable = value;
+        get => NerdFontsSettings.Current.Enable;
+        set => NerdFontsSettings.Current = NerdFontsSettings.Current with { Enable = value };
     }
 
     /// <summary>Mapping of file extension to <see cref="Glyphs"/> name.</summary>
