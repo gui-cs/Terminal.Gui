@@ -433,18 +433,9 @@ public partial class TreeView<T> : View, ITreeView where T : class
     {
         base.OnActivated (ctx);
 
-        T? o = SelectedObject;
-
-        if (o is null)
-        {
-            return;
-        }
-
-        var isExpandToggleAttempt = true;
-
+        // Mouse activation: use hit-test to find the clicked branch directly
         if (ctx?.Binding is MouseBinding { MouseEvent: { } } mouseBinding)
         {
-            // The line they clicked on a branch
             Branch<T>? clickedBranch = HitTest (mouseBinding.MouseEvent.Position!.Value.Y);
 
             if (clickedBranch is null)
@@ -461,19 +452,30 @@ public partial class TreeView<T> : View, ITreeView where T : class
                 return;
             }
 
-            isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (mouseBinding.MouseEvent.Position!.Value.X);
+            if (clickedBranch.IsHitOnExpandableSymbol (mouseBinding.MouseEvent.Position!.Value.X))
+            {
+                Toggle (clickedBranch.Model);
+            }
+
+            return;
         }
-        else if (CheckboxMode)
+
+        // Keyboard activation: operate on currently selected object
+        T? o = SelectedObject;
+
+        if (o is null)
+        {
+            return;
+        }
+
+        if (CheckboxMode)
         {
             ToggleChecked (o);
 
             return;
         }
 
-        if (isExpandToggleAttempt)
-        {
-            Toggle (SelectedObject);
-        }
+        Toggle (o);
     }
 
     /// <inheritdoc/>
