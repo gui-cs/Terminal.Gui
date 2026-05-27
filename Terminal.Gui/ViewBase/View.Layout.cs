@@ -115,9 +115,8 @@ public partial class View // Layout APIs
         // Issue #5358: when Frame shrinks or moves, the SuperView's old-frame area is now
         // uncovered and must be cleared on the next draw. Invalidate the union of the old and
         // new frames on the SuperView so its region-aware ClearViewport repaints just that area.
-        // This complements the same invalidation in View.Layout (which handles Frame changes
-        // that happen during a Pos/Dim-driven layout pass); SetFrame catches the direct-assignment
-        // path (e.g., view.Frame = newRect).
+        // SetFrame is the single source of truth for this invalidation for both direct Frame
+        // assignment and layout-driven frame updates.
         if (oldFrame is { } prev && SuperView is { })
         {
             SuperView.SetNeedsDraw (Rectangle.Union (prev, frame));
