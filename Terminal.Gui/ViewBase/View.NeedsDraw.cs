@@ -2,14 +2,19 @@
 
 public partial class View
 {
-    // NOTE: NeedsDrawRect is not currently used to clip drawing to only the invalidated region.
-    //       It is only used within SetNeedsDraw to propagate redraw requests to subviews.
+    // NOTE: NeedsDrawRect is in viewport-LOCAL coordinates: (0, 0) is the top-left visible
+    //       cell of the View's Viewport (inside Padding, after any scroll). The rect is
+    //       independent of Viewport.Location, so scrolling and negative viewport locations do
+    //       not bleed into the dirty rect. See SetNeedsDraw(Rectangle) for the cascade
+    //       convention used to propagate dirty rects into SubViews.
     // NOTE: Consider changing NeedsDrawRect from Rectangle to Region for more precise invalidation
     //       NeedsDraw is already efficiently cached via NeedsDrawRect. It checks:
     //       1. NeedsDrawRect (cached by SetNeedsDraw/ClearNeedsDraw)
     //       2. Adornment NeedsDraw flags (each cached separately)
     /// <summary>
-    ///     INTERNAL: Gets the viewport-relative region that needs to be redrawn.
+    ///     INTERNAL: Gets the viewport-local region that needs to be redrawn. <c>(0, 0)</c> is the
+    ///     top-left of <see cref="Viewport"/>; the rect is independent of <see cref="Viewport"/>'s
+    ///     <see cref="Rectangle.Location"/> (scroll offset).
     /// </summary>
     internal Rectangle NeedsDrawRect { get; private set; } = Rectangle.Empty;
 
@@ -41,20 +46,32 @@ public partial class View
             return;
         }
 
-        SetNeedsDraw (viewport);
+        // Pass a viewport-LOCAL rect: (0, 0, W, H) covers the whole visible viewport regardless
+        // of scroll. Passing Viewport here would leak Viewport.Location (the scroll offset, which
+        // can also be negative under AllowNegativeX/Y) into NeedsDrawRect, breaking the
+        // viewport-local convention NeedsDrawRect is supposed to honor.
+        SetNeedsDraw (new (Point.Empty, viewport.Size));
     }
 
     /// <summary>Expands the area of this view needing to be redrawn to include <paramref name="viewPortRelativeRegion"/>.</summary>
     /// <remarks>
     ///     <para>
-    ///         The location of <paramref name="viewPortRelativeRegion"/> is relative to the View's <see cref="Viewport"/>.
+    ///         <paramref name="viewPortRelativeRegion"/> is in viewport-LOCAL coordinates:
+    ///         <c>(0, 0)</c> is the top-left visible cell of the View's <see cref="Viewport"/>.
+    ///         The rect does NOT include <see cref="Viewport"/>'s <see cref="Rectangle.Location"/>
+    ///         (scroll offset).
+    ///     </para>
+    ///     <para>
+    ///         The cascade to intersecting SubViews translates the region into each SubView's
+    ///         own viewport-local coordinates, accounting for the parent's scroll, the SubView's
+    ///         adornments, and the SubView's own scroll.
     ///     </para>
     ///     <para>
     ///         If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
     ///         redrawn will be the <paramref name="viewPortRelativeRegion"/>.
     ///     </para>
     /// </remarks>
-    /// <param name="viewPortRelativeRegion">The <see cref="Viewport"/>relative region that needs to be redrawn.</param>
+    /// <param name="viewPortRelativeRegion">The viewport-local region that needs to be redrawn.</param>
     public void SetNeedsDraw (Rectangle viewPortRelativeRegion)
     {
         // Invalidate the cached drawn region used for TransparentMouse hit-testing.
@@ -112,16 +129,51 @@ public partial class View
             adornment.Adornment?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
 
+        // Cascade the dirty region into intersecting SubViews. Coordinate conversion chain
+        // (issue #5359 — every step is needed for correctness under scroll/adornments):
+        //   1. viewPortRelativeRegion is in THIS view's viewport-local coords; translate to
+        //      this view's content coords by adding Viewport.Location (the scroll offset).
+        //   2. subview.Frame is in this view's content coords; intersect there.
+        //   3. Translate the intersection to subview-frame-local (subtract Frame.Location).
+        //   4. Translate to subview-VIEWPORT-local by also subtracting the subview's adornment
+        //      offset (Padding inset) and the subview's own Viewport.Location.
+        //   5. Clip to the subview's visible viewport bounds; anything outside is in adornment
+        //      or scrolled-off territory. If nothing is left, fall back to a full subview
+        //      invalidation so the subview at least redraws itself safely.
+        Point thisScroll = Viewport.Location;
+        Rectangle contentRegion = viewPortRelativeRegion;
+        contentRegion.Offset (thisScroll.X, thisScroll.Y);
+
         foreach (View subview in InternalSubViews.Snapshot ())
         {
-            if (!subview.Frame.IntersectsWith (viewPortRelativeRegion))
+            if (!subview.Frame.IntersectsWith (contentRegion))
             {
                 continue;
             }
-            Rectangle subviewRegion = Rectangle.Intersect (subview.Frame, viewPortRelativeRegion);
-            subviewRegion.X -= subview.Frame.X;
-            subviewRegion.Y -= subview.Frame.Y;
-            subview.SetNeedsDraw (subviewRegion);
+
+            Rectangle subviewFrameRegion = Rectangle.Intersect (subview.Frame, contentRegion);
+            subviewFrameRegion.Offset (-subview.Frame.X, -subview.Frame.Y);
+
+            Point subviewAdornmentOffset = subview.GetViewportOffsetFromFrame ();
+            Point subviewScroll = subview.Viewport.Location;
+            subviewFrameRegion.Offset (-subviewAdornmentOffset.X - subviewScroll.X,
+                                       -subviewAdornmentOffset.Y - subviewScroll.Y);
+
+            Rectangle subviewViewportBounds = new (Point.Empty, subview.Viewport.Size);
+            Rectangle subviewViewportRegion = Rectangle.Intersect (subviewViewportBounds, subviewFrameRegion);
+
+            if (subviewViewportRegion.IsEmpty)
+            {
+                // Dirty region overlaps the subview's frame but only its adornment/scrolled-off
+                // area. The subview's own viewport isn't dirty; a no-arg SetNeedsDraw is the
+                // safe fallback (also flags adornments so any border/padding the dirty region
+                // touched gets repainted).
+                subview.SetNeedsDraw ();
+
+                continue;
+            }
+
+            subview.SetNeedsDraw (subviewViewportRegion);
         }
     }
 

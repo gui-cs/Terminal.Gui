@@ -137,9 +137,12 @@ public partial class View
         // methods (DoClearViewport, DoDrawText, DoDrawContent) are now gated on the
         // needsDrawSelf snapshot captured in Draw() *before* this escalation, so this no
         // longer forces a full parent redraw when only a child was dirty (issue #5358).
+        //
+        // Issue #5359: NeedsDrawRect is viewport-LOCAL, so set (0, 0, W, H) instead of
+        // Viewport (which carries the scroll offset and would corrupt the convention).
         if (NeedsDrawRect == Rectangle.Empty)
         {
-            NeedsDrawRect = Viewport;
+            NeedsDrawRect = new (Point.Empty, Viewport.Size);
         }
 
         if (OnDrawingAdornments ())
