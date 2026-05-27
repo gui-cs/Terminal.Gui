@@ -1014,41 +1014,106 @@ public class WizardTests
 
     #endregion Enabled State Tests
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Copilot
     [Fact]
-    public void Wizard_NextButton_Accept_AdvancesStep ()
+    public void Enter_In_TextField_Activates_Next_Button ()
     {
         Wizard wizard = new ();
         WizardStep step1 = new () { Title = "Step 1" };
+        TextField textField = new () { Width = Dim.Fill () };
         WizardStep step2 = new () { Title = "Step 2" };
+        step1.Add (textField);
         wizard.AddStep (step1);
         wizard.AddStep (step2);
         wizard.BeginInit ();
         wizard.EndInit ();
 
-        // Wizard uses buttons internally to navigate
-        // Verify the wizard is set up correctly
-        Assert.Equal (step1, wizard.CurrentStep);
+        var nextAccepting = 0;
+        wizard.NextFinishButton.Accepting += (_, _) => nextAccepting++;
+
+        var wizardAccepting = 0;
+        wizard.Accepting += (_, _) => wizardAccepting++;
+
+        textField.SetFocus ();
+        Assert.True (textField.HasFocus);
+
+        wizard.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, nextAccepting);
+        Assert.Equal (0, wizardAccepting);
+        Assert.Equal (step2, wizard.CurrentStep);
+        Assert.False (wizard.StopRequested);
 
         wizard.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Copilot
     [Fact]
-    public void Wizard_FinishButton_Accept_Completes ()
+    public void Enter_In_ListView_Activates_Next_Button ()
     {
         Wizard wizard = new ();
         WizardStep step1 = new () { Title = "Step 1" };
+        ListView listView = new ()
+        {
+            Width = 10,
+            Height = 1,
+            Source = new ListWrapper<string> (["One"])
+        };
+        WizardStep step2 = new () { Title = "Step 2" };
+        step1.Add (listView);
+        wizard.AddStep (step1);
+        wizard.AddStep (step2);
+        wizard.BeginInit ();
+        wizard.EndInit ();
+
+        var nextAccepting = 0;
+        wizard.NextFinishButton.Accepting += (_, _) => nextAccepting++;
+
+        var wizardAccepting = 0;
+        wizard.Accepting += (_, _) => wizardAccepting++;
+
+        listView.SetFocus ();
+        Assert.True (listView.HasFocus);
+
+        wizard.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, nextAccepting);
+        Assert.Equal (0, wizardAccepting);
+        Assert.Equal (step2, wizard.CurrentStep);
+        Assert.False (wizard.StopRequested);
+
+        wizard.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Enter_In_TextField_On_Last_Step_Activates_Finish_Button ()
+    {
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "Step 1" };
+        TextField textField = new () { Width = Dim.Fill () };
+        step1.Add (textField);
         wizard.AddStep (step1);
         wizard.BeginInit ();
         wizard.EndInit ();
 
-        // Wizard uses buttons internally to complete
-        // Verify the wizard is set up correctly
+        var finishAccepting = 0;
+        wizard.NextFinishButton.Accepting += (_, _) => finishAccepting++;
+
+        var wizardAccepting = 0;
+        wizard.Accepting += (_, e) =>
+                            {
+                                wizardAccepting++;
+                                e.Handled = true;
+                            };
+
+        textField.SetFocus ();
+        Assert.True (textField.HasFocus);
+
+        wizard.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, finishAccepting);
+        Assert.Equal (1, wizardAccepting);
         Assert.Equal (step1, wizard.CurrentStep);
 
         wizard.Dispose ();

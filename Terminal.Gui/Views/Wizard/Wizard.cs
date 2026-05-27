@@ -383,6 +383,20 @@ public class Wizard : Dialog, IDesignable
     /// </summary>
     public event EventHandler<ValueChangedEventArgs<WizardStep?>>? StepChanged;
 
+    /// <inheritdoc/>
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        View? sourceView = null;
+        args.Context?.Source?.TryGetTarget (out sourceView);
+
+        if (CurrentStep is { } && sourceView is { } && sourceView is not IAcceptTarget)
+        {
+            return NextFinishButton.InvokeCommand (Command.Accept) is true;
+        }
+
+        return base.OnAccepting (args);
+    }
+
     private void BackBtnOnAccepting (object? sender, CommandEventArgs e)
     {
         CancelEventArgs args = new ();
@@ -404,12 +418,15 @@ public class Wizard : Dialog, IDesignable
             return;
         }
         CancelEventArgs args = new ();
-        MovingNext?.Invoke (this, new CancelEventArgs ());
+        MovingNext?.Invoke (this, args);
 
-        if (!args.Cancel)
+        if (args.Cancel)
         {
-            e.Handled = GoNext ();
+            e.Handled = true;
+            return;
         }
+
+        e.Handled = GoNext ();
     }
 
     private void UpdateButtonsAndTitle ()
