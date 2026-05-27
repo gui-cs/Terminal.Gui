@@ -42,7 +42,6 @@ internal static class ConfigPropertyHostTypes
         typeof (Color),
         typeof (Driver),
         typeof (Key),
-        typeof (NerdFonts),
         typeof (Trace),
         typeof (View),
         typeof (BorderView),
@@ -73,7 +72,6 @@ internal static class ConfigPropertyHostTypes
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Color))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Driver))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Key))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (NerdFonts))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Trace))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (View))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (BorderView))]
