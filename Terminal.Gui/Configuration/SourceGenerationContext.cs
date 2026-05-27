@@ -23,7 +23,6 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (Color))]
 [JsonSerializable (typeof (Key))]
 [JsonSerializable (typeof (Key []))]
-[JsonSerializable (typeof (Glyphs))]
 [JsonSerializable (typeof (Alignment))]
 [JsonSerializable (typeof (AlignmentModes))]
 [JsonSerializable (typeof (LineStyle))]

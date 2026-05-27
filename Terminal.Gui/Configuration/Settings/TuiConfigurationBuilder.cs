@@ -124,6 +124,7 @@ public class TuiConfigurationBuilder
         BindSection<TraceSettings> (config, "Trace", s => TraceSettings.Defaults = s);
 
         // ThemeScope POCOs: two-pass overlay (root section + Themes:<active>:<section>) writes Current.
+        // TODO(A2): when ThemeSettings converts to record + Current, this becomes an immutable snapshot.
         string activeTheme = ThemeSettings.Defaults.Theme;
         BindThemeScope<ButtonSettings> (config, "Button", activeTheme, s => ButtonSettings.Current = s);
         BindThemeScope<CheckBoxSettings> (config, "CheckBox", activeTheme, s => CheckBoxSettings.Current = s);
@@ -142,7 +143,7 @@ public class TuiConfigurationBuilder
         BindThemeScope<TextFieldSettings> (config, "TextField", activeTheme, s => TextFieldSettings.Current = s);
         BindThemeScope<TextViewSettings> (config, "TextView", activeTheme, s => TextViewSettings.Current = s);
         BindThemeScope<WindowSettings> (config, "Window", activeTheme, s => WindowSettings.Current = s);
-        BindSection<GlyphSettings> (config, "Glyphs", s => GlyphSettings.Defaults = s);
+        BindThemeScope<GlyphSettings> (config, "Glyphs", activeTheme, s => GlyphSettings.Current = s);
     }
 
     /// <summary>

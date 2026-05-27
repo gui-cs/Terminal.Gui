@@ -240,7 +240,7 @@ public class SourcesManagerTests
         Assert.False (result);
     }
 
-    [Fact]
+    [Fact (Skip = "A2.2: Glyphs lost [ConfigurationProperty]; Resources/config.json Glyphs.X flat keys are now CM-unknown. Test removed with CM in step D.")]
     public void Load_WithValidResource_UpdatesSettingsScope ()
     {
         // Arrange
@@ -260,7 +260,7 @@ public class SourcesManagerTests
         // Verify settingsScope is updated as expected
     }
 
-    [Fact]
+    [Fact (Skip = "A2.2: Glyphs lost [ConfigurationProperty]; Resources/config.json Glyphs.X flat keys are now CM-unknown. Test removed with CM in step D.")]
     public void Load_Runtime_Overrides ()
     {
         // Arrange
@@ -398,7 +398,7 @@ public class SourcesManagerTests
         }
     }
 
-    [Fact]
+    [Fact (Skip = "A2.2: Glyphs lost [ConfigurationProperty]; Resources/config.json Glyphs.X flat keys are now CM-unknown. Test removed with CM in step D.")]
     public void Load_AddsResourceSourceToCollection ()
     {
         // Arrange

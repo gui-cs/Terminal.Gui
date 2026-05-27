@@ -40,7 +40,6 @@ internal static class ConfigPropertyHostTypes
         typeof (SchemeManager),
         typeof (ThemeManager),
         typeof (Color),
-        typeof (Glyphs),
         typeof (Driver),
         typeof (Key),
         typeof (NerdFonts),
@@ -72,7 +71,6 @@ internal static class ConfigPropertyHostTypes
     [DynamicDependency (PRESERVED_MEMBERS, typeof (SchemeManager))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (ThemeManager))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Color))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (Glyphs))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Driver))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Key))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (NerdFonts))]
