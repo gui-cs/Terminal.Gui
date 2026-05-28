@@ -700,7 +700,7 @@ public partial class DialogTests
         Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems, dialog.ButtonAlignmentModes);
         Assert.Equal (LineStyle.Heavy, dialog.BorderStyle);
         Assert.Equal (ShadowStyles.Transparent, dialog.ShadowStyle);
-        Assert.Equal (ViewArrangement.Overlapped, dialog.Arrangement);
+        Assert.Equal (ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped, dialog.Arrangement);
 
         dialog.Dispose ();
     }
