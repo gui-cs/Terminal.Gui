@@ -70,7 +70,7 @@ public partial class ListView
 
                 default:
                     // Combination 4: Checkbox style
-                    // Mark glyphs: Checkbox style (☒ marked, ☐ unmarked)
+                    // Mark glyphs: Checkbox style (☑ marked, ☐ unmarked)
                     // Visual roles: Standard selection (mark glyphs provide visual indication)
                     role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
 

@@ -263,6 +263,15 @@ public class CheckBoxTests
         Assert.Equal (new Rectangle (3, 4, 6, 1), ckb.Frame);
     }
 
+    // Copilot
+    [Fact]
+    public void Default_CheckState_Glyphs_Are_Distinct ()
+    {
+        Assert.Equal ((System.Text.Rune)'☑', Glyphs.CheckStateChecked);
+        Assert.Equal ((System.Text.Rune)'☐', Glyphs.CheckStateUnChecked);
+        Assert.Equal ((System.Text.Rune)'⬛', Glyphs.CheckStateNone);
+    }
+
     [Fact]
     public void LeftButtonReleased_Activates ()
     {
