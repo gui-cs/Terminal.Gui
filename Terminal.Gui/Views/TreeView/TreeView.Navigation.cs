@@ -373,12 +373,12 @@ public partial class TreeView<T>
         }
     }
 
-    /// <summary>Gets the effective check state of <paramref name="o"/>.</summary>
+    /// <summary>Gets the effective check state of <paramref name="o"/>, derived from children if applicable.</summary>
     /// <param name="o">The node object.</param>
     /// <returns>The effective check state.</returns>
     public CheckState GetCheckState (T? o) => o is null ? CheckState.UnChecked : GetEffectiveCheckState (o, []);
 
-    /// <summary>Sets the explicit check state of <paramref name="o"/>.</summary>
+    /// <summary>Sets the explicit check state of <paramref name="o"/> and propagates to all descendants.</summary>
     /// <param name="o">The node object.</param>
     /// <param name="state">The new check state.</param>
     public void SetChecked (T? o, CheckState state)
@@ -388,7 +388,7 @@ public partial class TreeView<T>
             return;
         }
 
-        SetCheckedCore (o, state);
+        SetCheckedRecursive (o, state);
         SetNeedsDraw ();
     }
 
@@ -756,34 +756,47 @@ public partial class TreeView<T>
             return _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
         }
 
-        CheckState explicitState = _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
-
         if (TreeBuilder is null)
         {
-            return explicitState;
+            return _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
         }
 
         T [] children = TreeBuilder.GetChildren (model).ToArray ();
 
         if (children.Length == 0)
         {
-            return explicitState;
+            return _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
         }
 
         CheckState [] childStates = children.Select (child => GetEffectiveCheckState (child, visited)).ToArray ();
-
-        if (childStates.Any (state => state is CheckState.None)
-            || (childStates.Any (state => state is CheckState.Checked) && childStates.Any (state => state is CheckState.UnChecked)))
-        {
-            return CheckState.None;
-        }
 
         if (childStates.All (state => state is CheckState.Checked))
         {
             return CheckState.Checked;
         }
 
-        return explicitState;
+        if (childStates.All (state => state is CheckState.UnChecked))
+        {
+            return CheckState.UnChecked;
+        }
+
+        // Mixed states among children → indeterminate
+        return CheckState.None;
+    }
+
+    private void SetCheckedRecursive (T model, CheckState state)
+    {
+        SetCheckedCore (model, state);
+
+        if (TreeBuilder is null)
+        {
+            return;
+        }
+
+        foreach (T child in TreeBuilder.GetChildren (model))
+        {
+            SetCheckedRecursive (child, state);
+        }
     }
 
     private void SetCheckedCore (T model, CheckState state)

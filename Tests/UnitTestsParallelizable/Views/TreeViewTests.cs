@@ -221,25 +221,29 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void CheckboxMode_Space_Toggles_Checked_State_Not_Expansion ()
     {
-        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out Car car2);
         tree.CheckboxMode = true;
         tree.SelectedObject = f;
 
-        var eventCount = 0;
+        List<object> checkedObjects = [];
         tree.CheckedChanged += (_, e) =>
                                {
-                                   eventCount++;
-                                   Assert.Same (f, e.Object);
-                                   Assert.Equal (CheckState.UnChecked, e.OldValue);
-                                   Assert.Equal (CheckState.Checked, e.NewValue);
+                                   checkedObjects.Add (e.Object!);
                                };
 
         tree.NewKeyDownEvent (Key.Space);
 
         Assert.False (tree.IsExpanded (f));
         Assert.Equal (CheckState.Checked, tree.GetCheckState (f));
-        Assert.Equal ([f], tree.GetCheckedObjects ());
-        Assert.Equal (1, eventCount);
+
+        // Propagation: f and all its children should be checked
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (car1));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (car2));
+
+        // Events fire for each node that changed
+        Assert.Contains (f, checkedObjects);
+        Assert.Contains (car1, checkedObjects);
+        Assert.Contains (car2, checkedObjects);
     }
 
     // Copilot
@@ -361,7 +365,7 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot - Opus 4.6
     [Fact]
-    public void CheckboxMode_Indeterminate_Parent_Shows_None_Glyph ()
+    public void CheckboxMode_TriState_Parent_Reflects_Children ()
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -377,21 +381,68 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         tree.AddObject (root);
         tree.Expand (root);
 
-        // Check only one child → parent should be indeterminate (None)
-        tree.SetChecked (child1, CheckState.Checked);
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
 
+        // Initially all unchecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        // Check one child → parent becomes indeterminate
+        tree.SetChecked (child1, CheckState.Checked);
         Assert.Equal (CheckState.None, tree.GetCheckState (root));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        // Check all children → parent becomes checked
+        tree.SetChecked (child2, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        // Uncheck one child → parent becomes indeterminate again
+        tree.SetChecked (child1, CheckState.UnChecked);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+
+        // Uncheck all children → parent becomes unchecked
+        tree.SetChecked (child2, CheckState.UnChecked);
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Toggling_Parent_Propagates_To_Children ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
 
         Runnable top = new ();
         top.Add (tree);
         app.Begin (top);
-        app.LayoutAndDraw ();
 
-        // Verify the indeterminate glyph is rendered (not unchecked)
-        string driverOutput = app.Driver!.ToString ()!;
-        string firstLine = driverOutput.Replace ("\r\n", "\n").Split ('\n') [0];
-        Assert.Contains (Glyphs.CheckStateNone.ToString (), firstLine);
-        Assert.DoesNotContain (Glyphs.CheckStateUnChecked.ToString (), firstLine);
+        // Toggle parent ON → all children become checked
+        tree.SetChecked (root, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child2));
+
+        // Toggle parent OFF → all children become unchecked
+        tree.SetChecked (root, CheckState.UnChecked);
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
 
         top.Dispose ();
         app.Dispose ();
