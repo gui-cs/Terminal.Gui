@@ -99,6 +99,8 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
+        Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
+
         CommandsToBubbleUp = [Command.Accept];
 
         _buttonContainer = new View
@@ -117,7 +119,6 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         Padding.GetOrCreateView ();
         Padding.View?.Add (_buttonContainer);
         UpdateSizes ();
-        SetStyle ();
     }
 
     /// <inheritdoc/>
@@ -331,40 +332,6 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             {
                 AddButton (b);
             }
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnIsRunningChanged (bool newIsModal)
-    {
-        base.OnIsRunningChanged (newIsModal);
-
-        if (newIsModal)
-        {
-            SetStyle ();
-        }
-    }
-
-    private void SetStyle ()
-    {
-        if (IsRunning)
-        {
-            // When running, restore to Dialog scheme only if it was set to Base by SetStyle
-            // (i.e., the scheme was not explicitly overridden before running, e.g. by
-            // MessageBox.ErrorQuery which sets SchemeName = "Error" before calling app.Run).
-            if (SchemeName == SchemeManager.SchemesToSchemeName (Schemes.Base))
-            {
-                SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-            }
-
-            Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
-        }
-        else
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
-
-            // strip out movable and resizable
-            Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
         }
     }
 

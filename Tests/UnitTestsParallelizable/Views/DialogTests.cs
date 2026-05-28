@@ -163,7 +163,7 @@ public partial class DialogTests (ITestOutputHelper output) : TestDriverBase
         Assert.Empty (dialog.Buttons);
         Assert.Null (dialog.Result);
         Assert.True (dialog.Canceled); // Canceled is true when Result is null
-        Assert.Equal (ViewArrangement.Overlapped, dialog.Arrangement);
+        Assert.Equal (ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped, dialog.Arrangement);
 
         dialog.Dispose ();
     }
@@ -195,7 +195,7 @@ public partial class DialogTests (ITestOutputHelper output) : TestDriverBase
     {
         Dialog dialog = new ();
 
-        Assert.Equal (ViewArrangement.Overlapped, dialog.Arrangement);
+        Assert.Equal (ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped, dialog.Arrangement);
 
         dialog.Dispose ();
     }
@@ -415,12 +415,12 @@ public partial class DialogTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot
     [Fact]
-    public void SchemeName_IsBase_WhenNotRunning ()
+    public void SchemeName_IsDialog_WhenNotRunning ()
     {
-        // When a Dialog is not running, it should use the Base scheme (not Dialog)
+        // A Dialog uses the Dialog scheme by default, set in the constructor
         Dialog dialog = new ();
 
-        Assert.Equal (SchemeManager.SchemesToSchemeName (Schemes.Base), dialog.SchemeName);
+        Assert.Equal (SchemeManager.SchemesToSchemeName (Schemes.Dialog), dialog.SchemeName);
 
         dialog.Dispose ();
     }
