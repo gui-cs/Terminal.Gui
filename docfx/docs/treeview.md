@@ -36,6 +36,7 @@ Both share the same rendering, navigation, selection, and command behavior.
   - [Multi-Select](#multi-select)
   - [Letter-Based Navigation](#letter-based-navigation)
 - [Filtering](#filtering)
+- [Checkbox Mode](#checkbox-mode)
 - [Dynamic Updates](#dynamic-updates)
 - [See Also](#see-also)
 
@@ -187,7 +188,7 @@ TreeView integrates with the Terminal.Gui [command system](command.md). Input fl
 | Key | Command | Behavior |
 |-----|---------|----------|
 | **Enter** | `Command.Accept` | Raises `Accepting`/`Accepted` (CWP) |
-| **Space** | `Command.Activate` | Raises `Activating`/`Activated`; toggles expand/collapse |
+| **Space** | `Command.Activate` | Raises `Activating`/`Activated`; toggles expand/collapse (or toggles checkbox when `CheckboxMode` is enabled) |
 | **→** | `Command.Expand` | Expand selected node |
 | **Ctrl+→** | `Command.ExpandAll` | Expand node and all descendants |
 | **←** | `Command.Collapse` | Collapse selected node, or navigate to parent node |
@@ -211,7 +212,7 @@ TreeView integrates with the Terminal.Gui [command system](command.md). Input fl
 
 | Input | Behavior |
 |-------|----------|
-| **Single click** | Select the clicked node. If the click lands on the expand/collapse symbol (`+`/`-`), toggle expansion. |
+| **Single click** | Select the clicked node. If the click lands on the expand/collapse symbol (`+`/`-`), toggle expansion. If `CheckboxMode` is enabled and the click lands on the checkbox glyph, toggle check state. |
 | **Double click** | Raises `Command.Accept` → fires `Accepting`/`Accepted` (CWP). Also toggles expand/collapse. |
 | **Wheel up/down** | Scroll viewport vertically |
 | **Wheel left/right** | Scroll viewport horizontally |
@@ -389,6 +390,74 @@ class MyFilter : ITreeViewFilter<GameObject>
 When a filter is active, parent nodes leading to matches remain visible even if they don't match, ensuring the tree structure is navigable.
 
 Set `Filter` to `null` to remove filtering.
+
+## Checkbox Mode
+
+To enable built-in checkboxes, set `CheckboxMode = true`. Each node displays a checkbox glyph between the expand symbol and the text:
+
+```csharp
+tree.CheckboxMode = true;
+```
+
+This produces:
+
+```
+├-☐ Root1
+│ ├─☐ Child1.1
+│ └─☐ Child1.2
+└-☐ Root2
+```
+
+### Tri-State Behavior
+
+TreeView implements standard tri-state checkbox semantics:
+
+| Parent State | Meaning |
+|-------------|---------|
+| **Unchecked** | No descendants are checked |
+| **Checked** | All descendants are checked |
+| **Indeterminate** | Some (but not all) descendants are checked |
+
+- **Toggling a parent** propagates the new state to all descendants.
+- **Toggling a leaf** updates ancestor states automatically via derivation.
+- The indeterminate state is always derived — it cannot be set directly by the user.
+
+### Interacting with Checkboxes
+
+| Input | Behavior |
+|-------|----------|
+| **Space** | Toggle the check state of the selected node |
+| **Click on checkbox glyph** | Toggle the check state of the clicked node |
+
+### Programmatic Access
+
+```csharp
+// Get the effective check state (derived for parents)
+CheckState state = tree.GetCheckState (node);
+
+// Set check state (propagates to descendants)
+tree.SetChecked (node, CheckState.Checked);
+
+// Get all explicitly checked objects
+IReadOnlyCollection<T> checkedObjects = tree.GetCheckedObjects ();
+```
+
+### CheckedChanged Event
+
+Fires for each node whose state changes (including descendants during propagation):
+
+```csharp
+tree.CheckedChanged += (sender, e) =>
+                       {
+                           // e.Object — the node whose state changed
+                           // e.OldValue — previous CheckState
+                           // e.NewValue — new CheckState
+                       };
+```
+
+### CheckboxMode vs. CheckBoxTableSourceWrapper
+
+When using `TreeTableSource<T>` to display a tree inside a `TableView`, the checkbox glyphs from `CheckboxMode` are **not** rendered in the table column. To add checkboxes to a tree-table, wrap the `TreeTableSource` with a `CheckBoxTableSourceWrapperByIndex` or `CheckBoxTableSourceWrapperByObject<T>` (see [TableView — Checkbox Columns](tableview.md#checkbox-columns)).
 
 ## Dynamic Updates
 
