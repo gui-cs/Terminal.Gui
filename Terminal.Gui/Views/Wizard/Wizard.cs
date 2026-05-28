@@ -88,7 +88,7 @@ public class Wizard : Dialog, IDesignable
     {
         if (CurrentStep is null || CurrentStep == GetLastStep ())
         {
-            return false;
+            return base.OnAccepting (args);
         }
 
         CancelEventArgs ce = new ();
@@ -119,6 +119,8 @@ public class Wizard : Dialog, IDesignable
 
         if (args.Cancel)
         {
+            e.Handled = true;
+
             return;
         }
 

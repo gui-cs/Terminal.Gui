@@ -1153,25 +1153,42 @@ public class WizardTests
 
     // Copilot
     [Fact]
-    public void Enter_In_TextField_On_Last_Step_Requests_Stop ()
+    public void Enter_In_TextField_On_Last_Step_Does_Not_Navigate ()
     {
-        // Bug: OnAccepting returns false on last step, bypassing Dialog<TResult>.OnAccepting
-        // which calls RequestStop(). Wizard should close when Enter is pressed on last step.
+        // Regression: OnAccepting must call base on last step so Dialog<TResult>.OnAccepting
+        // can call RequestStop() in modal mode. Without this, Enter from content views on the
+        // last step won't close the wizard. We verify OnAccepting doesn't intercept (navigate)
+        // on the last step, and that the accept propagates to Accepted (proving base chain ran).
         Wizard wizard = new ();
         WizardStep step1 = new () { Title = "Step 1" };
+        WizardStep step2 = new () { Title = "Step 2" };
         TextField textField = new () { Width = Dim.Fill () };
-        step1.Add (textField);
+        step2.Add (textField);
         wizard.AddStep (step1);
+        wizard.AddStep (step2);
         wizard.BeginInit ();
         wizard.EndInit ();
+        wizard.GoNext ();
+        Assert.Equal (step2, wizard.CurrentStep);
+
+        var accepted = 0;
+        wizard.Accepted += (_, _) => accepted++;
+
+        // MovingNext should NOT be raised on last step
+        var movingNextRaised = false;
+        wizard.MovingNext += (_, _) => movingNextRaised = true;
 
         textField.SetFocus ();
         Assert.True (textField.HasFocus);
 
         wizard.NewKeyDownEvent (Key.Enter);
 
-        // The wizard should have requested stop (modal close)
-        Assert.True (wizard.StopRequested);
+        // Should stay on last step (not navigate)
+        Assert.Equal (step2, wizard.CurrentStep);
+        // MovingNext should not fire on last step
+        Assert.False (movingNextRaised);
+        // Accepted should fire (base chain processed it)
+        Assert.Equal (1, accepted);
 
         wizard.Dispose ();
     }
