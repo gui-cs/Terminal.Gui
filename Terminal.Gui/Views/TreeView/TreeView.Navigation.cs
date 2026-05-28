@@ -763,11 +763,11 @@ public partial class TreeView<T>
             return explicitState;
         }
 
-        // Only derive state from children that are already expanded/known.
-        // Calling GetChildren on collapsed nodes could be expensive for lazy builders (e.g. filesystem).
+        // Derive state from known children (ChildBranches). These are preserved even after
+        // collapse, so we can derive correct tri-state without calling TreeBuilder.GetChildren.
         Branch<T>? branch = ObjectToBranch (model);
 
-        if (branch is not { IsExpanded: true, ChildBranches: { Count: > 0 } childBranches })
+        if (branch is not { ChildBranches: { Count: > 0 } childBranches })
         {
             return explicitState;
         }

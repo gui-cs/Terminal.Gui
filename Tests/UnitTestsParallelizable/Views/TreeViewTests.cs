@@ -581,6 +581,119 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         app.Dispose ();
     }
 
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Collapsed_Parent_Shows_Indeterminate_When_One_Child_Checked ()
+    {
+        // When only one child is checked and parent is collapsed, parent should show
+        // indeterminate (None), not Checked or UnChecked.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 30, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Check only child1 - parent should be indeterminate
+        tree.SetChecked (child1, CheckState.Checked);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+
+        // Collapse root - should STILL show indeterminate
+        tree.Collapse (root);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+
+        // Expand again - should still be indeterminate
+        tree.Expand (root);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Collapsed_Parent_Shows_Checked_When_All_Children_Checked ()
+    {
+        // When all children are checked and parent is collapsed, parent should show Checked.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 30, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Check both children
+        tree.SetChecked (child1, CheckState.Checked);
+        tree.SetChecked (child2, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        // Collapse root - should STILL show Checked
+        tree.Collapse (root);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Collapsed_Parent_Shows_UnChecked_When_No_Children_Checked ()
+    {
+        // When no children are checked and parent is collapsed, parent should show UnChecked.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 30, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // No children checked - parent is UnChecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        // Collapse root - should STILL show UnChecked
+        tree.Collapse (root);
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
     [Fact]
     public void ContentWidth_BiggerAfterExpand ()
     {
