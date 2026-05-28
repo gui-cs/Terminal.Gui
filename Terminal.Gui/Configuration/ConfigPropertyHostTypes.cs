@@ -40,31 +40,15 @@ internal static class ConfigPropertyHostTypes
         typeof (SchemeManager),
         typeof (ThemeManager),
         typeof (Color),
-        typeof (Glyphs),
         typeof (Driver),
         typeof (Key),
-        typeof (NerdFonts),
         typeof (Trace),
         typeof (View),
         typeof (BorderView),
-        typeof (Button),
-        typeof (CharMap),
-        typeof (CheckBox),
-        typeof (Dialog),
         typeof (FileDialog),
         typeof (FileDialogStyle),
-        typeof (FrameView),
-        typeof (HexView),
-        typeof (LinearRangeDefaults),
-        typeof (Menu),
         typeof (MenuBar),
-        typeof (MessageBox),
         typeof (PopoverMenu),
-        typeof (SelectorBase),
-        typeof (StatusBar),
-        typeof (TextField),
-        typeof (TextView),
-        typeof (Window)
     ];
 
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Application))]
@@ -72,30 +56,14 @@ internal static class ConfigPropertyHostTypes
     [DynamicDependency (PRESERVED_MEMBERS, typeof (SchemeManager))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (ThemeManager))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Color))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (Glyphs))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Driver))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Key))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (NerdFonts))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (Trace))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (View))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (BorderView))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (Button))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (CharMap))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (CheckBox))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (Dialog))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (FileDialog))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (FileDialogStyle))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (FrameView))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (HexView))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (LinearRangeDefaults))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (Menu))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (MenuBar))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (MessageBox))]
     [DynamicDependency (PRESERVED_MEMBERS, typeof (PopoverMenu))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (SelectorBase))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (StatusBar))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (TextField))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (TextView))]
-    [DynamicDependency (PRESERVED_MEMBERS, typeof (Window))]
     internal static Type [] GetTypes () => _types;
 }

@@ -77,18 +77,18 @@ public class MecSettingsTests
     public void StaticFacade_CanBeOverridden ()
     {
         // Save original
-        ButtonSettings original = ButtonSettings.Defaults;
+        ButtonSettings original = ButtonSettings.Current;
 
         try
         {
             ButtonSettings custom = new () { DefaultShadow = ShadowStyles.None };
-            ButtonSettings.Defaults = custom;
+            ButtonSettings.Current = custom;
 
-            Assert.Equal (ShadowStyles.None, ButtonSettings.Defaults.DefaultShadow);
+            Assert.Equal (ShadowStyles.None, ButtonSettings.Current.DefaultShadow);
         }
         finally
         {
-            ButtonSettings.Defaults = original;
+            ButtonSettings.Current = original;
         }
     }
 

@@ -10,7 +10,9 @@ public class ScopeJsonConverterTests
     [InlineData ("\"Key.Separator\":\"@\"")]
     [InlineData ("\"Themes\":[]")]
     [InlineData ("\"Themes\":[{\"themeName\":{}}]")]
-    [InlineData ("\"Themes\":[{\"themeName\":{\"Dialog.DefaultButtonAlignment\":\"End\"}}]")]
+    // A2.4: dropped "Dialog.DefaultButtonAlignment" InlineData row — Dialog.DefaultButtonAlignment lost
+    // [ConfigurationProperty] in A2.4 when view-facade theme setters were removed; ScopeJsonConverter now
+    // rejects it. CM and this test are removed in step D.
     public void RoundTripConversion_Property_Positive (string configPropertyJson)
     {
         // Arrange

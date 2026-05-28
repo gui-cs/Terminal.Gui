@@ -440,19 +440,14 @@ public class MenuBar : Menu, IDesignable
     /// <summary>
     ///     Gets or sets the default Border Style for the MenuBar. The default is <see cref="LineStyle.None"/>.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle
-    {
-        get => MenuBarSettings.Defaults.DefaultBorderStyle;
-        set => MenuBarSettings.Defaults.DefaultBorderStyle = value;
-    }
+    public new static LineStyle DefaultBorderStyle => MenuBarSettings.Current.DefaultBorderStyle;
 
     /// <summary>The default key for activating menu bars.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key DefaultKey
     {
-        get => MenuBarSettings.Defaults.DefaultKey;
-        set => MenuBarSettings.Defaults.DefaultKey = value;
+        get => MenuBarSettings.Current.DefaultKey;
+        set => MenuBarSettings.Current = MenuBarSettings.Current with { DefaultKey = value };
     }
 
     /// <inheritdoc/>

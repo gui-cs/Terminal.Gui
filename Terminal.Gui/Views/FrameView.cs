@@ -40,10 +40,5 @@ public class FrameView : View
     ///     This property can be set in a Theme to change the default <see cref="LineStyle"/> for all
     ///     <see cref="FrameView"/>s.
     /// </remarks>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle
-    {
-        get => FrameViewSettings.Defaults.DefaultBorderStyle;
-        set => FrameViewSettings.Defaults.DefaultBorderStyle = value;
-    }
+    public static LineStyle DefaultBorderStyle => FrameViewSettings.Current.DefaultBorderStyle;
 }
