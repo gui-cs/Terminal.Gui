@@ -438,8 +438,8 @@ CheckState state = tree.GetCheckState (node);
 // Set check state (propagates to descendants)
 tree.SetChecked (node, CheckState.Checked);
 
-// Get all explicitly checked objects
-IReadOnlyCollection<T> checkedObjects = tree.GetCheckedObjects ();
+// Get all checked objects (includes parents derived as checked from children)
+IEnumerable<T> checkedObjects = tree.GetCheckedObjects ();
 ```
 
 ### CheckedChanged Event

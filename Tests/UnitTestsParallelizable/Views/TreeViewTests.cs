@@ -1127,5 +1127,57 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         return tree;
     }
 
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_SetChecked_Handles_Cyclic_TreeBuilder ()
+    {
+        // A tree builder that creates a cycle: A -> B -> A
+        object a = "A";
+        object b = "B";
+
+        Dictionary<object, object []> graph = new ()
+        {
+            { a, [b] },
+            { b, [a] }
+        };
+
+        TreeView<object> tree = new (new DelegateTreeBuilder<object> (
+                                         o => graph.TryGetValue (o, out object []? children) ? children : [],
+                                         _ => true));
+        tree.CheckboxMode = true;
+        tree.AddObject (a);
+
+        // Should not stack overflow - cycle protection should prevent infinite recursion
+        Exception? ex = Record.Exception (() => tree.SetChecked (a, CheckState.Checked));
+        Assert.Null (ex);
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_GetCheckState_Handles_Cyclic_TreeBuilder ()
+    {
+        // A tree builder that creates a cycle: A -> B -> A
+        object a = "A";
+        object b = "B";
+
+        Dictionary<object, object []> graph = new ()
+        {
+            { a, [b] },
+            { b, [a] }
+        };
+
+        TreeView<object> tree = new (new DelegateTreeBuilder<object> (
+                                         o => graph.TryGetValue (o, out object []? children) ? children : [],
+                                         _ => true));
+        tree.CheckboxMode = true;
+        tree.AddObject (a);
+
+        tree.SetChecked (a, CheckState.Checked);
+
+        // Should not stack overflow when deriving state
+        Exception? ex = Record.Exception (() => tree.GetCheckState (a));
+        Assert.Null (ex);
+    }
+
     #endregion
 }

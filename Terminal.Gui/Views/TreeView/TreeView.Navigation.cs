@@ -756,19 +756,25 @@ public partial class TreeView<T>
             return _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
         }
 
+        CheckState explicitState = _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
+
         if (TreeBuilder is null)
         {
-            return _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
+            return explicitState;
         }
 
-        T [] children = TreeBuilder.GetChildren (model).ToArray ();
+        // Only derive state from children that are already expanded/known.
+        // Calling GetChildren on collapsed nodes could be expensive for lazy builders (e.g. filesystem).
+        Branch<T>? branch = ObjectToBranch (model);
 
-        if (children.Length == 0)
+        if (branch is not { IsExpanded: true, ChildBranches: { Count: > 0 } childBranches })
         {
-            return _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
+            return explicitState;
         }
 
-        CheckState [] childStates = children.Select (child => GetEffectiveCheckState (child, visited)).ToArray ();
+        CheckState [] childStates = childBranches
+                                    .Select (child => GetEffectiveCheckState (child.Model, visited))
+                                    .ToArray ();
 
         if (childStates.All (state => state is CheckState.Checked))
         {
@@ -780,12 +786,22 @@ public partial class TreeView<T>
             return CheckState.UnChecked;
         }
 
-        // Mixed states among children → indeterminate
+        // Mixed states among children - indeterminate
         return CheckState.None;
     }
 
     private void SetCheckedRecursive (T model, CheckState state)
     {
+        SetCheckedRecursive (model, state, []);
+    }
+
+    private void SetCheckedRecursive (T model, CheckState state, HashSet<T> visited)
+    {
+        if (!visited.Add (model))
+        {
+            return;
+        }
+
         SetCheckedCore (model, state);
 
         if (TreeBuilder is null)
@@ -795,21 +811,21 @@ public partial class TreeView<T>
 
         foreach (T child in TreeBuilder.GetChildren (model))
         {
-            SetCheckedRecursive (child, state);
+            SetCheckedRecursive (child, state, visited);
         }
     }
 
     private void SetCheckedCore (T model, CheckState state)
     {
-        CheckState oldValue = _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
+        CheckState oldEffective = GetCheckState (model);
 
-        if (oldValue == state)
+        if (oldEffective == state)
         {
             return;
         }
 
         _checkedStates [model] = state;
-        CheckedChanged?.Invoke (this, new CheckedChangedEventArgs<T> (this, model, oldValue, state));
+        CheckedChanged?.Invoke (this, new CheckedChangedEventArgs<T> (this, model, oldEffective, state));
     }
 
     private void ToggleChecked (T model)

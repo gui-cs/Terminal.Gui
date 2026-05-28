@@ -165,8 +165,10 @@ internal class Branch<T> where T : class
         if (toSkip > 0)
         {
             // For the event record a negative location for where model text starts since it
-            // is pushed off to the left because of scrolling
-            indexOfModelText = -toSkip;
+            // is pushed off to the left because of scrolling.
+            // Account for checkbox cells (glyph + space) prepended to lineBody.
+            int checkboxOffset = _tree.CheckboxMode ? 2 : 0;
+            indexOfModelText = -(toSkip - checkboxOffset);
 
             if (toSkip > lineBody.Length)
             {
