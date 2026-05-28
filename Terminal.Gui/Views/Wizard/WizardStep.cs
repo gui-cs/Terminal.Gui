@@ -115,23 +115,12 @@ public class WizardStep : View, IDesignable
     {
         Title = "Example Step";
 
-        Label label = new ()
-        {
-            Title = "_Enter Text:"
-        };
+        Label label = new () { Title = "_Enter Text:" };
 
-        TextField textField = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Width = 20
-        };
+        TextField textField = new () { X = Pos.Right (label) + 1, Width = 20 };
         Add (label, textField);
 
-        label = new Label
-        {
-            Title = "    _A List:",
-            Y = Pos.Bottom (label) + 1
-        };
+        label = new Label { Title = "    _A List:", Y = Pos.Bottom (label) + 1 };
 
         ListView listView = new ()
         {
@@ -147,11 +136,11 @@ public class WizardStep : View, IDesignable
 
         HelpText = """
                    ## WizardStep Help
-                   
+
                    Provide **markdown-formatted** instructions or information to guide the user through each step of the wizard.
-                   
+
                    Set `WizardStep.HelpText` to update this content. If `HelpText` is empty, the right padding will be hidden and the content will fill the entire step.
-                   
+
                    [Learn more about markdown formatting](https://www.markdownguide.org/basic-syntax/)
                    """;
 

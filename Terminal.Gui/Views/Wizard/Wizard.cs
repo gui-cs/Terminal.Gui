@@ -70,7 +70,7 @@ public class Wizard : Dialog, IDesignable
 
         NextFinishButton = new Button { Text = Strings.wzFinish, X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
 
-        BackButton.Accepting += BackBtnOnAccepting;
+        BackButton.Accepting += BackButtonOnAccepting;
 
         AddButton (BackButton);
         AddButton (NextFinishButton);
@@ -112,7 +112,7 @@ public class Wizard : Dialog, IDesignable
     /// </remarks>
     public Button BackButton { get; }
 
-    private void BackBtnOnAccepting (object? sender, CommandEventArgs e)
+    private void BackButtonOnAccepting (object? sender, CommandEventArgs e)
     {
         CancelEventArgs args = new ();
         MovingBack?.Invoke (this, args);
@@ -510,5 +510,5 @@ public class Wizard : Dialog, IDesignable
     }
 
     /// <inheritdoc/>
-    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Tab,wait:500,Tab,wait:500,Enter,wait:1000";
+    string IDesignable.GetDemoKeyStrokes () => "wait:500,Tab,wait:500,Tab,wait:500,Enter,wait:1000";
 }
