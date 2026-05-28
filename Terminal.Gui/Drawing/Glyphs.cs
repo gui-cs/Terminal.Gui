@@ -55,15 +55,15 @@ public class Glyphs
 
     /// <summary>Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Rune CheckStateChecked { get; set; } = (Rune)'☑'; // U+2611 BALLOT BOX WITH CHECK
+    public static Rune CheckStateChecked { get; set; } = (Rune)'☒'; // '☑' is colored
 
     /// <summary>Not Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Rune CheckStateUnChecked { get; set; } = (Rune)'☐'; // U+2610 BALLOT BOX
+    public static Rune CheckStateUnChecked { get; set; } = (Rune)'☐';
 
-    /// <summary>Null/Indeterminate Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
+    /// <summary>Null Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Rune CheckStateNone { get; set; } = (Rune)'⬛'; // U+2B1B BLACK LARGE SQUARE
+    public static Rune CheckStateNone { get; set; } = (Rune)'□'; // TODO: Verify this works as broadly as possible
 
     /// <summary>Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="OptionSelector"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]

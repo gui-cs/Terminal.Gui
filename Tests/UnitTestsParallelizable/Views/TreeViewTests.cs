@@ -448,6 +448,139 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         app.Dispose ();
     }
 
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Toggle_Parent_When_All_Children_Checked_Unchecks_All ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Check all children so parent derives as Checked
+        tree.SetChecked (child1, CheckState.Checked);
+        tree.SetChecked (child2, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        // Select root and press Space to toggle it OFF
+        tree.SelectedObject = root;
+        tree.NewKeyDownEvent (Key.Space);
+
+        // Parent and all children should now be unchecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_MouseClick_Uncheck_Parent_When_Children_Checked ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Check all children so parent derives as Checked
+        tree.SetChecked (child1, CheckState.Checked);
+        tree.SetChecked (child2, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        // Click on root's checkbox glyph (x=2 for expanded root with branch lines)
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (2, 0)));
+
+        // Parent and all children should now be unchecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_MouseClick_Children_Then_Uncheck_Parent ()
+    {
+        // Reproduce exact user scenario: click child1 cb, click child2 cb, then click root cb
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 30, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Layout with ShowBranchLines=true (default), CheckboxMode=true:
+        // GetLinePrefix yields: for each parent 2 elements (line + space), then 1 junction element.
+        // IsHitOnCheckbox = GetLinePrefix().Count() + GetExpandableSymbol().GetColumns()
+        // Root (depth=0): prefix count=1 (junction only), expand=1 col → checkbox at x=2
+        // Children (depth=1): prefix count=3 (parent line+space + junction), expand=1 col → checkbox at x=4
+
+        // Click child1's checkbox at (4, 1)
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (4, 1)));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.None, tree.GetCheckState (root)); // indeterminate
+
+        // Click child2's checkbox at (4, 2)
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (4, 2)));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child2));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root)); // all children checked
+
+        // Click root's checkbox at (2, 0) to uncheck everything
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (2, 0)));
+
+        // Parent and all children should now be unchecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
     [Fact]
     public void ContentWidth_BiggerAfterExpand ()
     {

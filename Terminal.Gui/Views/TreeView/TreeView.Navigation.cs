@@ -830,6 +830,65 @@ public partial class TreeView<T>
 
     private void ToggleChecked (T model)
     {
-        SetChecked (model, GetCheckState (model) == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked);
+        CheckState current = GetCheckState (model);
+
+        // If effective state is not UnChecked, toggle to UnChecked
+        if (current != CheckState.UnChecked)
+        {
+            SetChecked (model, CheckState.UnChecked);
+
+            return;
+        }
+
+        // Effective state is UnChecked - but for collapsed nodes, descendants might
+        // still be explicitly checked in the dictionary. Check for that case.
+        if (HasCheckedDescendantsInState (model))
+        {
+            SetChecked (model, CheckState.UnChecked);
+
+            return;
+        }
+
+        SetChecked (model, CheckState.Checked);
+    }
+
+    private bool HasCheckedDescendantsInState (T model)
+    {
+        if (TreeBuilder is null)
+        {
+            return false;
+        }
+
+        HashSet<T> visited = [];
+
+        return HasCheckedDescendantsRecursive (model, visited);
+    }
+
+    private bool HasCheckedDescendantsRecursive (T model, HashSet<T> visited)
+    {
+        if (!visited.Add (model))
+        {
+            return false;
+        }
+
+        if (TreeBuilder is null)
+        {
+            return false;
+        }
+
+        foreach (T child in TreeBuilder.GetChildren (model))
+        {
+            if (_checkedStates.TryGetValue (child, out CheckState state) && state == CheckState.Checked)
+            {
+                return true;
+            }
+
+            if (HasCheckedDescendantsRecursive (child, visited))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
