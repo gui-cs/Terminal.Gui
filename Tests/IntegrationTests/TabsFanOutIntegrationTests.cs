@@ -45,6 +45,7 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
         public int SubViewsLaidOut;
         public int DrawComplete;
         public int ClearedViewport;
+        public int DrawingText;
     }
 
     private static string MakeText (string prefix, int lines)
@@ -104,11 +105,13 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
             codes [i].SubViewsLaidOut += (_, _) => perTab [captured].SubViewsLaidOut++;
             codes [i].DrawComplete += (_, _) => perTab [captured].DrawComplete++;
             codes [i].ClearedViewport += (_, _) => perTab [captured].ClearedViewport++;
+            codes [i].DrawingText += (_, _) => perTab [captured].DrawingText++;
         }
 
         tabs.SubViewsLaidOut += (_, _) => tabsContainer.SubViewsLaidOut++;
         tabs.DrawComplete += (_, _) => tabsContainer.DrawComplete++;
         tabs.ClearedViewport += (_, _) => tabsContainer.ClearedViewport++;
+        tabs.DrawingText += (_, _) => tabsContainer.DrawingText++;
 
         ScrollableCode active = codes [0];
 
@@ -123,11 +126,13 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
                                                         perTab [i].SubViewsLaidOut = 0;
                                                         perTab [i].DrawComplete = 0;
                                                         perTab [i].ClearedViewport = 0;
+                                                        perTab [i].DrawingText = 0;
                                                     }
 
                                                     tabsContainer.SubViewsLaidOut = 0;
                                                     tabsContainer.DrawComplete = 0;
                                                     tabsContainer.ClearedViewport = 0;
+                                                    tabsContainer.DrawingText = 0;
                                                 })
                                          .KeyDown (Key.PageDown)
                                          .KeyDown (Key.PageDown)
@@ -136,12 +141,12 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
         outputHelper.WriteLine ($"Driver: {driverName}");
         outputHelper.WriteLine ($"Active tab viewport Y after 3 PageDowns: {active.Viewport.Y}");
         outputHelper.WriteLine ("Per-tab counters (after 3 PageDowns on active tab):");
-        outputHelper.WriteLine ("  tab        laidOut  drawComplete  clearedViewport");
-        outputHelper.WriteLine ($"  Tabs       {tabsContainer.SubViewsLaidOut,7}  {tabsContainer.DrawComplete,12}  {tabsContainer.ClearedViewport,15}");
+        outputHelper.WriteLine ("  tab        laidOut  drawComplete  clearedViewport  drawingText");
+        outputHelper.WriteLine ($"  Tabs       {tabsContainer.SubViewsLaidOut,7}  {tabsContainer.DrawComplete,12}  {tabsContainer.ClearedViewport,15}  {tabsContainer.DrawingText,11}");
 
         for (var i = 0; i < TabCount; i++)
         {
-            outputHelper.WriteLine ($"  Code{i + 1,-6} {perTab [i].SubViewsLaidOut,7}  {perTab [i].DrawComplete,12}  {perTab [i].ClearedViewport,15}");
+            outputHelper.WriteLine ($"  Code{i + 1,-6} {perTab [i].SubViewsLaidOut,7}  {perTab [i].DrawComplete,12}  {perTab [i].ClearedViewport,15}  {perTab [i].DrawingText,11}");
         }
 
         Assert.True (
@@ -152,27 +157,34 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
                      perTab [0].DrawComplete > 0,
                      $"Active tab must draw in response to real PageDown, got DrawComplete={perTab [0].DrawComplete}.");
 
-        int inactiveDraws = 0;
+        int inactiveTextDraws = 0;
         int inactiveLayouts = 0;
 
         for (var i = 1; i < TabCount; i++)
         {
-            inactiveDraws += perTab [i].DrawComplete;
+            inactiveTextDraws += perTab [i].DrawingText;
             inactiveLayouts += perTab [i].SubViewsLaidOut;
         }
 
-        outputHelper.WriteLine ($"Sum inactive DrawComplete = {inactiveDraws}");
+        outputHelper.WriteLine ($"Sum inactive DrawingText = {inactiveTextDraws}");
         outputHelper.WriteLine ($"Sum inactive SubViewsLaidOut = {inactiveLayouts}");
 
-        // CURRENT BEHAVIOR: draw fan-out still exists through the real input → command → main-loop path,
-        // but layout fan-out should now be eliminated.
+        // Issue #5358 fix narrows draw fan-out at the View.Draw pipeline level (verified by
+        // TabsFanOutDiagnosticTests at synthetic level). At integration level a separate
+        // cascade source remains: ApplicationImpl.LayoutAndDraw passes force=true to
+        // View.Draw whenever any view needed layout, which calls SetNeedsDraw on the top
+        // runnable, which cascades to overlapping subviews via the existing SetNeedsDraw
+        // recursion. Removing that force=true uncovers stale-content bugs in the shrink/move
+        // path (covered by existing ShadowTests and BorderViewTests) and is out of scope
+        // for #5358. Until that broader fix lands, inactive tab pages still receive
+        // NeedsDraw via the LayoutAndDraw force path. Layout fan-out is already fully
+        // eliminated by PR #5373.
         Assert.True (
-                     inactiveDraws > 0,
-                     $"Documents issue #4973 (integration-level): inactive_total DrawComplete={inactiveDraws}. " +
-                     "Flip to Assert.Equal(0, inactiveDraws) after fix lands.");
+                     inactiveTextDraws > 0,
+                     $"Documents the remaining draw fan-out via ApplicationImpl.LayoutAndDraw's force=true path: " +
+                     $"inactive_total DrawingText={inactiveTextDraws}. Flip to Assert.Equal(0, inactiveTextDraws) " +
+                     "after the broader LayoutAndDraw cascade is addressed (out of scope for #5358).");
 
-        Assert.Equal (
-                      0,
-                      inactiveLayouts);
+        Assert.Equal (0, inactiveLayouts);
     }
 }

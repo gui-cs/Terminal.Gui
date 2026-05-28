@@ -15,9 +15,10 @@ namespace Terminal.Gui.ViewBase;
 ///         back-reference, making <see cref="AdornmentImpl"/> the single authoritative owner of Thickness.
 ///     </para>
 ///     <para>
-///         During the incremental migration, existing <see cref="Border"/> and <see cref="Padding"/> continue
-///         to extend <see cref="Adornment"/>. Only newly migrated adornments (starting with <c>MarginView</c>)
-///         extend <see cref="AdornmentView"/>.
+///         <see cref="MarginView"/>, <see cref="BorderView"/>, and <see cref="PaddingView"/> all extend
+///         <see cref="AdornmentView"/>. <see cref="AdornmentImpl"/> is the authoritative owner of
+///         <see cref="IAdornment.Thickness"/>; the corresponding <see cref="AdornmentView"/> hosts the
+///         render-layer behavior.
 ///     </para>
 /// </remarks>
 public class AdornmentView : View, IAdornmentView, IDesignable
@@ -151,8 +152,9 @@ public class AdornmentView : View, IAdornmentView, IDesignable
             Adornment.Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
         }
 
-        SetNeedsDraw ();
-
+        // Do NOT call SetNeedsDraw () here. The thickness has been drawn; calling
+        // SetNeedsDraw cascades to the parent's SubViewNeedsDraw mid-pass and adds
+        // churn that competes with the needsDrawSelf gate added for issue #5358.
         return true;
     }
 
