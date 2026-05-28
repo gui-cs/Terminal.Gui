@@ -138,7 +138,8 @@ public partial class View
         //   2. subview.Frame is in this view's content coords; intersect there.
         //   3. Translate the intersection to subview-frame-local (subtract Frame.Location).
         //   4. Translate to subview-VIEWPORT-local by subtracting the subview's adornment
-        //      offset (Padding inset). Do NOT also subtract the subview's Viewport.Location:
+        //      offset (GetViewportOffsetFromFrame() — the combined Margin/Border/Padding inset).
+        //      Do NOT also subtract the subview's Viewport.Location:
         //      viewport-local coords are scroll-INDEPENDENT — (0, 0) is always the top-left
         //      visible cell regardless of which content cell the scroll maps there. The dirty
         //      ON-SCREEN cells are what we propagate, not the content cells they're showing.

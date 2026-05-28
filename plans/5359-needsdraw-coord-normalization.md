@@ -35,8 +35,8 @@ This matches what `ViewportToScreen(in Rectangle)` already expects and is the me
   - Translate `viewPortRelativeRegion` → `this`'s content coords by adding `Viewport.Location`.
   - Intersect with `subview.Frame` (already in `this`'s content coords).
   - Translate the intersection to subview-frame-local by subtracting `subview.Frame.Location`.
-  - Translate to subview-viewport-local by subtracting `subview.GetViewportOffsetFromFrame()` and `subview.Viewport.Location`.
-  - Clip to the subview's viewport bounds (`new Rectangle(Point.Empty, subview.Viewport.Size)`); if empty, fall back to `subview.SetNeedsDraw()` no-arg (the subview still needs *some* redraw since the parent invalidation touched its frame area, but it's all in adornment / scrolled-off territory — let it do a safe full redraw).
+  - Translate to subview-viewport-local by subtracting `subview.GetViewportOffsetFromFrame()` (the combined Margin/Border/Padding inset). Do **not** subtract `subview.Viewport.Location`: viewport-local coordinates are scroll-independent — `(0, 0)` is always the top-left visible cell regardless of which content cell the subview's scroll maps there. We propagate the dirty *on-screen* cells, not the content cells they're showing.
+  - Clip to the subview's viewport bounds (`new Rectangle(Point.Empty, subview.Viewport.Size)`); if empty, fall back to `subview.SetNeedsDraw()` no-arg (the subview still needs *some* redraw since the parent invalidation touched its frame area, but it's all in adornment territory — let it do a safe full redraw and flag its adornments).
 
 ### 2. `View.Drawing.Adornments.cs`
 
