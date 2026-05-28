@@ -11,9 +11,11 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class WizardStep : View, IDesignable
 {
-    private readonly Code _helpTextView = new ()
+    private readonly Markdown _helpTextView = new ()
     {
-        SyntaxHighlighter = null,
+        SyntaxHighlighter = new TextMateSyntaxHighlighter (),
+        ShowHeadingPrefix = false,
+        ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar,
         X = Pos.AnchorEnd () + 1,
         Height = Dim.Fill (),
 #if DEBUG
@@ -30,6 +32,7 @@ public class WizardStep : View, IDesignable
         CanFocus = true;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
+        CommandsToBubbleUp = [Command.Accept];
     }
 
     /// <inheritdoc/>
@@ -143,8 +146,13 @@ public class WizardStep : View, IDesignable
         Add (label, listView);
 
         HelpText = """
-                   This is some help text for the WizardStep. 
-                   You can provide instructions or information to guide the user through this step of the wizard.
+                   ## WizardStep Help
+                   
+                   Provide **markdown-formatted** instructions or information to guide the user through each step of the wizard.
+                   
+                   Set `WizardStep.HelpText` to update this content. If `HelpText` is empty, the right padding will be hidden and the content will fill the entire step.
+                   
+                   [Learn more about markdown formatting](https://www.markdownguide.org/basic-syntax/)
                    """;
 
         return true;

@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 ///     A multi-step dialog for collecting related data across sequential steps.
 /// </summary>
 /// <remarks>
-/// <img src="../images/views/Wizard.gif" alt="Wizard demo"/>
+///     <img src="../images/views/Wizard.gif" alt="Wizard demo"/>
 ///     <para>
 ///         Each <see cref="WizardStep"/> can host arbitrary <see cref="View"/>s and display help text.
 ///         Navigation buttons (Back/Next/Finish) are automatically managed.
@@ -49,8 +49,6 @@ namespace Terminal.Gui.Views;
 /// </example>
 public class Wizard : Dialog, IDesignable
 {
-    private string _wizardTitle = string.Empty;
-
     /// <summary>
     ///     Initializes a new instance of the <see cref="Wizard"/> class.
     /// </summary>
@@ -70,40 +68,12 @@ public class Wizard : Dialog, IDesignable
 
         BackButton = new Button { Text = Strings.wzBack, X = 0, Y = Pos.AnchorEnd () };
 
-        NextFinishButton = new Button { Text = Strings.wzFinish, IsDefault = true, X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
+        NextFinishButton = new Button { Text = Strings.wzFinish, X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
 
         BackButton.Accepting += BackBtnOnAccepting;
-        NextFinishButton.Accepting += NextFinishBtnOnAccepting;
 
         AddButton (BackButton);
         AddButton (NextFinishButton);
-    }
-
-    private void SetStyle ()
-    {
-        if (IsRunning)
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-            Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
-        }
-        else
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
-            BorderStyle = LineStyle.Dotted;
-
-            // strip out movable and resizable
-            Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
-            base.ShadowStyle = null;
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnTitleChanged ()
-    {
-        if (string.IsNullOrEmpty (_wizardTitle))
-        {
-            _wizardTitle = Title;
-        }
     }
 
     /// <inheritdoc/>
@@ -114,11 +84,24 @@ public class Wizard : Dialog, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnIsModalChanged (bool newIsModal)
+    protected override bool OnAccepting (CommandEventArgs args)
     {
-        SetStyle ();
+        if (CurrentStep is null || CurrentStep == GetLastStep ())
+        {
+            return false;
+        }
 
-        base.OnIsModalChanged (newIsModal);
+        CancelEventArgs ce = new ();
+        MovingNext?.Invoke (this, ce);
+
+        if (ce.Cancel)
+        {
+            return true;
+        }
+
+        GoNext ();
+
+        return true;
     }
 
     /// <summary>
@@ -129,14 +112,19 @@ public class Wizard : Dialog, IDesignable
     /// </remarks>
     public Button BackButton { get; }
 
-    private readonly LinkedList<WizardStep> _steps = [];
-    private WizardStep? _currentStep;
+    private void BackBtnOnAccepting (object? sender, CommandEventArgs e)
+    {
+        CancelEventArgs args = new ();
+        MovingBack?.Invoke (this, args);
 
-    /// <summary>Gets or sets the currently displayed step.</summary>
-    /// <remarks>
-    ///     Setting this property calls <see cref="GoToStep"/> and may be canceled via <see cref="StepChanging"/>.
-    /// </remarks>
-    public WizardStep? CurrentStep { get => _currentStep; set => GoToStep (value); }
+        if (args.Cancel)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        GoBack ();
+    }
 
     /// <summary>
     ///     The Next/Finish button. Advances to the next step or completes the wizard.
@@ -151,6 +139,7 @@ public class Wizard : Dialog, IDesignable
     /// </remarks>
     public Button NextFinishButton { get; }
 
+    private readonly LinkedList<WizardStep> _steps = [];
     private Size _maxStepSize = Size.Empty;
 
     /// <summary>
@@ -168,7 +157,7 @@ public class Wizard : Dialog, IDesignable
         _steps.AddLast (newStep);
 
         // Find the step's natural size
-        //newStep.SuperViewRendersLineCanvas = true;
+        // newStep.SuperViewRendersLineCanvas = true;
         newStep.Width = Dim.Auto ();
         newStep.Height = Dim.Auto ();
         newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
@@ -185,13 +174,21 @@ public class Wizard : Dialog, IDesignable
 
         Add (newStep);
 
-        //newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
-        //newStep.LayoutSubViews ();
-        //Width = Dim.Auto (minimumContentDim: _maxStepSize.Width + 2);
-        //Height = Dim.Auto (minimumContentDim: _maxStepSize.Height);
+        // newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
+        // newStep.LayoutSubViews ();
+        // Width = Dim.Auto (minimumContentDim: _maxStepSize.Width + 2);
+        // Height = Dim.Auto (minimumContentDim: _maxStepSize.Height);
 
         UpdateButtonsAndTitle ();
     }
+
+    private WizardStep? _currentStep;
+
+    /// <summary>Gets or sets the currently displayed step.</summary>
+    /// <remarks>
+    ///     Setting this property calls <see cref="GoToStep"/> and may be canceled via <see cref="StepChanging"/>.
+    /// </remarks>
+    public WizardStep? CurrentStep { get => _currentStep; set => GoToStep (value); }
 
     /// <summary>
     ///     Gets the first enabled step in the wizard.
@@ -310,16 +307,6 @@ public class Wizard : Dialog, IDesignable
     }
 
     /// <summary>
-    ///     Raised when the Back button is pressed. Set <c>Cancel</c> to prevent navigation.
-    /// </summary>
-    public event EventHandler<CancelEventArgs>? MovingBack;
-
-    /// <summary>
-    ///     Raised when the Next button is pressed on a non-final step. Set <c>Cancel</c> to prevent navigation.
-    /// </summary>
-    public event EventHandler<CancelEventArgs>? MovingNext;
-
-    /// <summary>
     ///     Navigates to the specified step.
     /// </summary>
     /// <param name="newStep">The step to navigate to.</param>
@@ -361,16 +348,35 @@ public class Wizard : Dialog, IDesignable
                                           out _);
 
     /// <summary>
-    ///     Called before <see cref="CurrentStep"/> changes. Override to add custom validation.
+    ///     Raised when the Back button is pressed. Set <c>Cancel</c> to prevent navigation.
     /// </summary>
-    /// <param name="args">Event arguments containing old and new step values.</param>
-    /// <returns><see langword="true"/> to cancel the step change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnStepChanging (ValueChangingEventArgs<WizardStep?> args) => false;
+    public event EventHandler<CancelEventArgs>? MovingBack;
+
+    /// <summary>
+    ///     Raised when the Next button is pressed on a non-final step. Set <c>Cancel</c> to prevent navigation.
+    /// </summary>
+    public event EventHandler<CancelEventArgs>? MovingNext;
+
+    /// <summary>
+    ///     Raised after <see cref="CurrentStep"/> changes.
+    /// </summary>
+    public event EventHandler<ValueChangedEventArgs<WizardStep?>>? StepChanged;
 
     /// <summary>
     ///     Raised before <see cref="CurrentStep"/> changes. Set <c>Handled</c> to cancel navigation.
     /// </summary>
     public event EventHandler<ValueChangingEventArgs<WizardStep?>>? StepChanging;
+
+    /// <inheritdoc/>
+    protected override void OnIsModalChanged (bool newIsModal)
+    {
+        if (newIsModal)
+        {
+            SetStyle ();
+        }
+
+        base.OnIsModalChanged (newIsModal);
+    }
 
     /// <summary>
     ///     Called after <see cref="CurrentStep"/> changes. Override to respond to step transitions.
@@ -379,56 +385,39 @@ public class Wizard : Dialog, IDesignable
     protected virtual void OnStepChanged (ValueChangedEventArgs<WizardStep?> args) { }
 
     /// <summary>
-    ///     Raised after <see cref="CurrentStep"/> changes.
+    ///     Called before <see cref="CurrentStep"/> changes. Override to add custom validation.
     /// </summary>
-    public event EventHandler<ValueChangedEventArgs<WizardStep?>>? StepChanged;
+    /// <param name="args">Event arguments containing old and new step values.</param>
+    /// <returns><see langword="true"/> to cancel the step change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnStepChanging (ValueChangingEventArgs<WizardStep?> args) => false;
+
+    private string _wizardTitle = string.Empty;
 
     /// <inheritdoc/>
-    protected override bool OnAccepting (CommandEventArgs args)
+    protected override void OnTitleChanged ()
     {
-        View? sourceView = null;
-        args.Context?.Source?.TryGetTarget (out sourceView);
-
-        if (CurrentStep is { } && sourceView is { } && sourceView is not IAcceptTarget)
+        if (string.IsNullOrEmpty (_wizardTitle))
         {
-            return NextFinishButton.InvokeCommand (Command.Accept) is true;
+            _wizardTitle = Title;
         }
-
-        return base.OnAccepting (args);
     }
 
-    private void BackBtnOnAccepting (object? sender, CommandEventArgs e)
+    private void SetStyle ()
     {
-        CancelEventArgs args = new ();
-        MovingBack?.Invoke (this, args);
-
-        if (args.Cancel)
+        if (IsModal)
         {
-            return;
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+            Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
         }
-
-        e.Handled = true;
-        GoBack ();
-    }
-
-    private void NextFinishBtnOnAccepting (object? sender, CommandEventArgs e)
-    {
-        if (CurrentStep == GetLastStep ())
+        else
         {
-            return;
-        }
-        CancelEventArgs args = new ();
-        MovingNext?.Invoke (this, args);
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
+            BorderStyle = LineStyle.Dotted;
 
-        if (args.Cancel)
-        {
-            e.Handled = true;
-            return;
+            // strip out movable and resizable
+            Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
+            base.ShadowStyle = null;
         }
-
-        // Always mark handled so accept does not bubble to the dialog if navigation is canceled
-        e.Handled = true;
-        GoNext ();
     }
 
     private void UpdateButtonsAndTitle ()
@@ -453,6 +442,8 @@ public class Wizard : Dialog, IDesignable
         {
             NextFinishButton.Text = CurrentStep.NextButtonText != string.Empty ? CurrentStep.NextButtonText : Strings.wzNext; // "_Next...";
         }
+
+        CurrentStep?.RestoreFocus ();
     }
 
     bool IDesignable.EnableForDesign ()
@@ -463,19 +454,20 @@ public class Wizard : Dialog, IDesignable
         (firstStep as IDesignable).EnableForDesign ();
         AddStep (firstStep);
 
+        WizardStep secondStep = new () { Title = "Second Step", HelpText = "## Second Step\nThis is the help text for the Second Step." };
         Label schemeLabel = new () { Title = "_Scheme:" };
 
-        OptionSelector<Schemes> selector = new () { X = Pos.Right (schemeLabel) + 1, Title = "Select Scheme" };
+        OptionSelector<Schemes> schemeSelector = new () { X = Pos.Right (schemeLabel) + 1, Title = "Select Scheme" };
 
-        selector.ValueChanged += (_, _) =>
-                                 {
-                                     if (selector.Value is { } scheme)
-                                     {
-                                         SchemeName = SchemeManager.SchemesToSchemeName (scheme);
-                                     }
-                                 };
+        schemeSelector.ValueChanged += (_, _) =>
+                                       {
+                                           if (schemeSelector.Value is { } scheme)
+                                           {
+                                               SchemeName = SchemeManager.SchemesToSchemeName (scheme);
+                                           }
+                                       };
 
-        Label borderStyleLabel = new () { Title = "_Border Style:", X = Pos.Right (selector) + 2 };
+        Label borderStyleLabel = new () { Title = "Border S_tyle:", X = Pos.Right (schemeSelector) + 2 };
 
         OptionSelector<LineStyle> borderStyleSelector = new () { X = Pos.Right (borderStyleLabel) + 1, Title = "Select Border Style" };
 
@@ -487,10 +479,32 @@ public class Wizard : Dialog, IDesignable
                                                 }
                                             };
 
-        WizardStep secondStep = new () { Title = "Second Step", HelpText = "This is the help text for the Second Step." };
-        secondStep.Add (schemeLabel, selector, borderStyleLabel, borderStyleSelector);
+        TextField test = new () { Y = Pos.Bottom (schemeSelector), Width = 10 };
+
+        secondStep.Add (schemeLabel, schemeSelector, borderStyleLabel, borderStyleSelector, test);
 
         AddStep (secondStep);
+
+        WizardStep lastStep = new () { Title = "Last Step", HelpText = "## Last Step\nThis is the help text for the Last Step." };
+        Label schemeResultsLabel = new () { Text = "Scheme Results:" };
+        Label schemeResultValueLabel = new () { X = Pos.Right (schemeResultsLabel) + 1, Text = SchemeName ?? string.Empty };
+        Label borderStyleResultsLabel = new () { Text = "Border Style Results:", Y = Pos.Bottom (schemeResultsLabel) };
+
+        Label borderStyleResultValueLabel =
+            new () { X = Pos.Right (borderStyleResultsLabel) + 1, Y = Pos.Bottom (schemeResultsLabel), Text = $"{BorderStyle}" };
+
+        lastStep.Add (schemeResultsLabel, schemeResultValueLabel, borderStyleResultsLabel, borderStyleResultValueLabel);
+
+        lastStep.VisibleChanged += (_, _) =>
+                                   {
+                                       if (!lastStep.Visible)
+                                       {
+                                           return;
+                                       }
+                                       schemeResultValueLabel.Text = SchemeName ?? string.Empty;
+                                       borderStyleResultValueLabel.Text = $"{BorderStyle}";
+                                   };
+        AddStep (lastStep);
 
         return true;
     }

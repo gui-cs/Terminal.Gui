@@ -1016,7 +1016,7 @@ public class WizardTests
 
     // Copilot
     [Fact]
-    public void Enter_In_TextField_Activates_Next_Button ()
+    public void Enter_In_TextField__Moves_To_Next_Step ()
     {
         Wizard wizard = new ();
         WizardStep step1 = new () { Title = "Step 1" };
@@ -1028,19 +1028,11 @@ public class WizardTests
         wizard.BeginInit ();
         wizard.EndInit ();
 
-        var nextAccepting = 0;
-        wizard.NextFinishButton.Accepting += (_, _) => nextAccepting++;
-
-        var wizardAccepting = 0;
-        wizard.Accepting += (_, _) => wizardAccepting++;
-
         textField.SetFocus ();
         Assert.True (textField.HasFocus);
 
         wizard.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, nextAccepting);
-        Assert.Equal (0, wizardAccepting);
         Assert.Equal (step2, wizard.CurrentStep);
         Assert.False (wizard.StopRequested);
 
@@ -1049,16 +1041,11 @@ public class WizardTests
 
     // Copilot
     [Fact]
-    public void Enter_In_ListView_Activates_Next_Button ()
+    public void Enter_In_ListView_Moves_To_Next_Step ()
     {
         Wizard wizard = new ();
         WizardStep step1 = new () { Title = "Step 1" };
-        ListView listView = new ()
-        {
-            Width = 10,
-            Height = 1,
-            Source = new ListWrapper<string> (["One"])
-        };
+        ListView listView = new () { Width = 10, Height = 1, Source = new ListWrapper<string> (["One"]) };
         WizardStep step2 = new () { Title = "Step 2" };
         step1.Add (listView);
         wizard.AddStep (step1);
@@ -1066,19 +1053,12 @@ public class WizardTests
         wizard.BeginInit ();
         wizard.EndInit ();
 
-        var nextAccepting = 0;
-        wizard.NextFinishButton.Accepting += (_, _) => nextAccepting++;
-
-        var wizardAccepting = 0;
-        wizard.Accepting += (_, _) => wizardAccepting++;
 
         listView.SetFocus ();
         Assert.True (listView.HasFocus);
 
         wizard.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, nextAccepting);
-        Assert.Equal (0, wizardAccepting);
         Assert.Equal (step2, wizard.CurrentStep);
         Assert.False (wizard.StopRequested);
 
@@ -1107,6 +1087,7 @@ public class WizardTests
 
         // Assert - step should not change
         Assert.Equal (step1, wizard.CurrentStep);
+
         // Assert - accept should not bubble to wizard (dialog would close)
         Assert.Equal (0, wizardAccepting);
 
@@ -1135,6 +1116,7 @@ public class WizardTests
 
         // Assert - step should not change
         Assert.Equal (step1, wizard.CurrentStep);
+
         // Assert - accept should not bubble to wizard (dialog would close)
         Assert.Equal (0, wizardAccepting);
 
@@ -1143,7 +1125,7 @@ public class WizardTests
 
     // Copilot
     [Fact]
-    public void Enter_In_TextField_On_Last_Step_Activates_Finish_Button ()
+    public void Enter_In_TextField_On_Last_Step_Accepts_Wizard()
     {
         Wizard wizard = new ();
         WizardStep step1 = new () { Title = "Step 1" };
@@ -1153,14 +1135,11 @@ public class WizardTests
         wizard.BeginInit ();
         wizard.EndInit ();
 
-        var finishAccepting = 0;
-        wizard.NextFinishButton.Accepting += (_, _) => finishAccepting++;
+        var wizardAccepted = 0;
 
-        var wizardAccepting = 0;
-        wizard.Accepting += (_, e) =>
+        wizard.Accepted += (_, e) =>
                             {
-                                wizardAccepting++;
-                                e.Handled = true;
+                                wizardAccepted++;
                             };
 
         textField.SetFocus ();
@@ -1168,8 +1147,7 @@ public class WizardTests
 
         wizard.NewKeyDownEvent (Key.Enter);
 
-        Assert.Equal (1, finishAccepting);
-        Assert.Equal (1, wizardAccepting);
+        Assert.Equal (1, wizardAccepted);
         Assert.Equal (step1, wizard.CurrentStep);
 
         wizard.Dispose ();
