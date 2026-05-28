@@ -1,4 +1,4 @@
-using System.Text;
+ï»¿using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Unicode;
@@ -9,7 +9,7 @@ public class KeyJsonConverterTests
 {
     [Theory]
     [InlineData (KeyCode.A, "\"a\"")]
-    [InlineData ((KeyCode)'â', "\"â\"")]
+    [InlineData ((KeyCode)'Ã¢', "\"Ã¢\"")]
     [InlineData (KeyCode.A | KeyCode.ShiftMask, "\"A\"")]
     [InlineData (KeyCode.A | KeyCode.CtrlMask, "\"Ctrl+A\"")]
     [InlineData (KeyCode.A | KeyCode.AltMask | KeyCode.CtrlMask, "\"Ctrl+Alt+A\"")]
