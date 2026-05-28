@@ -62,9 +62,11 @@ public partial class View
     ///         (scroll offset).
     ///     </para>
     ///     <para>
+    ///     <para>
     ///         The cascade to intersecting SubViews translates the region into each SubView's
-    ///         own viewport-local coordinates, accounting for the parent's scroll, the SubView's
-    ///         adornments, and the SubView's own scroll.
+    ///         own viewport-local coordinates, accounting for the parent's scroll and the SubView's
+    ///         adornments. Viewport-local coordinates are scroll-independent, so the SubView's own
+    ///         <see cref="Viewport"/> <see cref="Rectangle.Location"/> does not affect the propagated rect.
     ///     </para>
     ///     <para>
     ///         If the view has not been initialized (<see cref="IsInitialized"/> is <see langword="false"/>), the area to be
