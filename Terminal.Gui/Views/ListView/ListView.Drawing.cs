@@ -12,7 +12,8 @@ public partial class ListView
 
         var current = Attribute.Default;
         int item = Viewport.Y;
-        int col = ShowMarks ? 2 : 0;
+        // Reserve mark glyph + separator column. If a configured mark glyph is wide, it can consume the separator.
+        int reservedMarkColumns = ShowMarks ? 2 : 0;
         Move (0, 0);
 
         for (var row = 0; row < Viewport.Height; row++, item++)
@@ -145,7 +146,7 @@ public partial class ListView
                     }
                 }
 
-                int contentCol = col > 0 ? col : markWidth;
+                int contentCol = reservedMarkColumns > 0 ? reservedMarkColumns : markWidth;
                 Source.Render (this, isSelected, item, contentCol, row, Viewport.Width - contentCol, Viewport.X);
             }
         }
