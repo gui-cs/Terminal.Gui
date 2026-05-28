@@ -12,7 +12,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         By default, <see cref="Dialog{TResult}"/> is centered with <see cref="Dim.Auto"/> sizing and uses the
-///         <see cref="Schemes.Dialog"/> color scheme when running.
+///         <see cref="Schemes.Dialog"/> color scheme (applied at construction time, regardless of running state).
 ///     </para>
 ///     <para>
 ///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
