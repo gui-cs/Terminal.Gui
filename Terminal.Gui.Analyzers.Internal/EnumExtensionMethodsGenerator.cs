@@ -64,11 +64,11 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
         // Only generate for int and uint backed enums.
         // Unsafe.As<TEnum, int/uint> requires the enum to be exactly 4 bytes.
         string? underlyingTypeName = symbol.EnumUnderlyingType?.SpecialType switch
-                                     {
-                                         SpecialType.System_Int32 => "int",
-                                         SpecialType.System_UInt32 => "uint",
-                                         _ => null
-                                     };
+        {
+            SpecialType.System_Int32 => "int",
+            SpecialType.System_UInt32 => "uint",
+            _ => null
+        };
 
         if (underlyingTypeName is null)
         {
@@ -91,15 +91,15 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
             }
 
             int value = field.ConstantValue switch
-                        {
-                            int i => i,
-                            uint u => unchecked ((int)u),
-                            _ => 0
-                        };
+            {
+                int i => i,
+                uint u => unchecked((int)u),
+                _ => 0
+            };
             memberValues.Add (value);
         }
 
-        return new EnumInfo (enumNamespace, enumName, underlyingTypeName, hasFlags, memberValues.OrderBy (static v => unchecked ((uint)v)).ToArray ());
+        return new EnumInfo (enumNamespace, enumName, underlyingTypeName, hasFlags, memberValues.OrderBy (static v => unchecked((uint)v)).ToArray ());
     }
 
     private static void Execute (SourceProductionContext context, EnumInfo info)

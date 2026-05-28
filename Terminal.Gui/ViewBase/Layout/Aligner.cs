@@ -209,33 +209,33 @@ public class Aligner : INotifyPropertyChanged
         switch (sizes.Length)
         {
             case > 1:
-            {
-                var currentPosition = 0;
-                positions [0] = currentPosition; // first item is flush left
-
-                for (int i = sizes.Length - 1; i >= 0; i--)
                 {
-                    CheckSizeCannotBeNegative (i, in sizes);
+                    var currentPosition = 0;
+                    positions [0] = currentPosition; // first item is flush left
 
-                    if (i == sizes.Length - 1)
+                    for (int i = sizes.Length - 1; i >= 0; i--)
                     {
-                        // start at right
-                        currentPosition = Math.Max (totalItemsSize, containerSize) - sizes [i];
-                        positions [i] = currentPosition;
+                        CheckSizeCannotBeNegative (i, in sizes);
+
+                        if (i == sizes.Length - 1)
+                        {
+                            // start at right
+                            currentPosition = Math.Max (totalItemsSize, containerSize) - sizes [i];
+                            positions [i] = currentPosition;
+                        }
+
+                        if (i >= sizes.Length - 1 || i <= 0)
+                        {
+                            continue;
+                        }
+                        int spaceBefore = spacesToGive-- > 0 ? maxSpaceBetweenItems : 0;
+
+                        positions [i] = currentPosition - sizes [i] - spaceBefore;
+                        currentPosition = positions [i];
                     }
 
-                    if (i >= sizes.Length - 1 || i <= 0)
-                    {
-                        continue;
-                    }
-                    int spaceBefore = spacesToGive-- > 0 ? maxSpaceBetweenItems : 0;
-
-                    positions [i] = currentPosition - sizes [i] - spaceBefore;
-                    currentPosition = positions [i];
+                    break;
                 }
-
-                break;
-            }
 
             case 1:
                 CheckSizeCannotBeNegative (0, in sizes);

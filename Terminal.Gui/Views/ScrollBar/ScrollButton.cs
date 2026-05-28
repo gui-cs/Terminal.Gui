@@ -102,20 +102,20 @@ public class ScrollButton : Button, IOrientation
         if (Orientation == Orientation.Horizontal)
         {
             Title = Direction switch
-                    {
-                        NavigationDirection.Backward => Glyphs.LeftArrow.ToString (),
-                        NavigationDirection.Forward => Glyphs.RightArrow.ToString (),
-                        _ => Title
-                    };
+            {
+                NavigationDirection.Backward => Glyphs.LeftArrow.ToString (),
+                NavigationDirection.Forward => Glyphs.RightArrow.ToString (),
+                _ => Title
+            };
         }
         else
         {
             Title = Direction switch
-                    {
-                        NavigationDirection.Backward => Glyphs.UpArrow.ToString (),
-                        NavigationDirection.Forward => Glyphs.DownArrow.ToString (),
-                        _ => Title
-                    };
+            {
+                NavigationDirection.Backward => Glyphs.UpArrow.ToString (),
+                NavigationDirection.Forward => Glyphs.DownArrow.ToString (),
+                _ => Title
+            };
         }
     }
 

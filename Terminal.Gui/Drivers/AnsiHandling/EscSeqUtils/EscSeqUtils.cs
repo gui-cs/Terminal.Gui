@@ -448,9 +448,9 @@ public static class EscSeqUtils
                 //uint ck = ConsoleKeyMapping.MapKeyCodeToConsoleKey ((KeyCode)consoleKeyInfo.KeyChar, out bool isConsoleKey);
 
                 //if (isConsoleKey)
-            {
-                key = consoleKeyInfo.Key; // (ConsoleKey)ck;
-            }
+                {
+                    key = consoleKeyInfo.Key; // (ConsoleKey)ck;
+                }
 
                 newConsoleKeyInfo = new ConsoleKeyInfo (keyChar,
                                                         key,
@@ -672,15 +672,7 @@ public static class EscSeqUtils
         {
             var tooLongCursorPositionSequence = $"{CSI}{row};{col}H";
 
-            throw new InvalidOperationException ($"{
-                nameof (CSI_WriteCursorPosition)
-            } buffer (len: {
-                buffer.Length
-            }) is too short for cursor position sequence '{
-                tooLongCursorPositionSequence
-            }' (len: {
-                tooLongCursorPositionSequence.Length
-            }).");
+            throw new InvalidOperationException ($"{nameof (CSI_WriteCursorPosition)} buffer (len: {buffer.Length}) is too short for cursor position sequence '{tooLongCursorPositionSequence}' (len: {tooLongCursorPositionSequence.Length}).");
         }
 
         ReadOnlySpan<char> cursorPositionSequence = buffer [..charsWritten];

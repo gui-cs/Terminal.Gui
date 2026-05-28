@@ -6,7 +6,7 @@ namespace Terminal.Gui.Input;
 public static class CommandContextExtensions
 {
     /// <param name="context">The command context.</param>
-    extension (ICommandContext? context)
+    extension(ICommandContext? context)
     {
         /// <summary>
         ///     Tries to get the source <see cref="View"/> from a command context.

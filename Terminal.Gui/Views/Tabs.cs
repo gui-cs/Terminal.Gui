@@ -572,13 +572,13 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
 
             tab.Border.Thickness = _tabSide switch
-                                   {
-                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
-                                       _ => new Thickness (1, TabDepth, 1, 1)
-                                   };
+            {
+                Side.Top => new Thickness (1, TabDepth, 1, 1),
+                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                Side.Right => new Thickness (1, 1, TabDepth, 1),
+                _ => new Thickness (1, TabDepth, 1, 1)
+            };
         }
     }
 
@@ -594,26 +594,26 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         return TabSide switch
-               {
-                   Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
-                   Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
+        {
+            Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
+            Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
 
-                   Side.Top when ctx.Command == Command.Down => FocusContent (),
-                   Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
+            Side.Top when ctx.Command == Command.Down => FocusContent (),
+            Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
 
-                   Side.Bottom when ctx.Command == Command.Up => FocusContent (),
-                   Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
+            Side.Bottom when ctx.Command == Command.Up => FocusContent (),
+            Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
 
-                   Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
-                   Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
+            Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
+            Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
 
-                   Side.Left when ctx.Command == Command.Right => FocusContent (),
-                   Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
+            Side.Left when ctx.Command == Command.Right => FocusContent (),
+            Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
 
-                   Side.Right when ctx.Command == Command.Left => FocusContent (),
-                   Side.Right when ctx.Command == Command.Right => SelectNextTab (),
-                   _ => false
-               };
+            Side.Right when ctx.Command == Command.Left => FocusContent (),
+            Side.Right when ctx.Command == Command.Right => SelectNextTab (),
+            _ => false
+        };
     }
 
     private bool? SelectNextTab ()

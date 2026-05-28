@@ -69,7 +69,8 @@ public partial class TextView
 
         Viewport = Viewport with
         {
-            X = newPositionX, Y = Math.Max (position.Y > _model.Count - 1 - Viewport.Height ? _model.Count - Viewport.Height : position.Y, 0)
+            X = newPositionX,
+            Y = Math.Max (position.Y > _model.Count - 1 - Viewport.Height ? _model.Count - Viewport.Height : position.Y, 0)
         };
         PositionCursor ();
         SetNeedsDraw ();
