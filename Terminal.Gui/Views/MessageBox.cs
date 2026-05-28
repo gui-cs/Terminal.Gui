@@ -57,21 +57,11 @@ public static class MessageBox
     ///     Defines the default border styling for <see cref="MessageBox"/>. Can be configured via
     ///     <see cref="ConfigurationManager"/>.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle
-    {
-        get => MessageBoxSettings.Current.DefaultBorderStyle;
-        set => MessageBoxSettings.Current = MessageBoxSettings.Current with { DefaultBorderStyle = value };
-    }
+    public static LineStyle DefaultBorderStyle => MessageBoxSettings.Current.DefaultBorderStyle;
 
     /// <summary>The default <see cref="Alignment"/> for <see cref="Dialog"/>.</summary>
     /// <remarks>This property can be set in a Theme.</remarks>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment
-    {
-        get => MessageBoxSettings.Current.DefaultButtonAlignment;
-        set => MessageBoxSettings.Current = MessageBoxSettings.Current with { DefaultButtonAlignment = value };
-    }
+    public static Alignment DefaultButtonAlignment => MessageBoxSettings.Current.DefaultButtonAlignment;
 
     /// <summary>
     ///     Displays an auto-sized error <see cref="MessageBox"/>.

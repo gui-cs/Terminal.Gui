@@ -104,12 +104,7 @@ public partial class TextView : View, IDesignable
     /// <summary>
     ///     Gets or sets the default cursor style.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static CursorStyle DefaultCursorStyle
-    {
-        get => TextViewSettings.Current.DefaultCursorStyle;
-        set => TextViewSettings.Current = TextViewSettings.Current with { DefaultCursorStyle = value };
-    }
+    public static CursorStyle DefaultCursorStyle => TextViewSettings.Current.DefaultCursorStyle;
 
     private CultureInfo? _currentCulture;
 

@@ -64,42 +64,22 @@ public class Dialog : Dialog<int>
     ///     The default border style for new <see cref="Dialog"/> instances. Can be configured via
     ///     <see cref="ConfigurationManager"/> and theme files.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle
-    {
-        get => DialogSettings.Current.DefaultBorderStyle;
-        set => DialogSettings.Current = DialogSettings.Current with { DefaultBorderStyle = value };
-    }
+    public static LineStyle DefaultBorderStyle => DialogSettings.Current.DefaultBorderStyle;
 
     /// <summary>
     ///     The default button alignment for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Alignment DefaultButtonAlignment
-    {
-        get => DialogSettings.Current.DefaultButtonAlignment;
-        set => DialogSettings.Current = DialogSettings.Current with { DefaultButtonAlignment = value };
-    }
+    public static Alignment DefaultButtonAlignment => DialogSettings.Current.DefaultButtonAlignment;
 
     /// <summary>
     ///     The default button alignment modes for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static AlignmentModes DefaultButtonAlignmentModes
-    {
-        get => DialogSettings.Current.DefaultButtonAlignmentModes;
-        set => DialogSettings.Current = DialogSettings.Current with { DefaultButtonAlignmentModes = value };
-    }
+    public static AlignmentModes DefaultButtonAlignmentModes => DialogSettings.Current.DefaultButtonAlignmentModes;
 
     /// <summary>
     ///     The default shadow style for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyles DefaultShadow
-    {
-        get => DialogSettings.Current.DefaultShadow;
-        set => DialogSettings.Current = DialogSettings.Current with { DefaultShadow = value };
-    }
+    public static ShadowStyles DefaultShadow => DialogSettings.Current.DefaultShadow;
 
     /// <summary>
     ///     Helper property that gets whether the dialog was canceled (Result is <see langword="null"/> or 1).

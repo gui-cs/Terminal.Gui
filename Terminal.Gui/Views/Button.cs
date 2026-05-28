@@ -53,22 +53,12 @@ public class Button : View, IDesignable, IAcceptTarget
     /// <summary>
     ///     Gets or sets whether <see cref="Button"/>s are shown with a shadow effect by default.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyles DefaultShadow
-    {
-        get => ButtonSettings.Current.DefaultShadow;
-        set => ButtonSettings.Current = ButtonSettings.Current with { DefaultShadow = value };
-    }
+    public static ShadowStyles DefaultShadow => ButtonSettings.Current.DefaultShadow;
 
     /// <summary>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultMouseHighlightStates
-    {
-        get => ButtonSettings.Current.DefaultMouseHighlightStates;
-        set => ButtonSettings.Current = ButtonSettings.Current with { DefaultMouseHighlightStates = value };
-    }
+    public static MouseState DefaultMouseHighlightStates => ButtonSettings.Current.DefaultMouseHighlightStates;
 
     /// <summary>Initializes a new instance of <see cref="Button"/>.</summary>
     public Button ()
