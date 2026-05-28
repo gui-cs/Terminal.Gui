@@ -216,12 +216,12 @@ public class CheckBox : View, IValue<CheckState>
     public bool? AdvanceCheckState ()
     {
         CheckState nextValue = Value switch
-                               {
-                                   CheckState.None => CheckState.Checked,
-                                   CheckState.Checked => CheckState.UnChecked,
-                                   CheckState.UnChecked => AllowCheckStateNone ? CheckState.None : CheckState.Checked,
-                                   _ => CheckState.UnChecked
-                               };
+        {
+            CheckState.None => CheckState.Checked,
+            CheckState.Checked => CheckState.UnChecked,
+            CheckState.UnChecked => AllowCheckStateNone ? CheckState.None : CheckState.Checked,
+            _ => CheckState.UnChecked
+        };
 
         return ChangeValue (nextValue);
     }

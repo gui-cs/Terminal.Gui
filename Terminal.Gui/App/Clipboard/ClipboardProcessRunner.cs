@@ -38,7 +38,7 @@ internal static class ClipboardProcessRunner
 
         using var process = new Process ();
 
-        process.StartInfo = new()
+        process.StartInfo = new ()
         {
             FileName = cmd,
             Arguments = arguments,

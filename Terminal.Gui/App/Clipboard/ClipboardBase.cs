@@ -1,5 +1,5 @@
 #nullable disable
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Terminal.Gui.App;
 

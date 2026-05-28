@@ -34,7 +34,7 @@ namespace Terminal.Gui.Views;
 ///     if (wrapper.Result is { } date) Console.WriteLine (date);
 ///     </code>
 /// </example>
-public class RunnableWrapper<TView, TResult> : Runnable<TResult> where TView : View, new ()
+public class RunnableWrapper<TView, TResult> : Runnable<TResult> where TView : View, new()
 {
     private readonly TView _wrappedView;
 
@@ -48,7 +48,7 @@ public class RunnableWrapper<TView, TResult> : Runnable<TResult> where TView : V
         _wrappedView = new TView ();
         Width = Dim.Fill ();
         Height = Dim.Auto ();
-        Add (_wrappedView); 
+        Add (_wrappedView);
         CommandsToBubbleUp = [Command.Accept];
     }
 
@@ -59,7 +59,7 @@ public class RunnableWrapper<TView, TResult> : Runnable<TResult> where TView : V
     public RunnableWrapper (TView wrappedView)
     {
         KeyBindings.Clear ();
-        MouseBindings.Clear();
+        MouseBindings.Clear ();
         _wrappedView = wrappedView;
         Width = Dim.Fill ();
         Height = Dim.Auto ();

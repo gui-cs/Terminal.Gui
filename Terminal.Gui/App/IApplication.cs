@@ -294,7 +294,7 @@ public interface IApplication : IDisposable
     ///         session.
     ///     </para>
     /// </remarks>
-    Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
+    Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new();
 
     /// <summary>
     ///     Runs a new Session creating a <see cref="IRunnable"/>-derived object of type <typeparamref name="TRunnable"/>
@@ -340,7 +340,7 @@ public interface IApplication : IDisposable
     ///         The caller is responsible for disposing the object returned by this method.
     ///     </para>
     /// </remarks>
-    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new();
 
     #region Iteration & Invoke
 

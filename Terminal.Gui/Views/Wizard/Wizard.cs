@@ -64,8 +64,6 @@ public class Wizard : Dialog, IDesignable
 
         ButtonAlignment = Alignment.Fill;
 
-        SetStyle ();
-
         BackButton = new Button { Text = Strings.wzBack, X = 0, Y = Pos.AnchorEnd () };
 
         NextFinishButton = new Button { Text = Strings.wzFinish, X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
@@ -369,17 +367,6 @@ public class Wizard : Dialog, IDesignable
     /// </summary>
     public event EventHandler<ValueChangingEventArgs<WizardStep?>>? StepChanging;
 
-    /// <inheritdoc/>
-    protected override void OnIsModalChanged (bool newIsModal)
-    {
-        if (newIsModal)
-        {
-            SetStyle ();
-        }
-
-        base.OnIsModalChanged (newIsModal);
-    }
-
     /// <summary>
     ///     Called after <see cref="CurrentStep"/> changes. Override to respond to step transitions.
     /// </summary>
@@ -401,24 +388,6 @@ public class Wizard : Dialog, IDesignable
         if (string.IsNullOrEmpty (_wizardTitle))
         {
             _wizardTitle = Title;
-        }
-    }
-
-    private void SetStyle ()
-    {
-        if (IsModal)
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-            Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable;
-        }
-        else
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
-            BorderStyle = LineStyle.Dotted;
-
-            // strip out movable and resizable
-            Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
-            base.ShadowStyle = null;
         }
     }
 

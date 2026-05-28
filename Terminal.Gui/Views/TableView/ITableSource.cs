@@ -1,5 +1,5 @@
 #nullable enable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>Tabular matrix of data to be displayed in a <see cref="TableView"/>.</summary>
 public interface ITableSource

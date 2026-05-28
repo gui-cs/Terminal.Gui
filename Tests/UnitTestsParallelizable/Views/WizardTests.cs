@@ -29,7 +29,7 @@ public class WizardTests
 
     // Copilot
     [Fact]
-    public void Enter_In_TextField__Moves_To_Next_Step ()
+    public void Enter_In_TextField_Moves_To_Next_Step ()
     {
         Wizard wizard = new ();
         WizardStep step1 = new () { Title = "Step 1" };
@@ -150,9 +150,6 @@ public class WizardTests
         Assert.NotNull (wizard.BackButton);
         Assert.NotNull (wizard.NextFinishButton);
         Assert.Null (wizard.CurrentStep);
-        Assert.Equal (LineStyle.Dotted, wizard.BorderStyle);
-        Assert.False (wizard.Arrangement.HasFlag (ViewArrangement.Movable));
-        Assert.False (wizard.Arrangement.HasFlag (ViewArrangement.Resizable));
     }
 
     [Fact]

@@ -199,7 +199,7 @@ internal partial class ApplicationImpl
     #region Session Lifecycle - Run
 
     /// <inheritdoc/>
-    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ()
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new()
     {
         if (!Initialized)
         {
@@ -314,7 +314,7 @@ internal partial class ApplicationImpl
     }
 
     /// <inheritdoc/>
-    public Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ()
+    public Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new()
     {
         if (cancellationToken.IsCancellationRequested)
         {

@@ -72,7 +72,7 @@ public class WizardStep : View, IDesignable
     ///     The help text displayed in the right <see cref="Padding"/>.
     ///     If empty, the right padding is hidden and content fills the entire step.
     /// </summary>
-    /// <remarks>The help text is displayed using a read-only <see cref="Code"/> view.</remarks>
+    /// <remarks>The help text is displayed using a read-only <see cref="Markdown"/> view that supports markdown formatting.</remarks>
     public string HelpText
     {
         get => _helpTextView.Text;

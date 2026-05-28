@@ -78,7 +78,7 @@ internal static class UnixIOHelper
     /// <param name="timeout">Timeout in milliseconds (0 = non-blocking, -1 = infinite)</param>
     /// <returns>Number of file descriptors with events, or -1 on error</returns>
     [DllImport ("libc", SetLastError = true)]
-    public static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
+    public static extern int poll ([In][Out] Pollfd [] ufds, uint nfds, int timeout);
 
     /// <summary>
     ///     Read bytes from a file descriptor.
