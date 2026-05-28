@@ -55,7 +55,7 @@ public class Glyphs
 
     /// <summary>Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Rune CheckStateChecked { get; set; } = (Rune)'☒'; // '☑' is colored
+    public static Rune CheckStateChecked { get; set; } = (Rune)'☑';
 
     /// <summary>Not Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
@@ -63,7 +63,7 @@ public class Glyphs
 
     /// <summary>Null Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Rune CheckStateNone { get; set; } = (Rune)'□'; // TODO: Verify this works as broadly as possible
+    public static Rune CheckStateNone { get; set; } = (Rune)'⬛';
 
     /// <summary>Selected indicator  (e.g. for <see cref="ListView"/> and <see cref="OptionSelector"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]

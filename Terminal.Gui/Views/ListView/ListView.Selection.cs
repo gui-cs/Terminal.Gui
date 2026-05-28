@@ -49,7 +49,7 @@ public partial class ListView
     /// <value>Set to <see langword="true"/> to show mark glyphs; <see langword="false"/> to hide them.</value>
     /// <remarks>
     ///     <para>
-    ///         When <see langword="true"/>, marks are rendered with glyphs: checkboxes (☒/☐) when
+    ///         When <see langword="true"/>, marks are rendered with glyphs: checkboxes (☑/☐) when
     ///         <see cref="MarkMultiple"/> is <see langword="true"/>, or radio buttons (◉/○) when <see langword="false"/>.
     ///     </para>
     ///     <para>

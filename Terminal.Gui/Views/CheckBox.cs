@@ -108,7 +108,7 @@ public class CheckBox : View, IValue<CheckState>
     ///     <para>
     ///         If <see cref="AllowCheckStateNone"/> is <see langword="true"/> and <see cref="CheckState.None"/>, the
     ///         <see cref="CheckBox"/>
-    ///         will display the <c>Glyphs.CheckStateNone</c> character (☒).
+    ///         will display the <c>Glyphs.CheckStateNone</c> character (⬛).
     ///     </para>
     ///     <para>
     ///         If <see cref="CheckState.UnChecked"/>, the <see cref="CheckBox"/>
