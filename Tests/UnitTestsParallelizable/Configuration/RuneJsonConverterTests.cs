@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 
 namespace ConfigurationTests;
@@ -7,10 +7,10 @@ public class RuneJsonConverterTests
 {
     [Theory]
     [InlineData ("aa")]
-    [InlineData ("☑☑")]
+    [InlineData ("??")]
     [InlineData ("\\x2611")]
     [InlineData ("Z+2611")]
-    [InlineData ("🍎🍎")]
+    [InlineData ("????")]
     [InlineData ("U+FFF1F34E")]
     [InlineData ("\\UFFF1F34E")]
     [InlineData ("\\ud83d")] // not printable "high surrogate"
@@ -19,50 +19,50 @@ public class RuneJsonConverterTests
     [InlineData ("\\ud83ddc69")]
 
     // Emoji - Family Unit:
-    // Woman (U+1F469, 👩)
+    // Woman (U+1F469, ??)
     // Zero Width Joiner (U+200D)
-    // Woman (U+1F469, 👩)
+    // Woman (U+1F469, ??)
     // Zero Width Joiner (U+200D)
-    // Girl (U+1F467, 👧)
+    // Girl (U+1F467, ??)
     // Zero Width Joiner (U+200D)
-    // Girl (U+1F467, 👧)
+    // Girl (U+1F467, ??)
     [InlineData ("U+1F469 U+200D U+1F469 U+200D U+1F467 U+200D U+1F467")]
     [InlineData ("\\U0001F469\\u200D\\U0001F469\\u200D\\U0001F467\\u200D\\U0001F467")]
     public void RoundTripConversion_Negative (string rune)
     {
         // Act
-        string json = JsonSerializer.Serialize (rune, ConfigurationManager.SerializerContext.Options);
+        string json = JsonSerializer.Serialize (rune, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Throws<JsonException> (
                                       () => JsonSerializer.Deserialize<Rune> (
                                                                               json,
-                                                                              ConfigurationManager.SerializerContext.Options
+                                                                              TuiSerializerContext.Instance.Options
                                                                              )
                                      );
     }
 
     [Theory]
     [InlineData ("a", "a")]
-    [InlineData ("☑", "☑")]
-    [InlineData ("\\u2611", "☑")]
-    [InlineData ("U+2611", "☑")]
-    [InlineData ("🍎", "🍎")]
-    [InlineData ("U+1F34E", "🍎")]
-    [InlineData ("\\U0001F34E", "🍎")]
-    [InlineData ("\\ud83d \\udc69", "👩")]
-    [InlineData ("\\ud83d\\udc69", "👩")]
-    [InlineData ("U+d83d U+dc69", "👩")]
-    [InlineData ("U+1F469", "👩")]
-    [InlineData ("\\U0001F469", "👩")]
-    [InlineData ("\\u0065\\u0301", "é")]
+    [InlineData ("?", "?")]
+    [InlineData ("\\u2611", "?")]
+    [InlineData ("U+2611", "?")]
+    [InlineData ("??", "??")]
+    [InlineData ("U+1F34E", "??")]
+    [InlineData ("\\U0001F34E", "??")]
+    [InlineData ("\\ud83d \\udc69", "??")]
+    [InlineData ("\\ud83d\\udc69", "??")]
+    [InlineData ("U+d83d U+dc69", "??")]
+    [InlineData ("U+1F469", "??")]
+    [InlineData ("\\U0001F469", "??")]
+    [InlineData ("\\u0065\\u0301", "�")]
     public void RoundTripConversion_Positive (string rune, string expected)
     {
         // Arrange
 
         // Act
-        string json = JsonSerializer.Serialize (rune, ConfigurationManager.SerializerContext.Options);
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
+        string json = JsonSerializer.Serialize (rune, TuiSerializerContext.Instance.Options);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal (expected, deserialized.ToString ());
@@ -74,7 +74,7 @@ public class RuneJsonConverterTests
         // Arrange
 
         // Act
-        string json = JsonSerializer.Serialize ((Rune)'a', ConfigurationManager.SerializerContext.Options);
+        string json = JsonSerializer.Serialize ((Rune)'a', TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal ("\"a\"", json);
@@ -86,7 +86,7 @@ public class RuneJsonConverterTests
         // Arrange
 
         // Act
-        string json = JsonSerializer.Serialize ((Rune)0x01, ConfigurationManager.SerializerContext.Options);
+        string json = JsonSerializer.Serialize ((Rune)0x01, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal ("\"\\u0001\"", json);
@@ -99,7 +99,7 @@ public class RuneJsonConverterTests
         var json = "\"a\"";
 
         // Act
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal ("a", deserialized.ToString ());
@@ -112,7 +112,7 @@ public class RuneJsonConverterTests
         var json = "\"\\u0061\"";
 
         // Act
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal ("a", deserialized.ToString ());
@@ -125,7 +125,7 @@ public class RuneJsonConverterTests
         var json = "\"U+0061\"";
 
         // Act
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal ("a", deserialized.ToString ());
@@ -138,7 +138,7 @@ public class RuneJsonConverterTests
         var json = "97";
 
         // Act
-        var deserialized = JsonSerializer.Deserialize<Rune> (json, ConfigurationManager.SerializerContext.Options);
+        var deserialized = JsonSerializer.Deserialize<Rune> (json, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal ("a", deserialized.ToString ());

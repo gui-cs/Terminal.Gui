@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 
 namespace ConfigurationTests;
 
@@ -50,11 +50,11 @@ public class SchemeJsonConverterTests
         };
 
         string serializedScheme =
-            JsonSerializer.Serialize (expectedScheme, ConfigurationManager.SerializerContext.Options);
+            JsonSerializer.Serialize (expectedScheme, TuiSerializerContext.Instance.Options);
 
         // Act
         var actualScheme =
-            JsonSerializer.Deserialize<Scheme> (serializedScheme, ConfigurationManager.SerializerContext.Options);
+            JsonSerializer.Deserialize<Scheme> (serializedScheme, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal (expectedScheme, actualScheme);
@@ -77,8 +77,8 @@ public class SchemeJsonConverterTests
             Disabled = new (Color.Gray, Color.Black),
         };
 
-        string json = JsonSerializer.Serialize (expected, ConfigurationManager.SerializerContext.Options);
-        Scheme? actual = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options);
+        string json = JsonSerializer.Serialize (expected, TuiSerializerContext.Instance.Options);
+        Scheme? actual = JsonSerializer.Deserialize<Scheme> (json, TuiSerializerContext.Instance.Options);
 
         Assert.NotNull (actual);
 
@@ -109,7 +109,7 @@ public class SchemeJsonConverterTests
                             }
                             """;
 
-        Scheme scheme = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options)!;
+        Scheme scheme = JsonSerializer.Deserialize<Scheme> (json, TuiSerializerContext.Instance.Options)!;
 
         Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
         Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.HotNormal, out _));
@@ -132,7 +132,7 @@ public class SchemeJsonConverterTests
                             }
                             """;
 
-        Scheme scheme = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options)!;
+        Scheme scheme = JsonSerializer.Deserialize<Scheme> (json, TuiSerializerContext.Instance.Options)!;
 
         // explicitly set
         Assert.True (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Normal, out _));
@@ -159,8 +159,8 @@ public class SchemeJsonConverterTests
             CodeKeyword = new (Color.Blue, Color.Black, TextStyle.Bold)
         };
 
-        string json = JsonSerializer.Serialize (expected, ConfigurationManager.SerializerContext.Options);
-        Scheme? actual = JsonSerializer.Deserialize<Scheme> (json, ConfigurationManager.SerializerContext.Options);
+        string json = JsonSerializer.Serialize (expected, TuiSerializerContext.Instance.Options);
+        Scheme? actual = JsonSerializer.Deserialize<Scheme> (json, TuiSerializerContext.Instance.Options);
 
         Assert.NotNull (actual);
         Assert.True (actual.TryGetExplicitlySetAttributeForRole (VisualRole.CodeKeyword, out Attribute? attr));
