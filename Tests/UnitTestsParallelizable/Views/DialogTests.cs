@@ -452,6 +452,43 @@ public partial class DialogTests (ITestOutputHelper output) : TestDriverBase
         }
     }
 
+    // Copilot
+    [Fact]
+    public void Custom_SchemeName_And_Arrangement_Are_Not_Overwritten_By_Run ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Dialog dialog = new ();
+        string customSchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base)!;
+        const ViewArrangement customArrangement = ViewArrangement.Overlapped;
+
+        dialog.SchemeName = customSchemeName;
+        dialog.Arrangement = customArrangement;
+
+        string? schemeNameWhileRunning = null;
+        ViewArrangement arrangementWhileRunning = default;
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        Assert.Equal (customSchemeName, schemeNameWhileRunning);
+        Assert.Equal (customArrangement, arrangementWhileRunning);
+        Assert.Equal (customSchemeName, dialog.SchemeName);
+        Assert.Equal (customArrangement, dialog.Arrangement);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            schemeNameWhileRunning = dialog.SchemeName;
+            arrangementWhileRunning = dialog.Arrangement;
+            app.Iteration -= AppOnIteration;
+            app.RequestStop ();
+        }
+    }
+
     [Fact]
     public void Text_Property ()
     {
