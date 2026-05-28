@@ -3,6 +3,8 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
+#pragma warning disable CS0618 // Obsolete - ThemeManager still uses ConfigurationManager/ConfigProperty/ThemeScope internally during transition
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>Manages Themes.</summary>

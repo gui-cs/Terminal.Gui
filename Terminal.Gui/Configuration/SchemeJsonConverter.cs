@@ -34,7 +34,7 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
             reader.Read ();
 
             // Make sure attributes are marked as explicitly set when deserialized
-            object? attrObj = JsonSerializer.Deserialize (ref reader, ConfigurationManager.SerializerContext.Attribute);
+            object? attrObj = JsonSerializer.Deserialize (ref reader, TuiSerializerContext.Instance.Attribute);
 
             if (attrObj is not Attribute attribute)
             {

@@ -1,5 +1,7 @@
 using Terminal.Gui.Tracing;
 
+#pragma warning disable CS0618 // Obsolete - View.Keyboard still uses ConfigurationPropertyAttribute during transition
+
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Keyboard APIs

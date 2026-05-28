@@ -2,6 +2,8 @@
 using System.Text.Json.Serialization;
 using Terminal.Gui.Input;
 
+#pragma warning disable CS0618 // Obsolete - SourceGenerationContext registers serialization types used during transition
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
