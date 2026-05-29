@@ -244,30 +244,30 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                 switch (readResult)
                 {
                     case > 0:
-                    {
-                        // Convert UTF-8 bytes to characters
-                        string text = Encoding.UTF8.GetString (buffer, 0, readResult);
-
-                        foreach (char ch in text)
                         {
-                            yield return ch;
-                        }
+                            // Convert UTF-8 bytes to characters
+                            string text = Encoding.UTF8.GetString (buffer, 0, readResult);
 
-                        break;
-                    }
+                            foreach (char ch in text)
+                            {
+                                yield return ch;
+                            }
+
+                            break;
+                        }
 
                     case 0:
                         // EOF
                         yield break;
 
                     default:
-                    {
-                        // Error
-                        int errno = Marshal.GetLastWin32Error ();
-                        Logging.Warning ($"{nameof (AnsiInput)}: read() returned {readResult}, errno={errno}");
+                        {
+                            // Error
+                            int errno = Marshal.GetLastWin32Error ();
+                            Logging.Warning ($"{nameof (AnsiInput)}: read() returned {readResult}, errno={errno}");
 
-                        yield break;
-                    }
+                            yield break;
+                        }
                 }
             }
             else

@@ -43,32 +43,32 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
             if (propertyName is { })
             {
                 scheme = propertyName.ToLowerInvariant () switch
-                         {
-                             "normal" => scheme with { Normal = attribute },
-                             "hotnormal" => scheme with { HotNormal = attribute },
-                             "focus" => scheme with { Focus = attribute },
-                             "hotfocus" => scheme with { HotFocus = attribute },
-                             "active" => scheme with { Active = attribute },
-                             "hotactive" => scheme with { HotActive = attribute },
-                             "highlight" => scheme with { Highlight = attribute },
-                             "editable" => scheme with { Editable = attribute },
-                              "readonly" => scheme with { ReadOnly = attribute },
-                              "disabled" => scheme with { Disabled = attribute },
-                              "code" => scheme with { Code = attribute },
-                              "codecomment" => scheme with { CodeComment = attribute },
-                              "codekeyword" => scheme with { CodeKeyword = attribute },
-                              "codestring" => scheme with { CodeString = attribute },
-                              "codenumber" => scheme with { CodeNumber = attribute },
-                              "codeoperator" => scheme with { CodeOperator = attribute },
-                              "codetype" => scheme with { CodeType = attribute },
-                              "codepreprocessor" => scheme with { CodePreprocessor = attribute },
-                              "codeidentifier" => scheme with { CodeIdentifier = attribute },
-                              "codeconstant" => scheme with { CodeConstant = attribute },
-                              "codepunctuation" => scheme with { CodePunctuation = attribute },
-                              "codefunctionname" => scheme with { CodeFunctionName = attribute },
-                              "codeattribute" => scheme with { CodeAttribute = attribute },
-                              _ => throw new JsonException ($"{propertyName}: Unrecognized Scheme Attribute name.")
-                          };
+                {
+                    "normal" => scheme with { Normal = attribute },
+                    "hotnormal" => scheme with { HotNormal = attribute },
+                    "focus" => scheme with { Focus = attribute },
+                    "hotfocus" => scheme with { HotFocus = attribute },
+                    "active" => scheme with { Active = attribute },
+                    "hotactive" => scheme with { HotActive = attribute },
+                    "highlight" => scheme with { Highlight = attribute },
+                    "editable" => scheme with { Editable = attribute },
+                    "readonly" => scheme with { ReadOnly = attribute },
+                    "disabled" => scheme with { Disabled = attribute },
+                    "code" => scheme with { Code = attribute },
+                    "codecomment" => scheme with { CodeComment = attribute },
+                    "codekeyword" => scheme with { CodeKeyword = attribute },
+                    "codestring" => scheme with { CodeString = attribute },
+                    "codenumber" => scheme with { CodeNumber = attribute },
+                    "codeoperator" => scheme with { CodeOperator = attribute },
+                    "codetype" => scheme with { CodeType = attribute },
+                    "codepreprocessor" => scheme with { CodePreprocessor = attribute },
+                    "codeidentifier" => scheme with { CodeIdentifier = attribute },
+                    "codeconstant" => scheme with { CodeConstant = attribute },
+                    "codepunctuation" => scheme with { CodePunctuation = attribute },
+                    "codefunctionname" => scheme with { CodeFunctionName = attribute },
+                    "codeattribute" => scheme with { CodeAttribute = attribute },
+                    _ => throw new JsonException ($"{propertyName}: Unrecognized Scheme Attribute name.")
+                };
             }
             else
             {
@@ -84,7 +84,7 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
     {
         writer.WriteStartObject ();
 
-        foreach (VisualRole role in Enum.GetValues<VisualRole>())
+        foreach (VisualRole role in Enum.GetValues<VisualRole> ())
         {
             // Get the attribute for the role
 

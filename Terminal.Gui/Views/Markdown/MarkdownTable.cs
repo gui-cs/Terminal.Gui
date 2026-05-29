@@ -104,11 +104,11 @@ public sealed class MarkdownTable : View, IDesignable
             for (var i = 0; i < _data.ColumnCount; i++)
             {
                 seps [i] = _data.ColumnAlignments [i] switch
-                           {
-                               Alignment.Center => ":---:",
-                               Alignment.End => "---:",
-                               _ => "---"
-                           };
+                {
+                    Alignment.Center => ":---:",
+                    Alignment.End => "---:",
+                    _ => "---"
+                };
             }
 
             lines.Add ($"| {string.Join (" | ", seps)} |");
@@ -696,7 +696,7 @@ public sealed class MarkdownTable : View, IDesignable
     {
         if (maxWidth <= 0)
         {
-            return [[]];
+            return [ []];
         }
 
         List<List<StyledSegment>> lines = [];
@@ -1076,11 +1076,11 @@ public sealed class MarkdownTable : View, IDesignable
         int usableTextWidth = Math.Min (textWidth, innerWidth);
 
         return alignment switch
-               {
-                   Alignment.Center => 1 + Math.Max ((innerWidth - usableTextWidth) / 2, 0),
-                   Alignment.End => 1 + Math.Max (innerWidth - usableTextWidth, 0),
-                   _ => 1
-               };
+        {
+            Alignment.Center => 1 + Math.Max ((innerWidth - usableTextWidth) / 2, 0),
+            Alignment.End => 1 + Math.Max (innerWidth - usableTextWidth, 0),
+            _ => 1
+        };
     }
 
     private static string TruncateToWidth (string text, int maxWidth)

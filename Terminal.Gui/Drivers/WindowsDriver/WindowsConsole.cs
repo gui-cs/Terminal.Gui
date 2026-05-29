@@ -257,14 +257,14 @@ public class WindowsConsole
         public readonly override string ToString ()
         {
             return (EventType switch
-                    {
-                        EventType.Focus => FocusEvent.ToString (),
-                        EventType.Key => KeyEvent.ToString (),
-                        EventType.Menu => MenuEvent.ToString (),
-                        EventType.Mouse => MouseEvent.ToString (),
-                        EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
-                        _ => "Unknown event type: " + EventType
-                    })!;
+            {
+                EventType.Focus => FocusEvent.ToString (),
+                EventType.Key => KeyEvent.ToString (),
+                EventType.Menu => MenuEvent.ToString (),
+                EventType.Mouse => MouseEvent.ToString (),
+                EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
+                _ => "Unknown event type: " + EventType
+            })!;
         }
     }
 

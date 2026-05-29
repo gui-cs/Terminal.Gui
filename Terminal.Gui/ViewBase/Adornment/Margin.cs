@@ -86,19 +86,19 @@ public class Margin : AdornmentImpl
             {
                 case ShadowStyles.Opaque:
                 case ShadowStyles.Transparent when marginView.ShadowSize.Width == 0 || marginView.ShadowSize.Height == 0:
-                {
-                    if (marginView.ShadowSize.Width != 1)
                     {
-                        marginView.ShadowSize = marginView.ShadowSize with { Width = 1 };
-                    }
+                        if (marginView.ShadowSize.Width != 1)
+                        {
+                            marginView.ShadowSize = marginView.ShadowSize with { Width = 1 };
+                        }
 
-                    if (marginView.ShadowSize.Height != 1)
-                    {
-                        marginView.ShadowSize = marginView.ShadowSize with { Height = 1 };
-                    }
+                        if (marginView.ShadowSize.Height != 1)
+                        {
+                            marginView.ShadowSize = marginView.ShadowSize with { Height = 1 };
+                        }
 
-                    break;
-                }
+                        break;
+                    }
             }
 
             // Always call SetShadow to update thickness and shadow views

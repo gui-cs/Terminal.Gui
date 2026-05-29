@@ -85,11 +85,12 @@ public partial class View
         }
         else
         {
-            int x = Math.Min (Viewport.X, viewPortRelativeRegion.X);
-            int y = Math.Min (Viewport.Y, viewPortRelativeRegion.Y);
-            int w = Math.Max (Viewport.Width, viewPortRelativeRegion.Width);
-            int h = Math.Max (Viewport.Height, viewPortRelativeRegion.Height);
-            NeedsDrawRect = new Rectangle (x, y, w, h);
+            // Union NeedsDrawRect with the incoming region. The previous formula unioned
+            // against Viewport (a bug — it widened to nearly viewport-size on every call),
+            // which made NeedsDrawRect useless for narrowing draw work. Issue #5358
+            // requires an accurate dirty rect so the region-aware ClearViewport and
+            // SetNeedsDraw cascade can stay narrow.
+            NeedsDrawRect = Rectangle.Union (NeedsDrawRect, viewPortRelativeRegion);
         }
 
         // Do not set on Margin - it will be drawn in a separate pass.

@@ -1,5 +1,5 @@
 #nullable disable
-﻿
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -111,7 +111,7 @@ public class AppendAutocomplete : AutocompleteBase
         _textField.SetAttribute (
                                new Attribute (
                                               Scheme.Normal.Foreground,
-                                              _textField.GetAttributeForRole(VisualRole.Focus).Background,
+                                              _textField.GetAttributeForRole (VisualRole.Focus).Background,
                                               Scheme.Normal.Style
                                              )
                               );

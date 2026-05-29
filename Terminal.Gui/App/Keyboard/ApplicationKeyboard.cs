@@ -255,10 +255,10 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                         while (viewToArrange is { Arrangement: ViewArrangement.Fixed })
                         {
                             viewToArrange = viewToArrange switch
-                                            {
-                                                AdornmentView adornmentView => adornmentView.Adornment?.Parent,
-                                                _ => viewToArrange.SuperView
-                                            };
+                            {
+                                AdornmentView adornmentView => adornmentView.Adornment?.Parent,
+                                _ => viewToArrange.SuperView
+                            };
                         }
 
                         return viewToArrange is { } ? (viewToArrange.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed) : false;

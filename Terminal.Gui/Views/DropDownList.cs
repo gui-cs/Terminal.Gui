@@ -333,18 +333,18 @@ public class DropDownList : TextField
             case VisualRole.ReadOnly when ReadOnly:
 
             case VisualRole.Active when ReadOnly:
-            {
-                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                {
+                    currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
 
-                return true;
-            }
+                    return true;
+                }
 
             case VisualRole.Editable when ReadOnly:
-            {
-                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                {
+                    currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
 
-                break;
-            }
+                    break;
+                }
         }
 
         return false;

@@ -543,12 +543,12 @@ public class TextValidateField : View, IDesignable, IValue<string>
         int total = width - count;
 
         return TextAlignment switch
-               {
-                   Alignment.Start => (0, total),
-                   Alignment.Center => (total / 2, total / 2 + total % 2),
-                   Alignment.End => (total, 0),
-                   _ => (0, total)
-               };
+        {
+            Alignment.Start => (0, total),
+            Alignment.Center => (total / 2, total / 2 + total % 2),
+            Alignment.End => (total, 0),
+            _ => (0, total)
+        };
     }
 
     /// <summary>Moves the cursor to first char.</summary>

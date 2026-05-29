@@ -8,7 +8,7 @@ namespace Terminal.Gui.Input;
 /// </summary>
 /// <typeparam name="TEvent">The type of the event (e.g. <see cref="Key"/> or <see cref="MouseFlags"/>).</typeparam>
 /// <typeparam name="TBinding">The binding type (e.g. <see cref="KeyBinding"/>).</typeparam>
-public abstract class CommandBindingsBase<TEvent, TBinding> where TBinding : ICommandBinding, new () where TEvent : notnull
+public abstract class CommandBindingsBase<TEvent, TBinding> where TBinding : ICommandBinding, new() where TEvent : notnull
 {
     /// <summary>
     ///     Initializes a new instance.

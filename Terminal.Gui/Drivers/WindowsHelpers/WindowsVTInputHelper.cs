@@ -45,10 +45,16 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool CancelIoEx (nint hFile, nint lpOverlapped);
+
     [DllImport ("kernel32.dll")]
     private static extern uint GetConsoleCP ();
 
     #endregion
+
+    private const int ERROR_NOT_FOUND = 1168;
+    private const int ERROR_OPERATION_ABORTED = 995;
 
     // Console mode flags
     private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
@@ -183,6 +189,12 @@ internal sealed class WindowsVTInputHelper : IDisposable
             if (!success)
             {
                 int error = Marshal.GetLastWin32Error ();
+
+                if (error == ERROR_OPERATION_ABORTED)
+                {
+                    return false;
+                }
+
                 Logging.Warning ($"{nameof (WindowsVTInputHelper)}: ReadFile failed with error code: {error}");
 
                 return false;
@@ -252,6 +264,36 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// </summary>
     /// <returns><c>true</c> if there is at least one input event available.</returns>
     public bool Peek () => GetNumberOfConsoleInputEvents (InputHandle, out uint count) && count > 0;
+
+    /// <summary>
+    ///     Cancels any pending synchronous <see cref="ReadFile"/> on the Windows console input handle.
+    /// </summary>
+    public static void WakePendingRead ()
+    {
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+        {
+            return;
+        }
+
+        nint inputHandle = TerminalDevice.InputHandle;
+
+        if (inputHandle == nint.Zero || inputHandle == new nint (-1))
+        {
+            return;
+        }
+
+        if (CancelIoEx (inputHandle, nint.Zero))
+        {
+            return;
+        }
+
+        int error = Marshal.GetLastWin32Error ();
+
+        if (error != ERROR_NOT_FOUND)
+        {
+            Logging.Warning ($"{nameof (WindowsVTInputHelper)}: CancelIoEx failed with error code: {error}");
+        }
+    }
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);

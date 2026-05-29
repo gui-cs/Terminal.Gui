@@ -385,7 +385,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// </summary>
     /// <remarks>
     ///     <para>
-        ///         When the terminal reports associated text, this contains the exact text produced by the key event.
+    ///         When the terminal reports associated text, this contains the exact text produced by the key event.
     ///         This is preferred for text insertion because it preserves layout-specific printable characters.
     ///         For example, in kitty input like <c>ESC[50:64;2;64u</c>, the primary key code is <c>'2'</c>,
     ///         the shifted alternate key code is <c>'@'</c>, and the associated text is also <c>'@'</c>.

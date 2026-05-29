@@ -415,6 +415,11 @@ public class AnsiOutput : OutputBase, IOutput
         {
             Trace.Lifecycle (nameof (AnsiOutput), "Dispose", "Flushing output and releasing resources.");
 
+            if (_platform == AnsiPlatform.WindowsVT)
+            {
+                WindowsVTInputHelper.WakePendingRead ();
+            }
+
             _windowsVTOutput?.Dispose ();
         }
     }

@@ -59,7 +59,7 @@ internal record AnsiResponseExpectation (string? Terminator, string? Value, Acti
         }
 
         int startIndex = 1;
-        int endIndex = input.IndexOfAny ([ ';', terminator [0] ], startIndex);
+        int endIndex = input.IndexOfAny ([';', terminator [0]], startIndex);
 
         if (endIndex < 0)
         {

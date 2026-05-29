@@ -239,6 +239,10 @@ public class NeedsDrawTests : TestDriverBase
     [Fact]
     public void NeedsDrawRect_Is_Viewport_Relative ()
     {
+        // Issue #5358: NeedsDrawRect is now a true accumulating union of all dirty regions
+        // since the last Draw() / ClearNeedsDraw(). Previously the broken union math clamped
+        // each call's result to the current Viewport size, which incidentally produced
+        // "current Viewport" semantics. This test asserts the accumulating union semantics.
         View superView = new () { Id = "superView", Width = 10, Height = 10 };
         Assert.Equal (new Rectangle (0, 0, 10, 10), superView.Frame);
         Assert.Equal (new Rectangle (0, 0, 10, 10), superView.Viewport);
@@ -262,37 +266,46 @@ public class NeedsDrawTests : TestDriverBase
         view.Frame = new Rectangle (3, 3, 5, 5);
         Assert.Equal (new Rectangle (3, 3, 5, 5), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 5, 5), view.Viewport);
+        // Union((0,0,2,3),(0,0,5,5)) = (0,0,5,5)
         Assert.Equal (new Rectangle (0, 0, 5, 5), view.NeedsDrawRect);
 
         view.Frame = new Rectangle (3, 3, 6, 6); // Grow right/bottom 1
         Assert.Equal (new Rectangle (3, 3, 6, 6), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 6, 6), view.Viewport);
+        // Union((0,0,5,5),(0,0,6,6)) = (0,0,6,6)
         Assert.Equal (new Rectangle (0, 0, 6, 6), view.NeedsDrawRect);
 
         view.Frame = new Rectangle (3, 3, 5, 5); // Shrink right/bottom 1
         Assert.Equal (new Rectangle (3, 3, 5, 5), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 5, 5), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 5, 5), view.NeedsDrawRect);
+        // Union((0,0,6,6),(0,0,5,5)) = (0,0,6,6) — accumulates the prior larger area.
+        Assert.Equal (new Rectangle (0, 0, 6, 6), view.NeedsDrawRect);
 
         view.SetContentSize (new Size (10, 10));
         Assert.Equal (new Rectangle (3, 3, 5, 5), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 5, 5), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 5, 5), view.NeedsDrawRect);
+        // SetContentSize only calls SetNeedsLayout, not SetNeedsDraw. NeedsDrawRect unchanged.
+        Assert.Equal (new Rectangle (0, 0, 6, 6), view.NeedsDrawRect);
 
         view.Viewport = new Rectangle (1, 1, 5, 5); // Scroll up/left 1
         Assert.Equal (new Rectangle (3, 3, 5, 5), view.Frame);
         Assert.Equal (new Rectangle (1, 1, 5, 5), view.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 5, 5), view.NeedsDrawRect);
+        // Scroll calls SetNeedsLayout (not SetNeedsDraw). NeedsDrawRect unchanged.
+        Assert.Equal (new Rectangle (0, 0, 6, 6), view.NeedsDrawRect);
 
         view.Frame = new Rectangle (3, 3, 6, 6); // Grow right/bottom 1
         Assert.Equal (new Rectangle (3, 3, 6, 6), view.Frame);
         Assert.Equal (new Rectangle (1, 1, 6, 6), view.Viewport);
-        Assert.Equal (new Rectangle (1, 1, 6, 6), view.NeedsDrawRect);
+        // Union((0,0,6,6),(1,1,6,6)) — Viewport now has scroll offset (1,1).
+        // SetFrame's SetNeedsDraw passes the current Viewport = (1,1,6,6).
+        // Rectangle.Union((0,0,6,6),(1,1,6,6)) = (0,0,7,7).
+        Assert.Equal (new Rectangle (0, 0, 7, 7), view.NeedsDrawRect);
 
         view.Frame = new Rectangle (3, 3, 5, 5);
         Assert.Equal (new Rectangle (3, 3, 5, 5), view.Frame);
         Assert.Equal (new Rectangle (1, 1, 5, 5), view.Viewport);
-        Assert.Equal (new Rectangle (1, 1, 5, 5), view.NeedsDrawRect);
+        // Union((0,0,7,7),(1,1,5,5)) = (0,0,7,7).
+        Assert.Equal (new Rectangle (0, 0, 7, 7), view.NeedsDrawRect);
     }
 
     [Fact]
@@ -498,9 +511,11 @@ public class NeedsDrawTests : TestDriverBase
         view.SetNeedsDraw (new Rectangle (5, 5, 10, 10));
         view.SetNeedsDraw (new Rectangle (15, 15, 10, 10));
 
-        // Should expand to cover the entire viewport when we have overlapping regions
-        // The current implementation expands to viewport size
-        var expected = new Rectangle (0, 0, 30, 30);
+        // Issue #5358: NeedsDrawRect is now a true union of all SetNeedsDraw regions,
+        // not a max-of-Viewport-and-region clamp. Previously the broken union math
+        // expanded to viewport size on any second call; that masked partial-dirty regions
+        // and made region-aware ClearViewport impossible.
+        var expected = new Rectangle (5, 5, 20, 20);
         Assert.Equal (expected, view.NeedsDrawRect);
     }
 

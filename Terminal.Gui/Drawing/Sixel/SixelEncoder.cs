@@ -113,8 +113,8 @@ public class SixelEncoder
         Array.Fill (accu, (ushort)1);
         Array.Fill (slots, (short)-1);
 
-        List<int> usedColorIdx = new List<int> ();
-        List<List<string>> targets = new List<List<string>> ();
+        List<int> usedColorIdx = new();
+        List<List<string>> targets = new();
 
         // Process columns within the band
         for (var x = 0; x < width; ++x)

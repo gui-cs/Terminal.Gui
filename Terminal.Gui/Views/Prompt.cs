@@ -50,7 +50,7 @@ namespace Terminal.Gui.Views;
 ///     }
 ///     </code>
 /// </example>
-public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new ()
+public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new()
 {
     private readonly TView? _wrappedView;
 

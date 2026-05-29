@@ -51,19 +51,19 @@ internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDi
         return dictionary;
     }
 
-    public override void Write(Utf8JsonWriter writer, ConcurrentDictionary<string, T> value, JsonSerializerOptions options)
+    public override void Write (Utf8JsonWriter writer, ConcurrentDictionary<string, T> value, JsonSerializerOptions options)
     {
-        writer.WriteStartArray();
+        writer.WriteStartArray ();
 
         foreach (KeyValuePair<string, T> item in value)
         {
-            writer.WriteStartObject();
+            writer.WriteStartObject ();
 
-            writer.WritePropertyName(item.Key);
-            JsonSerializer.Serialize(writer, item.Value, typeof(T), ConfigurationManager.SerializerContext);
-            writer.WriteEndObject();
+            writer.WritePropertyName (item.Key);
+            JsonSerializer.Serialize (writer, item.Value, typeof (T), ConfigurationManager.SerializerContext);
+            writer.WriteEndObject ();
         }
 
-        writer.WriteEndArray();
+        writer.WriteEndArray ();
     }
 }

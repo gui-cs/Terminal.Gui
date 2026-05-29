@@ -119,8 +119,8 @@
             }
           }
         ],
-        "Glyphs.CheckStateChecked": "☒",
-        "Glyphs.CheckStateNone": "□",
+        "Glyphs.CheckStateChecked": "☑",
+        "Glyphs.CheckStateNone": "⬛",
         "Glyphs.CheckStateUnChecked": "☐",
         "Glyphs.LeftBracket": "[",
         "Glyphs.RightBracket": "]"
@@ -185,8 +185,8 @@
             }
           }
         ],
-        "Glyphs.CheckStateChecked": "☒",
-        "Glyphs.CheckStateNone": "□",
+        "Glyphs.CheckStateChecked": "☑",
+        "Glyphs.CheckStateNone": "⬛",
         "Glyphs.CheckStateUnChecked": "☐",
         "Glyphs.LeftBracket": "[",
         "Glyphs.RightBracket": "]"
