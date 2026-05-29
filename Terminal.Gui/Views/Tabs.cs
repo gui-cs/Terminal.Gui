@@ -57,6 +57,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     private readonly List<WeakReference<View>> _tabList = [];
+    private readonly HashSet<View> _tabsWithManagedScrolling = [];
 
     /// <summary>
     ///     Gets the logical index of the specified view within this <see cref="Tabs"/> container.
@@ -399,12 +400,8 @@ public class Tabs : View, IValue<View?>, IDesignable
         // get focus is if the user explicitly sets focus to it
         // or, if the users uses the Next/PreviousTabGroup key.
         view.Border.View?.TabStop = TabBehavior.NoStop;
-
         view.HotKeySpecifier = (Rune)'\xffff';
-
         view.Border.View?.CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
-
-        //view.CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
     }
 
     /// <summary>
@@ -414,6 +411,8 @@ public class Tabs : View, IValue<View?>, IDesignable
     protected override void OnSubViewRemoved (View view)
     {
         base.OnSubViewRemoved (view);
+
+        _tabsWithManagedScrolling.Remove (view);
 
         if (_disposing)
         {
@@ -817,7 +816,59 @@ public class Tabs : View, IValue<View?>, IDesignable
     {
         base.OnSubViewLayout (args);
 
+        UpdateTabContentSizes ();
         UpdateTabOffsets ();
+    }
+
+    private void UpdateTabContentSizes ()
+    {
+        foreach (View tab in TabCollection)
+        {
+            if (!ShouldManageTabScrolling (tab, out Size contentSize))
+            {
+                if (_tabsWithManagedScrolling.Remove (tab))
+                {
+                    tab.ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
+                    tab.SetContentSize (null);
+                }
+
+                continue;
+            }
+
+            if (!tab.ViewportSettings.FastHasFlags (ViewportSettingsFlags.HasScrollBars))
+            {
+                tab.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+            }
+
+            if (!_tabsWithManagedScrolling.Contains (tab) || tab.GetContentSize () != contentSize)
+            {
+                tab.SetContentSize (contentSize);
+            }
+
+            _tabsWithManagedScrolling.Add (tab);
+        }
+    }
+
+    private bool ShouldManageTabScrolling (View tab, out Size contentSize)
+    {
+        contentSize = Size.Empty;
+
+        if (_tabSide is not (Side.Right or Side.Bottom) || tab != Value || tab.SubViews.Count == 0)
+        {
+            return false;
+        }
+
+        int requiredWidth = tab.SubViews.Where (v => v.Visible).Select (v => Math.Max (0, v.Frame.Right)).DefaultIfEmpty (0).Max ();
+        int requiredHeight = tab.SubViews.Where (v => v.Visible).Select (v => Math.Max (0, v.Frame.Bottom)).DefaultIfEmpty (0).Max ();
+
+        if (requiredWidth <= tab.Viewport.Width && requiredHeight <= tab.Viewport.Height)
+        {
+            return false;
+        }
+
+        contentSize = new Size (Math.Max (requiredWidth, tab.Viewport.Width), Math.Max (requiredHeight, tab.Viewport.Height));
+
+        return true;
     }
 
     /// <summary>
