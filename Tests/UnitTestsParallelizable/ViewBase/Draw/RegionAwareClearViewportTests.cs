@@ -147,52 +147,11 @@ public class RegionAwareClearViewportTests : TestDriverBase
         driver.Dispose ();
     }
 
-    /// <summary>
-    ///     Review feedback item 1: narrowing must NOT fire when the view is itself scrolled,
-    ///     because SetNeedsDraw(Rectangle) cascades to subviews using frame-local coordinates
-    ///     while the no-arg version passes content-coord Viewport. Until that convention is
-    ///     normalized, the framework falls back to a full clear for scrolled views.
-    /// </summary>
-    [Fact]
-    public void FrameworkDraw_ScrolledView_FallsBackToFullClear ()
-    {
-        IDriver driver = CreateTestDriver (40, 20);
-        driver.Clip = new Region (driver.Screen);
-
-        View view = new () { Driver = driver, X = 5, Y = 5, Width = 10, Height = 5 };
-        view.SetContentSize (new Size (100, 100));
-        view.BeginInit ();
-        view.EndInit ();
-        view.LayoutSubViews ();
-        view.Draw ();
-
-        // Scroll so Viewport.Location is non-empty.
-        view.Viewport = view.Viewport with { Y = 5 };
-        Assert.Equal (new Point (0, 5), view.Viewport.Location);
-
-        view.Draw ();
-        driver.Clip = new Region (driver.Screen);
-        driver.FillRect (driver.Screen, new Rune ('X'));
-
-        // Set a partial dirty rect (which would narrow if the view weren't scrolled).
-        view.ClearNeedsDraw ();
-        view.SetNeedsDraw (new Rectangle (1, 6, 3, 2));
-
-        view.Draw ();
-
-        // Full viewport should be cleared (narrowing must not fire on scrolled view).
-        Rectangle screen = view.ViewportToScreen (view.Viewport with { Location = new Point (0, 0) });
-        for (int y = screen.Y; y < screen.Y + screen.Height; y++)
-        {
-            for (int x = screen.X; x < screen.X + screen.Width; x++)
-            {
-                Assert.Equal (" ", driver.Contents [y, x].Grapheme);
-            }
-        }
-
-        view.Dispose ();
-        driver.Dispose ();
-    }
+    // Note: a prior FrameworkDraw_ScrolledView_FallsBackToFullClear test was removed in #5359.
+    // It documented the temporary "Viewport.Location == Point.Empty" guard added in #5431 as a
+    // workaround for the cascade coord-system inconsistency. Issue #5359 normalized the
+    // convention and removed that guard. Narrowing on scrolled views is now correct and is
+    // covered by NeedsDrawCoordTests.FrameworkNarrowing_NowWorks_OnScrolledView.
 
     /// <summary>
     ///     When a subview's Frame shrinks, View.Layout invalidates the SuperView for the union
