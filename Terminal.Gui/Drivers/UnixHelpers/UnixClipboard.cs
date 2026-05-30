@@ -7,18 +7,27 @@ namespace Terminal.Gui.Drivers;
 /// <remarks>If xclip is not installed, this implementation will not work.</remarks>
 internal class UnixClipboard : ClipboardBase
 {
+    private readonly IClipboardProcessRunner _processRunner;
     private string _xclipPath = string.Empty;
-    public UnixClipboard () => IsSupported = CheckSupport ();
+
+    public UnixClipboard () : this (new ClipboardProcessRunnerImpl ()) { }
+
+    internal UnixClipboard (IClipboardProcessRunner processRunner)
+    {
+        _processRunner = processRunner ?? throw new ArgumentNullException (nameof (processRunner));
+        IsSupported = CheckSupport ();
+    }
+
     public override bool IsSupported { get; }
 
     protected override string GetClipboardDataImpl ()
     {
         string tempFileName = Path.GetTempFileName ();
-        var xclipargs = "-selection clipboard -o";
+        string xclipArgs = "-selection clipboard -o";
 
         try
         {
-            (int exitCode, string _) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
+            (int exitCode, string _) = _processRunner.Bash ($"{_xclipPath} {xclipArgs} > {tempFileName}", waitForOutput: false);
 
             if (exitCode == 0)
             {
@@ -27,7 +36,7 @@ internal class UnixClipboard : ClipboardBase
         }
         catch (Exception e)
         {
-            throw new NotSupportedException ($"\"{_xclipPath} {xclipargs}\" failed.", e);
+            throw new NotSupportedException ($"\"{_xclipPath} {xclipArgs}\" failed.", e);
         }
         finally
         {
@@ -39,15 +48,15 @@ internal class UnixClipboard : ClipboardBase
 
     protected override void SetClipboardDataImpl (string text)
     {
-        var xclipargs = "-selection clipboard -i";
+        string xclipArgs = "-selection clipboard -i";
 
         try
         {
-            ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs}", text);
+            _processRunner.Bash ($"{_xclipPath} {xclipArgs}", text);
         }
         catch (Exception e)
         {
-            throw new NotSupportedException ($"\"{_xclipPath} {xclipargs} < {text}\" failed", e);
+            throw new NotSupportedException ($"\"{_xclipPath} {xclipArgs} < {text}\" failed", e);
         }
     }
 
@@ -56,7 +65,7 @@ internal class UnixClipboard : ClipboardBase
 #pragma warning disable RCS1075 // Avoid empty catch clause that catches System.Exception.
         try
         {
-            (int exitCode, string result) = ClipboardProcessRunner.Bash ("which xclip", waitForOutput: true);
+            (int exitCode, string result) = _processRunner.Bash ("which xclip", waitForOutput: true);
 
             if (exitCode == 0 && result.FileExists ())
             {
