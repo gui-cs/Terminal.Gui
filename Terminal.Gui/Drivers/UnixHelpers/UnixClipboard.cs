@@ -18,7 +18,7 @@ internal class UnixClipboard : ClipboardBase
 
         try
         {
-            (int exitCode, string result) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
+            (int exitCode, string _) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
 
             if (exitCode == 0)
             {
@@ -43,7 +43,7 @@ internal class UnixClipboard : ClipboardBase
 
         try
         {
-            (int exitCode, _) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs}", text);
+            ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs}", text);
         }
         catch (Exception e)
         {
@@ -172,6 +172,17 @@ internal class MacOSXClipboard : ClipboardBase
 internal class WSLClipboard : ClipboardBase
 {
     private static string _powershellPath = string.Empty;
+    private readonly string _powershellPathOverride;
+    private readonly IClipboardProcessRunner _processRunner;
+
+    public WSLClipboard () : this (new ClipboardProcessRunnerImpl ()) { }
+
+    internal WSLClipboard (IClipboardProcessRunner processRunner, string powershellPath = "")
+    {
+        _processRunner = processRunner ?? throw new ArgumentNullException (nameof (processRunner));
+        _powershellPathOverride = powershellPath;
+    }
+
     public override bool IsSupported => CheckSupport ();
 
     protected override string GetClipboardDataImpl ()
@@ -182,19 +193,19 @@ internal class WSLClipboard : ClipboardBase
         }
 
         (int exitCode, string output) =
-            ClipboardProcessRunner.Process (_powershellPath, "-noprofile -command \"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Get-Clipboard\"");
+            _processRunner.Process (GetPowershellPath (), "-noprofile -command \"[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Get-Clipboard\"");
 
-        if (exitCode == 0)
+        if (exitCode != 0)
         {
-            if (output.EndsWith ("\r\n"))
-            {
-                output = output.Substring (0, output.Length - 2);
-            }
-
-            return output;
+            return string.Empty;
         }
 
-        return string.Empty;
+        if (output.EndsWith ("\r\n", StringComparison.Ordinal))
+        {
+            output = output [..^2];
+        }
+
+        return output;
     }
 
     protected override void SetClipboardDataImpl (string text)
@@ -204,27 +215,46 @@ internal class WSLClipboard : ClipboardBase
             return;
         }
 
-        (int exitCode, string output) = ClipboardProcessRunner.Process (_powershellPath, "-noprofile -command \"$input | Set-Clipboard\"", input: text);
+        _processRunner.Process (GetPowershellPath (),
+                                "-noprofile -command \"$encoded = [Console]::In.ReadToEnd(); $text = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($encoded)); Set-Clipboard -Value $text\"",
+                                input: Convert.ToBase64String (Encoding.Unicode.GetBytes (text)));
     }
 
     private bool CheckSupport ()
     {
-        if (string.IsNullOrEmpty (_powershellPath))
+        if (!string.IsNullOrEmpty (_powershellPathOverride))
         {
-            // Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
-            (int exitCode, string result) = ClipboardProcessRunner.Bash ("which pwsh.exe", waitForOutput: true);
+            return true;
+        }
 
-            if (exitCode > 0)
-            {
-                (exitCode, result) = ClipboardProcessRunner.Bash ("which powershell.exe", waitForOutput: true);
-            }
+        if (!string.IsNullOrEmpty (_powershellPath))
+        {
+            return !string.IsNullOrEmpty (_powershellPath);
+        }
 
-            if (exitCode == 0)
-            {
-                _powershellPath = result;
-            }
+        // Specify pwsh.exe (not pwsh) to ensure we get the Windows version (invoked via WSL)
+        (int exitCode, string result) = _processRunner.Bash ("which pwsh.exe", waitForOutput: true);
+
+        if (exitCode > 0)
+        {
+            (exitCode, result) = _processRunner.Bash ("which powershell.exe", waitForOutput: true);
+        }
+
+        if (exitCode == 0)
+        {
+            _powershellPath = result;
         }
 
         return !string.IsNullOrEmpty (_powershellPath);
+    }
+
+    private string GetPowershellPath ()
+    {
+        if (!string.IsNullOrEmpty (_powershellPathOverride))
+        {
+            return _powershellPathOverride;
+        }
+
+        return _powershellPath;
     }
 }
