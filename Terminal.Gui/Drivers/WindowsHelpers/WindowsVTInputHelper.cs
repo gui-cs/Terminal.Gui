@@ -51,6 +51,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll")]
     private static extern uint GetConsoleCP ();
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleCP (uint wCodePageID);
+
     #endregion
 
     private const int ERROR_NOT_FOUND = 1168;
@@ -67,6 +70,21 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
     private uint _originalConsoleMode;
     private bool _disposed;
+
+    private const uint CP_UTF8 = 65001;
+
+    private readonly uint _originalConsoleCP;
+    private readonly Encoding _utf8 = new UTF8Encoding (encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
+
+    public WindowsVTInputHelper ()
+    {
+        _originalConsoleCP = GetConsoleCP ();
+
+        if (_originalConsoleCP != CP_UTF8)
+        {
+            SetConsoleCP (CP_UTF8);
+        }
+    }
 
     /// <summary>
     ///     Gets whether VTS input mode was successfully enabled.
@@ -238,6 +256,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
+            SetConsoleCP (_originalConsoleCP);
             SetConsoleMode (InputHandle, _originalConsoleMode);
             IsEnabled = false;
         }
