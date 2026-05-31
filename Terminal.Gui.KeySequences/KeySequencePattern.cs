@@ -7,13 +7,13 @@ public sealed class KeySequencePattern
 {
     private readonly List<KeySequenceToken> _tokens = [];
 
-    private KeySequencePattern (Key leaderKey)
+    private KeySequencePattern (Key? leaderKey)
     {
         LeaderKey = leaderKey;
     }
 
     /// <summary>Gets the leader key that starts this sequence.</summary>
-    public Key LeaderKey { get; }
+    public Key? LeaderKey { get; }
 
     /// <summary>Gets the tokens entered after the leader key.</summary>
     public IReadOnlyList<KeySequenceToken> Tokens => _tokens;
@@ -26,6 +26,9 @@ public sealed class KeySequencePattern
 
     /// <summary>Creates a pattern with the specified leader key.</summary>
     public static KeySequencePattern Leader (Key leaderKey) => new (leaderKey);
+
+    /// <summary>Creates a pattern that matches in persistent command mode.</summary>
+    public static KeySequencePattern CommandMode () => new (null);
 
     /// <summary>Adds a literal key token.</summary>
     public KeySequencePattern Then (Key key)
@@ -56,5 +59,7 @@ public sealed class KeySequencePattern
     }
 
     /// <inheritdoc/>
-    public override string ToString () => $"{LeaderKey} {string.Join (" ", _tokens)}".TrimEnd ();
+    public override string ToString () => LeaderKey is { } leaderKey
+                                              ? $"{leaderKey} {string.Join (" ", _tokens)}".TrimEnd ()
+                                              : string.Join (" ", _tokens);
 }

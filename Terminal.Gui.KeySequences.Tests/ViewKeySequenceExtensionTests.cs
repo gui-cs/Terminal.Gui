@@ -50,4 +50,31 @@ public class ViewKeySequenceExtensionTests
 
         Assert.False (view.NewKeyDownEvent (';'));
     }
+
+    [Fact]
+    public void UseKeySequences_Captures_Keys_While_Command_Mode_Is_Active ()
+    {
+        View view = new ();
+        int moveCount = 0;
+
+        using IDisposable registration = view.UseKeySequences (
+            bindings =>
+            {
+                bindings.Mode = KeySequenceMode.Persistent;
+                bindings.EnterModeKey = Key.Esc;
+                bindings.ExitModeKey = 'i';
+                bindings.AddMode ("<count> k", context =>
+                {
+                    moveCount = context.Count;
+                    return true;
+                });
+            },
+            KeySequenceInterceptionMode.Preemptive);
+
+        Assert.True (view.NewKeyDownEvent (Key.Esc));
+        Assert.True (view.NewKeyDownEvent ('3'));
+        Assert.True (view.NewKeyDownEvent ('k'));
+        Assert.Equal (3, moveCount);
+        Assert.True (view.NewKeyDownEvent ('i'));
+    }
 }

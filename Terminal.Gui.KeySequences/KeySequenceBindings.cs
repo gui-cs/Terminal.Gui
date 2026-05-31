@@ -13,6 +13,7 @@ public sealed class KeySequenceBindings
 
     private Key? _leaderKey;
     private DateTimeOffset _lastKeyTime;
+    private bool _isCommandMode;
 
     /// <summary>Raised when sequence capture state changes.</summary>
     public event EventHandler<KeySequenceStateChangedEventArgs>? StateChanged;
@@ -23,11 +24,23 @@ public sealed class KeySequenceBindings
     /// <summary>Gets or sets the key that cancels active sequence capture.</summary>
     public Key CancelKey { get; set; } = Key.Esc;
 
+    /// <summary>Gets or sets the matching mode.</summary>
+    public KeySequenceMode Mode { get; set; }
+
+    /// <summary>Gets or sets the key that enters persistent command mode.</summary>
+    public Key EnterModeKey { get; set; } = Key.Esc;
+
+    /// <summary>Gets or sets the key that exits persistent command mode.</summary>
+    public Key ExitModeKey { get; set; } = 'i';
+
     /// <summary>Gets or sets the time provider used for timeout checks.</summary>
     public TimeProvider TimeProvider { get; set; } = TimeProvider.System;
 
     /// <summary>Gets whether sequence capture is active.</summary>
-    public bool IsCapturing => _leaderKey is { };
+    public bool IsCapturing => _leaderKey is { } || _isCommandMode;
+
+    /// <summary>Gets whether persistent command mode is active.</summary>
+    public bool IsCommandMode => _isCommandMode;
 
     /// <summary>Adds a leader key.</summary>
     public void AddLeader (Key leaderKey)
@@ -52,7 +65,7 @@ public sealed class KeySequenceBindings
         ArgumentNullException.ThrowIfNull (pattern);
         ArgumentNullException.ThrowIfNull (handler);
 
-        if (!pattern.LeaderKey.IsValid)
+        if (pattern.LeaderKey is { } leaderKey && !leaderKey.IsValid)
         {
             throw new ArgumentException (@"Pattern must have a valid leader key.", nameof (pattern));
         }
@@ -74,12 +87,19 @@ public sealed class KeySequenceBindings
             throw new InvalidOperationException ($"A binding for {patternText} already exists.");
         }
 
-        AddLeader (pattern.LeaderKey);
+        if (pattern.LeaderKey is { } patternLeaderKey)
+        {
+            AddLeader (patternLeaderKey);
+        }
+
         _bindings.Add (new KeySequenceBinding (pattern, handler));
     }
 
     /// <summary>Adds a sequence binding from a compact pattern string.</summary>
     public void Add (string pattern, KeySequenceHandler handler) => Add (KeySequenceParser.Parse (pattern), handler);
+
+    /// <summary>Adds a persistent command-mode sequence binding from a compact pattern string.</summary>
+    public void AddMode (string pattern, KeySequenceHandler handler) => Add (KeySequenceParser.ParseCommandMode (pattern), handler);
 
     /// <summary>Removes a sequence binding.</summary>
     public bool Remove (KeySequencePattern pattern)
@@ -111,12 +131,17 @@ public sealed class KeySequenceBindings
 
         KeySequenceResult timeoutResult = ResetIfTimedOut ();
 
-        if (timeoutResult == KeySequenceResult.TimedOut && !IsLeader (key))
+        if (timeoutResult == KeySequenceResult.TimedOut && Mode != KeySequenceMode.Persistent && !IsLeader (key))
         {
             return KeySequenceResult.TimedOut;
         }
 
-        if (!IsCapturing)
+        if (Mode == KeySequenceMode.Persistent)
+        {
+            return ProcessPersistentKey (target, key, commandContext);
+        }
+
+        if (_leaderKey is null)
         {
             if (!IsLeader (key))
             {
@@ -165,9 +190,25 @@ public sealed class KeySequenceBindings
         _keys.Clear ();
     }
 
+    /// <summary>Enters persistent command mode.</summary>
+    public void EnterCommandMode ()
+    {
+        _isCommandMode = true;
+        Reset ();
+        RaiseStateChanged (KeySequenceResult.ModeEntered, CandidateCount ());
+    }
+
+    /// <summary>Exits persistent command mode.</summary>
+    public void ExitCommandMode ()
+    {
+        _isCommandMode = false;
+        Reset ();
+        RaiseStateChanged (KeySequenceResult.ModeExited, 0);
+    }
+
     private KeySequenceResult ResetIfTimedOut ()
     {
-        if (!IsCapturing || Timeout <= TimeSpan.Zero)
+        if ((!IsCapturing || _keys.Count == 0) || Timeout <= TimeSpan.Zero)
         {
             return KeySequenceResult.NotLeader;
         }
@@ -182,12 +223,59 @@ public sealed class KeySequenceBindings
         return KeySequenceResult.TimedOut;
     }
 
+    private KeySequenceResult ProcessPersistentKey (View target, Key key, CommandContext? commandContext)
+    {
+        if (!_isCommandMode)
+        {
+            if (key != EnterModeKey)
+            {
+                return KeySequenceResult.NotLeader;
+            }
+
+            EnterCommandMode ();
+            return KeySequenceResult.ModeEntered;
+        }
+
+        if (key == ExitModeKey)
+        {
+            ExitCommandMode ();
+            return KeySequenceResult.ModeExited;
+        }
+
+        if (!key.IsValid || key.IsModifierOnly)
+        {
+            Reset ();
+            RaiseStateChanged (KeySequenceResult.Rejected, CandidateCount ());
+            return KeySequenceResult.Rejected;
+        }
+
+        if (key == CancelKey)
+        {
+            Reset ();
+            RaiseStateChanged (KeySequenceResult.Canceled, CandidateCount ());
+            return KeySequenceResult.Canceled;
+        }
+
+        _keys.Add (key);
+        _lastKeyTime = TimeProvider.GetUtcNow ();
+
+        MatchEvaluation evaluation = Evaluate (target, commandContext);
+
+        if (evaluation.Result != KeySequenceResult.Pending)
+        {
+            Reset ();
+        }
+
+        RaiseStateChanged (evaluation.Result, evaluation.CandidateCount);
+        return evaluation.Result;
+    }
+
     private MatchEvaluation Evaluate (View target, CommandContext? commandContext)
     {
         List<CandidateMatch> matches = [];
         int candidateCount = 0;
 
-        foreach (KeySequenceBinding sequenceBinding in _bindings.Where (b => b.Pattern.LeaderKey == _leaderKey!))
+        foreach (KeySequenceBinding sequenceBinding in GetCandidateBindings ())
         {
             CandidateMatch match = KeySequenceMatcher.Match (sequenceBinding.Pattern, _keys);
 
@@ -230,6 +318,23 @@ public sealed class KeySequenceBindings
         return new MatchEvaluation (KeySequenceResult.Rejected, 0);
     }
 
+    private IEnumerable<KeySequenceBinding> GetCandidateBindings ()
+    {
+        if (Mode == KeySequenceMode.Persistent && _isCommandMode)
+        {
+            return _bindings.Where (b => b.Pattern.LeaderKey is null);
+        }
+
+        if (_leaderKey is null)
+        {
+            return [];
+        }
+
+        Key activeLeader = _leaderKey;
+
+        return _bindings.Where (b => b.Pattern.LeaderKey is { } patternLeader && patternLeader == activeLeader);
+    }
+
     private KeySequenceContext CreateContext (View target, KeySequencePattern pattern, CandidateMatch match, CommandContext? commandContext)
     {
         List<Key> literalKeys = pattern.Tokens.Where (t => t.Kind == KeySequenceTokenKind.Literal && t.Key is { }).Select (t => t.Key!).ToList ();
@@ -238,7 +343,8 @@ public sealed class KeySequenceBindings
         return new KeySequenceContext
         {
             Target = target,
-            LeaderKey = _leaderKey!,
+            LeaderKey = _leaderKey,
+            IsCommandMode = Mode == KeySequenceMode.Persistent && _isCommandMode,
             Keys = _keys.ToArray (),
             Pattern = pattern,
             Count = match.Count,
@@ -251,19 +357,26 @@ public sealed class KeySequenceBindings
 
     private int CandidateCount ()
     {
+        if (Mode == KeySequenceMode.Persistent && _isCommandMode)
+        {
+            return _bindings.Count (b => b.Pattern.LeaderKey is null);
+        }
+
         if (_leaderKey is null)
         {
             return 0;
         }
 
-        return _bindings.Count (b => b.Pattern.LeaderKey == _leaderKey);
+        Key activeLeader = _leaderKey;
+
+        return _bindings.Count (b => b.Pattern.LeaderKey is { } patternLeader && patternLeader == activeLeader);
     }
 
     private void RaiseStateChanged (KeySequenceResult result, int candidateCount)
     {
         string countText = GetCountText ();
-        KeySequenceState state = IsCapturing ? KeySequenceState.Capturing : KeySequenceState.Idle;
-        StateChanged?.Invoke (this, new KeySequenceStateChangedEventArgs (state, _leaderKey, _keys.ToArray (), countText, candidateCount, result));
+        KeySequenceState state = _isCommandMode ? KeySequenceState.CommandMode : IsCapturing ? KeySequenceState.Capturing : KeySequenceState.Idle;
+        StateChanged?.Invoke (this, new KeySequenceStateChangedEventArgs (state, _leaderKey, _keys.ToArray (), countText, candidateCount, result, _isCommandMode));
     }
 
     private string GetCountText ()

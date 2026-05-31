@@ -9,8 +9,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public sealed class KeySequencesDemo : Scenario
 {
-    private const string Leader = ";";
-
     private const string SampleCode =
         """
         using Terminal.Gui.App;
@@ -77,14 +75,14 @@ public sealed class KeySequencesDemo : Scenario
 
         Label title = new ()
         {
-            Text = "Leader key: ;",
+            Text = "Command mode: ; enters, i exits",
             X = 0,
             Y = 0
         };
 
         Label commands = new ()
         {
-            Text = "; h/j/k/l  ; w/b  ; 0/$  ; g g/G  ; d d  ; y y  ; p  ; u  ; Ctrl+R  ; v motion",
+            Text = "In command mode: h/j/k/l  w/b  0/$  g g/G  d d  y y  p  u  Ctrl+R  v motion",
             X = 0,
             Y = Pos.Bottom (title)
         };
@@ -117,13 +115,18 @@ public sealed class KeySequencesDemo : Scenario
         window.Add (title, commands, editor, logView);
 
         AddLog ("Focus is on the editor.");
-        AddLog ("Motions: ; h/j/k/l, ; 4 j, ; w, ; b, ; 0, ; $, ; g g, ; G, ; Ctrl+B/F");
-        AddLog ("Selection: ; v h/j/k/l/w/b/0/$/g g/G/Ctrl+B/Ctrl+F");
-        AddLog ("Edit: ; d d, ; 3 d d, ; y y, ; v y, ; v c, ; p, ; x, ; X, ; u, ; Ctrl+R");
+        AddLog ("Press ; once to enter command mode.");
+        AddLog ("Motions: h/j/k/l, 4 j, w, b, 0, $, g g, G, Ctrl+B/F");
+        AddLog ("Selection: v h/j/k/l/w/b/0/$/g g/G/Ctrl+B/Ctrl+F");
+        AddLog ("Edit: d d, 3 d d, y y, v y, v c, p, x, X, u, Ctrl+R");
+        AddLog ("Press i to return to normal editing.");
 
         using IDisposable registration = editor.UseKeySequences (
             bindings =>
             {
+                bindings.Mode = KeySequenceMode.Persistent;
+                bindings.EnterModeKey = ';';
+                bindings.ExitModeKey = 'i';
                 bindings.Timeout = TimeSpan.FromSeconds (5);
 
                 AddMotionBindings (bindings, editor);
@@ -135,6 +138,18 @@ public sealed class KeySequencesDemo : Scenario
                     if (e.Result == KeySequenceResult.Started)
                     {
                         AddLog ("Sequence started");
+                        return;
+                    }
+
+                    if (e.Result == KeySequenceResult.ModeEntered)
+                    {
+                        AddLog ("COMMAND mode");
+                        return;
+                    }
+
+                    if (e.Result == KeySequenceResult.ModeExited)
+                    {
+                        AddLog ("NORMAL editing");
                         return;
                     }
 
@@ -164,54 +179,54 @@ public sealed class KeySequencesDemo : Scenario
 
     private void AddMotionBindings (KeySequenceBindings bindings, Editor editor)
     {
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> h", Command.Left, "h");
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> l", Command.Right, "l");
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> k", Command.Up, "k");
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> j", Command.Down, "j");
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> b", Command.WordLeft, "b");
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> w", Command.WordRight, "w");
+        AddRepeatedCommand (bindings, editor, "<count> h", Command.Left, "h");
+        AddRepeatedCommand (bindings, editor, "<count> l", Command.Right, "l");
+        AddRepeatedCommand (bindings, editor, "<count> k", Command.Up, "k");
+        AddRepeatedCommand (bindings, editor, "<count> j", Command.Down, "j");
+        AddRepeatedCommand (bindings, editor, "<count> b", Command.WordLeft, "b");
+        AddRepeatedCommand (bindings, editor, "<count> w", Command.WordRight, "w");
         AddImmediateCommand (bindings, editor, '0', Command.LeftStart, "0");
-        AddCommand (bindings, editor, $"{Leader} $", Command.RightEnd, "$");
-        AddCommand (bindings, editor, $"{Leader} g g", Command.Start, "g g");
-        AddCommand (bindings, editor, $"{Leader} G", Command.End, "G");
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> Ctrl+B", Command.PageUp, "Ctrl+B");
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> Ctrl+F", Command.PageDown, "Ctrl+F");
+        AddCommand (bindings, editor, "$", Command.RightEnd, "$");
+        AddCommand (bindings, editor, "g g", Command.Start, "g g");
+        AddCommand (bindings, editor, "G", Command.End, "G");
+        AddRepeatedCommand (bindings, editor, "<count> Ctrl+B", Command.PageUp, "Ctrl+B");
+        AddRepeatedCommand (bindings, editor, "<count> Ctrl+F", Command.PageDown, "Ctrl+F");
     }
 
     private void AddSelectionBindings (KeySequenceBindings bindings, Editor editor)
     {
-        AddRepeatedCommand (bindings, editor, $"{Leader} v <count> h", Command.LeftExtend, "v h");
-        AddRepeatedCommand (bindings, editor, $"{Leader} v <count> l", Command.RightExtend, "v l");
-        AddRepeatedCommand (bindings, editor, $"{Leader} v <count> k", Command.UpExtend, "v k");
-        AddRepeatedCommand (bindings, editor, $"{Leader} v <count> j", Command.DownExtend, "v j");
-        AddRepeatedCommand (bindings, editor, $"{Leader} v <count> b", Command.WordLeftExtend, "v b");
-        AddRepeatedCommand (bindings, editor, $"{Leader} v <count> w", Command.WordRightExtend, "v w");
-        AddCommand (bindings, editor, $"{Leader} v 0", Command.LeftStartExtend, "v 0");
-        AddCommand (bindings, editor, $"{Leader} v $", Command.RightEndExtend, "v $");
-        AddCommand (bindings, editor, $"{Leader} v g g", Command.StartExtend, "v g g");
-        AddCommand (bindings, editor, $"{Leader} v G", Command.EndExtend, "v G");
-        AddRepeatedCommand (bindings, editor, $"{Leader} v <count> Ctrl+B", Command.PageUpExtend, "v Ctrl+B");
-        AddRepeatedCommand (bindings, editor, $"{Leader} v <count> Ctrl+F", Command.PageDownExtend, "v Ctrl+F");
+        AddRepeatedCommand (bindings, editor, "v <count> h", Command.LeftExtend, "v h");
+        AddRepeatedCommand (bindings, editor, "v <count> l", Command.RightExtend, "v l");
+        AddRepeatedCommand (bindings, editor, "v <count> k", Command.UpExtend, "v k");
+        AddRepeatedCommand (bindings, editor, "v <count> j", Command.DownExtend, "v j");
+        AddRepeatedCommand (bindings, editor, "v <count> b", Command.WordLeftExtend, "v b");
+        AddRepeatedCommand (bindings, editor, "v <count> w", Command.WordRightExtend, "v w");
+        AddCommand (bindings, editor, "v 0", Command.LeftStartExtend, "v 0");
+        AddCommand (bindings, editor, "v $", Command.RightEndExtend, "v $");
+        AddCommand (bindings, editor, "v g g", Command.StartExtend, "v g g");
+        AddCommand (bindings, editor, "v G", Command.EndExtend, "v G");
+        AddRepeatedCommand (bindings, editor, "v <count> Ctrl+B", Command.PageUpExtend, "v Ctrl+B");
+        AddRepeatedCommand (bindings, editor, "v <count> Ctrl+F", Command.PageDownExtend, "v Ctrl+F");
     }
 
     private void AddEditingBindings (KeySequenceBindings bindings, Editor editor)
     {
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> x", Command.DeleteCharRight, "x");
-        AddRepeatedCommand (bindings, editor, $"{Leader} <count> X", Command.DeleteCharLeft, "X");
-        AddCommand (bindings, editor, $"{Leader} p", Command.Paste, "p");
-        AddCommand (bindings, editor, $"{Leader} u", Command.Undo, "u");
-        AddCommand (bindings, editor, $"{Leader} Ctrl+R", Command.Redo, "Ctrl+R");
-        AddCommand (bindings, editor, $"{Leader} a", Command.SelectAll, "a");
-        AddCommand (bindings, editor, $"{Leader} c", Command.Cut, "c");
-        AddCommand (bindings, editor, $"{Leader} v y", Command.Copy, "v y");
-        AddCommand (bindings, editor, $"{Leader} v c", Command.Cut, "v c");
-        AddCountedLineCommand (bindings, editor, $"{Leader} <count> d d", Command.Cut, "d d");
-        AddCountedLineCommand (bindings, editor, $"{Leader} <count> y y", Command.Copy, "y y");
+        AddRepeatedCommand (bindings, editor, "<count> x", Command.DeleteCharRight, "x");
+        AddRepeatedCommand (bindings, editor, "<count> X", Command.DeleteCharLeft, "X");
+        AddCommand (bindings, editor, "p", Command.Paste, "p");
+        AddCommand (bindings, editor, "u", Command.Undo, "u");
+        AddCommand (bindings, editor, "Ctrl+R", Command.Redo, "Ctrl+R");
+        AddCommand (bindings, editor, "a", Command.SelectAll, "a");
+        AddCommand (bindings, editor, "c", Command.Cut, "c");
+        AddCommand (bindings, editor, "v y", Command.Copy, "v y");
+        AddCommand (bindings, editor, "v c", Command.Cut, "v c");
+        AddCountedLineCommand (bindings, editor, "<count> d d", Command.Cut, "d d");
+        AddCountedLineCommand (bindings, editor, "<count> y y", Command.Copy, "y y");
     }
 
     private void AddRepeatedCommand (KeySequenceBindings bindings, Editor editor, string pattern, Command command, string display)
     {
-        bindings.Add (pattern, context =>
+        bindings.AddMode (pattern, context =>
         {
             InvokeRepeated (editor, command, context.Count);
             AddLog ($"{FormatSequence (context)} -> {display} x{context.Count}");
@@ -221,7 +236,7 @@ public sealed class KeySequencesDemo : Scenario
 
     private void AddCommand (KeySequenceBindings bindings, Editor editor, string pattern, Command command, string display)
     {
-        bindings.Add (pattern, context =>
+        bindings.AddMode (pattern, context =>
         {
             editor.InvokeCommand (command);
             AddLog ($"{FormatSequence (context)} -> {display}");
@@ -231,7 +246,7 @@ public sealed class KeySequencesDemo : Scenario
 
     private void AddImmediateCommand (KeySequenceBindings bindings, Editor editor, char key, Command command, string display)
     {
-        KeySequencePattern pattern = KeySequencePattern.Leader (Leader [0]).Then (key);
+        KeySequencePattern pattern = KeySequencePattern.CommandMode ().Then (key);
         pattern.MatchMode = KeySequenceMatchMode.Immediate;
         pattern.AllowZeroCount = true;
 
@@ -245,7 +260,7 @@ public sealed class KeySequencesDemo : Scenario
 
     private void AddCountedLineCommand (KeySequenceBindings bindings, Editor editor, string pattern, Command command, string display)
     {
-        bindings.Add (pattern, context =>
+        bindings.AddMode (pattern, context =>
         {
             editor.InvokeCommand (Command.LeftStart);
             InvokeRepeated (editor, Command.DownExtend, context.Count);
@@ -275,7 +290,17 @@ public sealed class KeySequencesDemo : Scenario
         return string.Join (" ", keys.Select (key => key.ToString ()));
     }
 
-    private static string FormatSequence (KeySequenceContext context) => $"{context.LeaderKey} {FormatKeys (context.Keys)}";
+    private static string FormatSequence (KeySequenceContext context)
+    {
+        string keys = FormatKeys (context.Keys);
+
+        if (context.LeaderKey is { } leaderKey)
+        {
+            return $"{leaderKey} {keys}";
+        }
+
+        return keys;
+    }
 
     private void AddLog (string message)
     {

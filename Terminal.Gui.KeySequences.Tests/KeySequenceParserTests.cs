@@ -28,4 +28,15 @@ public class KeySequenceParserTests
     {
         Assert.Throws<ArgumentException> (() => KeySequenceParser.Parse ("; <count> m <count> k"));
     }
+
+    [Fact]
+    public void ParseCommandMode_Creates_Tokens_Without_Leader ()
+    {
+        KeySequencePattern pattern = KeySequenceParser.ParseCommandMode ("<count> k");
+
+        Assert.Null (pattern.LeaderKey);
+        Assert.Equal (2, pattern.Tokens.Count);
+        Assert.Equal (KeySequenceTokenKind.Count, pattern.Tokens [0].Kind);
+        Assert.Equal (KeySequenceTokenKind.Literal, pattern.Tokens [1].Kind);
+    }
 }

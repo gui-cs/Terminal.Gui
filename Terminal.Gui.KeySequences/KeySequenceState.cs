@@ -7,5 +7,8 @@ public enum KeySequenceState
     Idle,
 
     /// <summary>A leader key has started sequence capture.</summary>
-    Capturing
+    Capturing,
+
+    /// <summary>Persistent command mode is active.</summary>
+    CommandMode
 }

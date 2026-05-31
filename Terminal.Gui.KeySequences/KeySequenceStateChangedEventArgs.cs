@@ -12,7 +12,8 @@ public sealed class KeySequenceStateChangedEventArgs : EventArgs
         IReadOnlyList<Key> keys,
         string countText,
         int candidateCount,
-        KeySequenceResult result)
+        KeySequenceResult result,
+        bool isCommandMode = false)
     {
         State = state;
         LeaderKey = leaderKey;
@@ -20,6 +21,7 @@ public sealed class KeySequenceStateChangedEventArgs : EventArgs
         CountText = countText;
         CandidateCount = candidateCount;
         Result = result;
+        IsCommandMode = isCommandMode;
     }
 
     /// <summary>Gets the current capture state.</summary>
@@ -39,4 +41,7 @@ public sealed class KeySequenceStateChangedEventArgs : EventArgs
 
     /// <summary>Gets the processing result that caused the state change.</summary>
     public KeySequenceResult Result { get; }
+
+    /// <summary>Gets whether persistent command mode is active.</summary>
+    public bool IsCommandMode { get; }
 }

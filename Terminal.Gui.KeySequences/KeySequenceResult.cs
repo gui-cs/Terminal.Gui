@@ -22,5 +22,11 @@ public enum KeySequenceResult
     Rejected,
 
     /// <summary>The active sequence timed out.</summary>
-    TimedOut
+    TimedOut,
+
+    /// <summary>Persistent command mode was entered.</summary>
+    ModeEntered,
+
+    /// <summary>Persistent command mode was exited.</summary>
+    ModeExited
 }

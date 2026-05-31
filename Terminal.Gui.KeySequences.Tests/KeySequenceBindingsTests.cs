@@ -95,4 +95,70 @@ public class KeySequenceBindingsTests
 
         Assert.Throws<InvalidOperationException> (() => bindings.Add ("; m <count> k", _ => true));
     }
+
+    [Fact]
+    public void PersistentMode_Enters_Matches_And_Stays_In_Command_Mode ()
+    {
+        KeySequenceBindings bindings = new ()
+        {
+            Mode = KeySequenceMode.Persistent,
+            EnterModeKey = Key.Esc,
+            ExitModeKey = 'i'
+        };
+        int moveCount = 0;
+
+        bindings.AddMode ("<count> k", context =>
+        {
+            moveCount = context.Count;
+            Assert.True (context.IsCommandMode);
+            Assert.Null (context.LeaderKey);
+            return true;
+        });
+
+        View target = new ();
+
+        Assert.Equal (KeySequenceResult.ModeEntered, bindings.ProcessKey (target, Key.Esc));
+        Assert.True (bindings.IsCommandMode);
+        Assert.Equal (KeySequenceResult.Pending, bindings.ProcessKey (target, '4'));
+        Assert.Equal (KeySequenceResult.Matched, bindings.ProcessKey (target, 'k'));
+        Assert.Equal (4, moveCount);
+        Assert.True (bindings.IsCommandMode);
+    }
+
+    [Fact]
+    public void PersistentMode_Exits_With_ExitModeKey ()
+    {
+        KeySequenceBindings bindings = new ()
+        {
+            Mode = KeySequenceMode.Persistent,
+            EnterModeKey = Key.Esc,
+            ExitModeKey = 'i'
+        };
+
+        View target = new ();
+
+        bindings.ProcessKey (target, Key.Esc);
+
+        Assert.Equal (KeySequenceResult.ModeExited, bindings.ProcessKey (target, 'i'));
+        Assert.False (bindings.IsCommandMode);
+    }
+
+    [Fact]
+    public void PersistentMode_Rejects_Invalid_Sequence_And_Stays_In_Command_Mode ()
+    {
+        KeySequenceBindings bindings = new ()
+        {
+            Mode = KeySequenceMode.Persistent,
+            EnterModeKey = Key.Esc,
+            ExitModeKey = 'i'
+        };
+        bindings.AddMode ("k", _ => true);
+
+        View target = new ();
+
+        bindings.ProcessKey (target, Key.Esc);
+
+        Assert.Equal (KeySequenceResult.Rejected, bindings.ProcessKey (target, 'x'));
+        Assert.True (bindings.IsCommandMode);
+    }
 }

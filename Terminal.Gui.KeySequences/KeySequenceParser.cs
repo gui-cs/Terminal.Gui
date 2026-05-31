@@ -13,7 +13,7 @@ public static class KeySequenceParser
             throw new ArgumentException (@"Pattern must not be empty.", nameof (pattern));
         }
 
-        string [] parts = pattern.Split (' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        string [] parts = SplitPattern (pattern);
 
         if (parts.Length == 0)
         {
@@ -22,9 +22,33 @@ public static class KeySequenceParser
 
         Key leaderKey = ParseKeyToken (parts [0]);
         KeySequencePattern sequencePattern = KeySequencePattern.Leader (leaderKey);
+        AddTokens (sequencePattern, parts, 1, pattern);
+
+        return sequencePattern;
+    }
+
+    /// <summary>Parses a persistent command-mode sequence pattern.</summary>
+    public static KeySequencePattern ParseCommandMode (string pattern)
+    {
+        if (string.IsNullOrWhiteSpace (pattern))
+        {
+            throw new ArgumentException (@"Pattern must not be empty.", nameof (pattern));
+        }
+
+        string [] parts = SplitPattern (pattern);
+        KeySequencePattern sequencePattern = KeySequencePattern.CommandMode ();
+        AddTokens (sequencePattern, parts, 0, pattern);
+
+        return sequencePattern;
+    }
+
+    private static string [] SplitPattern (string pattern) => pattern.Split (' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    private static void AddTokens (KeySequencePattern sequencePattern, string [] parts, int start, string pattern)
+    {
         bool hasCount = false;
 
-        for (int i = 1; i < parts.Length; i++)
+        for (int i = start; i < parts.Length; i++)
         {
             string part = parts [i];
 
@@ -54,8 +78,6 @@ public static class KeySequenceParser
 
             sequencePattern.Then (ParseKeyToken (part));
         }
-
-        return sequencePattern;
     }
 
     private static Key ParseKeyToken (string token)

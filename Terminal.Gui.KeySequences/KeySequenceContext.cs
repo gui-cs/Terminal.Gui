@@ -10,7 +10,10 @@ public sealed record KeySequenceContext
     public required View Target { get; init; }
 
     /// <summary>Gets the leader key that started capture.</summary>
-    public required Key LeaderKey { get; init; }
+    public Key? LeaderKey { get; init; }
+
+    /// <summary>Gets whether the sequence matched in persistent command mode.</summary>
+    public bool IsCommandMode { get; init; }
 
     /// <summary>Gets the keys entered after the leader key.</summary>
     public required IReadOnlyList<Key> Keys { get; init; }
