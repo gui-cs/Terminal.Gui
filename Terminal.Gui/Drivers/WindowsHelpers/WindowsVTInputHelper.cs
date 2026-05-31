@@ -74,7 +74,6 @@ internal sealed class WindowsVTInputHelper : IDisposable
     private const uint CP_UTF8 = 65001;
 
     private readonly uint _originalConsoleCP;
-    private readonly Encoding _utf8 = new UTF8Encoding (encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 
     public WindowsVTInputHelper ()
     {
