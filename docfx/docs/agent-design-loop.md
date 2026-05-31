@@ -4,7 +4,7 @@ This proposal adapts the WinUI plugin model ([microsoft/win-dev-skills](https://
 
 ## Problem
 
-AI agents can generate Terminal.Gui views, but they need a fast, reliable way to **see** what was rendered and share it with humans in chat-first workflows.
+AI agents can generate Terminal.Gui apps, but they need a fast, reliable way to **see** what was rendered and share it with humans in chat-first workflows.
 
 ## Proposed End State
 
@@ -23,7 +23,7 @@ src/tools/                helper CLIs used by skills
 ### Suggested skill set
 
 - `tui-setup` - install/verify prerequisites for Terminal.Gui, `dotnet`, and `tuirec`
-- `tui-design` - headless render + iterative layout refinement
+- `tui-design` - headless render + iterative app UX/layout refinement
 - `tui-dev-workflow` - scaffold/build/run/fix inner-loop workflow
 - `tui-snapshot` - capture/compare golden screen snapshots
 - `tui-record` - produce GIF/video evidence using `tuirec`
@@ -34,11 +34,19 @@ src/tools/                helper CLIs used by skills
 
 The design loop should be first-class and consistent:
 
-1. Agent edits view code
+1. Agent edits app code (views, state, commands, and workflows)
 2. Agent renders offscreen in a deterministic terminal size
 3. Agent captures the **full text grid**
 4. Agent optionally rasterizes to PNG/GIF for human review
 5. Accepted grid becomes a golden snapshot artifact
+
+## Scope and rollout
+
+The proposal should target full Terminal.Gui app development as the first milestone.
+
+1. **Phase 1 (now):** deeply optimize for Terminal.Gui app authoring and review.
+2. **Phase 2:** generalize the same design-loop contracts to other .NET TUI frameworks.
+3. **Phase 3:** extend the plugin model to non-.NET TUI frameworks where the same artifacts/contracts apply.
 
 ## Self-improvement feedback loop
 
