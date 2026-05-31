@@ -28,7 +28,7 @@ src/tools/                helper CLIs used by skills
 - `tui-snapshot` - capture/compare golden screen snapshots
 - `tui-record` - produce GIF/video evidence using `tuirec`
 - `tui-code-review` - TUI-specific review pass before commit
-- `tui-session-report` - summarize what happened in an agent session
+- `tui-session-report` - summarize what happened in an agent session, including what the agent learned
 
 ## Design-loop contract across repos
 
@@ -39,6 +39,16 @@ The design loop should be first-class and consistent:
 3. Agent captures the **full text grid**
 4. Agent optionally rasterizes to PNG/GIF for human review
 5. Accepted grid becomes a golden snapshot artifact
+
+## Self-improvement feedback loop
+
+The plugin should include a built-in path for agents to improve guidance over time:
+
+1. `tui-session-report` emits a structured "lessons learned" block (failures, recovery steps, missing docs, tool friction).
+2. A dedupe step computes a stable fingerprint so repeated sessions with the same lesson do not create duplicates.
+3. Only high-signal lessons open issues in the plugin repo (for example: seen in multiple sessions or marked as blocking).
+4. Issue creation is rate-limited (for example: max N auto-filed issues per day) and labels items as `agent-feedback`.
+5. Each issue links evidence (session id, logs/snapshots, repro steps) and a concrete proposed guidance/tooling update.
 
 ## Required enhancements by repo
 
