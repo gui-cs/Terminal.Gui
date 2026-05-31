@@ -80,14 +80,12 @@ internal sealed class WindowsVTInputHelper : IDisposable
     {
         _originalConsoleCP = GetConsoleCP ();
 
-        if (_originalConsoleCP != CP_UTF8)
+        if (_originalConsoleCP == CP_UTF8 || SetConsoleCP (CP_UTF8))
         {
-            if (!SetConsoleCP (CP_UTF8))
-            {
-                int error = Marshal.GetLastWin32Error ();
-                Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to set console input code page to UTF-8. Win32 error: {error}");
-            }
+            return;
         }
+        int error = Marshal.GetLastWin32Error ();
+        Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to set console input code page to UTF-8. Win32 error: {error}");
     }
 
     /// <summary>
