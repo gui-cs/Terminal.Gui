@@ -67,15 +67,16 @@ public sealed class KeySequencesDemo : Scenario
         ConfigurationManager.Enable (ConfigLocations.All);
         using IApplication app = Application.Create ();
         app.Init ();
+        app.Keyboard.KeyBindings.Remove (Key.Esc);
 
         using Window window = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = "Key Sequences - :q to Quit"
         };
 
         Label title = new ()
         {
-            Text = "Command mode: ; enters, i exits",
+            Text = "Command mode: Esc enters, i exits, :q quits",
             X = 0,
             Y = 0
         };
@@ -115,23 +116,24 @@ public sealed class KeySequencesDemo : Scenario
         window.Add (title, commands, editor, logView);
 
         AddLog ("Focus is on the editor.");
-        AddLog ("Press ; once to enter command mode.");
+        AddLog ("Press Esc once to enter command mode.");
         AddLog ("Motions: h/j/k/l, 4 j, w, b, 0, $, g g, G, Ctrl+B/F");
         AddLog ("Selection: v h/j/k/l/w/b/0/$/g g/G/Ctrl+B/Ctrl+F");
         AddLog ("Edit: d d, 3 d d, y y, v y, v c, p, x, X, u, Ctrl+R");
-        AddLog ("Press i to return to normal editing.");
+        AddLog ("Press i to return to normal editing. Press : q to quit.");
 
         using IDisposable registration = editor.UseKeySequences (
             bindings =>
             {
                 bindings.Mode = KeySequenceMode.Persistent;
-                bindings.EnterModeKey = ';';
+                bindings.EnterModeKey = Key.Esc;
                 bindings.ExitModeKey = 'i';
                 bindings.Timeout = TimeSpan.FromSeconds (5);
 
                 AddMotionBindings (bindings, editor);
                 AddSelectionBindings (bindings, editor);
                 AddEditingBindings (bindings, editor);
+                AddQuitBinding (bindings, app);
 
                 bindings.StateChanged += (_, e) =>
                 {
@@ -222,6 +224,16 @@ public sealed class KeySequencesDemo : Scenario
         AddCommand (bindings, editor, "v c", Command.Cut, "v c");
         AddCountedLineCommand (bindings, editor, "<count> d d", Command.Cut, "d d");
         AddCountedLineCommand (bindings, editor, "<count> y y", Command.Copy, "y y");
+    }
+
+    private void AddQuitBinding (KeySequenceBindings bindings, IApplication app)
+    {
+        bindings.AddMode (": q", context =>
+        {
+            AddLog ($"{FormatSequence (context)} -> quit");
+            app.RequestStop ();
+            return true;
+        });
     }
 
     private void AddRepeatedCommand (KeySequenceBindings bindings, Editor editor, string pattern, Command command, string display)

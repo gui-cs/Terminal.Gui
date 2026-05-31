@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Terminal.Gui.KeySequences\Terminal.Gui.KeySequences.csproj" />
-    <ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
+    <ProjectReference Include="..\Terminal.Gui.KeySequences.csproj" />
+    <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
   </ItemGroup>
 
   <ItemGroup>
