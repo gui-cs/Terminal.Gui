@@ -52,6 +52,10 @@ public class Mandelbrot : Scenario
             Y = Pos.Center (),
             Width = ImageColumns,
             Height = ImageRows,
+            BorderStyle = LineStyle.Double,
+            CanFocus = true,
+            TabStop = TabBehavior.TabGroup,
+            Arrangement = ViewArrangement.Resizable,
             UseSixel = true
         };
 
