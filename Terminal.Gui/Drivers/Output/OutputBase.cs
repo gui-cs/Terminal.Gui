@@ -501,10 +501,15 @@ public abstract class OutputBase
         }
 
         StringBuilder ansiOutput = new ();
-        Attribute? lastAttr = null;
+        bool wroteRasterImages = AppendRasterImageAnsi (buffer, ansiOutput);
 
+        if (wroteRasterImages)
+        {
+            ansiOutput.Append (EscSeqUtils.CSI_SetCursorPosition (1, 1));
+        }
+
+        Attribute? lastAttr = null;
         BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
-        AppendRasterImageAnsi (buffer, ansiOutput);
 
         return ansiOutput.ToString ();
     }
@@ -534,22 +539,28 @@ public abstract class OutputBase
         }
     }
 
-    private static void AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output)
+    private static bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output)
     {
+        bool wroteRasterImages = false;
+
         foreach (RasterImageCommand command in buffer.GetRasterImages ())
         {
             foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
             {
                 if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
                 {
+
                     continue;
                 }
 
                 output.Append (EscSeqUtils.CSI_SetCursorPosition (visibleCells.Y + 1, visibleCells.X + 1));
                 SixelEncoder encoder = command.Encoder ?? new ();
                 output.Append (encoder.EncodeSixel (pixels));
+                wroteRasterImages = true;
             }
         }
+
+        return wroteRasterImages;
     }
 
     private static IEnumerable<Rectangle> GetVisibleRasterCellRectangles (RasterImageCommand command)

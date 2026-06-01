@@ -298,6 +298,7 @@ public class OutputBufferImpl : IOutputBuffer
     public void AddRasterImage (RasterImageCommand command)
     {
         ArgumentNullException.ThrowIfNull (command);
+        ArgumentException.ThrowIfNullOrEmpty (command.Id);
 
         if (command.Pixels is null)
         {
@@ -312,16 +313,18 @@ public class OutputBufferImpl : IOutputBuffer
         lock (_contentsLock)
         {
             command.Clip = Clip?.Clone ();
-            MarkRasterImageCellsClean (command);
-            int index = _rasterImages.FindIndex (existing => existing.Id is not null && existing.Id == command.Id);
+            int index = _rasterImages.FindIndex (existing => existing.Id == command.Id);
 
             if (index >= 0)
             {
+                MarkRasterImageCellsDirty (_rasterImages [index]);
+                MarkRasterImageCellsClean (command);
                 _rasterImages [index] = command;
 
                 return;
             }
 
+            MarkRasterImageCellsClean (command);
             _rasterImages.Add (command);
         }
     }
@@ -333,7 +336,17 @@ public class OutputBufferImpl : IOutputBuffer
 
         lock (_contentsLock)
         {
-            _rasterImages.RemoveAll (command => command.Id == id);
+            for (int i = _rasterImages.Count - 1; i >= 0; i--)
+            {
+                if (_rasterImages [i].Id != id)
+                {
+
+                    continue;
+                }
+
+                MarkRasterImageCellsDirty (_rasterImages [i]);
+                _rasterImages.RemoveAt (i);
+            }
         }
     }
 
@@ -341,6 +354,16 @@ public class OutputBufferImpl : IOutputBuffer
     public IReadOnlyList<RasterImageCommand> GetRasterImages () => _rasterImages;
 
     private void MarkRasterImageCellsClean (RasterImageCommand command)
+    {
+        SetRasterImageCellsDirtyState (command, false);
+    }
+
+    private void MarkRasterImageCellsDirty (RasterImageCommand command)
+    {
+        SetRasterImageCellsDirtyState (command, true);
+    }
+
+    private void SetRasterImageCellsDirtyState (RasterImageCommand command, bool isDirty)
     {
         if (Contents is null)
         {
@@ -355,6 +378,7 @@ public class OutputBufferImpl : IOutputBuffer
 
             if (visible.Width <= 0 || visible.Height <= 0)
             {
+
                 continue;
             }
 
@@ -362,7 +386,8 @@ public class OutputBufferImpl : IOutputBuffer
             {
                 for (int col = visible.X; col < visible.Right; col++)
                 {
-                    Contents [row, col].IsDirty = false;
+                    Contents [row, col].IsDirty = isDirty;
+                    DirtyLines [row] |= isDirty;
                 }
             }
         }

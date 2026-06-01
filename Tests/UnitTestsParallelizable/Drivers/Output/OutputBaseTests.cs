@@ -1031,6 +1031,127 @@ public class OutputBaseTests
 
     // Copilot - GPT-5.5
     [Fact]
+    public void ToAnsi_RasterImage_RendersBeforeLaterTextCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+        buffer.Move (0, 0);
+        buffer.AddStr ("\u03a9");
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        int imageIndex = ansi.IndexOf ("\u001bP", StringComparison.Ordinal);
+        int resetAfterImageIndex = ansi.IndexOf (EscSeqUtils.CSI_SetCursorPosition (1, 1), imageIndex, StringComparison.Ordinal);
+        int textIndex = ansi.IndexOf ("\u03a9", StringComparison.Ordinal);
+        Assert.InRange (imageIndex, 0, resetAfterImageIndex - 1);
+        Assert.InRange (resetAfterImageIndex, imageIndex + 1, textIndex - 1);
+    }
+
+    // Copilot - GPT-5.5
+    [Theory]
+    [InlineData (null)]
+    [InlineData ("")]
+    public void AddRasterImage_RequiresId (string? id)
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+
+        RasterImageCommand command = new ()
+        {
+            Id = id,
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        // Act & Assert
+        Assert.ThrowsAny<ArgumentException> (() => buffer.AddRasterImage (command));
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void AddRasterImage_ReplacingExistingInvalidatesOldOnlyCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        RasterImageCommand oldCommand = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (4, 4, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        };
+
+        buffer.AddRasterImage (oldCommand);
+        buffer.DirtyLines [3] = false;
+
+        RasterImageCommand newCommand = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (0, 255, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        // Act
+        buffer.AddRasterImage (newCommand);
+
+        // Assert
+        RasterImageCommand captured = Assert.Single (buffer.GetRasterImages ());
+        Assert.Equal (new Rectangle (0, 0, 2, 2), captured.DestinationCells);
+        Assert.True (buffer.Contents! [3, 3].IsDirty);
+        Assert.True (buffer.DirtyLines [3]);
+        Assert.False (buffer.Contents [0, 0].IsDirty);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void RemoveRasterImage_InvalidatesCoveredCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+        buffer.DirtyLines [0] = false;
+
+        // Act
+        buffer.RemoveRasterImage ("image");
+
+        // Assert
+        Assert.Empty (buffer.GetRasterImages ());
+        Assert.True (buffer.Contents! [0, 0].IsDirty);
+        Assert.True (buffer.DirtyLines [0]);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
     public void Write_RasterImage_RendersBeforeLaterDirtyCells ()
     {
         // Arrange
