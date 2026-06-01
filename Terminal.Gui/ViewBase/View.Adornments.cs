@@ -11,6 +11,11 @@ public partial class View // Adornments
         {
             return;
         }
+
+        Thickness previousMarginThickness = Margin.Thickness;
+        Thickness previousBorderThickness = Border.Thickness;
+        Thickness previousPaddingThickness = Padding.Thickness;
+
         Margin.Parent = this;
         Border.Parent = this;
         Padding.Parent = this;
@@ -18,27 +23,42 @@ public partial class View // Adornments
         // When any adornment's thickness changes, recompute frames and request layout + redraw.
         Margin.ThicknessChanged += (_, _) =>
                                    {
-                                       Margin.View?.SetNeedsLayout ();
-                                       SetAdornmentFrames ();
-                                       SetNeedsLayout ();
-                                       SetNeedsDraw ();
+                                      previousMarginThickness = HandleAdornmentThicknessChanged (Margin, previousMarginThickness);
                                    };
 
         Border.ThicknessChanged += (_, _) =>
                                    {
-                                       Border.View?.SetNeedsLayout ();
-                                       SetAdornmentFrames ();
-                                       SetNeedsLayout ();
-                                       SetNeedsDraw ();
+                                       previousBorderThickness = HandleAdornmentThicknessChanged (Border, previousBorderThickness);
                                    };
 
         Padding.ThicknessChanged += (_, _) =>
                                     {
-                                        Padding.View?.SetNeedsLayout ();
-                                        SetAdornmentFrames ();
-                                        SetNeedsLayout ();
-                                        SetNeedsDraw ();
+                                        previousPaddingThickness = HandleAdornmentThicknessChanged (Padding, previousPaddingThickness);
                                     };
+
+        Thickness HandleAdornmentThicknessChanged (IAdornment adornment, Thickness previousThickness)
+        {
+            Rectangle oldViewport = GetViewportForAdornmentThickness (adornment, previousThickness);
+            Rectangle oldViewportFrame = GetViewportFrameForAdornmentThickness (adornment, previousThickness);
+            Thickness currentThickness = adornment.Thickness;
+
+            (adornment.View as View)?.SetNeedsLayout ();
+            SetAdornmentFrames ();
+            SetNeedsLayout ();
+            SetNeedsDraw ();
+
+            if (oldViewportFrame != GetViewportFrameForAdornmentThickness (adornment, currentThickness))
+            {
+                InvalidateAdornmentThicknessChange ();
+            }
+
+            if (oldViewport != Viewport)
+            {
+                RaiseViewportChangedEvent (oldViewport);
+            }
+
+            return currentThickness;
+        }
     }
 
     private void BeginInitAdornments ()
@@ -344,5 +364,47 @@ public partial class View // Adornments
 
         // Border and Padding dynamically update based on Margin's View's Frame changing
         Margin.View?.Frame = Frame with { Location = Point.Empty };
+    }
+
+    private Rectangle GetViewportForAdornmentThickness (IAdornment changedAdornment, Thickness changedThickness)
+    {
+        Thickness thickness = GetAdornmentsThicknessForAdornment (changedAdornment, changedThickness);
+
+        return new Rectangle (_viewportLocation,
+                              new Size (Math.Max (0, Frame.Width - thickness.Horizontal), Math.Max (0, Frame.Height - thickness.Vertical)));
+    }
+
+    private Rectangle GetViewportFrameForAdornmentThickness (IAdornment changedAdornment, Thickness changedThickness)
+    {
+        Thickness thickness = GetAdornmentsThicknessForAdornment (changedAdornment, changedThickness);
+
+        return new Rectangle (new Point (thickness.Left, thickness.Top),
+                              new Size (Math.Max (0, Frame.Width - thickness.Horizontal), Math.Max (0, Frame.Height - thickness.Vertical)));
+    }
+
+    private Thickness GetAdornmentsThicknessForAdornment (IAdornment changedAdornment, Thickness changedThickness)
+    {
+        Thickness thickness = Thickness.Empty;
+
+        thickness += ReferenceEquals (changedAdornment, Margin) ? changedThickness : Margin.Thickness;
+        thickness += ReferenceEquals (changedAdornment, Border) ? changedThickness : Border.Thickness;
+        thickness += ReferenceEquals (changedAdornment, Padding) ? changedThickness : Padding.Thickness;
+
+        return thickness;
+    }
+
+    private void InvalidateAdornmentThicknessChange ()
+    {
+        if (SuperView is null)
+        {
+            NeedsClearScreenNextIteration ();
+
+            return;
+        }
+
+        Rectangle invalidationViewport = Frame;
+        Point superScroll = SuperView.Viewport.Location;
+        invalidationViewport.Offset (-superScroll.X, -superScroll.Y);
+        SuperView.SetNeedsDraw (invalidationViewport);
     }
 }
