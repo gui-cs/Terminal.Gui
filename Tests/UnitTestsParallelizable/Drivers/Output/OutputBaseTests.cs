@@ -948,6 +948,118 @@ public class OutputBaseTests
         driver.Dispose ();
     }
 
+    // Copilot - GPT-5.5
+    [Fact]
+    public void AddRasterImage_CapturesCurrentClip ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (1, 1, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (4, 4, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        };
+
+        // Act
+        buffer.AddRasterImage (command);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        // Assert
+        RasterImageCommand captured = Assert.Single (buffer.GetRasterImages ());
+        Assert.NotNull (captured.Clip);
+        Assert.Equal (new Rectangle (1, 1, 2, 2), captured.Clip!.GetBounds ());
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void ToAnsi_RasterImage_CropsToClipAndMovesCursor ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (1, 1, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (4, 4, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        Assert.Contains (EscSeqUtils.CSI_SetCursorPosition (2, 2), ansi);
+        Assert.Contains ("\u001bP0;0;0q\"1;1;2;2", ansi);
+        Assert.DoesNotContain ("\u001bP0;0;0q\"1;1;4;4", ansi);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void ToAnsi_RasterImage_SkipsWhenClipDoesNotIntersect ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (3, 3, 1, 1));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        Assert.DoesNotContain ("\u001bP", ansi);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void Write_RasterImage_RendersBeforeLaterDirtyCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+        buffer.Move (0, 0);
+        buffer.AddStr ("\u03a9");
+
+        // Act
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        // Assert
+        int imageIndex = rendered.IndexOf ("\u001bP", StringComparison.Ordinal);
+        int textIndex = rendered.IndexOf ("\u03a9", StringComparison.Ordinal);
+        Assert.InRange (imageIndex, 0, textIndex - 1);
+    }
+
     [Fact]
     public void DriverImpl_SixelSupport_DefaultsToNull ()
     {
@@ -1042,5 +1154,20 @@ public class OutputBaseTests
         Assert.True (driver.SixelSupport.SupportsTransparency);
 
         driver.Dispose ();
+    }
+
+    private static Color [,] CreateSolidImage (int width, int height, Color color)
+    {
+        Color [,] image = new Color [width, height];
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                image [x, y] = color;
+            }
+        }
+
+        return image;
     }
 }
