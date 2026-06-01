@@ -7,6 +7,9 @@ public class Mandelbrot : Scenario
 {
     private const int ImageColumns = 30;
     private const int ImageRows = 20;
+    private const double MinimumSpan = 0.05;
+    private const double ZoomInFactor = 0.5;
+    private const double ZoomOutFactor = 2;
 
     private IApplication _app = null!;
     private NumericUpDown<double> _centerX = null!;
@@ -63,6 +66,9 @@ public class Mandelbrot : Scenario
         };
 
         BuildSettings (settings);
+        BuildZoomButtons ();
+        _mandelbrotView.ViewportChanged += (_, _) => RenderMandelbrot ();
+
         display.Add (_status, _mandelbrotView);
         _window.Add (settings, display);
 
@@ -134,7 +140,7 @@ public class Mandelbrot : Scenario
 
         _span.ValueChanging += (_, args) =>
                                {
-                                   if (args.NewValue <= 0.05)
+                                   if (args.NewValue < MinimumSpan)
                                    {
                                        args.Handled = true;
                                    }
@@ -176,11 +182,43 @@ public class Mandelbrot : Scenario
             X = 1,
             Y = 13,
             Width = Dim.Fill (1),
-            Height = 4,
-            Text = "The image is a 30 x 20\nImageView SubView drawn\nthrough sixel raster\ncommands."
+            Height = 5,
+            Text = "The bordered image starts\nat 30 x 20 cells. Resize\nit or use +/- to rerender\nthrough sixel raster\ncommands."
         };
 
         settings.Add (_centerX, _centerY, _span, _iterations, reset, overlay, note);
+    }
+
+    private void BuildZoomButtons ()
+    {
+        Button zoomOut = new ()
+        {
+            X = Pos.AnchorEnd (2),
+            Y = Pos.AnchorEnd (1),
+            Width = 1,
+            Height = 1,
+            Text = "-",
+            NoDecorations = true,
+            NoPadding = true,
+            ShadowStyle = null
+        };
+
+        Button zoomIn = new ()
+        {
+            X = Pos.AnchorEnd (1),
+            Y = Pos.AnchorEnd (1),
+            Width = 1,
+            Height = 1,
+            Text = "+",
+            NoDecorations = true,
+            NoPadding = true,
+            ShadowStyle = null
+        };
+
+        zoomOut.Accepted += (_, _) => Zoom (ZoomOutFactor);
+        zoomIn.Accepted += (_, _) => Zoom (ZoomInFactor);
+
+        _mandelbrotView.Add (zoomOut, zoomIn);
     }
 
     private void ResetSettings ()
@@ -192,6 +230,18 @@ public class Mandelbrot : Scenario
         RenderMandelbrot ();
     }
 
+    private void Zoom (double spanMultiplier)
+    {
+        double nextSpan = Math.Max (MinimumSpan, _span.Value * spanMultiplier);
+
+        if (Math.Abs (nextSpan - _span.Value) < double.Epsilon)
+        {
+            return;
+        }
+
+        _span.Value = nextSpan;
+    }
+
     private void RenderMandelbrot ()
     {
         if (_mandelbrotView is null)
@@ -200,8 +250,17 @@ public class Mandelbrot : Scenario
         }
 
         SixelSupportResult support = EnsureSixelSupportForDemo ();
-        int pixelWidth = ImageColumns * Math.Max (1, support.Resolution.Width);
-        int pixelHeight = ImageRows * Math.Max (1, support.Resolution.Height);
+        Rectangle viewport = _mandelbrotView.Viewport;
+        int imageColumns = Math.Max (0, viewport.Width);
+        int imageRows = Math.Max (0, viewport.Height);
+
+        if (imageColumns == 0 || imageRows == 0)
+        {
+            return;
+        }
+
+        int pixelWidth = imageColumns * Math.Max (1, support.Resolution.Width);
+        int pixelHeight = imageRows * Math.Max (1, support.Resolution.Height);
         int iterations = _iterations.Value;
         double centerX = _centerX.Value;
         double centerY = _centerY.Value;
@@ -210,7 +269,7 @@ public class Mandelbrot : Scenario
         _mandelbrotView.Render (pixelWidth, pixelHeight, centerX, centerY, span, iterations, support);
         string renderMode = _mandelbrotView.IsUsingSixel ? "Sixel raster" : "Cell fallback";
         _status.Text =
-            $"{renderMode}: {pixelWidth} x {pixelHeight}px, {support.Resolution.Width} x {support.Resolution.Height}px/cell";
+            $"{renderMode}: {imageColumns} x {imageRows} cells, {pixelWidth} x {pixelHeight}px";
         _status.SetNeedsDraw ();
     }
 
