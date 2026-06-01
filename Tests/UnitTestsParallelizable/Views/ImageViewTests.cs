@@ -36,8 +36,8 @@ public class ImageViewTests
         Assert.Equal ([Command.ScrollUp], imageView.KeyBindings.GetCommands (Key.CursorUp));
         Assert.Equal ([Command.ScrollDown], imageView.KeyBindings.GetCommands (Key.CursorDown));
         Assert.Equal ([Command.Home], imageView.KeyBindings.GetCommands (Key.Home));
-        Assert.Equal ([Command.ZoomOut], imageView.KeyBindings.GetCommands (Key.PageUp));
-        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (Key.PageDown));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (Key.PageUp));
+        Assert.Equal ([Command.ZoomOut], imageView.KeyBindings.GetCommands (Key.PageDown));
         Assert.Equal ([Command.ZoomIn], imageView.MouseBindings.GetCommands (MouseFlags.WheeledUp));
         Assert.Equal ([Command.ZoomOut], imageView.MouseBindings.GetCommands (MouseFlags.WheeledDown));
         Assert.Equal ([Command.Center], imageView.MouseBindings.GetCommands (MouseFlags.LeftButtonDoubleClicked));
@@ -51,7 +51,7 @@ public class ImageViewTests
 
     // Copilot - GPT-5.5
     [Fact]
-    public void BackgroundRendering_WhenEnabled_ShowsRenderingOverlayOnFirstDraw ()
+    public void BackgroundRendering_WhenEnabled_ShowsSpinnerBeforeFirstDraw ()
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -69,13 +69,16 @@ public class ImageViewTests
         };
         runnable.Add (imageView);
 
-        Label overlay = Assert.Single (imageView.SubViews.OfType<Label> ());
-        Assert.False (overlay.Visible);
+        SpinnerView overlay = Assert.Single (imageView.SubViews.OfType<SpinnerView> ());
+        Assert.True (overlay.Visible);
+        Assert.True (overlay.AutoSpin);
+        Assert.IsType<SpinnerStyle.Aesthetic2> (overlay.Style);
 
         app.LayoutAndDraw ();
 
         Assert.True (overlay.Visible);
-        Assert.Equal ("Rendering...", overlay.Text);
+        Assert.True (overlay.AutoSpin);
+        Assert.IsType<SpinnerStyle.Aesthetic2> (overlay.Style);
 
         runnable.Dispose ();
     }
@@ -649,7 +652,7 @@ public class ImageViewTests
         runnable.Add (imageView);
         app.LayoutAndDraw ();
 
-        Assert.True (imageView.NewKeyDownEvent (Key.PageDown));
+        Assert.True (imageView.NewKeyDownEvent (Key.PageUp));
         Assert.True (imageView.ZoomLevel > 1d);
 
         imageView.ZoomLevel = 2d;
@@ -670,6 +673,30 @@ public class ImageViewTests
 
     // Copilot - GPT-5.5
     [Fact]
+    public void KeyBindings_PageDown_ZoomsOutBelowFit ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 4, Height = 4, UseSixel = false, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        for (int i = 0; i < 12; i++)
+        {
+            imageView.NewKeyDownEvent (Key.PageDown);
+        }
+
+        Assert.True (imageView.ZoomLevel < 1d);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
     public void ApplicationKeyDispatch_WhenFocused_ZoomsAndScrolls ()
     {
         using IApplication app = Application.Create ();
@@ -684,7 +711,7 @@ public class ImageViewTests
         app.LayoutAndDraw ();
         imageView.SetFocus ();
 
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.PageDown));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.PageUp));
         Assert.True (imageView.ZoomLevel > 1d);
 
         imageView.ZoomLevel = 2d;

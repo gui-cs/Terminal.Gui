@@ -16,6 +16,15 @@ public class RasterImageCommand
     public Color [,]? Pixels { get; set; }
 
     /// <summary>
+    ///     Gets or sets pre-encoded sixel data for <see cref="Pixels"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This is used only when the full <see cref="DestinationCells"/> rectangle is visible. Clipped output still
+    ///     encodes the cropped pixels so the emitted sixel dimensions match the clipped cell region.
+    /// </remarks>
+    public string? EncodedSixel { get; set; }
+
+    /// <summary>
     ///     Gets or sets the screen cells occupied by <see cref="Pixels"/>.
     /// </summary>
     public Rectangle DestinationCells { get; set; }

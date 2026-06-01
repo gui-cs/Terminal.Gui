@@ -532,8 +532,7 @@ public abstract class OutputBase
                 }
 
                 SetCursorPositionImpl (visibleCells.X, visibleCells.Y);
-                SixelEncoder encoder = command.Encoder ?? new ();
-                Write (new StringBuilder (encoder.EncodeSixel (pixels)));
+                Write (new StringBuilder (GetRasterImageSixelData (command, visibleCells, pixels)));
             }
 
             command.IsDirty = false;
@@ -555,13 +554,24 @@ public abstract class OutputBase
                 }
 
                 output.Append (EscSeqUtils.CSI_SetCursorPosition (visibleCells.Y + 1, visibleCells.X + 1));
-                SixelEncoder encoder = command.Encoder ?? new ();
-                output.Append (encoder.EncodeSixel (pixels));
+                output.Append (GetRasterImageSixelData (command, visibleCells, pixels));
                 wroteRasterImages = true;
             }
         }
 
         return wroteRasterImages;
+    }
+
+    private static string GetRasterImageSixelData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)
+    {
+        if (command.EncodedSixel is { } encodedSixel && visibleCells == command.DestinationCells)
+        {
+            return encodedSixel;
+        }
+
+        SixelEncoder encoder = command.Encoder ?? new ();
+
+        return encoder.EncodeSixel (pixels);
     }
 
     private static IEnumerable<Rectangle> GetVisibleRasterCellRectangles (RasterImageCommand command)

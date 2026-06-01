@@ -1062,6 +1062,34 @@ public class OutputBaseTests
     }
 
     // Copilot - GPT-5.5
+    [Fact]
+    public void ToAnsi_RasterImage_UsesEncodedSixelForFullVisibleRectangle ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        string encodedSixel = "\u001bPpre-encoded\u001b\\";
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        Assert.Contains (encodedSixel, ansi);
+        Assert.DoesNotContain ("\"1;1;2;2", ansi);
+    }
+
+    // Copilot - GPT-5.5
     [Theory]
     [InlineData (null)]
     [InlineData ("")]

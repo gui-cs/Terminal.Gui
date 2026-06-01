@@ -223,7 +223,8 @@ public class Images : Scenario
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.Resizable,
             UseSixel = true,
-            UseBackgroundRendering = true
+            UseBackgroundRendering = true,
+            Title = "ImageView"
         };
 
         Label lblPxX = new () { Y = 0, Text = "Pixels per Col:" };
@@ -258,15 +259,9 @@ public class Images : Scenario
 
     private void SetBackgroundRendering (bool enabled)
     {
-        if (_basicImageView is { })
-        {
-            _basicImageView.UseBackgroundRendering = enabled;
-        }
+        _basicImageView?.UseBackgroundRendering = enabled;
 
-        if (_sixelImageView is { })
-        {
-            _sixelImageView.UseBackgroundRendering = enabled;
-        }
+        _sixelImageView?.UseBackgroundRendering = enabled;
     }
 
     private void Driver_SixelSupportChanged (object sender, ValueChangedEventArgs<SixelSupportResult> e) => UpdateSixelSupportState (e.NewValue);
