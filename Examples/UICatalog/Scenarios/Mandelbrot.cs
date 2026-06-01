@@ -8,12 +8,23 @@ public class Mandelbrot : Scenario
     private const int ImageColumns = 30;
     private const int ImageRows = 20;
     private const double MinimumSpan = 0.05;
+    private const int SettingLabelWidth = 11;
+    private const int CenterXLabelGroupId = 1;
+    private const int CenterYLabelGroupId = 2;
+    private const int SpanLabelGroupId = 3;
+    private const int IterationsLabelGroupId = 4;
+    private const int ResetGroupId = 5;
+    private const int NoteGroupId = 6;
+    private const int FireLabelGroupId = 7;
+    private const int FireProgressGroupId = 8;
     private const double ZoomInFactor = 0.5;
     private const double ZoomOutFactor = 2;
 
     private IApplication _app = null!;
     private NumericUpDown<double> _centerX = null!;
     private NumericUpDown<double> _centerY = null!;
+    private ProgressBar _fireProgress = null!;
+    private object? _fireProgressTimeout;
     private NumericUpDown<int> _iterations = null!;
     private MandelbrotImageView _mandelbrotView = null!;
     private NumericUpDown<double> _span = null!;
@@ -27,32 +38,15 @@ public class Mandelbrot : Scenario
         _app = app;
         _app.Driver!.SixelSupportChanged += OnSixelSupportChanged;
 
-        _window = new () { Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()}" };
+        _window = new Window { Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()}" };
 
-        FrameView settings = new ()
-        {
-            Title = "Settings",
-            Width = 34,
-            Height = Dim.Fill ()
-        };
+        FrameView settings = new () { Title = "Settings", Width = 34, Height = Dim.Fill () };
 
-        View display = new ()
-        {
-            X = Pos.Right (settings),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            CanFocus = true
-        };
+        View display = new () { X = Pos.Right (settings), Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
 
-        _status = new ()
-        {
-            X = 1,
-            Y = 1,
-            Width = Dim.Fill (1),
-            Height = 1
-        };
+        _status = new Label { X = Pos.Align (Alignment.Start), Y = Pos.Align (Alignment.Start), Width = Dim.Fill (), Height = 1 };
 
-        _mandelbrotView = new ()
+        _mandelbrotView = new MandelbrotImageView
         {
             X = Pos.Center (),
             Y = Pos.Center (),
@@ -75,6 +69,8 @@ public class Mandelbrot : Scenario
         _window.Initialized += (_, _) =>
                                {
                                    RenderMandelbrot ();
+                                   StartFireProgress ();
+
                                    _app.AddTimeout (TimeSpan.FromMilliseconds (100),
                                                     () =>
                                                     {
@@ -90,50 +86,67 @@ public class Mandelbrot : Scenario
         }
         finally
         {
+            StopFireProgress ();
             _app.Driver!.SixelSupportChanged -= OnSixelSupportChanged;
             _window.Dispose ();
         }
     }
 
+    private bool AdvanceFireProgress ()
+    {
+        if (_fireProgressTimeout is null)
+        {
+            return false;
+        }
+
+        float nextFraction = _fireProgress.Fraction + 0.02f;
+        _fireProgress.Fraction = nextFraction >= 1 ? 0 : nextFraction;
+
+        return true;
+    }
+
     private void BuildSettings (View settings)
     {
-        settings.Add (
-                      new Label { X = 1, Y = 1, Text = "Center X:" },
-                      new Label { X = 1, Y = 3, Text = "Center Y:" },
-                      new Label { X = 1, Y = 5, Text = "Span:" },
-                      new Label { X = 1, Y = 7, Text = "Iterations:" });
+        Label centerXLabel = CreateSettingLabel ("Center X:", CenterXLabelGroupId);
+        Label centerYLabel = CreateSettingLabel ("Center Y:", CenterYLabelGroupId, centerXLabel);
+        Label spanLabel = CreateSettingLabel ("Span:", SpanLabelGroupId, centerYLabel);
+        Label iterationsLabel = CreateSettingLabel ("Iterations:", IterationsLabelGroupId, spanLabel);
 
-        _centerX = new ()
+        _centerX = new NumericUpDown<double>
         {
-            X = 14,
-            Y = 1,
+            X = Pos.Right (centerXLabel) + 1,
+            Y = Pos.Top (centerXLabel),
+            Width = Dim.Fill (),
             Value = -0.5,
             Increment = 0.05,
             Format = "{0:0.000}"
         };
 
-        _centerY = new ()
+        _centerY = new NumericUpDown<double>
         {
-            X = 14,
-            Y = 3,
+            X = Pos.Right (centerYLabel) + 1,
+            Y = Pos.Top (centerYLabel),
+            Width = Dim.Fill (),
             Value = 0,
             Increment = 0.05,
             Format = "{0:0.000}"
         };
 
-        _span = new ()
+        _span = new NumericUpDown<double>
         {
-            X = 14,
-            Y = 5,
+            X = Pos.Right (spanLabel) + 1,
+            Y = Pos.Top (spanLabel),
+            Width = Dim.Fill (),
             Value = 3,
             Increment = 0.1,
             Format = "{0:0.000}"
         };
 
-        _iterations = new ()
+        _iterations = new NumericUpDown<int>
         {
-            X = 14,
-            Y = 7,
+            X = Pos.Right (iterationsLabel) + 1,
+            Y = Pos.Top (iterationsLabel),
+            Width = Dim.Fill (),
             Value = 80,
             Increment = 10
         };
@@ -159,34 +172,48 @@ public class Mandelbrot : Scenario
         _span.ValueChanged += (_, _) => RenderMandelbrot ();
         _iterations.ValueChanged += (_, _) => RenderMandelbrot ();
 
-        Button reset = new ()
-        {
-            X = 1,
-            Y = 10,
-            Text = "_Reset"
-        };
+        Button reset = new () { X = Pos.Align (Alignment.Start, groupId: ResetGroupId), Y = Pos.Bottom (iterationsLabel) + 2, Text = "_Reset" };
 
         reset.Accepted += (_, _) => ResetSettings ();
 
-        Button overlay = new ()
-        {
-            X = Pos.Right (reset) + 2,
-            Y = 10,
-            Text = "_Overlay"
-        };
+        Button overlay = new () { X = Pos.Right (reset) + 1, Y = Pos.Top (reset), Text = "_Overlay" };
 
         overlay.Accepted += (_, _) => ShowOverlay ();
 
         Label note = new ()
         {
-            X = 1,
-            Y = 13,
-            Width = Dim.Fill (1),
-            Height = 5,
+            X = Pos.Align (Alignment.Start, groupId: NoteGroupId),
+            Y = Pos.Bottom (reset) + 2,
+            Width = Dim.Fill (),
+            Height = Dim.Auto (),
             Text = "The bordered image starts\nat 30 x 20 cells. Resize\nit or use +/- to rerender\nthrough sixel raster\ncommands."
         };
 
-        settings.Add (_centerX, _centerY, _span, _iterations, reset, overlay, note);
+        Label fireLabel = new () { X = Pos.Align (Alignment.Start, groupId: FireLabelGroupId), Y = Pos.AnchorEnd (2), Text = "Fire progress:" };
+
+        _fireProgress = new ProgressBar
+        {
+            X = Pos.Align (Alignment.Start, groupId: FireProgressGroupId),
+            Y = Pos.Bottom (fireLabel),
+            Width = Dim.Fill (),
+            ProgressBarStyle = ProgressBarStyle.Fire,
+            ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage,
+            CanFocus = true
+        };
+
+        settings.Add (centerXLabel,
+                      centerYLabel,
+                      spanLabel,
+                      iterationsLabel,
+                      _centerX,
+                      _centerY,
+                      _span,
+                      _iterations,
+                      reset,
+                      overlay,
+                      note,
+                      fireLabel,
+                      _fireProgress);
     }
 
     private void BuildZoomButtons ()
@@ -221,57 +248,15 @@ public class Mandelbrot : Scenario
         _mandelbrotView.Add (zoomOut, zoomIn);
     }
 
-    private void ResetSettings ()
-    {
-        _centerX.Value = -0.5;
-        _centerY.Value = 0;
-        _span.Value = 3;
-        _iterations.Value = 80;
-        RenderMandelbrot ();
-    }
-
-    private void Zoom (double spanMultiplier)
-    {
-        double nextSpan = Math.Max (MinimumSpan, _span.Value * spanMultiplier);
-
-        if (Math.Abs (nextSpan - _span.Value) < double.Epsilon)
+    private static Label CreateSettingLabel (string text, int groupId, View? previous = null) =>
+        new ()
         {
-            return;
-        }
-
-        _span.Value = nextSpan;
-    }
-
-    private void RenderMandelbrot ()
-    {
-        if (_mandelbrotView is null)
-        {
-            return;
-        }
-
-        SixelSupportResult support = EnsureSixelSupportForDemo ();
-        Rectangle viewport = _mandelbrotView.Viewport;
-        int imageColumns = Math.Max (0, viewport.Width);
-        int imageRows = Math.Max (0, viewport.Height);
-
-        if (imageColumns == 0 || imageRows == 0)
-        {
-            return;
-        }
-
-        int pixelWidth = imageColumns * Math.Max (1, support.Resolution.Width);
-        int pixelHeight = imageRows * Math.Max (1, support.Resolution.Height);
-        int iterations = _iterations.Value;
-        double centerX = _centerX.Value;
-        double centerY = _centerY.Value;
-        double span = _span.Value;
-
-        _mandelbrotView.Render (pixelWidth, pixelHeight, centerX, centerY, span, iterations, support);
-        string renderMode = _mandelbrotView.IsUsingSixel ? "Sixel raster" : "Cell fallback";
-        _status.Text =
-            $"{renderMode}: {imageColumns} x {imageRows} cells, {pixelWidth} x {pixelHeight}px";
-        _status.SetNeedsDraw ();
-    }
+            X = Pos.Align (Alignment.Start, groupId: groupId),
+            Y = previous is null ? Pos.Align (Alignment.Start) : Pos.Bottom (previous) + 1,
+            Width = SettingLabelWidth,
+            TextAlignment = Alignment.End,
+            Text = text
+        };
 
     private SixelSupportResult EnsureSixelSupportForDemo ()
     {
@@ -318,81 +303,106 @@ public class Mandelbrot : Scenario
         RenderMandelbrot ();
     }
 
+    private void RenderMandelbrot ()
+    {
+        if (_mandelbrotView is null)
+        {
+            return;
+        }
+
+        SixelSupportResult support = EnsureSixelSupportForDemo ();
+        Rectangle viewport = _mandelbrotView.Viewport;
+        int imageColumns = Math.Max (0, viewport.Width);
+        int imageRows = Math.Max (0, viewport.Height);
+
+        if (imageColumns == 0 || imageRows == 0)
+        {
+            return;
+        }
+
+        int pixelWidth = imageColumns * Math.Max (1, support.Resolution.Width);
+        int pixelHeight = imageRows * Math.Max (1, support.Resolution.Height);
+        int iterations = _iterations.Value;
+        double centerX = _centerX.Value;
+        double centerY = _centerY.Value;
+        double span = _span.Value;
+
+        _mandelbrotView.Render (pixelWidth, pixelHeight, centerX, centerY, span, iterations, support);
+        string renderMode = _mandelbrotView.IsUsingSixel ? "Sixel raster" : "Cell fallback";
+        _status.Text = $"{renderMode}: {imageColumns} x {imageRows} cells, {pixelWidth} x {pixelHeight}px";
+        _status.SetNeedsDraw ();
+    }
+
+    private void ResetSettings ()
+    {
+        _centerX.Value = -0.5;
+        _centerY.Value = 0;
+        _span.Value = 3;
+        _iterations.Value = 80;
+        RenderMandelbrot ();
+    }
+
     private void ShowOverlay ()
     {
         _mandelbrotView.SetNeedsDraw ();
 
-        Dialog dialog = new ()
+        Dialog dialog = new () { Title = "Overlay Runnable", Width = 38, Height = 9 };
+
+        dialog.Add (new Label
         {
-            Title = "Overlay Runnable",
-            Width = 38,
-            Height = 9
-        };
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Text = "This dialog is a runnable\nshown over the sixel image\nto exercise clipping."
+        });
 
-        dialog.Add (
-                    new Label
-                    {
-                        X = 1,
-                        Y = 1,
-                        Width = Dim.Fill (2),
-                        Height = 3,
-                        Text = "This dialog is a runnable\nshown over the sixel image\nto exercise clipping."
-                    });
-
-        dialog.AddButton (new () { Text = "_OK", IsDefault = true });
+        dialog.AddButton (new Button { Text = "_OK", IsDefault = true });
         _app.Run (dialog);
         dialog.Dispose ();
 
         _mandelbrotView.SetNeedsDraw ();
     }
 
+    private void StartFireProgress () => _fireProgressTimeout ??= _app.AddTimeout (TimeSpan.FromMilliseconds (80), AdvanceFireProgress);
+
+    private void StopFireProgress ()
+    {
+        if (_fireProgressTimeout is null)
+        {
+            return;
+        }
+
+        _app.RemoveTimeout (_fireProgressTimeout);
+        _fireProgressTimeout = null;
+    }
+
+    private void Zoom (double spanMultiplier)
+    {
+        double nextSpan = Math.Max (MinimumSpan, _span.Value * spanMultiplier);
+
+        if (Math.Abs (nextSpan - _span.Value) < double.Epsilon)
+        {
+            return;
+        }
+
+        _span.Value = nextSpan;
+    }
+
     private sealed class MandelbrotImageView : ImageView
     {
-        public void Render (int pixelWidth,
-                            int pixelHeight,
-                            double centerX,
-                            double centerY,
-                            double span,
-                            int maxIterations,
-                            SixelSupportResult support)
+        public void Render (int pixelWidth, int pixelHeight, double centerX, double centerY, double span, int maxIterations, SixelSupportResult support)
         {
             SixelEncoder = new ();
             SixelEncoder.Quantizer.MaxColors = Math.Min (support.MaxPaletteColors, 64);
             Image = CreateMandelbrotPixels (pixelWidth, pixelHeight, centerX, centerY, span, maxIterations);
         }
 
-        private static Color [,] CreateMandelbrotPixels (int width,
-                                                        int height,
-                                                        double centerX,
-                                                        double centerY,
-                                                        double span,
-                                                        int maxIterations)
-        {
-            Color [,] pixels = new Color [width, height];
-            double spanY = span * height / width;
-            double xMin = centerX - span / 2;
-            double yMin = centerY - spanY / 2;
-
-            for (int y = 0; y < height; y++)
-            {
-                double cy = yMin + spanY * y / Math.Max (1, height - 1);
-
-                for (int x = 0; x < width; x++)
-                {
-                    double cx = xMin + span * x / Math.Max (1, width - 1);
-                    int iterations = CountIterations (cx, cy, maxIterations);
-                    pixels [x, y] = GetMandelbrotColor (iterations, maxIterations);
-                }
-            }
-
-            return pixels;
-        }
-
         private static int CountIterations (double cx, double cy, int maxIterations)
         {
             double zx = 0;
             double zy = 0;
-            int iterations = 0;
+            var iterations = 0;
 
             while (zx * zx + zy * zy <= 4 && iterations < maxIterations)
             {
@@ -405,6 +415,28 @@ public class Mandelbrot : Scenario
             return iterations;
         }
 
+        private static Color [,] CreateMandelbrotPixels (int width, int height, double centerX, double centerY, double span, int maxIterations)
+        {
+            Color [,] pixels = new Color [width, height];
+            double spanY = span * height / width;
+            double xMin = centerX - span / 2;
+            double yMin = centerY - spanY / 2;
+
+            for (var y = 0; y < height; y++)
+            {
+                double cy = yMin + spanY * y / Math.Max (1, height - 1);
+
+                for (var x = 0; x < width; x++)
+                {
+                    double cx = xMin + span * x / Math.Max (1, width - 1);
+                    int iterations = CountIterations (cx, cy, maxIterations);
+                    pixels [x, y] = GetMandelbrotColor (iterations, maxIterations);
+                }
+            }
+
+            return pixels;
+        }
+
         private static Color GetMandelbrotColor (int iterations, int maxIterations)
         {
             if (iterations >= maxIterations)
@@ -413,11 +445,11 @@ public class Mandelbrot : Scenario
             }
 
             double t = (double)iterations / maxIterations;
-            byte red = (byte)(9 * (1 - t) * t * t * t * 255);
-            byte green = (byte)(15 * (1 - t) * (1 - t) * t * t * 255);
-            byte blue = (byte)(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);
+            var red = (byte)(9 * (1 - t) * t * t * t * 255);
+            var green = (byte)(15 * (1 - t) * (1 - t) * t * t * 255);
+            var blue = (byte)(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);
 
-            return new Color (red, green, blue);
+            return new (red, green, blue);
         }
     }
 }
