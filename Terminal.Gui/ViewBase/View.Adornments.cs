@@ -23,7 +23,7 @@ public partial class View // Adornments
         // When any adornment's thickness changes, recompute frames and request layout + redraw.
         Margin.ThicknessChanged += (_, _) =>
                                    {
-                                      previousMarginThickness = HandleAdornmentThicknessChanged (Margin, previousMarginThickness);
+                                       previousMarginThickness = HandleAdornmentThicknessChanged (Margin, previousMarginThickness);
                                    };
 
         Border.ThicknessChanged += (_, _) =>
@@ -370,17 +370,18 @@ public partial class View // Adornments
     {
         Thickness thickness = GetAdornmentsThicknessForAdornment (changedAdornment, changedThickness);
 
-        return new Rectangle (_viewportLocation,
-                              new Size (Math.Max (0, Frame.Width - thickness.Horizontal), Math.Max (0, Frame.Height - thickness.Vertical)));
+        return new Rectangle (_viewportLocation, GetViewportSizeForThickness (thickness));
     }
 
     private Rectangle GetViewportFrameForAdornmentThickness (IAdornment changedAdornment, Thickness changedThickness)
     {
         Thickness thickness = GetAdornmentsThicknessForAdornment (changedAdornment, changedThickness);
 
-        return new Rectangle (new Point (thickness.Left, thickness.Top),
-                              new Size (Math.Max (0, Frame.Width - thickness.Horizontal), Math.Max (0, Frame.Height - thickness.Vertical)));
+        return new Rectangle (new Point (thickness.Left, thickness.Top), GetViewportSizeForThickness (thickness));
     }
+
+    private Size GetViewportSizeForThickness (Thickness thickness) =>
+        new (Math.Max (0, Frame.Width - thickness.Horizontal), Math.Max (0, Frame.Height - thickness.Vertical));
 
     private Thickness GetAdornmentsThicknessForAdornment (IAdornment changedAdornment, Thickness changedThickness)
     {
