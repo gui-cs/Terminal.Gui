@@ -16,11 +16,13 @@ public class Mandelbrot : Scenario
     private NumericUpDown<double> _span = null!;
     private Label _status = null!;
     private Window _window = null!;
+    private bool _forcingSixelSupport;
 
     public override void Main ()
     {
-        using IApplication app = Application.Create ().Init ();
+        using IApplication app = Application.Create ().Init (DriverRegistry.Names.ANSI);
         _app = app;
+        _app.Driver!.SixelSupportChanged += OnSixelSupportChanged;
 
         _window = new () { Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()}" };
 
@@ -35,7 +37,8 @@ public class Mandelbrot : Scenario
         {
             X = Pos.Right (settings),
             Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
+            CanFocus = true
         };
 
         _status = new ()
@@ -54,7 +57,7 @@ public class Mandelbrot : Scenario
             Height = ImageRows,
             BorderStyle = LineStyle.Double,
             CanFocus = true,
-            TabStop = TabBehavior.TabGroup,
+            TabStop = TabBehavior.TabStop,
             Arrangement = ViewArrangement.Resizable,
             UseSixel = true
         };
@@ -63,10 +66,27 @@ public class Mandelbrot : Scenario
         display.Add (_status, _mandelbrotView);
         _window.Add (settings, display);
 
-        _window.Initialized += (_, _) => RenderMandelbrot ();
+        _window.Initialized += (_, _) =>
+                               {
+                                   RenderMandelbrot ();
+                                   _app.AddTimeout (TimeSpan.FromMilliseconds (100),
+                                                    () =>
+                                                    {
+                                                        _mandelbrotView.SetFocus ();
 
-        app.Run (_window);
-        _window.Dispose ();
+                                                        return false;
+                                                    });
+                               };
+
+        try
+        {
+            app.Run (_window);
+        }
+        finally
+        {
+            _app.Driver!.SixelSupportChanged -= OnSixelSupportChanged;
+            _window.Dispose ();
+        }
     }
 
     private void BuildSettings (View settings)
@@ -188,8 +208,9 @@ public class Mandelbrot : Scenario
         double span = _span.Value;
 
         _mandelbrotView.Render (pixelWidth, pixelHeight, centerX, centerY, span, iterations, support);
+        string renderMode = _mandelbrotView.IsUsingSixel ? "Sixel raster" : "Cell fallback";
         _status.Text =
-            $"Sixel raster: {pixelWidth} x {pixelHeight}px, {support.Resolution.Width} x {support.Resolution.Height}px/cell";
+            $"{renderMode}: {pixelWidth} x {pixelHeight}px, {support.Resolution.Width} x {support.Resolution.Height}px/cell";
         _status.SetNeedsDraw ();
     }
 
@@ -216,6 +237,26 @@ public class Mandelbrot : Scenario
         }
 
         return forced;
+    }
+
+    private void OnSixelSupportChanged (object sender, ValueChangedEventArgs<SixelSupportResult> args)
+    {
+        if (_forcingSixelSupport || args.NewValue is { IsSupported: true })
+        {
+            return;
+        }
+
+        try
+        {
+            _forcingSixelSupport = true;
+            EnsureSixelSupportForDemo ();
+        }
+        finally
+        {
+            _forcingSixelSupport = false;
+        }
+
+        RenderMandelbrot ();
     }
 
     private void ShowOverlay ()
