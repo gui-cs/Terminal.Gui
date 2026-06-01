@@ -218,7 +218,7 @@ public class ProgressBar : View, IDesignable
         get => string.IsNullOrEmpty (base.Text) ? $"{_fraction * 100:F0}%" : base.Text;
         set
         {
-            if (ProgressBarStyle is ProgressBarStyle.MarqueeBlocks or ProgressBarStyle.MarqueeContinuous)
+            if (ProgressBarStyle is ProgressBarStyle.MarqueeBlocks or ProgressBarStyle.MarqueeContinuous or ProgressBarStyle.Fire)
             {
                 base.Text = value;
             }
@@ -292,9 +292,9 @@ public class ProgressBar : View, IDesignable
 
         if (_fraction > .5)
         {
-            attr = new (GetAttributeForRole (VisualRole.Normal).Background,
-                        GetAttributeForRole (VisualRole.Normal).Foreground,
-                        GetAttributeForRole (VisualRole.Normal).Style);
+            attr = new Attribute (GetAttributeForRole (VisualRole.Normal).Background,
+                                  GetAttributeForRole (VisualRole.Normal).Foreground,
+                                  GetAttributeForRole (VisualRole.Normal).Style);
         }
 
         tf.Draw (Driver,
@@ -440,8 +440,7 @@ public class ProgressBar : View, IDesignable
 
     private static SixelEncoder CreateFireEncoder (SixelSupportResult support)
     {
-        SixelEncoder encoder = new ();
-        encoder.Quantizer.MaxColors = Math.Min (support.MaxPaletteColors, _firePalette.Length);
+        SixelEncoder encoder = new () { Quantizer = { MaxColors = Math.Min (support.MaxPaletteColors, _firePalette.Length) } };
 
         return encoder;
     }
@@ -511,5 +510,5 @@ public class ProgressBar : View, IDesignable
     }
 
     /// <inheritdoc/>
-    public string? GetDemoKeyStrokes () => "wait:2000";
+    public string GetDemoKeyStrokes () => "wait:2000";
 }

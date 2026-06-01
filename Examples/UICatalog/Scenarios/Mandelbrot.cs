@@ -1,3 +1,5 @@
+#nullable enable
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Mandelbrot", "Displays a sixel-rendered Mandelbrot set with live settings and an overlay dialog.")]
@@ -30,7 +32,7 @@ public class Mandelbrot : Scenario
     private NumericUpDown<double> _span = null!;
     private Label _status = null!;
     private Window _window = null!;
-    private bool _forcingSixelSupport;
+    private SixelSupportResult _sixelSupportResult = new ();
 
     public override void Main ()
     {
@@ -69,6 +71,7 @@ public class Mandelbrot : Scenario
 
         _window.Initialized += (_, _) =>
                                {
+                                   UpdateSixelSupport (_app.Driver?.SixelSupport);
                                    RenderMandelbrot ();
                                    StartFireProgress ();
 
@@ -226,6 +229,7 @@ public class Mandelbrot : Scenario
             Width = 1,
             Height = 1,
             Text = "-",
+            CanFocus = false,
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = null
@@ -238,13 +242,23 @@ public class Mandelbrot : Scenario
             Width = 1,
             Height = 1,
             Text = "+",
+            CanFocus = false,
             NoDecorations = true,
             NoPadding = true,
             ShadowStyle = null
         };
 
-        zoomOut.Accepted += (_, _) => Zoom (ZOOM_OUT_FACTOR);
-        zoomIn.Accepted += (_, _) => Zoom (ZOOM_IN_FACTOR);
+        zoomOut.Accepted += (_, _) =>
+                            {
+                                Zoom (ZOOM_OUT_FACTOR);
+                                _mandelbrotView.SetFocus ();
+                            };
+
+        zoomIn.Accepted += (_, _) =>
+                           {
+                               Zoom (ZOOM_IN_FACTOR);
+                               _mandelbrotView.SetFocus ();
+                           };
 
         _mandelbrotView.Add (zoomOut, zoomIn);
     }
@@ -275,63 +289,21 @@ public class Mandelbrot : Scenario
 
         double span = _span.Value;
         double spanY = span * viewport.Height / viewport.Width;
-        _centerX.Value += (((double)position.X + 0.5d) / viewport.Width - 0.5d) * span;
-        _centerY.Value += (((double)position.Y + 0.5d) / viewport.Height - 0.5d) * spanY;
+        _centerX.Value += ((position.X + 0.5d) / viewport.Width - 0.5d) * span;
+        _centerY.Value += ((position.Y + 0.5d) / viewport.Height - 0.5d) * spanY;
     }
 
-    private SixelSupportResult EnsureSixelSupportForDemo ()
+    private void OnSixelSupportChanged (object? sender, ValueChangedEventArgs<SixelSupportResult?> args)
     {
-        SixelSupportResult source = _app.Driver?.SixelSupport ?? new ();
-
-        if (source.IsSupported)
-        {
-            return source;
-        }
-
-        SixelSupportResult forced = new ()
-        {
-            IsSupported = true,
-            Resolution = source.Resolution,
-            MaxPaletteColors = source.MaxPaletteColors,
-            SupportsTransparency = source.SupportsTransparency
-        };
-
-        if (_app.Driver is DriverImpl driver)
-        {
-            driver.SetSixelSupport (forced);
-        }
-
-        return forced;
-    }
-
-    private void OnSixelSupportChanged (object sender, ValueChangedEventArgs<SixelSupportResult> args)
-    {
-        if (_forcingSixelSupport || args.NewValue is { IsSupported: true })
-        {
-            return;
-        }
-
-        try
-        {
-            _forcingSixelSupport = true;
-            EnsureSixelSupportForDemo ();
-        }
-        finally
-        {
-            _forcingSixelSupport = false;
-        }
-
+        UpdateSixelSupport (args.NewValue);
         RenderMandelbrot ();
     }
 
+    private void UpdateSixelSupport (SixelSupportResult? support) => _sixelSupportResult = support ?? new SixelSupportResult ();
+
     private void RenderMandelbrot ()
     {
-        if (_mandelbrotView is null)
-        {
-            return;
-        }
-
-        SixelSupportResult support = EnsureSixelSupportForDemo ();
+        SixelSupportResult support = _app.Driver?.SixelSupport ?? _sixelSupportResult;
         Rectangle viewport = _mandelbrotView.Viewport;
         int imageColumns = Math.Max (0, viewport.Width);
         int imageRows = Math.Max (0, viewport.Height);
@@ -412,27 +384,16 @@ public class Mandelbrot : Scenario
 
     private sealed class MandelbrotImageView : ImageView
     {
-        public MandelbrotImageView ()
-        {
-            MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
-        }
-
         public event Action<Point>? CenterRequested;
 
         public void Render (int pixelWidth, int pixelHeight, double centerX, double centerY, double span, int maxIterations, SixelSupportResult support)
         {
-            SixelEncoder = new ();
-            SixelEncoder.Quantizer.MaxColors = Math.Min (support.MaxPaletteColors, 64);
+            SixelEncoder = new SixelEncoder { Quantizer = { MaxColors = Math.Min (support.MaxPaletteColors, 64) } };
             Image = CreateMandelbrotPixels (pixelWidth, pixelHeight, centerX, centerY, span, maxIterations);
         }
 
-        protected override bool OnAccepting (CommandEventArgs args)
+        protected override bool CenterOnViewportPoint (Point position)
         {
-            if (args.Context?.Binding is not MouseBinding { MouseEvent: { IsDoubleClicked: true, Position: { } position } })
-            {
-                return base.OnAccepting (args);
-            }
-
             CenterRequested?.Invoke (position);
 
             return true;
@@ -489,7 +450,7 @@ public class Mandelbrot : Scenario
             var green = (byte)(15 * (1 - t) * (1 - t) * t * t * 255);
             var blue = (byte)(8.5 * (1 - t) * (1 - t) * (1 - t) * t * 255);
 
-            return new (red, green, blue);
+            return new Color (red, green, blue);
         }
     }
 }

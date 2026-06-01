@@ -1,5 +1,3 @@
-﻿using System.Collections.Concurrent;
-
 namespace Terminal.Gui.Drawing;
 
 /// <summary>
@@ -12,6 +10,9 @@ public class ColorQuantizer
     ///     <see cref="BuildPalette"/>.
     /// </summary>
     public IReadOnlyCollection<Color> Palette { get; private set; } = new List<Color> ();
+
+    private Color [] _palette = [];
+    private Dictionary<Color, int> _paletteIndex = [];
 
     /// <summary>
     ///     Gets or sets the maximum number of colors to put into the <see cref="Palette"/>.
@@ -30,7 +31,7 @@ public class ColorQuantizer
     /// </summary>
     public IPaletteBuilder PaletteBuildingAlgorithm { get; set; } = new PopularityPaletteWithThreshold (new EuclideanColorDistance (), 8);
 
-    private readonly ConcurrentDictionary<Color, int> _nearestColorCache = new ();
+    private readonly Dictionary<Color, int> _nearestColorCache = [];
 
     /// <summary>
     ///     Builds a <see cref="Palette"/> of colors that most represent the colors used in <paramref name="pixels"/> image.
@@ -39,6 +40,13 @@ public class ColorQuantizer
     /// <param name="pixels"></param>
     public void BuildPalette (Color [,] pixels)
     {
+        if (PaletteBuildingAlgorithm is IStaticPaletteBuilder staticPaletteBuilder)
+        {
+            SetPalette (staticPaletteBuilder.BuildPalette (MaxColors));
+
+            return;
+        }
+
         List<Color> allColors = [];
         int width = pixels.GetLength (0);
         int height = pixels.GetLength (1);
@@ -52,7 +60,20 @@ public class ColorQuantizer
         }
 
         _nearestColorCache.Clear ();
-        Palette = PaletteBuildingAlgorithm.BuildPalette (allColors, MaxColors);
+        SetPalette (PaletteBuildingAlgorithm.BuildPalette (allColors, MaxColors));
+    }
+
+    private void SetPalette (List<Color> palette)
+    {
+        _nearestColorCache.Clear ();
+        Palette = palette;
+        _palette = [.. palette];
+        _paletteIndex = new (_palette.Length);
+
+        for (int i = 0; i < _palette.Length; i++)
+        {
+            _paletteIndex.TryAdd (_palette [i], i);
+        }
     }
 
     /// <summary>
@@ -63,19 +84,25 @@ public class ColorQuantizer
     /// <returns></returns>
     public int GetNearestColor (Color toTranslate)
     {
+        if (_paletteIndex.TryGetValue (toTranslate, out int exactIndex))
+        {
+            return exactIndex;
+        }
+
         if (_nearestColorCache.TryGetValue (toTranslate, out int cachedAnswer))
         {
             return cachedAnswer;
         }
 
-        // Simple nearest color matching based on DistanceAlgorithm
-        var minDistance = double.MaxValue;
-        var nearestIndex = 0;
+        double minDistance = double.MaxValue;
+        int nearestIndex = 0;
 
-        for (var index = 0; index < Palette.Count; index++)
+        for (int index = 0; index < _palette.Length; index++)
         {
-            Color color = Palette.ElementAt (index);
-            double distance = DistanceAlgorithm.CalculateDistance (color, toTranslate);
+            Color color = _palette [index];
+            double distance = DistanceAlgorithm is EuclideanColorDistance
+                                  ? CalculateEuclideanDistanceSquared (color, toTranslate)
+                                  : DistanceAlgorithm.CalculateDistance (color, toTranslate);
 
             if (distance < minDistance)
             {
@@ -87,5 +114,14 @@ public class ColorQuantizer
         _nearestColorCache.TryAdd (toTranslate, nearestIndex);
 
         return nearestIndex;
+    }
+
+    private static double CalculateEuclideanDistanceSquared (Color c1, Color c2)
+    {
+        int rDiff = c1.R - c2.R;
+        int gDiff = c1.G - c2.G;
+        int bDiff = c1.B - c2.B;
+
+        return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;
     }
 }
