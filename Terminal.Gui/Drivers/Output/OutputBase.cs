@@ -93,6 +93,7 @@ public abstract class OutputBase
 
         InvalidateRowsWithUrlsIfStale (buffer, rows, cols);
 
+        // Raster images must be written before dirty cells so later text draws above them.
         if (!IsLegacyConsole)
         {
             RenderRasterImages (buffer);

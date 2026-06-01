@@ -115,6 +115,40 @@ public class ProgressBarTests : TestDriverBase
 
     // Copilot - GPT-5.5
     [Fact]
+    public void FireStyle_SixelSupport_WritesPercentageAfterRasterImageOnRepeatedFrames ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver (8, 1);
+        driver.Clip = new (driver.Screen);
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (1, 6) });
+
+        ProgressBar pb = new ()
+        {
+            Driver = driver,
+            Width = 8,
+            Fraction = 0.5F,
+            ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage,
+            ProgressBarStyle = ProgressBarStyle.Fire
+        };
+        pb.BeginInit ();
+        pb.EndInit ();
+        pb.LayoutSubViews ();
+
+        pb.Draw ();
+        driver.Refresh ();
+
+        pb.Draw ();
+        driver.Refresh ();
+
+        string output = driver.GetOutput ().GetLastOutput ();
+        int sixelEnd = output.IndexOf ("\u001b\\", StringComparison.Ordinal);
+        int percentage = output.IndexOf ("50%", StringComparison.Ordinal);
+
+        Assert.True (sixelEnd >= 0);
+        Assert.True (percentage > sixelEnd);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
     public void FireStyle_SwitchingAway_RemovesRasterImage ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver (4, 1);

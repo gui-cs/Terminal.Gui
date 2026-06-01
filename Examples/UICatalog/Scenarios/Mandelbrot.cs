@@ -5,20 +5,20 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Drawing")]
 public class Mandelbrot : Scenario
 {
-    private const int ImageColumns = 30;
-    private const int ImageRows = 20;
-    private const double MinimumSpan = 0.05;
-    private const int SettingLabelWidth = 11;
-    private const int CenterXLabelGroupId = 1;
-    private const int CenterYLabelGroupId = 2;
-    private const int SpanLabelGroupId = 3;
-    private const int IterationsLabelGroupId = 4;
-    private const int ResetGroupId = 5;
-    private const int NoteGroupId = 6;
-    private const int FireLabelGroupId = 7;
-    private const int FireProgressGroupId = 8;
-    private const double ZoomInFactor = 0.5;
-    private const double ZoomOutFactor = 2;
+    private const int IMAGE_COLUMNS = 30;
+    private const int IMAGE_ROWS = 20;
+    private const double MINIMUM_SPAN = 0.05;
+    private const int SETTING_LABEL_WIDTH = 11;
+    private const int CENTER_X_LABEL_GROUP_ID = 1;
+    private const int CENTER_Y_LABEL_GROUP_ID = 2;
+    private const int SPAN_LABEL_GROUP_ID = 3;
+    private const int ITERATIONS_LABEL_GROUP_ID = 4;
+    private const int RESET_GROUP_ID = 5;
+    private const int NOTE_GROUP_ID = 6;
+    private const int FIRE_LABEL_GROUP_ID = 7;
+    private const int FIRE_PROGRESS_GROUP_ID = 8;
+    private const double ZOOM_IN_FACTOR = 0.8;
+    private const double ZOOM_OUT_FACTOR = 1.25;
 
     private IApplication _app = null!;
     private NumericUpDown<double> _centerX = null!;
@@ -50,14 +50,15 @@ public class Mandelbrot : Scenario
         {
             X = Pos.Center (),
             Y = Pos.Center (),
-            Width = ImageColumns,
-            Height = ImageRows,
+            Width = IMAGE_COLUMNS,
+            Height = IMAGE_ROWS,
             BorderStyle = LineStyle.Double,
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
             Arrangement = ViewArrangement.Resizable,
             UseSixel = true
         };
+        _mandelbrotView.CenterRequested += CenterMandelbrot;
 
         BuildSettings (settings);
         BuildZoomButtons ();
@@ -107,10 +108,10 @@ public class Mandelbrot : Scenario
 
     private void BuildSettings (View settings)
     {
-        Label centerXLabel = CreateSettingLabel ("Center X:", CenterXLabelGroupId);
-        Label centerYLabel = CreateSettingLabel ("Center Y:", CenterYLabelGroupId, centerXLabel);
-        Label spanLabel = CreateSettingLabel ("Span:", SpanLabelGroupId, centerYLabel);
-        Label iterationsLabel = CreateSettingLabel ("Iterations:", IterationsLabelGroupId, spanLabel);
+        Label centerXLabel = CreateSettingLabel ("Center X:", CENTER_X_LABEL_GROUP_ID);
+        Label centerYLabel = CreateSettingLabel ("Center Y:", CENTER_Y_LABEL_GROUP_ID, centerXLabel);
+        Label spanLabel = CreateSettingLabel ("Span:", SPAN_LABEL_GROUP_ID, centerYLabel);
+        Label iterationsLabel = CreateSettingLabel ("Iterations:", ITERATIONS_LABEL_GROUP_ID, spanLabel);
 
         _centerX = new NumericUpDown<double>
         {
@@ -153,7 +154,7 @@ public class Mandelbrot : Scenario
 
         _span.ValueChanging += (_, args) =>
                                {
-                                   if (args.NewValue < MinimumSpan)
+                                   if (args.NewValue < MINIMUM_SPAN)
                                    {
                                        args.Handled = true;
                                    }
@@ -172,7 +173,7 @@ public class Mandelbrot : Scenario
         _span.ValueChanged += (_, _) => RenderMandelbrot ();
         _iterations.ValueChanged += (_, _) => RenderMandelbrot ();
 
-        Button reset = new () { X = Pos.Align (Alignment.Start, groupId: ResetGroupId), Y = Pos.Bottom (iterationsLabel) + 2, Text = "_Reset" };
+        Button reset = new () { X = Pos.Align (Alignment.Start, groupId: RESET_GROUP_ID), Y = Pos.Bottom (iterationsLabel) + 2, Text = "_Reset" };
 
         reset.Accepted += (_, _) => ResetSettings ();
 
@@ -182,18 +183,18 @@ public class Mandelbrot : Scenario
 
         Label note = new ()
         {
-            X = Pos.Align (Alignment.Start, groupId: NoteGroupId),
+            X = Pos.Align (Alignment.Start, groupId: NOTE_GROUP_ID),
             Y = Pos.Bottom (reset) + 2,
             Width = Dim.Fill (),
             Height = Dim.Auto (),
             Text = "The bordered image starts\nat 30 x 20 cells. Resize\nit or use +/- to rerender\nthrough sixel raster\ncommands."
         };
 
-        Label fireLabel = new () { X = Pos.Align (Alignment.Start, groupId: FireLabelGroupId), Y = Pos.AnchorEnd (2), Text = "Fire progress:" };
+        Label fireLabel = new () { X = Pos.Align (Alignment.Start, groupId: FIRE_LABEL_GROUP_ID), Y = Pos.AnchorEnd (2), Text = "Fire progress:" };
 
         _fireProgress = new ProgressBar
         {
-            X = Pos.Align (Alignment.Start, groupId: FireProgressGroupId),
+            X = Pos.Align (Alignment.Start, groupId: FIRE_PROGRESS_GROUP_ID),
             Y = Pos.Bottom (fireLabel),
             Width = Dim.Fill (),
             ProgressBarStyle = ProgressBarStyle.Fire,
@@ -242,8 +243,8 @@ public class Mandelbrot : Scenario
             ShadowStyle = null
         };
 
-        zoomOut.Accepted += (_, _) => Zoom (ZoomOutFactor);
-        zoomIn.Accepted += (_, _) => Zoom (ZoomInFactor);
+        zoomOut.Accepted += (_, _) => Zoom (ZOOM_OUT_FACTOR);
+        zoomIn.Accepted += (_, _) => Zoom (ZOOM_IN_FACTOR);
 
         _mandelbrotView.Add (zoomOut, zoomIn);
     }
@@ -253,10 +254,30 @@ public class Mandelbrot : Scenario
         {
             X = Pos.Align (Alignment.Start, groupId: groupId),
             Y = previous is null ? Pos.Align (Alignment.Start) : Pos.Bottom (previous) + 1,
-            Width = SettingLabelWidth,
+            Width = SETTING_LABEL_WIDTH,
             TextAlignment = Alignment.End,
             Text = text
         };
+
+    private void CenterMandelbrot (Point position)
+    {
+        Rectangle viewport = _mandelbrotView.Viewport;
+
+        if (viewport.Width <= 0 || viewport.Height <= 0)
+        {
+            return;
+        }
+
+        if (position.X < 0 || position.Y < 0 || position.X >= viewport.Width || position.Y >= viewport.Height)
+        {
+            return;
+        }
+
+        double span = _span.Value;
+        double spanY = span * viewport.Height / viewport.Width;
+        _centerX.Value += (((double)position.X + 0.5d) / viewport.Width - 0.5d) * span;
+        _centerY.Value += (((double)position.Y + 0.5d) / viewport.Height - 0.5d) * spanY;
+    }
 
     private SixelSupportResult EnsureSixelSupportForDemo ()
     {
@@ -379,7 +400,7 @@ public class Mandelbrot : Scenario
 
     private void Zoom (double spanMultiplier)
     {
-        double nextSpan = Math.Max (MinimumSpan, _span.Value * spanMultiplier);
+        double nextSpan = Math.Max (MINIMUM_SPAN, _span.Value * spanMultiplier);
 
         if (Math.Abs (nextSpan - _span.Value) < double.Epsilon)
         {
@@ -391,11 +412,30 @@ public class Mandelbrot : Scenario
 
     private sealed class MandelbrotImageView : ImageView
     {
+        public MandelbrotImageView ()
+        {
+            MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        }
+
+        public event Action<Point>? CenterRequested;
+
         public void Render (int pixelWidth, int pixelHeight, double centerX, double centerY, double span, int maxIterations, SixelSupportResult support)
         {
             SixelEncoder = new ();
             SixelEncoder.Quantizer.MaxColors = Math.Min (support.MaxPaletteColors, 64);
             Image = CreateMandelbrotPixels (pixelWidth, pixelHeight, centerX, centerY, span, maxIterations);
+        }
+
+        protected override bool OnAccepting (CommandEventArgs args)
+        {
+            if (args.Context?.Binding is not MouseBinding { MouseEvent: { IsDoubleClicked: true, Position: { } position } })
+            {
+                return base.OnAccepting (args);
+            }
+
+            CenterRequested?.Invoke (position);
+
+            return true;
         }
 
         private static int CountIterations (double cx, double cy, int maxIterations)
