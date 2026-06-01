@@ -15,8 +15,8 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         When sixel is available (detected via <see cref="IDriver.SixelSupport"/>) and
 ///         <see cref="UseSixel"/> is <see langword="true"/>, the view will encode the image as
-///         sixel escape sequences and render it through the driver's sixel pipeline. Sixel data
-///         is only re-encoded and re-sent to the terminal when <see cref="View.NeedsDraw"/> is true,
+///         sixel escape sequences and render it through the driver's output buffer. Sixel data
+///         is only re-sent to the terminal when <see cref="View.NeedsDraw"/> is true,
 ///         avoiding redundant rendering of unchanged images.
 ///     </para>
 ///     <para>
@@ -29,8 +29,7 @@ public class ImageView : View, IDesignable
     private Color [,]? _image;
     private Color [,]? _scaledImage;
     private Size? _scaledImageCellSize;
-    private SixelToRender? _sixelToRender;
-    private string? _cachedSixelData;
+    private string RasterImageId => $"ImageView_{GetHashCode ()}";
 
     // Cell-based rendering cache
     private readonly Dictionary<Color, Attribute> _attributeCache = new ();
@@ -51,9 +50,14 @@ public class ImageView : View, IDesignable
         {
             _image = value;
             _scaledImage = null;
-            _cachedSixelData = null;
             _scaledImageCellSize = null;
             _attributeCache.Clear ();
+
+            if (_image is null)
+            {
+                App?.Driver?.GetOutputBuffer ().RemoveRasterImage (RasterImageId);
+            }
+
             UpdateSixelData ();
             SetNeedsDraw ();
         }
@@ -202,23 +206,6 @@ public class ImageView : View, IDesignable
                 Rectangle viewport = ViewportToScreen ();
                 Rectangle dirtyRect = new (viewport.X, viewport.Y, Math.Min (viewport.Width, cellSize.Width), Math.Min (viewport.Height, cellSize.Height));
                 context?.AddDrawnRectangle (dirtyRect);
-
-                // Mark the content buffer for the area we will draw as not dirty.
-                // This will avoid redrawing the area of the screen that will
-                // eventually be overwritten by the sixel anyway.
-                if (ScreenContents is { } contents && Driver is { } driver)
-                {
-                    for (int y = dirtyRect.Y; y < dirtyRect.Bottom; y++)
-                    {
-                        for (int x = dirtyRect.X; x < dirtyRect.Right; x++)
-                        {
-                            if (x >= 0 && y >= 0 && x < driver.Cols && y < driver.Rows)
-                            {
-                                contents [y, x].IsDirty = false;
-                            }
-                        }
-                    }
-                }
             }
         }
         else
@@ -293,39 +280,40 @@ public class ImageView : View, IDesignable
     /// </summary>
     private void DrawSixel ()
     {
-        SixelSupportResult? support = App?.Driver?.SixelSupport;
-
-        if (support is null)
+        if (App?.Driver is not { } driver)
         {
             return;
         }
 
-        if (_cachedSixelData is null)
+        if (_scaledImage is null || _scaledImageCellSize is null)
         {
             UpdateSixelData ();
         }
 
-        // Get screen position for this view's viewport
-        Point screenPos = ViewportToScreen ().Location;
-
-        if (_sixelToRender is null)
+        if (_scaledImage is null || _scaledImageCellSize is null || SixelEncoder is null)
         {
-            _sixelToRender = new SixelToRender
-            {
-                SixelData = _cachedSixelData,
-                ScreenPosition = screenPos,
-                Id = $"ImageView_{GetHashCode ()}",
-                IsDirty = true
-            };
+            return;
+        }
 
-            App?.Driver?.GetOutput ().GetSixels ().Enqueue (_sixelToRender);
-        }
-        else
+        Rectangle viewport = ViewportToScreen ();
+        Size cellSize = _scaledImageCellSize.Value;
+        Rectangle destinationCells = new (viewport.X, viewport.Y, Math.Min (viewport.Width, cellSize.Width), Math.Min (viewport.Height, cellSize.Height));
+
+        if (destinationCells.Width <= 0 || destinationCells.Height <= 0)
         {
-            _sixelToRender.SixelData = _cachedSixelData;
-            _sixelToRender.ScreenPosition = screenPos;
-            _sixelToRender.IsDirty = true;
+            return;
         }
+
+        RasterImageCommand command = new ()
+        {
+            Id = RasterImageId,
+            Pixels = _scaledImage,
+            DestinationCells = destinationCells,
+            Encoder = SixelEncoder,
+            IsDirty = true
+        };
+
+        driver.GetOutputBuffer ().AddRasterImage (command);
     }
 
     private void UpdateSixelData ()
@@ -336,7 +324,7 @@ public class ImageView : View, IDesignable
         }
 
         // Use caller-provided encoder or create a default one
-        SixelEncoder ??= new SixelEncoder ();
+        SixelEncoder ??= new ();
 
         // Clamp MaxColors regardless of whether the encoder was provided
         SixelEncoder.Quantizer.MaxColors = Math.Min (SixelEncoder.Quantizer.MaxColors, support.MaxPaletteColors);
@@ -352,8 +340,6 @@ public class ImageView : View, IDesignable
             return;
         }
 
-        // Encode sixel data
-        _cachedSixelData = SixelEncoder.EncodeSixel (_scaledImage);
     }
 
     /// <summary>
@@ -427,13 +413,9 @@ public class ImageView : View, IDesignable
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
-        if (disposing && _sixelToRender is { })
+        if (disposing)
         {
-            // Clear the sixel data so it's not rendered anymore.
-            // The ConcurrentQueue doesn't support removal, but clearing the data
-            // ensures OutputBase.Write skips it.
-            _sixelToRender.SixelData = null;
-            _sixelToRender.IsDirty = false;
+            App?.Driver?.GetOutputBuffer ().RemoveRasterImage (RasterImageId);
         }
 
         base.Dispose (disposing);

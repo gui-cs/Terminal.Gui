@@ -93,6 +93,11 @@ public abstract class OutputBase
 
         InvalidateRowsWithUrlsIfStale (buffer, rows, cols);
 
+        if (!IsLegacyConsole)
+        {
+            RenderRasterImages (buffer);
+        }
+
         // Process each row
         for (int row = top; row < rows; row++)
         {
@@ -496,12 +501,155 @@ public abstract class OutputBase
         }
 
         StringBuilder ansiOutput = new ();
-        Attribute? lastAttr = null;
+        bool wroteRasterImages = AppendRasterImageAnsi (buffer, ansiOutput);
 
+        if (wroteRasterImages)
+        {
+            ansiOutput.Append (EscSeqUtils.CSI_SetCursorPosition (1, 1));
+        }
+
+        Attribute? lastAttr = null;
         BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
 
         return ansiOutput.ToString ();
     }
+
+    private void RenderRasterImages (IOutputBuffer buffer)
+    {
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            if (!command.IsDirty && !command.AlwaysRender)
+            {
+                continue;
+            }
+
+            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            {
+                if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
+                {
+                    continue;
+                }
+
+                SetCursorPositionImpl (visibleCells.X, visibleCells.Y);
+                SixelEncoder encoder = command.Encoder ?? new ();
+                Write (new StringBuilder (encoder.EncodeSixel (pixels)));
+            }
+
+            command.IsDirty = false;
+        }
+    }
+
+    private static bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output)
+    {
+        bool wroteRasterImages = false;
+
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            {
+                if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
+                {
+
+                    continue;
+                }
+
+                output.Append (EscSeqUtils.CSI_SetCursorPosition (visibleCells.Y + 1, visibleCells.X + 1));
+                SixelEncoder encoder = command.Encoder ?? new ();
+                output.Append (encoder.EncodeSixel (pixels));
+                wroteRasterImages = true;
+            }
+        }
+
+        return wroteRasterImages;
+    }
+
+    private static IEnumerable<Rectangle> GetVisibleRasterCellRectangles (RasterImageCommand command)
+    {
+        if (command.Pixels is null || command.DestinationCells.Width <= 0 || command.DestinationCells.Height <= 0)
+        {
+            yield break;
+        }
+
+        if (command.Clip is null)
+        {
+            yield return command.DestinationCells;
+
+            yield break;
+        }
+
+        foreach (Rectangle clipRect in command.Clip.GetRectangles ())
+        {
+            Rectangle visible = Rectangle.Intersect (command.DestinationCells, clipRect);
+
+            if (visible.Width <= 0 || visible.Height <= 0)
+            {
+                continue;
+            }
+
+            yield return visible;
+        }
+    }
+
+    private static bool TryCropRasterImagePixels (Color [,] source,
+                                                 Rectangle destinationCells,
+                                                 Rectangle visibleCells,
+                                                 out Color [,] pixels)
+    {
+        pixels = source;
+
+        int sourceWidth = source.GetLength (0);
+        int sourceHeight = source.GetLength (1);
+
+        if (sourceWidth <= 0
+            || sourceHeight <= 0
+            || destinationCells.Width <= 0
+            || destinationCells.Height <= 0
+            || visibleCells.Width <= 0
+            || visibleCells.Height <= 0)
+        {
+            return false;
+        }
+
+        int xStart = ScaleCellOffsetToPixels (visibleCells.X - destinationCells.X, destinationCells.Width, sourceWidth);
+        int xEnd = ScaleCellOffsetToPixels (visibleCells.Right - destinationCells.X, destinationCells.Width, sourceWidth);
+        int yStart = ScaleCellOffsetToPixels (visibleCells.Y - destinationCells.Y, destinationCells.Height, sourceHeight);
+        int yEnd = ScaleCellOffsetToPixels (visibleCells.Bottom - destinationCells.Y, destinationCells.Height, sourceHeight);
+
+        xStart = Math.Clamp (xStart, 0, sourceWidth);
+        xEnd = Math.Clamp (xEnd, xStart, sourceWidth);
+        yStart = Math.Clamp (yStart, 0, sourceHeight);
+        yEnd = Math.Clamp (yEnd, yStart, sourceHeight);
+
+        int width = xEnd - xStart;
+        int height = yEnd - yStart;
+
+        if (width <= 0 || height <= 0)
+        {
+            return false;
+        }
+
+        if (width == sourceWidth && height == sourceHeight)
+        {
+            pixels = source;
+
+            return true;
+        }
+
+        pixels = new Color [width, height];
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                pixels [x, y] = source [xStart + x, yStart + y];
+            }
+        }
+
+        return true;
+    }
+
+    private static int ScaleCellOffsetToPixels (int cellOffset, int cellCount, int pixelCount) =>
+        (int)((long)cellOffset * pixelCount / cellCount);
 
     /// <summary>
     ///     Writes buffered output to console, then clears the buffer and advances
