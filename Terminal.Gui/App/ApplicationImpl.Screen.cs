@@ -26,15 +26,24 @@ internal partial class ApplicationImpl
                 // Resize the output buffer to match the inline region dimensions.
                 _screen = value;
                 (Driver as DriverImpl)?.ResizeOutputBuffer (value.Width, value.Height);
-            }
-            else
-            {
-                // Fullscreen: sync with Driver.Screen (resizes both terminal tracking and buffer).
-                _screen = null;
-                Driver?.SetScreenSize (value.Width, value.Height);
+
+                RaiseScreenChangedEvent (value);
+
+                return;
             }
 
-            RaiseScreenChangedEvent (Screen);
+            _screen = null;
+
+            if (Driver is null)
+            {
+                RaiseScreenChangedEvent (Screen);
+
+                return;
+            }
+
+            // Fullscreen: sync with Driver.Screen (resizes both terminal tracking and buffer).
+            // Driver_SizeChanged will raise ScreenChanged and invalidate layout.
+            Driver.SetScreenSize (value.Width, value.Height);
         }
     }
 
@@ -271,6 +280,15 @@ internal partial class ApplicationImpl
 
             // Only force a complete redraw if needed (needsLayout or forceRedraw).
             // Otherwise, just redraw views that need it.
+            //
+            // NOTE (#5358): passing force=true here calls SetNeedsDraw on the top runnable, which
+            // cascades to all overlapping subviews via the existing SetNeedsDraw recursion. This
+            // is the remaining draw-fan-out source documented by TabsFanOutIntegrationTests. The
+            // proper fix requires tracking adornment thickness changes (in addition to Frame
+            // changes) so the SuperView can be invalidated precisely instead of force-redrawing
+            // the whole tree. Dropping force-on-neededLayout without that tracking exposes
+            // stale-content bugs in the shrink/move and adornment-rebalance paths (covered by
+            // ShadowTests / BorderViewTests).
             View.Draw (views.ToArray ().Cast<View> (), neededLayout || forceRedraw);
 
             Driver.Clip = new Region (clipRect);

@@ -4,6 +4,7 @@ namespace Terminal.Gui.Views;
 ///     Draws a single line using the <see cref="LineStyle"/> specified by <see cref="Line.Style"/>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Line.gif" alt="Line demo"/>
 ///     <para>
 ///         <see cref="Line"/> is a <see cref="View"/> that renders a single horizontal or vertical line
 ///         using the <see cref="LineCanvas"/> system. <see cref="Line"/> integrates with the LineCanvas

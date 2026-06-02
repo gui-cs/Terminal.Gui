@@ -15,6 +15,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 /// </typeparam>
 /// <remarks>
+///     <img src="../images/views/Prompt-2.gif" alt="Prompt demo"/>
 ///     <para>
 ///         This class provides a convenient way to prompt the user with any view and get a typed result.
 ///         The wrapped view is displayed in the dialog, and when the user clicks Ok (or presses Enter),
@@ -49,7 +50,7 @@ namespace Terminal.Gui.Views;
 ///     }
 ///     </code>
 /// </example>
-public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new ()
+public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new()
 {
     private readonly TView? _wrappedView;
 

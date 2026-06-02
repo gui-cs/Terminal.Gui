@@ -43,6 +43,7 @@ public class OutputBufferImpl : IOutputBuffer
     private Rune _column1ReplacementChar = Glyphs.WideGlyphReplacement;
 
     private Region? _clip;
+    private readonly List<RasterImageCommand> _rasterImages = [];
 
     /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when
@@ -113,6 +114,7 @@ public class OutputBufferImpl : IOutputBuffer
         {
             _rows = value;
             ClearContents ();
+            _rasterImages.Clear ();
         }
     }
 
@@ -124,6 +126,7 @@ public class OutputBufferImpl : IOutputBuffer
         {
             _cols = value;
             ClearContents ();
+            _rasterImages.Clear ();
         }
     }
 
@@ -227,6 +230,7 @@ public class OutputBufferImpl : IOutputBuffer
             _cols = cols;
             _rows = rows;
             ClearContentsCore (!InlineMode);
+            _rasterImages.Clear ();
         }
     }
 
@@ -288,6 +292,111 @@ public class OutputBufferImpl : IOutputBuffer
     {
         Col = col;
         Row = row;
+    }
+
+    /// <inheritdoc/>
+    public void AddRasterImage (RasterImageCommand command)
+    {
+        ArgumentNullException.ThrowIfNull (command);
+        ArgumentException.ThrowIfNullOrEmpty (command.Id);
+
+        if (command.Pixels is null)
+        {
+            throw new ArgumentException ("Raster image pixels are required.", nameof (command));
+        }
+
+        if (command.DestinationCells.Width <= 0 || command.DestinationCells.Height <= 0)
+        {
+            throw new ArgumentException ("Raster image destination must have a positive size.", nameof (command));
+        }
+
+        lock (_contentsLock)
+        {
+            command.Clip = Clip?.Clone ();
+            int index = _rasterImages.FindIndex (existing => existing.Id == command.Id);
+
+            if (index >= 0)
+            {
+                MarkRasterImageCellsDirty (_rasterImages [index]);
+                MarkRasterImageCellsClean (command);
+                _rasterImages [index] = command;
+
+                return;
+            }
+
+            MarkRasterImageCellsClean (command);
+            _rasterImages.Add (command);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void RemoveRasterImage (string id)
+    {
+        ArgumentException.ThrowIfNullOrEmpty (id);
+
+        lock (_contentsLock)
+        {
+            for (int i = _rasterImages.Count - 1; i >= 0; i--)
+            {
+                if (_rasterImages [i].Id != id)
+                {
+
+                    continue;
+                }
+
+                MarkRasterImageCellsDirty (_rasterImages [i]);
+                _rasterImages.RemoveAt (i);
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public IReadOnlyList<RasterImageCommand> GetRasterImages ()
+    {
+        lock (_contentsLock)
+        {
+            return _rasterImages.ToArray ();
+        }
+    }
+
+    private void MarkRasterImageCellsClean (RasterImageCommand command)
+    {
+        SetRasterImageCellsDirtyState (command, false);
+    }
+
+    private void MarkRasterImageCellsDirty (RasterImageCommand command)
+    {
+        SetRasterImageCellsDirtyState (command, true);
+    }
+
+    private void SetRasterImageCellsDirtyState (RasterImageCommand command, bool isDirty)
+    {
+        if (Contents is null)
+        {
+            return;
+        }
+
+        Region clip = command.Clip ?? new (Screen);
+
+        foreach (Rectangle clipRect in clip.GetRectangles ())
+        {
+            Rectangle visible = Rectangle.Intersect (Rectangle.Intersect (command.DestinationCells, clipRect), Screen);
+
+            if (visible.Width <= 0 || visible.Height <= 0)
+            {
+
+                continue;
+            }
+
+            for (int row = visible.Y; row < visible.Bottom; row++)
+            {
+                for (int col = visible.X; col < visible.Right; col++)
+                {
+                    Contents [row, col].IsDirty = isDirty;
+                    DirtyLines [row] |= isDirty;
+                }
+            }
+        }
     }
 
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>

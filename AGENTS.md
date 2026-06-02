@@ -62,7 +62,7 @@ dotnet run
 ### Key Resources
 - **App Building Guide**: [.claude/tasks/build-app.md](.claude/tasks/build-app.md)
 - **Common Patterns**: [.claude/cookbook/common-patterns.md](.claude/cookbook/common-patterns.md)
-- **Examples**: `Examples/Example/` (minimal), `Examples/UICatalog/` (comprehensive)
+- **Examples**: `Examples/UICatalog/`, `Examples/ScenarioRunner/`, and [gui-cs/Examples](https://github.com/gui-cs/Examples)
 
 ### API Reference (Compressed)
 | Namespace | Contents |
@@ -503,7 +503,6 @@ Implementing `IValue<T>` requires `ValueChanging`, `ValueChanged`, and `ValueCha
 |IFileOperations|Interface|GetFiles,GetDirectories,Exists
 |FileSystemTreeBuilder|Class|Build file trees
 ```
-
 
 
 

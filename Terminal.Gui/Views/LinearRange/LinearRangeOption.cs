@@ -1,8 +1,8 @@
 namespace Terminal.Gui.Views;
 
- /// <summary>Represents an option in a <see cref="LinearRange{T}"/> .</summary>
- /// <typeparam name="T">Data type of the option.</typeparam>
- public class LinearRangeOption<T>
+/// <summary>Represents an option in a <see cref="LinearRange{T}"/> .</summary>
+/// <typeparam name="T">Data type of the option.</typeparam>
+public class LinearRangeOption<T>
 {
     /// <summary>Creates a new empty instance of the <see cref="LinearRangeOption{T}"/> class.</summary>
     public LinearRangeOption () { }

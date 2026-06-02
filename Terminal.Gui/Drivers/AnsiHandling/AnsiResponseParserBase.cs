@@ -76,7 +76,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     // Valid ANSI response terminators per CSI specification
     // See https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
     // Note: N and O are intentionally excluded as they have special handling
-    protected readonly HashSet<char> _knownTerminators = [..EscSeqUtils.KnownTerminators];
+    protected readonly HashSet<char> _knownTerminators = [.. EscSeqUtils.KnownTerminators];
 
     /// <inheritdoc/>
     public AnsiResponseParserState State

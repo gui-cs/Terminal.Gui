@@ -10,6 +10,9 @@ using System.Globalization;
 namespace Terminal.Gui.Views;
 
 /// <summary>Lets the user pick a date from a visual calendar.</summary>
+/// <remarks>
+/// <img src="../images/views/DatePicker.gif" alt="DatePicker demo"/>
+/// </remarks>
 public class DatePicker : View, IValue<DateTime>
 {
     private TableView? _calendar;

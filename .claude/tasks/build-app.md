@@ -142,10 +142,9 @@ See `.claude/cookbook/common-patterns.md` for recipes including:
 
 | Example | Location | Description |
 |---------|----------|-------------|
-| Hello World | `Examples/Example/` | Minimal login form |
 | All Controls | `Examples/UICatalog/` | Comprehensive demo app |
-| MVVM | `Examples/CommunityToolkitExample/` | CommunityToolkit MVVM |
-| Reactive | `Examples/ReactiveExample/` | ReactiveUI integration |
+| Scenario automation | `Examples/ScenarioRunner/` | Run UICatalog scenarios from the CLI |
+| Additional samples | `gui-cs/Examples` | Standalone example applications |
 
 ## Event Handling Patterns
 

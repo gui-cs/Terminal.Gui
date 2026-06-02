@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 ///     for selecting from a list of items.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/DropDownList.gif" alt="DropDownList demo"/>
 ///     <para>
 ///         <see cref="DropDownList"/> provides a modern dropdown control that can operate in two modes:
 ///     </para>
@@ -332,18 +333,18 @@ public class DropDownList : TextField
             case VisualRole.ReadOnly when ReadOnly:
 
             case VisualRole.Active when ReadOnly:
-            {
-                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                {
+                    currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
 
-                return true;
-            }
+                    return true;
+                }
 
             case VisualRole.Editable when ReadOnly:
-            {
-                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                {
+                    currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
 
-                break;
-            }
+                    break;
+                }
         }
 
         return false;
@@ -604,6 +605,9 @@ public class DropDownList : TextField
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public override string? GetDemoKeyStrokes () => "wait:500,F4,wait:600,CursorDown,wait:400,CursorDown,wait:400,Enter,wait:800";
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

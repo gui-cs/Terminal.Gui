@@ -39,7 +39,7 @@ public class AnsiOutput : OutputBase, IOutput
     // Tracks which underlying platform APIs are in use
     private readonly AnsiPlatform _platform;
 
-    private Size _consoleSize = new (80, 25);
+    private Size _consoleSize;
     private IOutputBuffer? _lastBuffer;
 
     private readonly WindowsVTOutputHelper? _windowsVTOutput;
@@ -71,7 +71,6 @@ public class AnsiOutput : OutputBase, IOutput
         _platform = AnsiPlatform.Degraded;
 
         _lastBuffer = new OutputBufferImpl ();
-        _lastBuffer.SetSize (80, 25);
         _currentCursor = new Cursor ();
 
         try
@@ -86,6 +85,9 @@ public class AnsiOutput : OutputBase, IOutput
             // Check if we have a real console first
             if (!IsAttachedToTerminal)
             {
+                _consoleSize = new Size (80, 25);
+                _lastBuffer.SetSize (_consoleSize.Width, _consoleSize.Height);
+
                 Trace.Lifecycle (nameof (AnsiOutput), "Init", "No real terminal attached. Running in degraded mode.");
 
                 return;
@@ -414,6 +416,11 @@ public class AnsiOutput : OutputBase, IOutput
         finally
         {
             Trace.Lifecycle (nameof (AnsiOutput), "Dispose", "Flushing output and releasing resources.");
+
+            if (_platform == AnsiPlatform.WindowsVT)
+            {
+                WindowsVTInputHelper.WakePendingRead ();
+            }
 
             _windowsVTOutput?.Dispose ();
         }

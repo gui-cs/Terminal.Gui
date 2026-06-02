@@ -28,6 +28,10 @@ Integration tests for Terminal.Gui.
 
 Stress tests for Terminal.Gui.
 
+### ./NativeAotSmoke
+
+Native AOT smoke-test application used by CI to validate trimming and AOT compatibility in-repo.
+
 ---
 
 ## Static State in Terminal.Gui

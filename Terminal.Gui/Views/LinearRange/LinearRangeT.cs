@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <typeparam name="T">The data type of the options.</typeparam>
 /// <remarks>
+///     <img src="../images/views/LinearRange.gif" alt="LinearRange demo"/>
 ///     <para>
 ///         To switch between left-bounded, right-bounded, and closed range modes, set
 ///         <see cref="RangeKind"/>. Setting <see cref="RangeKind"/> migrates the current
@@ -193,40 +194,40 @@ public class LinearRange<T> : LinearRangeViewBase<T, LinearRangeSpan<T>>, IDesig
             case LinearRangeSpanKind.None:
                 return [];
             case LinearRangeSpanKind.LeftBounded:
-            {
-                int end = span.EndIndex >= 0 ? span.EndIndex : IndexOfData (span.End);
+                {
+                    int end = span.EndIndex >= 0 ? span.EndIndex : IndexOfData (span.End);
 
-                return end >= 0 ? [end] : [];
-            }
+                    return end >= 0 ? [end] : [];
+                }
             case LinearRangeSpanKind.RightBounded:
-            {
-                int start = span.StartIndex >= 0 ? span.StartIndex : IndexOfData (span.Start);
+                {
+                    int start = span.StartIndex >= 0 ? span.StartIndex : IndexOfData (span.Start);
 
-                return start >= 0 ? [start] : [];
-            }
+                    return start >= 0 ? [start] : [];
+                }
             case LinearRangeSpanKind.Closed:
             default:
-            {
-                int start = span.StartIndex >= 0 ? span.StartIndex : IndexOfData (span.Start);
-                int end = span.EndIndex >= 0 ? span.EndIndex : IndexOfData (span.End);
-
-                if (start < 0 && end < 0)
                 {
-                    return [];
-                }
+                    int start = span.StartIndex >= 0 ? span.StartIndex : IndexOfData (span.Start);
+                    int end = span.EndIndex >= 0 ? span.EndIndex : IndexOfData (span.End);
 
-                if (start < 0)
-                {
-                    return [end];
-                }
+                    if (start < 0 && end < 0)
+                    {
+                        return [];
+                    }
 
-                if (end < 0 || start == end)
-                {
-                    return [start];
-                }
+                    if (start < 0)
+                    {
+                        return [end];
+                    }
 
-                return [start, end];
-            }
+                    if (end < 0 || start == end)
+                    {
+                        return [start];
+                    }
+
+                    return [start, end];
+                }
         }
     }
 

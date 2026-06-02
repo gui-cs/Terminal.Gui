@@ -91,6 +91,36 @@ Most draw steps can be overridden using the [Cancellable Work Pattern](cancellab
 Clipping enables better performance and features like shadows by ensuring regions of the terminal that need to be drawn actually get drawn by the driver. Terminal.Gui supports non-rectangular clip regions with <xref:Terminal.Gui.Drawing.Region>. The driver.Clip is the application managed clip region and is managed by <xref:Terminal.Gui.App.Application>. Developers cannot change this directly, but can use `SetClipToScreen()`, `SetClip()`(Terminal.Gui.Region), `SetClipToFrame()`, etc...
 
 
+## Sixel Raster Images
+
+Terminal.Gui can render raster images through the same deferred drawing pipeline as text and line art. <xref:Terminal.Gui.Views.ImageView> accepts a `Color[,]` pixel buffer. When `ImageView.UseSixel` is `true` and <xref:Terminal.Gui.Drivers.IDriver.SixelSupport> reports support, the view encodes the pixels with <xref:Terminal.Gui.Drawing.SixelEncoder> and stores a raster image command in the driver's output buffer.
+
+Raster image commands participate in normal composition:
+
+1. The current clip region is captured when the image is drawn.
+2. The output layer crops the pixel buffer to the visible clipped cell rectangles.
+3. The raster command is emitted before dirty text cells, so later-drawn SubViews, dialogs, borders, and overlays can paint over the image.
+4. Replacing or removing the image invalidates the cells the previous raster occupied, so stale terminal graphics are cleared by the next refresh.
+
+To render an image, assign the pixel buffer and mark the view for drawing:
+
+```cs
+ImageView imageView = new ()
+{
+    Width = 30,
+    Height = 20,
+    UseSixel = true
+};
+
+imageView.Image = pixels;
+```
+
+To customize sixel encoding, assign `ImageView.SixelEncoder` before setting `Image`. Terminals that do not report sixel support use ImageView's cell-based fallback.
+
+The UICatalog Mandelbrot scenario demonstrates a resizable `ImageView` with a double-line border and a runnable dialog drawn over the raster image.
+
+![Mandelbrot sixel raster demo](../images/Mandelbrot.gif)
+
 ## Cell
 
 The <xref:Terminal.Gui.Drawing.Cell> class represents a single cell on the screen. It contains a character and an attribute. The character is of type `Rune` and the attribute is of type <xref:Terminal.Gui.Drawing.Attribute>.

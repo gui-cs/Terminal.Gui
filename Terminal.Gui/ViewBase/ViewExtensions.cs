@@ -6,7 +6,7 @@ namespace Terminal.Gui.ViewBase;
 public static class ViewExtensions
 {
     /// <param name="view">The view to identify.</param>
-    extension (View? view)
+    extension(View? view)
     {
         /// <summary>
         ///     Returns a formatted string that identifies the View for debugging/logging purposes.

@@ -1,5 +1,5 @@
 #nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Extends <see cref="IReadOnlyCollection{T}"/> with methods to find the index of an element.

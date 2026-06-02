@@ -47,6 +47,7 @@ docfx/_site
 # Test Results
 UnitTests/TestResults
 TestResults
+*.actual
 
 # git merge files
 *.orig
@@ -82,3 +83,9 @@ log.*
 .mcp.json
 .env
 tmpclaude-*-cwd
+
+# tuirec artifacts
+artifacts/
+docfx/artifacts/
+local_packages/
+*.cast

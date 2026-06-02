@@ -12,6 +12,9 @@ public interface ITreeView
     /// <summary>Gets or sets whether the user can navigate the tree using letter keys.</summary>
     bool AllowLetterBasedNavigation { get; set; }
 
+    /// <summary>Gets or sets whether built-in checkbox rendering and toggling is enabled for tree nodes.</summary>
+    bool CheckboxMode { get; set; }
+
     /// <summary>Gets or sets the maximum depth to which the tree will expand.</summary>
     int MaxDepth { get; set; }
 

@@ -4,6 +4,9 @@ namespace Terminal.Gui.Views;
 ///     Allows the user to pick an <see cref="Attribute"/> by selecting foreground and background colors,
 ///     and text styles.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/AttributePicker.gif" alt="AttributePicker demo"/>
+/// </remarks>
 public class AttributePicker : View, IValue<Attribute?>, IDesignable
 {
     private Attribute? _value;

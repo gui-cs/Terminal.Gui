@@ -7,6 +7,7 @@ namespace Terminal.Gui.Views;
 ///     <see cref="Border"/>. The currently focused SubView is the selected (front-most) tab.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Tabs.gif" alt="Tabs demo"/>
 ///     <para>
 ///         Add any <see cref="View"/> instances via <see cref="View.Add(View)"/>. Each added view is automatically
 ///         configured with <see cref="BorderSettings.Tab"/>, <see cref="ViewArrangement.Overlapped"/> arrangement,
@@ -571,13 +572,13 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
 
             tab.Border.Thickness = _tabSide switch
-                                   {
-                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
-                                       _ => new Thickness (1, TabDepth, 1, 1)
-                                   };
+            {
+                Side.Top => new Thickness (1, TabDepth, 1, 1),
+                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                Side.Right => new Thickness (1, 1, TabDepth, 1),
+                _ => new Thickness (1, TabDepth, 1, 1)
+            };
         }
     }
 
@@ -593,26 +594,26 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         return TabSide switch
-               {
-                   Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
-                   Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
+        {
+            Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
+            Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
 
-                   Side.Top when ctx.Command == Command.Down => FocusContent (),
-                   Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
+            Side.Top when ctx.Command == Command.Down => FocusContent (),
+            Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
 
-                   Side.Bottom when ctx.Command == Command.Up => FocusContent (),
-                   Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
+            Side.Bottom when ctx.Command == Command.Up => FocusContent (),
+            Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
 
-                   Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
-                   Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
+            Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
+            Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
 
-                   Side.Left when ctx.Command == Command.Right => FocusContent (),
-                   Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
+            Side.Left when ctx.Command == Command.Right => FocusContent (),
+            Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
 
-                   Side.Right when ctx.Command == Command.Left => FocusContent (),
-                   Side.Right when ctx.Command == Command.Right => SelectNextTab (),
-                   _ => false
-               };
+            Side.Right when ctx.Command == Command.Left => FocusContent (),
+            Side.Right when ctx.Command == Command.Right => SelectNextTab (),
+            _ => false
+        };
     }
 
     private bool? SelectNextTab ()
@@ -1092,6 +1093,9 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
         }
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Alt+S,wait:500,Alt+I,wait:500,Alt+I,wait:500,Alt+I,wait:500,Alt+I,wait:500,Shift+Tab,Shift+Tab,wait:300," + string.Join (",", Enumerable.Repeat ("CursorDown", 10)) + ",wait:300,Space,wait:1000";
 
     #endregion
 

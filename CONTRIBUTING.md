@@ -98,14 +98,6 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 ### Common Build Issues
 
-#### Issue: NativeAot/SelfContained Build
-
-- **Solution**: Restore these projects explicitly:
-  ```bash
-  dotnet restore ./Examples/NativeAot/NativeAot.csproj -f
-  dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
-  ```
-
 ## Coding Conventions
 
 **⚠️ CRITICAL - These rules MUST be followed in ALL new or modified code**
@@ -285,7 +277,7 @@ foreach (Rune rune in text.EnumerateRunes ())
 
 ### Root Directory Files
 
-- `Terminal.sln` - Main solution file
+- `Terminal.slnx` - Main solution file
 - `Terminal.sln.DotSettings` - ReSharper code style settings
 - `.editorconfig` - Code formatting rules (111KB, extensive)
 - `global.json` - .NET SDK version pinning
@@ -314,13 +306,13 @@ foreach (Rune rune in text.EnumerateRunes ())
 - `UnitTestsParallelizable/` - Parallel tests (no static dependencies) - **Preferred**
 - `IntegrationTests/` - Integration tests
 - `StressTests/` - Long-running stress tests (scheduled daily)
+- `NativeAotSmoke/` - AOT smoke-test app used in CI validation
 - `coverlet.runsettings` - Code coverage configuration
 
 **`/Examples/`**:
 - `UICatalog/` - Comprehensive demo app for manual testing
-- `Example/` - Basic example
-- `NativeAot/`, `SelfContained/` - Deployment examples
-- `ReactiveExample/`, `CommunityToolkitExample/` - Integration examples
+- `ScenarioRunner/` - Scenario automation tool
+- Additional examples live in [gui-cs/Examples](https://github.com/gui-cs/Examples)
 
 **`/docfx/`** - Documentation source:
 - `docs/` - Conceptual documentation (deep dives)

@@ -294,7 +294,7 @@ public interface IApplication : IDisposable
     ///         session.
     ///     </para>
     /// </remarks>
-    Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
+    Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new();
 
     /// <summary>
     ///     Runs a new Session creating a <see cref="IRunnable"/>-derived object of type <typeparamref name="TRunnable"/>
@@ -340,7 +340,7 @@ public interface IApplication : IDisposable
     ///         The caller is responsible for disposing the object returned by this method.
     ///     </para>
     /// </remarks>
-    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new();
 
     #region Iteration & Invoke
 
@@ -595,6 +595,13 @@ public interface IApplication : IDisposable
     ///     <para>
     ///         If the <see cref="IDriver"/> has not been initialized, this will return a default size of 2048x2048; useful
     ///         for unit tests.
+    ///     </para>
+    ///     <para>
+    ///         In <see cref="AppModel.FullScreen"/> mode, setting this property delegates to
+    ///         <see cref="IDriver.SetScreenSize(int,int)"/> when the Driver has been initialized. If the Driver
+    ///         is <see langword="null"/> (before <see cref="IApplication.Init(string?)"/> or after disposal),
+    ///         the setter raises <see cref="ScreenChanged"/> with the current getter value but does not call the Driver.
+    ///         To simulate a terminal resize in tests, prefer calling <see cref="IDriver.SetScreenSize(int,int)"/> directly.
     ///     </para>
     /// </remarks>
     Rectangle Screen { get; set; }

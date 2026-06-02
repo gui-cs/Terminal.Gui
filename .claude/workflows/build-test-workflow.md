@@ -80,13 +80,13 @@ dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet te
 
 ## Common Build Issues
 
-### Issue: NativeAot/SelfContained Build Failures
+### Issue: AOT validation failures
 
-**Solution:** Restore these projects explicitly:
+**Solution:** Build and publish the in-repo AOT smoke app:
 
 ```bash
-dotnet restore ./Examples/NativeAot/NativeAot.csproj -f
-dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
+dotnet publish ./Tests/NativeAotSmoke/NativeAotSmoke.csproj --configuration Release --output ./aot-publish
+./aot-publish/NativeAotSmoke --smoke-test
 ```
 
 ## Build Order Best Practice
