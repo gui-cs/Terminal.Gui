@@ -1,14 +1,10 @@
 namespace UICatalog.Scenarios;
 
-internal class MedianCutPaletteBuilder : IPaletteBuilder
+internal class MedianCutPaletteBuilder (IColorDistance colorDistance) : IPaletteBuilder
 {
-    public MedianCutPaletteBuilder (IColorDistance colorDistance) => _colorDistance = colorDistance;
-
-    private readonly IColorDistance _colorDistance;
-
     public List<Color> BuildPalette (List<Color> colors, int maxColors)
     {
-        if (colors == null || colors.Count == 0 || maxColors <= 0)
+        if (colors.Count == 0 || maxColors <= 0)
         {
             return [];
         }
