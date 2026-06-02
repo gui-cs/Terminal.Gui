@@ -126,12 +126,12 @@ public class SixelEncoder
             {
                 Color color = pixels [x, startY + row];
 
-                int colorIndex = Quantizer.GetNearestColor (color);
-
                 if (color.A == 0) // Skip fully transparent pixels
                 {
                     continue;
                 }
+
+                int colorIndex = Quantizer.GetNearestColor (color);
 
                 if (slots [colorIndex] == -1)
                 {

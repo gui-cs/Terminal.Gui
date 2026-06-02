@@ -16,11 +16,74 @@ public class ImageViewTests
         Assert.True (imageView.UseSixel);
         Assert.Null (imageView.SixelEncoder);
         Assert.False (imageView.IsUsingSixel); // No driver, so sixel not available
+        Assert.True (imageView.CanFocus);
+        Assert.Equal (1d, imageView.ZoomLevel);
+        Assert.Equal (64, imageView.MaxSixelPaletteColors);
+        Assert.True (imageView.AllowSixelUpscaling);
+        Assert.False (imageView.UseBackgroundRendering);
+
+        imageView.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void Defaults_ConfigurePanAndZoomBindings ()
+    {
+        ImageView imageView = new ();
+
+        Assert.Equal ([Command.ScrollLeft], imageView.KeyBindings.GetCommands (Key.CursorLeft));
+        Assert.Equal ([Command.ScrollRight], imageView.KeyBindings.GetCommands (Key.CursorRight));
+        Assert.Equal ([Command.ScrollUp], imageView.KeyBindings.GetCommands (Key.CursorUp));
+        Assert.Equal ([Command.ScrollDown], imageView.KeyBindings.GetCommands (Key.CursorDown));
+        Assert.Equal ([Command.Home], imageView.KeyBindings.GetCommands (Key.Home));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (Key.PageUp));
+        Assert.Equal ([Command.ZoomOut], imageView.KeyBindings.GetCommands (Key.PageDown));
+        Assert.Equal ([Command.ZoomIn], imageView.MouseBindings.GetCommands (MouseFlags.WheeledUp));
+        Assert.Equal ([Command.ZoomOut], imageView.MouseBindings.GetCommands (MouseFlags.WheeledDown));
+        Assert.Equal ([Command.Center], imageView.MouseBindings.GetCommands (MouseFlags.LeftButtonDoubleClicked));
 
         imageView.Dispose ();
     }
 
     #endregion Construction and Defaults
+
+    #region Background Rendering
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void BackgroundRendering_WhenEnabled_ShowsSpinnerBeforeFirstDraw ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new ()
+        {
+            Width = 2,
+            Height = 2,
+            UseBackgroundRendering = true,
+            UseSixel = false,
+            Image = CreateCoordinateImage (4, 4)
+        };
+        runnable.Add (imageView);
+
+        SpinnerView overlay = Assert.Single (imageView.SubViews.OfType<SpinnerView> ());
+        Assert.True (overlay.Visible);
+        Assert.True (overlay.AutoSpin);
+        Assert.IsType<SpinnerStyle.Aesthetic2> (overlay.Style);
+
+        app.LayoutAndDraw ();
+
+        Assert.True (overlay.Visible);
+        Assert.True (overlay.AutoSpin);
+        Assert.IsType<SpinnerStyle.Aesthetic2> (overlay.Style);
+
+        runnable.Dispose ();
+    }
+
+    #endregion Background Rendering
 
     #region Image Property
 
@@ -134,6 +197,184 @@ public class ImageViewTests
         Assert.Same (encoder, imageView.SixelEncoder);
 
         imageView.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void MaxSixelPaletteColors_SetInvalid_Throws ()
+    {
+        ImageView imageView = new ();
+
+        Assert.Throws<ArgumentOutOfRangeException> (() => imageView.MaxSixelPaletteColors = 0);
+
+        imageView.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void SixelRendering_DefaultEncoder_UsesInteractivePaletteLimit ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (1, 1), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.NotNull (imageView.SixelEncoder);
+        Assert.Equal (64, imageView.SixelEncoder!.Quantizer.MaxColors);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void SixelRendering_DefaultEncoder_ClampsPaletteLimitToTerminalSupport ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (1, 1), MaxPaletteColors = 64 });
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.NotNull (imageView.SixelEncoder);
+        Assert.Equal (64, imageView.SixelEncoder!.Quantizer.MaxColors);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void SixelRendering_CustomEncoder_KeepsPaletteLimitAboveInteractiveDefault ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (1, 1), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        SixelEncoder encoder = new ();
+        encoder.Quantizer.MaxColors = 200;
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4), SixelEncoder = encoder };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.Equal (200, encoder.Quantizer.MaxColors);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void SixelRendering_CanDisableUpscaling_WhenViewportWouldUpscale ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new ()
+        {
+            Width = 4,
+            Height = 4,
+            AllowSixelUpscaling = false,
+            Image = CreateCoordinateImage (4, 4)
+        };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        RasterImageCommand command = Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+        Assert.NotNull (command.Pixels);
+        Assert.Equal (4, command.Pixels!.GetLength (0));
+        Assert.Equal (4, command.Pixels.GetLength (1));
+        Assert.Equal (new Rectangle (0, 0, 1, 1), command.DestinationCells);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void SixelRendering_DefaultUpscaling_ScalesToViewport ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new ()
+        {
+            Width = 4,
+            Height = 4,
+            Image = CreateCoordinateImage (4, 4)
+        };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        RasterImageCommand command = Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+        Assert.NotNull (command.Pixels);
+        Assert.Equal (40, command.Pixels!.GetLength (0));
+        Assert.Equal (40, command.Pixels.GetLength (1));
+        Assert.Equal (new Rectangle (0, 0, 4, 4), command.DestinationCells);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void SixelRendering_SupportResolutionChange_RecomputesWithoutResize ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (1, 1), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        RasterImageCommand firstCommand = Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+        Assert.NotNull (firstCommand.Pixels);
+        Assert.Equal (2, firstCommand.Pixels!.GetLength (0));
+        Assert.Equal (2, firstCommand.Pixels.GetLength (1));
+
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+        imageView.SetNeedsDraw ();
+        app.LayoutAndDraw ();
+
+        RasterImageCommand secondCommand = Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+        Assert.NotNull (secondCommand.Pixels);
+        Assert.Equal (20, secondCommand.Pixels!.GetLength (0));
+        Assert.Equal (20, secondCommand.Pixels.GetLength (1));
+
+        runnable.Dispose ();
     }
 
     #endregion SixelEncoder Property
@@ -323,7 +564,311 @@ public class ImageViewTests
         runnable.Dispose ();
     }
 
+    // Copilot - GPT-5.5
+    [Fact]
+    public void CellBasedRendering_TargetSizeChange_RecomputesScaledImage ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        Color [,] image = CreateCoordinateImage (4, 4);
+        NonInvalidatingImageView imageView = new () { Width = 2, Height = 2, UseSixel = false, Image = image };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        imageView.Width = 4;
+        imageView.Height = 4;
+        app.LayoutAndDraw ();
+
+        AssertCellBackground (app.Driver!, 3, 3, image [3, 3]);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void CellBasedRendering_StretchesImageToViewport ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        Color [,] image = CreateCoordinateImage (4, 4);
+        ImageView imageView = new () { Width = 4, Height = 2, UseSixel = false, Image = image };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        AssertCellBackground (app.Driver!, 0, 0, image [0, 0]);
+        AssertCellBackground (app.Driver!, 3, 1, image [3, 2]);
+
+        runnable.Dispose ();
+    }
+
     #endregion Cell-Based Rendering
+
+    #region Pan and Zoom
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void Commands_ZoomInZoomOutAndHome_UpdateZoomLevel ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.InvokeCommand (Command.ZoomIn));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        Assert.True (imageView.InvokeCommand (Command.ZoomOut));
+        Assert.Equal (1d, imageView.ZoomLevel);
+
+        imageView.ZoomLevel = 2d;
+        Assert.True (imageView.InvokeCommand (Command.Home));
+        Assert.Equal (1d, imageView.ZoomLevel);
+
+        host.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void KeyBindings_ZoomScrollAndHome_UpdateView ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        Color [,] image = CreateCoordinateImage (4, 4);
+        ImageView imageView = new () { Width = 2, Height = 2, UseSixel = false, Image = image };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.True (imageView.NewKeyDownEvent (Key.PageUp));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        imageView.ZoomLevel = 2d;
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [1, 1]);
+
+        Assert.True (imageView.NewKeyDownEvent (Key.CursorRight));
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [2, 1]);
+
+        Assert.True (imageView.NewKeyDownEvent (Key.Home));
+        Assert.Equal (1d, imageView.ZoomLevel);
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [0, 0]);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void KeyBindings_PageDown_ZoomsOutBelowFit ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 4, Height = 4, UseSixel = false, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        for (int i = 0; i < 12; i++)
+        {
+            imageView.NewKeyDownEvent (Key.PageDown);
+        }
+
+        Assert.True (imageView.ZoomLevel < 1d);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void ApplicationKeyDispatch_WhenFocused_ZoomsAndScrolls ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        Color [,] image = CreateCoordinateImage (4, 4);
+        ImageView imageView = new () { Width = 2, Height = 2, UseSixel = false, Image = image };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        imageView.SetFocus ();
+
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.PageUp));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        imageView.ZoomLevel = 2d;
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [1, 1]);
+
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorRight));
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [2, 1]);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void ApplicationKeyDispatch_WhenFocused_EatsScrollKeysEvenWithoutPan ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 2, Height = 2, UseSixel = false, Image = CreateCoordinateImage (2, 2) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        imageView.SetFocus ();
+
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorLeft));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorRight));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorUp));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.CursorDown));
+        Assert.Equal (1d, imageView.ZoomLevel);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void CellBasedRendering_ZoomAndScroll_ChangesVisiblePixels ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        Color [,] image = CreateCoordinateImage (4, 4);
+        ImageView imageView = new () { Width = 2, Height = 2, UseSixel = false, Image = image };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        imageView.ZoomLevel = 2d;
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [1, 1]);
+
+        Assert.True (imageView.InvokeCommand (Command.ScrollRight));
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [2, 1]);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void MouseWheel_ZoomsInAndOut ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledUp, Position = new (1, 1) }));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        Assert.True (imageView.NewMouseEvent (new Mouse { Flags = MouseFlags.WheeledDown, Position = new (1, 1) }));
+        Assert.Equal (1d, imageView.ZoomLevel);
+
+        host.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void DoubleClick_CentersOnClickedPoint ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        Color [,] image = CreateCoordinateImage (4, 4);
+        ImageView imageView = new () { Width = 2, Height = 2, UseSixel = false, Image = image, ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [1, 1]);
+
+        Assert.True (imageView.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonDoubleClicked, Position = new (0, 0) }));
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [0, 0]);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void Drag_PansImage ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        Color [,] image = CreateCoordinateImage (4, 4);
+        ImageView imageView = new () { Width = 2, Height = 2, UseSixel = false, Image = image, ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [1, 1]);
+
+        Assert.True (imageView.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new (1, 0) }));
+        Assert.True (imageView.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport, Position = new (0, 0) }));
+        Assert.True (imageView.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased, Position = new (0, 0) }));
+        app.LayoutAndDraw ();
+        AssertCellBackground (app.Driver!, 0, 0, image [2, 1]);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void SixelRendering_Zoom_UsesVisiblePixels ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (1, 1) });
+
+        Runnable runnable = new () { Width = 4, Height = 4 };
+        app.Begin (runnable);
+
+        Color [,] image = CreateCoordinateImage (4, 4);
+        ImageView imageView = new () { Width = 2, Height = 2, Image = image, ZoomLevel = 2d, SixelEncoder = new () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        RasterImageCommand command = Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+        Assert.NotNull (command.Pixels);
+        Assert.Equal (image [1, 1], command.Pixels! [0, 0]);
+
+        runnable.Dispose ();
+    }
+
+    #endregion Pan and Zoom
 
     #region Dispose
 
@@ -932,6 +1477,28 @@ public class ImageViewTests
         return image;
     }
 
+    private static Color [,] CreateCoordinateImage (int width, int height)
+    {
+        Color [,] image = new Color [width, height];
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                image [x, y] = new ((byte)(x * 40 + 10), (byte)(y * 40 + 20), (byte)(x * 10 + y));
+            }
+        }
+
+        return image;
+    }
+
+    private static void AssertCellBackground (IDriver driver, int col, int row, Color expected)
+    {
+        Cell [,]? contents = driver.Contents;
+        Assert.NotNull (contents);
+        Assert.Equal (expected, contents! [row, col].Attribute!.Value.Background);
+    }
+
     /// <summary>Creates a gradient image where pixel color varies by position.</summary>
     private static Color [,] CreateGradientImage (int width, int height)
     {
@@ -948,6 +1515,11 @@ public class ImageViewTests
         }
 
         return image;
+    }
+
+    private sealed class NonInvalidatingImageView : ImageView
+    {
+        protected override void OnFrameChanged (in Rectangle frame) { }
     }
 
     #endregion Helper Methods

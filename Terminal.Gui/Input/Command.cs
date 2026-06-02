@@ -102,6 +102,9 @@ public enum Command
     /// <summary>Moves to the start (e.g. the top or home).</summary>
     Start,
 
+    /// <summary>Moves or resets to the home position.</summary>
+    Home,
+
     /// <summary>Moves to the end (e.g. the bottom).</summary>
     End,
 
@@ -356,6 +359,15 @@ public enum Command
     ///     Invokes a user interface for editing or configuring something.
     /// </summary>
     Edit,
+
+    /// <summary>Centers the current item or viewport.</summary>
+    Center,
+
+    /// <summary>Zooms in.</summary>
+    ZoomIn,
+
+    /// <summary>Zooms out.</summary>
+    ZoomOut,
 
     #endregion
 

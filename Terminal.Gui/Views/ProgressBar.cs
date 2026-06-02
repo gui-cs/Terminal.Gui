@@ -1,5 +1,3 @@
-using Terminal.Gui.Drivers;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.</summary>
@@ -15,7 +13,10 @@ public enum ProgressBarStyle
     MarqueeBlocks,
 
     /// <summary>Indicates progress by continuously scrolling a block across a <see cref="ProgressBar"/> in a marquee fashion.</summary>
-    MarqueeContinuous
+    MarqueeContinuous,
+
+    /// <summary>Indicates progress by filling the progress area with a sixel-rendered Doom fire effect when available.</summary>
+    Fire
 }
 
 /// <summary>Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.</summary>
@@ -30,7 +31,7 @@ public enum ProgressBarFormat
 
 /// <summary>A Progress Bar view that can indicate progress of an activity visually.</summary>
 /// <remarks>
-/// <img src="../images/views/ProgressBar.gif" alt="ProgressBar demo"/>
+///     <img src="../images/views/ProgressBar.gif" alt="ProgressBar demo"/>
 ///     <para>
 ///         <see cref="ProgressBar"/> can operate in two modes, percentage mode, or activity mode. The progress bar
 ///         starts in percentage mode and setting the Fraction property will reflect on the UI the progress made so far.
@@ -40,8 +41,58 @@ public enum ProgressBarFormat
 /// </remarks>
 public class ProgressBar : View, IDesignable
 {
+    private static readonly ProgressBarStyle [] _progressBarStyles =
+    [
+        ProgressBarStyle.Blocks, ProgressBarStyle.Continuous, ProgressBarStyle.MarqueeBlocks, ProgressBarStyle.MarqueeContinuous, ProgressBarStyle.Fire
+    ];
+
+    private static readonly Color [] _firePalette =
+    [
+        new (7, 7, 7),
+        new (31, 7, 7),
+        new (47, 15, 7),
+        new (71, 15, 7),
+        new (87, 23, 7),
+        new (103, 31, 7),
+        new (119, 31, 7),
+        new (143, 39, 7),
+        new (159, 47, 7),
+        new (175, 63, 7),
+        new (191, 71, 7),
+        new (199, 71, 7),
+        new (223, 79, 7),
+        new (223, 87, 7),
+        new (223, 87, 7),
+        new (215, 95, 7),
+        new (215, 95, 7),
+        new (215, 103, 15),
+        new (207, 111, 15),
+        new (207, 119, 15),
+        new (207, 127, 15),
+        new (207, 135, 23),
+        new (199, 135, 23),
+        new (199, 143, 23),
+        new (199, 151, 31),
+        new (191, 159, 31),
+        new (191, 159, 31),
+        new (191, 167, 39),
+        new (191, 167, 39),
+        new (191, 175, 47),
+        new (183, 175, 47),
+        new (183, 183, 47),
+        new (183, 183, 55),
+        new (207, 207, 111),
+        new (223, 223, 159),
+        new (239, 239, 199),
+        new (255, 255, 255)
+    ];
+
     private int []? _activityPos;
     private int _delta;
+    private SixelEncoder? _fireEncoder;
+    private int _fireEncoderMaxColors;
+    private int _fireFrame;
+    private readonly string _fireRasterImageId = $"{nameof (ProgressBar)}.{Guid.NewGuid ():N}.Fire";
     private float _fraction;
     private bool _isActivity;
     private bool _syncWithTerminal;
@@ -118,8 +169,6 @@ public class ProgressBar : View, IDesignable
         get;
         set
         {
-            field = value;
-
             switch (value)
             {
                 case ProgressBarStyle.Blocks:
@@ -141,8 +190,19 @@ public class ProgressBar : View, IDesignable
                     SegmentCharacter = Glyphs.ContinuousMeterSegment;
 
                     break;
+
+                case ProgressBarStyle.Fire:
+                    SegmentCharacter = Glyphs.ContinuousMeterSegment;
+
+                    break;
             }
 
+            if (field == ProgressBarStyle.Fire && value != ProgressBarStyle.Fire)
+            {
+                RemoveFireRasterImage ();
+            }
+
+            field = value;
             SetNeedsDraw ();
         }
     } = ProgressBarStyle.Blocks;
@@ -160,7 +220,7 @@ public class ProgressBar : View, IDesignable
         get => string.IsNullOrEmpty (base.Text) ? $"{_fraction * 100:F0}%" : base.Text;
         set
         {
-            if (ProgressBarStyle is ProgressBarStyle.MarqueeBlocks or ProgressBarStyle.MarqueeContinuous)
+            if (ProgressBarStyle is ProgressBarStyle.MarqueeBlocks or ProgressBarStyle.MarqueeContinuous or ProgressBarStyle.Fire)
             {
                 base.Text = value;
             }
@@ -176,6 +236,8 @@ public class ProgressBar : View, IDesignable
 
         if (_isActivity)
         {
+            RemoveFireRasterImage ();
+
             for (var i = 0; i < Viewport.Width; i++)
             {
                 if (Array.IndexOf (_activityPos!, i) != -1)
@@ -191,16 +253,31 @@ public class ProgressBar : View, IDesignable
         else
         {
             var mid = (int)(_fraction * Viewport.Width);
-            int i;
 
-            for (i = 0; (i < mid) & (i < Viewport.Width); i++)
+            if (ProgressBarStyle == ProgressBarStyle.Fire && DrawFireProgress (mid))
             {
-                AddRune (SegmentCharacter);
+                Move (Math.Clamp (mid, 0, Viewport.Width), 0);
+
+                for (int i = Math.Clamp (mid, 0, Viewport.Width); i < Viewport.Width; i++)
+                {
+                    AddRune ((Rune)' ');
+                }
             }
-
-            for (; i < Viewport.Width; i++)
+            else
             {
-                AddRune ((Rune)' ');
+                RemoveFireRasterImage ();
+
+                int i;
+
+                for (i = 0; i < Math.Clamp (mid, 0, Viewport.Width); i++)
+                {
+                    AddRune (SegmentCharacter);
+                }
+
+                for (; i < Viewport.Width; i++)
+                {
+                    AddRune ((Rune)' ');
+                }
             }
         }
 
@@ -208,11 +285,12 @@ public class ProgressBar : View, IDesignable
         {
             return true;
         }
-        var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
 
-        var attr = new Attribute (GetAttributeForRole (VisualRole.Normal).Foreground,
-                                  GetAttributeForRole (VisualRole.Normal).Background,
-                                  GetAttributeForRole (VisualRole.Normal).Style);
+        TextFormatter tf = new () { Alignment = Alignment.Center, Text = Text };
+
+        Attribute attr = new (GetAttributeForRole (VisualRole.Normal).Foreground,
+                              GetAttributeForRole (VisualRole.Normal).Background,
+                              GetAttributeForRole (VisualRole.Normal).Style);
 
         if (_fraction > .5)
         {
@@ -228,6 +306,19 @@ public class ProgressBar : View, IDesignable
                  SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle));
 
         return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? commandContext)
+    {
+        base.OnActivated (commandContext);
+
+        if (!CanFocus)
+        {
+            return;
+        }
+
+        CycleProgressBarStyle ();
     }
 
     /// <summary>Notifies the <see cref="ProgressBar"/> that some progress has taken place.</summary>
@@ -298,12 +389,111 @@ public class ProgressBar : View, IDesignable
             ClearTerminalProgress ();
         }
 
+        if (disposing)
+        {
+            RemoveFireRasterImage ();
+        }
+
         base.Dispose (disposing);
     }
 
     private void ClearTerminalProgress () => Driver?.ProgressIndicator?.Clear ();
 
+    private void CycleProgressBarStyle ()
+    {
+        int current = Array.IndexOf (_progressBarStyles, ProgressBarStyle);
+
+        if (current < 0)
+        {
+            ProgressBarStyle = ProgressBarStyle.Blocks;
+
+            return;
+        }
+
+        ProgressBarStyle = _progressBarStyles [(current + 1) % _progressBarStyles.Length];
+    }
+
+    private bool DrawFireProgress (int filledCells)
+    {
+        filledCells = Math.Clamp (filledCells, 0, Viewport.Width);
+
+        if (filledCells <= 0 || Viewport.Height <= 0 || Driver?.SixelSupport is not { IsSupported: true } support)
+        {
+            return false;
+        }
+
+        int cellWidthPixels = Math.Max (1, support.Resolution.Width);
+        int cellHeightPixels = Math.Max (1, support.Resolution.Height);
+        int pixelWidth = Math.Max (1, filledCells * cellWidthPixels);
+        int pixelHeight = Math.Max (1, Viewport.Height * cellHeightPixels);
+
+        RasterImageCommand command = new ()
+        {
+            Id = _fireRasterImageId,
+            Pixels = CreateFirePixels (pixelWidth, pixelHeight, _fireFrame++),
+            DestinationCells = ViewportToScreen (new Rectangle (0, 0, filledCells, Viewport.Height)),
+            Encoder = GetFireEncoder (support)
+        };
+
+        Driver.GetOutputBuffer ().AddRasterImage (command);
+
+        return true;
+    }
+
+    private SixelEncoder GetFireEncoder (SixelSupportResult support)
+    {
+        int maxColors = Math.Min (support.MaxPaletteColors, _firePalette.Length);
+
+        if (_fireEncoder is { } encoder && _fireEncoderMaxColors == maxColors)
+        {
+            return encoder;
+        }
+
+        _fireEncoderMaxColors = maxColors;
+        _fireEncoder = new ()
+        {
+            Quantizer =
+            {
+                MaxColors = maxColors,
+                PaletteBuildingAlgorithm = new FirePaletteBuilder ()
+            }
+        };
+
+        return _fireEncoder;
+    }
+
+    private static Color [,] CreateFirePixels (int width, int height, int frame)
+    {
+        Color [,] pixels = new Color [width, height];
+        int maxIntensity = _firePalette.Length - 1;
+
+        for (var y = 0; y < height; y++)
+        {
+            double vertical = 1d - (double)y / Math.Max (1, height - 1);
+
+            for (var x = 0; x < width; x++)
+            {
+                double wave = (Math.Sin ((x + frame * 3) * 0.18d) + Math.Sin (x * 0.11d - frame * 0.27d)) * 0.08d;
+                double flicker = (((x * 17 + y * 31 + frame * 13) & 15) - 7) / 110d;
+                double heat = Math.Clamp (vertical + wave + flicker, 0, 1);
+                int intensity = Math.Clamp ((int)Math.Round (heat * maxIntensity), 0, maxIntensity);
+                pixels [x, y] = _firePalette [intensity];
+            }
+        }
+
+        return pixels;
+    }
+
     private int GetProgressPercentage () => Math.Clamp ((int)Math.Round (_fraction * 100), 0, 100);
+
+    private sealed class FirePaletteBuilder : IStaticPaletteBuilder
+    {
+        public List<Color> BuildPalette (List<Color> colors, int maxColors) => BuildPalette (maxColors);
+
+        public List<Color> BuildPalette (int maxColors) => [.. _firePalette.Take (maxColors)];
+    }
+
+    private void RemoveFireRasterImage () => Driver?.GetOutputBuffer ().RemoveRasterImage (_fireRasterImageId);
 
     private void UpdateTerminalProgress ()
     {
@@ -337,12 +527,12 @@ public class ProgressBar : View, IDesignable
     {
         Width = Dim.Fill ();
         Height = Dim.Auto (DimAutoStyle.Text, 1);
+        CanFocus = true;
         Fraction = 0.75f;
 
         return true;
     }
 
     /// <inheritdoc/>
-    public string? GetDemoKeyStrokes () => "wait:2000";
-
+    public string GetDemoKeyStrokes () => "wait:2000";
 }
