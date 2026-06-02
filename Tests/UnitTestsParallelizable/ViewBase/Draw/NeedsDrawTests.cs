@@ -296,16 +296,16 @@ public class NeedsDrawTests : TestDriverBase
         view.Frame = new Rectangle (3, 3, 6, 6); // Grow right/bottom 1
         Assert.Equal (new Rectangle (3, 3, 6, 6), view.Frame);
         Assert.Equal (new Rectangle (1, 1, 6, 6), view.Viewport);
-        // Union((0,0,6,6),(1,1,6,6)) — Viewport now has scroll offset (1,1).
-        // SetFrame's SetNeedsDraw passes the current Viewport = (1,1,6,6).
-        // Rectangle.Union((0,0,6,6),(1,1,6,6)) = (0,0,7,7).
-        Assert.Equal (new Rectangle (0, 0, 7, 7), view.NeedsDrawRect);
+        // Issue #5359: NeedsDrawRect is viewport-LOCAL — independent of Viewport.Location
+        // (the scroll offset). SetFrame's SetNeedsDraw passes (0, 0, 6, 6), not (1, 1, 6, 6).
+        // Union((0,0,6,6),(0,0,6,6)) = (0,0,6,6).
+        Assert.Equal (new Rectangle (0, 0, 6, 6), view.NeedsDrawRect);
 
         view.Frame = new Rectangle (3, 3, 5, 5);
         Assert.Equal (new Rectangle (3, 3, 5, 5), view.Frame);
         Assert.Equal (new Rectangle (1, 1, 5, 5), view.Viewport);
-        // Union((0,0,7,7),(1,1,5,5)) = (0,0,7,7).
-        Assert.Equal (new Rectangle (0, 0, 7, 7), view.NeedsDrawRect);
+        // Union((0,0,6,6),(0,0,5,5)) = (0,0,6,6).
+        Assert.Equal (new Rectangle (0, 0, 6, 6), view.NeedsDrawRect);
     }
 
     [Fact]

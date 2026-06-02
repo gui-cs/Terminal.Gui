@@ -113,6 +113,24 @@ public interface IOutputBuffer
     void Move (int col, int row);
 
     /// <summary>
+    ///     Adds or replaces a raster image command, capturing the current <see cref="Clip"/> for later composition.
+    /// </summary>
+    /// <param name="command">The raster image command to add.</param>
+    void AddRasterImage (RasterImageCommand command);
+
+    /// <summary>
+    ///     Removes a raster image command from the output buffer.
+    /// </summary>
+    /// <param name="id">The raster image command identifier.</param>
+    void RemoveRasterImage (string id);
+
+    /// <summary>
+    ///     Gets the raster image commands currently held by the output buffer.
+    /// </summary>
+    /// <returns>The raster image commands.</returns>
+    IReadOnlyList<RasterImageCommand> GetRasterImages ();
+
+    /// <summary>
     ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>

@@ -117,9 +117,17 @@ public partial class View // Layout APIs
         // new frames on the SuperView so its region-aware ClearViewport repaints just that area.
         // SetFrame is the single source of truth for this invalidation for both direct Frame
         // assignment and layout-driven frame updates.
+        //
+        // Issue #5359: Frames are in SuperView CONTENT coords, but SetNeedsDraw expects
+        // SuperView VIEWPORT-LOCAL coords. Translate by subtracting the SuperView's scroll
+        // offset (Viewport.Location).
         if (oldFrame is { } prev && SuperView is { })
         {
-            SuperView.SetNeedsDraw (Rectangle.Union (prev, frame));
+            Rectangle invalidationContent = Rectangle.Union (prev, frame);
+            Point superScroll = SuperView.Viewport.Location;
+            Rectangle invalidationViewport = invalidationContent;
+            invalidationViewport.Offset (-superScroll.X, -superScroll.Y);
+            SuperView.SetNeedsDraw (invalidationViewport);
         }
 
         // BUGBUG: When SetFrame is called from Frame_set, this event gets raised BEFORE OnResizeNeeded. Is that OK?

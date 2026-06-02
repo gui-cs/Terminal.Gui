@@ -118,23 +118,12 @@ public partial class View // Drawing APIs
             // If no context ...
             context ??= new DrawContext ();
 
-            // Per-view context tracks only what THIS view draws (text + content).
-            // Used for CachedDrawnRegion (TransparentMouse hit-testing) so that a
-            // transparent view's hit region reflects only its own draws, not its
-            // SuperView's ClearViewport or peer SubViews' content.
-            // This follows the same pattern as DrawAdornments(), which creates
-            // per-adornment DrawContexts for the same reason.
-            //
-            // Issue #5358 (review feedback item 2): only recreate _localDrawContext when
-            // we actually intend to redraw self-content this pass. On child-only passes
-            // (needsDrawSelf=false), we must preserve the prior context so DoDrawComplete
-            // doesn't overwrite CachedDrawnRegion with an empty region and break
-            // TransparentMouse hit-testing until the next full self-redraw.
-            if (needsDrawSelf)
-            {
-                _localDrawContext = new DrawContext ();
-            }
-
+            // Self-draw is gated on needsDrawSelf and intentionally SPLIT around DoDrawSubViews
+            // to preserve the required order: Clear (self) -> SubViews -> Text/Content (self).
+            // The "clear self viewport" half is here; the "draw self content" half — which owns the
+            // _localDrawContext lifecycle (see DrawSelfContent and the _localDrawContext field) —
+            // runs after SubViews below. DoClearViewport draws into the shared context only, so the
+            // local context is not needed until DrawSelfContent.
             if (needsDrawSelf)
             {
                 SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
@@ -160,20 +149,7 @@ public partial class View // Drawing APIs
 
             if (needsDrawSelf)
             {
-                // ------------------------------------
-                // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
-                Trace.Draw (this.ToIdentifyingString (), "Text");
-                SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
-                DoDrawText (_localDrawContext);
-
-                // ------------------------------------
-                // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
-                Trace.Draw (this.ToIdentifyingString (), "Content");
-                DoDrawContent (_localDrawContext);
-
-                // Merge this view's own draws into the shared context so the SuperView
-                // can track the aggregate for clip exclusion.
-                context.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
+                DrawSelfContent (context);
             }
 
             // ------------------------------------
@@ -217,6 +193,43 @@ public partial class View // Drawing APIs
         // a clip with "holes" where this view (and any SubViews drawn before it) are located.
     }
 
+    /// <summary>
+    ///     Draws this view's own Text and Content (not SubViews or adornments) and maintains the
+    ///     per-view <see cref="_localDrawContext"/> used for <see cref="CachedDrawnRegion"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Called from <see cref="Draw(DrawContext)"/> only when the view's own content needs redrawing
+    ///     (<c>needsDrawSelf</c>), after SubViews have drawn. This is the second half of the
+    ///     self-draw step (the first half clears the viewport before SubViews). It owns the whole
+    ///     <see cref="_localDrawContext"/> lifecycle for a self-redraw pass: (re)create it, draw
+    ///     Text and Content into it, then merge its drawn region into <paramref name="sharedContext"/>.
+    /// </remarks>
+    /// <param name="sharedContext">
+    ///     The shared <see cref="DrawContext"/> for the current draw pass; this view's drawn region is
+    ///     merged into it so the SuperView can track the aggregate for clip exclusion.
+    /// </param>
+    private void DrawSelfContent (DrawContext sharedContext)
+    {
+        // Recreate the per-view context for this self-redraw pass. It is created here (rather than
+        // alongside the viewport clear) so its creation, population, and merge stay in one place.
+        _localDrawContext = new DrawContext ();
+
+        // ------------------------------------
+        // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
+        Trace.Draw (this.ToIdentifyingString (), "Text");
+        SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
+        DoDrawText (_localDrawContext);
+
+        // ------------------------------------
+        // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
+        Trace.Draw (this.ToIdentifyingString (), "Content");
+        DoDrawContent (_localDrawContext);
+
+        // Merge this view's own draws into the shared context so the SuperView
+        // can track the aggregate for clip exclusion.
+        sharedContext.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
+    }
+
     // DrawAdornments region (DoDrawAdornmentsSubViews, DoDrawAdornments, DrawAdornments,
     // OnDrawingAdornments) is in View.Drawing.Adornments.cs.
 
@@ -241,18 +254,11 @@ public partial class View // Drawing APIs
         }
 
         // Issue #5358: narrow the framework's clear to NeedsDrawRect when it's a true
-        // partial region AND this view is not itself scrolled. Narrowing in the public
-        // ClearViewport API would silently change the contract for direct callers
-        // (Code.OnClearingViewport, MarkdownCodeBlock, direct test calls) that expect
-        // a full fill of the viewport background — see review feedback items 1, 3.
-        //
-        // The "this view is not itself scrolled" guard sidesteps a separate coordinate-
-        // space inconsistency: SetNeedsDraw(Rectangle) cascades to subviews using
-        // frame-local coordinates (subtracts subview.Frame.X/Y), while the no-arg
-        // SetNeedsDraw passes Viewport (content-coord). For an unscrolled view those
-        // coincide; for a scrolled view they don't, and the narrowing math would shift
-        // the clear off-screen. Until that convention is normalized (out of scope here),
-        // only narrow when Viewport.Location is the origin.
+        // partial region. Narrowing in the public ClearViewport API would silently change the
+        // contract for direct callers (Code.OnClearingViewport, MarkdownCodeBlock, direct test
+        // calls) that expect a full fill of the viewport background — see review feedback
+        // items 1, 3 on PR #5431. Issue #5359 normalized NeedsDrawRect on viewport-local
+        // coordinates, so narrowing is now safe regardless of scroll state.
         if (CanNarrowClearToNeedsDrawRect (out Rectangle narrowedScreen))
         {
             Driver?.FillRect (narrowedScreen);
@@ -289,15 +295,9 @@ public partial class View // Drawing APIs
 
         Rectangle viewport = Viewport;
 
-        // Only narrow when this view is NOT itself scrolled — see DoClearViewport comment.
-        if (viewport.Location != Point.Empty)
-        {
-            return false;
-        }
-
         // Only narrow when NeedsDrawRect is strictly smaller than the viewport. SetNeedsDraw()
-        // (no-arg) sets NeedsDrawRect to the current Viewport, meaning "everything is dirty";
-        // we don't want to narrow in that case.
+        // (no-arg) sets NeedsDrawRect to (Point.Empty, Viewport.Size), meaning "everything is
+        // dirty"; we don't want to narrow in that case.
         if (NeedsDrawRect.Width >= viewport.Width && NeedsDrawRect.Height >= viewport.Height)
         {
             return false;
@@ -310,8 +310,8 @@ public partial class View // Drawing APIs
             return false;
         }
 
-        // NeedsDrawRect is in this view's coords; for an unscrolled view those equal viewport-
-        // local coords (origin (0,0) = top-left of visible area). Convert to screen.
+        // NeedsDrawRect is viewport-LOCAL — (0, 0) is the top-left visible cell — so
+        // ViewportToScreen converts it correctly regardless of any scroll on this view.
         Rectangle dirtyScreen = ViewportToScreen (NeedsDrawRect);
         Rectangle toClear = ViewportToScreen (viewport with { Location = Point.Empty });
         narrowedScreen = Rectangle.Intersect (toClear, dirtyScreen);
@@ -748,6 +748,14 @@ public partial class View // Drawing APIs
     ///     isolated from the shared context. Used to compute <see cref="CachedDrawnRegion"/> for
     ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> hit-testing.
     /// </summary>
+    /// <remarks>
+    ///     Lifecycle (issue #5358 review feedback item 2): (re)created and populated only on
+    ///     self-redraw passes, in <see cref="DrawSelfContent"/>. On child-only passes (parent
+    ///     entered <see cref="Draw(DrawContext)"/> via <see cref="SubViewNeedsDraw"/> with its own content
+    ///     clean) it is intentionally left untouched so <see cref="DoDrawComplete"/> can still
+    ///     read a valid <see cref="CachedDrawnRegion"/> — recreating it there would wipe the
+    ///     transparent view's hit region to empty until the next self-redraw.
+    /// </remarks>
     private DrawContext? _localDrawContext;
 
     /// <summary>
