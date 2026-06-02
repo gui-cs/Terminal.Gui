@@ -241,7 +241,7 @@ public class Images : Scenario
         Label lblPopThreshold = new () { Text = "(threshold)", X = Pos.Right (_popularityThreshold), Y = Pos.Top (_popularityThreshold) };
 
         Label distanceLabel = new () { Text = "Color Distance Algorithm", Width = Dim.Auto (), Y = Pos.Bottom (_osPaletteBuilder) + 1 };
-        _osDistanceAlgorithm = new OptionSelector { Labels = ["Euclidian", "CIE76"], Y = Pos.Bottom (distanceLabel) };
+        _osDistanceAlgorithm = new OptionSelector { Labels = ["Euclidean", "CIE76"], Y = Pos.Bottom (distanceLabel) };
 
         _sixelSettings.Add (lblPxX);
         _sixelSettings.Add (_pxX);
@@ -335,7 +335,7 @@ public class Images : Scenario
         {
             case 0: return new PopularityPaletteWithThreshold (GetDistanceAlgorithm (), _popularityThreshold.Value);
 
-            case 1: return new MedianCutPaletteBuilder (GetDistanceAlgorithm ());
+            case 1: return new MedianCutPaletteBuilder ();
 
             default: throw new ArgumentOutOfRangeException ();
         }

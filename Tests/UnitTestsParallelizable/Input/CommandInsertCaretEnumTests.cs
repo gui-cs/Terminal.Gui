@@ -53,14 +53,18 @@ public class CommandInsertCaretEnumTests
 
         Assert.True (belowValue > aboveValue);
 
-        // All members except the InsertCaret and mouse-selection commands (added later)
+        // All members except the InsertCaret, mouse-selection, and ImageView commands (added later)
         // should have lower values than InsertCaretAbove.
         HashSet<Command> tailCommands =
         [
             Command.InsertCaretAbove,
             Command.InsertCaretBelow,
             Command.StartSelection,
-            Command.StartRectangleSelection
+            Command.StartRectangleSelection,
+            Command.Home,
+            Command.Center,
+            Command.ZoomIn,
+            Command.ZoomOut
         ];
 
         Assert.All (

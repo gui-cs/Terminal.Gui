@@ -1,6 +1,6 @@
 namespace UICatalog.Scenarios;
 
-internal class MedianCutPaletteBuilder (IColorDistance colorDistance) : IPaletteBuilder
+internal class MedianCutPaletteBuilder : IPaletteBuilder
 {
     public List<Color> BuildPalette (List<Color> colors, int maxColors)
     {

@@ -89,6 +89,8 @@ public class ProgressBar : View, IDesignable
 
     private int []? _activityPos;
     private int _delta;
+    private SixelEncoder? _fireEncoder;
+    private int _fireEncoderMaxColors;
     private int _fireFrame;
     private readonly string _fireRasterImageId = $"{nameof (ProgressBar)}.{Guid.NewGuid ():N}.Fire";
     private float _fraction;
@@ -430,7 +432,7 @@ public class ProgressBar : View, IDesignable
             Id = _fireRasterImageId,
             Pixels = CreateFirePixels (pixelWidth, pixelHeight, _fireFrame++),
             DestinationCells = ViewportToScreen (new Rectangle (0, 0, filledCells, Viewport.Height)),
-            Encoder = CreateFireEncoder (support)
+            Encoder = GetFireEncoder (support)
         };
 
         Driver.GetOutputBuffer ().AddRasterImage (command);
@@ -438,11 +440,26 @@ public class ProgressBar : View, IDesignable
         return true;
     }
 
-    private static SixelEncoder CreateFireEncoder (SixelSupportResult support)
+    private SixelEncoder GetFireEncoder (SixelSupportResult support)
     {
-        SixelEncoder encoder = new () { Quantizer = { MaxColors = Math.Min (support.MaxPaletteColors, _firePalette.Length) } };
+        int maxColors = Math.Min (support.MaxPaletteColors, _firePalette.Length);
 
-        return encoder;
+        if (_fireEncoder is { } encoder && _fireEncoderMaxColors == maxColors)
+        {
+            return encoder;
+        }
+
+        _fireEncoderMaxColors = maxColors;
+        _fireEncoder = new ()
+        {
+            Quantizer =
+            {
+                MaxColors = maxColors,
+                PaletteBuildingAlgorithm = new FirePaletteBuilder ()
+            }
+        };
+
+        return _fireEncoder;
     }
 
     private static Color [,] CreateFirePixels (int width, int height, int frame)
@@ -468,6 +485,13 @@ public class ProgressBar : View, IDesignable
     }
 
     private int GetProgressPercentage () => Math.Clamp ((int)Math.Round (_fraction * 100), 0, 100);
+
+    private sealed class FirePaletteBuilder : IStaticPaletteBuilder
+    {
+        public List<Color> BuildPalette (List<Color> colors, int maxColors) => BuildPalette (maxColors);
+
+        public List<Color> BuildPalette (int maxColors) => [.. _firePalette.Take (maxColors)];
+    }
 
     private void RemoveFireRasterImage () => Driver?.GetOutputBuffer ().RemoveRasterImage (_fireRasterImageId);
 

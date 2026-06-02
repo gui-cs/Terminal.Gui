@@ -351,7 +351,13 @@ public class OutputBufferImpl : IOutputBuffer
     }
 
     /// <inheritdoc/>
-    public IReadOnlyList<RasterImageCommand> GetRasterImages () => _rasterImages;
+    public IReadOnlyList<RasterImageCommand> GetRasterImages ()
+    {
+        lock (_contentsLock)
+        {
+            return _rasterImages.ToArray ();
+        }
+    }
 
     private void MarkRasterImageCellsClean (RasterImageCommand command)
     {

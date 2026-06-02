@@ -1180,6 +1180,33 @@ public class OutputBaseTests
 
     // Copilot - GPT-5.5
     [Fact]
+    public void GetRasterImages_ReturnsReadOnlySnapshot ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        IReadOnlyList<RasterImageCommand> images = buffer.GetRasterImages ();
+
+        // Assert
+        IList<RasterImageCommand> list = Assert.IsAssignableFrom<IList<RasterImageCommand>> (images);
+        Assert.Throws<NotSupportedException> (() => list.Clear ());
+        Assert.Single (buffer.GetRasterImages ());
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
     public void Write_RasterImage_RendersBeforeLaterDirtyCells ()
     {
         // Arrange

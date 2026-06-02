@@ -102,9 +102,6 @@ public enum Command
     /// <summary>Moves to the start (e.g. the top or home).</summary>
     Start,
 
-    /// <summary>Moves or resets to the home position.</summary>
-    Home,
-
     /// <summary>Moves to the end (e.g. the bottom).</summary>
     End,
 
@@ -360,15 +357,6 @@ public enum Command
     /// </summary>
     Edit,
 
-    /// <summary>Centers the current item or viewport.</summary>
-    Center,
-
-    /// <summary>Zooms in.</summary>
-    ZoomIn,
-
-    /// <summary>Zooms out.</summary>
-    ZoomOut,
-
     #endregion
 
     #region Multi-Caret Commands
@@ -398,6 +386,18 @@ public enum Command
 
     /// <summary>Starts extending a rectangular selection via pointing-device input.</summary>
     StartRectangleSelection,
+
+    /// <summary>Moves or resets to the home position.</summary>
+    Home,
+
+    /// <summary>Centers the current item or viewport.</summary>
+    Center,
+
+    /// <summary>Zooms in.</summary>
+    ZoomIn,
+
+    /// <summary>Zooms out.</summary>
+    ZoomOut,
 
     #endregion
 }

@@ -109,8 +109,37 @@ public class ProgressBarTests : TestDriverBase
         Assert.Equal (new (0, 0, 2, 2), command.DestinationCells);
         Assert.Equal (4, command.Pixels!.GetLength (0));
         Assert.Equal (6, command.Pixels.GetLength (1));
+        Assert.IsAssignableFrom<IStaticPaletteBuilder> (command.Encoder!.Quantizer.PaletteBuildingAlgorithm);
         Assert.False (driver.Contents! [0, 0].IsDirty);
         Assert.Equal (" ", driver.Contents [0, 2].Grapheme);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void FireStyle_SixelSupport_ReusesEncoderAcrossFrames ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver (4, 2);
+        driver.Clip = new (driver.Screen);
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (2, 3) });
+
+        ProgressBar pb = new ()
+        {
+            Driver = driver,
+            Width = 4,
+            Height = 2,
+            Fraction = 0.5F,
+            ProgressBarStyle = ProgressBarStyle.Fire
+        };
+        pb.BeginInit ();
+        pb.EndInit ();
+        pb.LayoutSubViews ();
+
+        pb.Draw ();
+        SixelEncoder encoder = Assert.Single (driver.GetOutputBuffer ().GetRasterImages ()).Encoder!;
+
+        pb.Draw ();
+
+        Assert.Same (encoder, Assert.Single (driver.GetOutputBuffer ().GetRasterImages ()).Encoder);
     }
 
     // Copilot - GPT-5.5
