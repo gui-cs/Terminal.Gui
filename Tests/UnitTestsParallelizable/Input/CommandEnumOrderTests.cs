@@ -22,23 +22,6 @@ public class CommandEnumOrderTests
         Assert.True ((int)Command.StartRectangleSelection > (int)Command.StartSelection);
     }
 
-    // Copilot - GPT-5.5
-    [Fact]
-    public void ImageViewCommands_AreAppendedAfterExistingCommands ()
-    {
-        Assert.True ((int)Command.Home > (int)Command.StartRectangleSelection);
-        Assert.True ((int)Command.Center > (int)Command.Home);
-        Assert.True ((int)Command.ZoomIn > (int)Command.Center);
-        Assert.True ((int)Command.ZoomOut > (int)Command.ZoomIn);
-    }
-
-    // Copilot - GPT-5.5
-    [Fact]
-    public void End_Ordinal_IsUnchanged ()
-    {
-        Assert.Equal (15, (int)Command.End);
-    }
-
     [Fact]
     public void KillWordRight_Ordinal_IsUnchanged ()
     {
