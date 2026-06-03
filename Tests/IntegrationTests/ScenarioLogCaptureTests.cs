@@ -23,19 +23,44 @@ public class ScenarioLogCaptureTests
     [Fact]
     public void GetScenarioLogs_RespectsScenarioStart_AfterTrim ()
     {
-        var capture = new ScenarioLogCapture ();
+        ScenarioLogCapture capture = new ();
         ILogger logger = capture.CreateLogger ("test");
         string message = new ('y', 4096);
 
-        for (var i = 0; i < 120; i++)
+        // Fill close to the cap so the next few entries will trigger a trim.
+        while (capture.GetAllLogs ().Length < 250_000)
         {
             logger.LogInformation ("{Message}", message);
         }
 
+        logger.LogInformation ("before-start");
+
         capture.MarkScenarioStart ();
+
+        int lengthBefore = capture.GetAllLogs ().Length;
+        bool trimmed = false;
+
+        for (int i = 0; i < 50; i++)
+        {
+            logger.LogInformation ("{Message}", message);
+
+            int lengthAfter = capture.GetAllLogs ().Length;
+
+            if (lengthAfter < lengthBefore)
+            {
+                trimmed = true;
+                break;
+            }
+
+            lengthBefore = lengthAfter;
+        }
+
+        Assert.True (trimmed);
+
         logger.LogInformation ("after-start");
 
         string logs = capture.GetScenarioLogs ();
+        Assert.DoesNotContain ("before-start", logs);
         Assert.Contains ("after-start", logs);
     }
 }
