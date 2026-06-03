@@ -8,7 +8,7 @@ public class ScenarioLogCaptureTests
     [Fact]
     public void LogBuffer_IsTrimmed_WhenItGrowsTooLarge ()
     {
-        var capture = new ScenarioLogCapture ();
+        ScenarioLogCapture capture = new ();
         ILogger logger = capture.CreateLogger ("test");
         string message = new ('x', 4096);
 
