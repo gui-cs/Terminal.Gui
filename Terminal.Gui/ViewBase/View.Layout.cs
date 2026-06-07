@@ -95,6 +95,7 @@ public partial class View // Layout APIs
             return false;
         }
 
+        Rectangle? oldFrame = _frame;
         var oldViewport = Rectangle.Empty;
 
         if (IsInitialized)
@@ -110,6 +111,24 @@ public partial class View // Layout APIs
 
         SetNeedsDraw ();
         SetNeedsLayout ();
+
+        // Issue #5358: when Frame shrinks or moves, the SuperView's old-frame area is now
+        // uncovered and must be cleared on the next draw. Invalidate the union of the old and
+        // new frames on the SuperView so its region-aware ClearViewport repaints just that area.
+        // SetFrame is the single source of truth for this invalidation for both direct Frame
+        // assignment and layout-driven frame updates.
+        //
+        // Issue #5359: Frames are in SuperView CONTENT coords, but SetNeedsDraw expects
+        // SuperView VIEWPORT-LOCAL coords. Translate by subtracting the SuperView's scroll
+        // offset (Viewport.Location).
+        if (oldFrame is { } prev && SuperView is { })
+        {
+            Rectangle invalidationContent = Rectangle.Union (prev, frame);
+            Point superScroll = SuperView.Viewport.Location;
+            Rectangle invalidationViewport = invalidationContent;
+            invalidationViewport.Offset (-superScroll.X, -superScroll.Y);
+            SuperView.SetNeedsDraw (invalidationViewport);
+        }
 
         // BUGBUG: When SetFrame is called from Frame_set, this event gets raised BEFORE OnResizeNeeded. Is that OK?
         OnFrameChanged (in frame);
@@ -578,6 +597,12 @@ public partial class View // Layout APIs
             // recomputed during dependency resolution. Draw after layout only when this view was
             // directly invalidated for layout or its resolved frame actually changed.
             SetNeedsDraw ();
+
+            // NOTE (#5358, review feedback item 4): the SuperView invalidation for frame
+            // changes is handled in SetFrame, which is the single source of truth for Frame
+            // mutation. Both direct (view.Frame = ...) and layout-driven (SetRelativeLayout
+            // → SetFrame) paths go through it, so calling SuperView.SetNeedsDraw(union) here
+            // too would be redundant and would do the cascade work twice on the hot path.
         }
 
         return true;

@@ -339,12 +339,12 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         Thickness thickness = us.GetAdornmentsThickness ();
 
         int adornmentThickness = dimension switch
-                                 {
-                                     Dimension.Width => thickness.Horizontal,
-                                     Dimension.Height => thickness.Vertical,
-                                     Dimension.None => 0,
-                                     _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
-                                 };
+        {
+            Dimension.Width => thickness.Horizontal,
+            Dimension.Height => thickness.Vertical,
+            Dimension.None => 0,
+            _ => throw new ArgumentOutOfRangeException (nameof (dimension), dimension, null)
+        };
 
         max += adornmentThickness;
 

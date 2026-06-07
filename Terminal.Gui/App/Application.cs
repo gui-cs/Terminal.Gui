@@ -2,23 +2,23 @@
 // Put them here so they are available throughout the application.
 // Do not put them in AssemblyInfo.cs as it will break GitVersion's /updateassemblyinfo
 
-global using Attribute = Terminal.Gui.Drawing.Attribute;
-global using Color = Terminal.Gui.Drawing.Color;
-#pragma warning disable CS0618 // Obsolete - ConfigurationManager alias and ConfigurationPropertyAttribute still used internally during transition
-global using CM = Terminal.Gui.Configuration.ConfigurationManager;
-#pragma warning restore CS0618
 global using Terminal.Gui.App;
-global using Terminal.Gui.Testing;
-global using Terminal.Gui.Time;
-global using Terminal.Gui.Drivers;
-global using Terminal.Gui.Input;
 global using Terminal.Gui.Configuration;
+global using Terminal.Gui.Drawing;
+global using Terminal.Gui.Drivers;
+global using Terminal.Gui.FileServices;
+global using Terminal.Gui.Input;
+global using Terminal.Gui.Resources;
+global using Terminal.Gui.Testing;
+global using Terminal.Gui.Text;
+global using Terminal.Gui.Time;
 global using Terminal.Gui.ViewBase;
 global using Terminal.Gui.Views;
-global using Terminal.Gui.Drawing;
-global using Terminal.Gui.Text;
-global using Terminal.Gui.Resources;
-global using Terminal.Gui.FileServices;
+global using Attribute = Terminal.Gui.Drawing.Attribute;
+#pragma warning disable CS0618 // Obsolete - ConfigurationManager alias still used internally during transition
+global using CM = Terminal.Gui.Configuration.ConfigurationManager;
+#pragma warning restore CS0618
+global using Color = Terminal.Gui.Drawing.Color;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;

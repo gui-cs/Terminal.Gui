@@ -7,7 +7,7 @@ namespace Terminal.Gui.Drawing;
 /// </summary>
 public static class ColorStrings
 {
-    private static readonly StandardColorsNameResolver _standard = new();
+    private static readonly StandardColorsNameResolver _standard = new ();
 
     /// <summary>
     ///     Gets the color name for <paramref name="color"/>.

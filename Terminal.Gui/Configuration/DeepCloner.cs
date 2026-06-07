@@ -469,7 +469,7 @@ public static class DeepCloner
     #region AOT Support
 
     private static TScopeT CloneScope<TScopeT> (TScopeT scope, ConcurrentDictionary<object, object> visited)
-        where TScopeT : Scope<TScopeT>, new ()
+        where TScopeT : Scope<TScopeT>, new()
     {
         TScopeT clonedScope = new ();
         visited.TryAdd (scope, clonedScope);

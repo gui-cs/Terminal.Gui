@@ -350,8 +350,7 @@ public class SpinnerView : View, IDesignable
 
     bool IDesignable.EnableForDesign ()
     {
-        Style = new SpinnerStyle.Points ();
-        SpinReverse = true;
+        Style = new SpinnerStyle.Dots2 ();
         AutoSpin = true;
 
         return true;

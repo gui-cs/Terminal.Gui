@@ -595,7 +595,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>
                              new MenuItem (targetView as View, Command.SelectAll),
                              new Line (),
                              new MenuItem (targetView as View, Command.Quit)
-                         ]) { Id = "enableForDesignRoot" };
+                         ])
+        { Id = "enableForDesignRoot" };
 
         // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
         // NOTE: without being activated via App?.Popover. But we want it to be visible.

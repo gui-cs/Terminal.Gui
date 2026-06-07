@@ -24,11 +24,11 @@ internal class EscAsAltPattern : AnsiKeyboardParserPattern
         char ch = match.Groups [1].Value [0];
 
         Key key = ch switch
-                  {
-                      >= '\u0001' and <= '\u001a' => ((Key)(ch + 96)).WithCtrl,
-                      '\u001f' => Key.D7.WithCtrl.WithShift,
-                      _ => ch
-                  };
+        {
+            >= '\u0001' and <= '\u001a' => ((Key)(ch + 96)).WithCtrl,
+            '\u001f' => Key.D7.WithCtrl.WithShift,
+            _ => ch
+        };
 
         return new Key (key).WithAlt;
     }

@@ -57,6 +57,7 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
             view.DrawComplete += (_, _) => counts.DrawComplete++;
             view.ClearedViewport += (_, _) => counts.ClearedViewport++;
             view.DrawingContent += (_, _) => counts.DrawingContent++;
+            view.DrawingText += (_, _) => counts.DrawingText++;
             view.FrameChanged += (_, _) => counts.FrameChanged++;
         }
 
@@ -74,14 +75,14 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         {
             StringBuilder sb = new ();
             sb.AppendLine (title);
-            sb.AppendLine ("  view                       laidOut  drawComplete  clearedViewport  drawingContent  frameChanged");
+            sb.AppendLine ("  view                       laidOut  drawComplete  clearedViewport  drawingContent  drawingText  frameChanged");
 
             foreach ((View view, string label) in _order)
             {
                 Counts c = _counts [view];
 
                 sb.AppendLine (
-                               $"  {label,-26} {c.SubViewsLaidOut,7}  {c.DrawComplete,12}  {c.ClearedViewport,15}  {c.DrawingContent,14}  {c.FrameChanged,12}");
+                               $"  {label,-26} {c.SubViewsLaidOut,7}  {c.DrawComplete,12}  {c.ClearedViewport,15}  {c.DrawingContent,14}  {c.DrawingText,11}  {c.FrameChanged,12}");
             }
 
             return sb.ToString ();
@@ -93,6 +94,7 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
             public int DrawComplete;
             public int ClearedViewport;
             public int DrawingContent;
+            public int DrawingText;
             public int FrameChanged;
 
             public void Reset ()
@@ -101,6 +103,7 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
                 DrawComplete = 0;
                 ClearedViewport = 0;
                 DrawingContent = 0;
+                DrawingText = 0;
                 FrameChanged = 0;
             }
         }
@@ -269,6 +272,7 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         int inactiveDraws = 0;
         int inactiveClears = 0;
         int inactiveContentDraws = 0;
+        int inactiveTextDraws = 0;
 
         for (var i = 1; i < TabCount; i++)
         {
@@ -276,31 +280,27 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
             inactiveDraws += c.DrawComplete;
             inactiveClears += c.ClearedViewport;
             inactiveContentDraws += c.DrawingContent;
+            inactiveTextDraws += c.DrawingText;
         }
 
         output.WriteLine ($"Active DrawComplete: {activeCounts.DrawComplete}");
         output.WriteLine ($"Sum of inactive DrawComplete:    {inactiveDraws}");
         output.WriteLine ($"Sum of inactive ClearedViewport: {inactiveClears}");
         output.WriteLine ($"Sum of inactive DrawingContent:  {inactiveContentDraws}");
+        output.WriteLine ($"Sum of inactive DrawingText:     {inactiveTextDraws}");
 
-        // CURRENT BEHAVIOR (issue #4973): inactive tabs receive full draw passes when active scrolls.
-        // DrawComplete is the widget-agnostic signal — it always fires once per call to Draw(),
-        // regardless of whether the view overrides OnClearingViewport / OnDrawingContent (as Code does).
-        // After #4973 is fixed, flip this to `Assert.Equal (0, inactiveDraws)`.
-        Assert.True (
-                     inactiveDraws > 0,
-                     $"Documents issue #4973 draw fan-out: inactive_total DrawComplete={inactiveDraws}, " +
-                     $"active={activeCounts.DrawComplete}. Flip to Assert.Equal(0, inactiveDraws) after #4973 fix.");
+        // Issue #5358 fix: inactive tabs' NeedsDraw is no longer set as a side-effect
+        // of the parent entering Draw(). DrawingText is the right metric here because
+        // it's gated on NeedsDraw inside DoDrawText — and Code does NOT override
+        // OnDrawingText (unlike OnClearingViewport / OnDrawingContent which Code
+        // intercepts, suppressing those events). DrawComplete fires unconditionally
+        // for clip-exclusion bookkeeping, so it is informational only.
+        Assert.Equal (0, inactiveTextDraws);
 
-        // ClearedViewport / DrawingContent on Code instances will be 0 because Code overrides those
-        // handlers and returns true (suppressing the events). The Tabs container still fires them,
-        // so they remain useful as a secondary diagnostic — recorded in the report above but not
-        // asserted at the per-tab level.
+        // Issue #5358 fix: the Tabs container itself no longer clears its viewport
+        // when only a child tab is dirty. Before the fix this was > 0; after, == 0.
         ViewActivityCounters.Counts tabsCounts = counters.Get (tabs);
-        Assert.True (
-                     tabsCounts.ClearedViewport > 0,
-                     $"Tabs container must register clear activity (got {tabsCounts.ClearedViewport}); " +
-                     "this confirms the lower-level draw pipeline is being exercised.");
+        Assert.Equal (0, tabsCounts.ClearedViewport);
 
         root.Dispose ();
         driver.Dispose ();
@@ -349,33 +349,30 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         ViewActivityCounters.Counts tabActiveCounts = tabCounters.Get (active);
         output.WriteLine (tabCounters.Report ("Tabbed scenario (5 scrolls of active tab):"));
 
-        int totalTabDraws = tabActiveCounts.DrawComplete;
+        int totalTabTextDraws = tabActiveCounts.DrawingText;
         int totalTabLayouts = tabActiveCounts.SubViewsLaidOut;
 
         for (var i = 1; i < TabCount; i++)
         {
-            totalTabDraws += tabCounters.Get (codes [i]).DrawComplete;
+            totalTabTextDraws += tabCounters.Get (codes [i]).DrawingText;
             totalTabLayouts += tabCounters.Get (codes [i]).SubViewsLaidOut;
         }
 
-        double drawFanOut = singleCounts.DrawComplete == 0 ? double.NaN : (double)totalTabDraws / singleCounts.DrawComplete;
+        double textDrawFanOut = singleCounts.DrawingText == 0 ? double.NaN : (double)totalTabTextDraws / singleCounts.DrawingText;
         double layoutFanOut = singleCounts.SubViewsLaidOut == 0 ? double.NaN : (double)totalTabLayouts / singleCounts.SubViewsLaidOut;
 
-        output.WriteLine ($"Tabbed total draws / single draws  = {totalTabDraws} / {singleCounts.DrawComplete} = {drawFanOut:F2}");
-        output.WriteLine ($"Tabbed total layouts / single layouts = {totalTabLayouts} / {singleCounts.SubViewsLaidOut} = {layoutFanOut:F2}");
+        output.WriteLine ($"Tabbed total text draws / single text draws = {totalTabTextDraws} / {singleCounts.DrawingText} = {textDrawFanOut:F2}");
+        output.WriteLine ($"Tabbed total layouts / single layouts       = {totalTabLayouts} / {singleCounts.SubViewsLaidOut} = {layoutFanOut:F2}");
 
-        Assert.True (singleCounts.DrawComplete > 0, "Single-Code baseline must record draw activity.");
-        Assert.True (tabActiveCounts.DrawComplete > 0, "Active tab in tabbed scenario must record draw activity.");
+        Assert.True (singleCounts.DrawingText > 0, "Single-Code baseline must record text-draw activity (NeedsDraw-gated).");
+        Assert.True (tabActiveCounts.DrawingText > 0, "Active tab in tabbed scenario must record text-draw activity.");
 
-        // CURRENT BEHAVIOR: draw fan-out still exists, but layout fan-out should now match baseline.
-        Assert.True (
-                     drawFanOut > 1.0,
-                     $"Documents issue #4973: tabbed draw fan-out ({drawFanOut:F2}x) exceeds single-Code baseline. " +
-                     "After fix, drawFanOut should approach 1.0.");
+        // Issue #5358 fix: tabbed text-draw fan-out is now at parity with the single-Code baseline.
+        // DrawingText is gated on NeedsDraw, so it only fires on tabs whose NeedsDraw was set —
+        // which is just the active tab after the fix.
+        Assert.Equal (1.0, textDrawFanOut);
 
-        Assert.Equal (
-                      1.0,
-                      layoutFanOut);
+        Assert.Equal (1.0, layoutFanOut);
 
         singleRoot.Dispose ();
         tabRoot.Dispose ();
@@ -420,10 +417,9 @@ public class TabsFanOutDiagnosticTests (ITestOutputHelper output) : TestDriverBa
         {
             ViewActivityCounters.Counts c = counters.Get (codes [i]);
 
-            // Copilot: Lock in current fan-out behavior. After #4973, this should likely become == 0.
-            Assert.True (
-                         c.DrawComplete > 0,
-                         $"Tab {i + 1} should currently still record DrawComplete even with Transparent (got {c.DrawComplete}). Update this expectation after #4973.");
+            // Issue #5358 fix: transparent inactive peers also stay out of NeedsDraw-gated work.
+            // DrawingText is the right per-Code metric (Code intercepts ClearedViewport / DrawingContent).
+            Assert.Equal (0, c.DrawingText);
         }
 
         root.Dispose ();

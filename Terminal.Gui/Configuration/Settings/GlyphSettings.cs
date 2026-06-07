@@ -24,13 +24,13 @@ public class GlyphSettings
     public Rune Null { get; set; } = (Rune)'␀';
 
     /// <summary>Checked indicator.</summary>
-    public Rune CheckStateChecked { get; set; } = (Rune)'☒';
+    public Rune CheckStateChecked { get; set; } = (Rune)'☑';
 
     /// <summary>Not Checked indicator.</summary>
     public Rune CheckStateUnChecked { get; set; } = (Rune)'☐';
 
     /// <summary>Null Checked indicator.</summary>
-    public Rune CheckStateNone { get; set; } = (Rune)'□';
+    public Rune CheckStateNone { get; set; } = (Rune)'⬛';
 
     /// <summary>Selected indicator.</summary>
     public Rune Selected { get; set; } = (Rune)'◉';

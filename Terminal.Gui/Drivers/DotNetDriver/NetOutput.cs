@@ -196,11 +196,7 @@ public class NetOutput : OutputBase, IOutput
             // Check if we have a real console first
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
             {
-                Logging.Information ($"Console redirected (Output: {
-                    Console.IsOutputRedirected
-                }, Input: {
-                    Console.IsInputRedirected
-                }). Running in degraded mode.");
+                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
 
                 return;
             }

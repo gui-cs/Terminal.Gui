@@ -1005,7 +1005,7 @@ public partial class View // Command APIs
     {
         Trace.Command (this, ctx, "Entry");
 
-        if (RaiseHandlingHotKey (ctx) is true)
+        if (!CanBeVisible (this) || RaiseHandlingHotKey (ctx) is true)
         {
             // The hotkey was cancelled by OnHandlingHotKey or HandlingHotKey event.
             // Return false so the key is not consumed and can be processed as normal input

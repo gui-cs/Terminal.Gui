@@ -1,5 +1,5 @@
 #nullable disable
-﻿using System.Collections;
+using System.Collections;
 
 namespace Terminal.Gui.Views;
 

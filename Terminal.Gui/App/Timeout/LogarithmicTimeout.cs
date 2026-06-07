@@ -1,5 +1,5 @@
 #nullable disable
-﻿namespace Terminal.Gui.App;
+namespace Terminal.Gui.App;
 
 /// <summary>Implements a logarithmic increasing timeout.</summary>
 public class LogarithmicTimeout : Timeout

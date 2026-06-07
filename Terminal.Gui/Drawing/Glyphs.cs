@@ -79,7 +79,7 @@ public class Glyphs
 
     /// <summary>Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Rune CheckStateChecked // 'â˜‘' is colored
+    public static Rune CheckStateChecked
     {
         get => GlyphSettings.Defaults.CheckStateChecked;
         set => GlyphSettings.Defaults.CheckStateChecked = value;
@@ -95,7 +95,7 @@ public class Glyphs
 
     /// <summary>Null Checked indicator (e.g. for <see cref="ListView"/> and <see cref="CheckBox"/>).</summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static Rune CheckStateNone // TODO: Verify this works as broadly as possible
+    public static Rune CheckStateNone
     {
         get => GlyphSettings.Defaults.CheckStateNone;
         set => GlyphSettings.Defaults.CheckStateNone = value;

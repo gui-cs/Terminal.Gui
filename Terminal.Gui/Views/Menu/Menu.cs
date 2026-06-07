@@ -159,14 +159,14 @@ public class Menu : Bar, IValue<MenuItem?>
         switch (view)
         {
             case MenuItem menuItem:
-            {
-                menuItem.CanFocus = true;
+                {
+                    menuItem.CanFocus = true;
 
-                // Accept propagation is handled by CommandsToBubbleUp=[Accept] (line 36).
-                // An explicit Accepting subscription here caused double-fire of Accepted.
+                    // Accept propagation is handled by CommandsToBubbleUp=[Accept] (line 36).
+                    // An explicit Accepting subscription here caused double-fire of Accepted.
 
-                break;
-            }
+                    break;
+                }
 
             case Line line:
                 // Grow line so we get auto-join line

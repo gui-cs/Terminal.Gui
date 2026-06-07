@@ -1,5 +1,5 @@
 #nullable disable
-﻿namespace Terminal.Gui.App;
+namespace Terminal.Gui.App;
 
 /// <summary>
 ///     Timeout which accelerates slowly at first then fast up to a maximum speed.
