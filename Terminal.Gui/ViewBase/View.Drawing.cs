@@ -682,6 +682,7 @@ public partial class View // Drawing APIs
                 && view.Arrangement.FastHasFlags (ViewArrangement.Overlapped)
                 && !view.SuperViewRendersLineCanvas
                 && view.ShadowStyle is null or ShadowStyles.None
+                && !view.ParticipatesInTransparentMouseHitTesting ()
                 && IsFullyCovered (view.FrameToScreen (), opaqueCoverage))
             {
                 // Fully occluded by higher-Z opaque peers. Clear the draw flags to mirror a
@@ -772,6 +773,42 @@ public partial class View // Drawing APIs
         coveredScreenRect = marginTransparent ? Border.FrameToScreen () : Margin.FrameToScreen ();
 
         return true;
+    }
+
+    /// <summary>
+    ///     Determines whether culling this view would diverge mouse hit-testing state, so the view must not be
+    ///     culled by <see cref="DrawSubViews"/> occlusion culling (issue #5360).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The cull path skips <see cref="Draw(DrawContext?)"/>, hence <see cref="DoDrawComplete"/>, which
+    ///         repopulates the <see cref="CachedDrawnRegion"/> that <see cref="GetViewsUnderLocation"/> consults
+    ///         for <see cref="ViewportSettingsFlags.TransparentMouse"/> layers. A view's own
+    ///         <see cref="CachedDrawnRegion"/> is invalidated by <see cref="SetNeedsDraw()"/>, so a
+    ///         <see cref="ViewportSettingsFlags.TransparentMouse"/> view that is culled would be left with a null
+    ///         cache and dropped from hit-testing.
+    ///     </para>
+    ///     <para>
+    ///         Adornment caches survive <see cref="SetNeedsDraw()"/>, but hit-testing only consults them when the
+    ///         adornment is <see cref="ViewportSettingsFlags.TransparentMouse"/> with non-empty
+    ///         <see cref="AdornmentImpl.Thickness"/>; those are excluded too so the first draw cannot leave a thick
+    ///         transparent-mouse adornment without a cache. <see cref="Margin"/> is
+    ///         <see cref="ViewportSettingsFlags.TransparentMouse"/> by default, so this only excludes views with an
+    ///         actual Margin thickness — the common (empty-margin) overlapped view is still culled.
+    ///     </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> if culling would diverge hit-testing; otherwise <see langword="false"/>.</returns>
+    private bool ParticipatesInTransparentMouseHitTesting ()
+    {
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.TransparentMouse))
+        {
+            return true;
+        }
+
+        return IsThickTransparentMouse (Margin) || IsThickTransparentMouse (Border) || IsThickTransparentMouse (Padding);
+
+        static bool IsThickTransparentMouse (AdornmentImpl adornment) =>
+            adornment.Thickness != Thickness.Empty && adornment.ViewportSettings.FastHasFlags (ViewportSettingsFlags.TransparentMouse);
     }
 
     /// <summary>

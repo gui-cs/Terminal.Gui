@@ -364,4 +364,61 @@ public class OcclusionCullingTests : TestDriverBase
         tabs.Dispose ();
         driver.Dispose ();
     }
+
+    /// <summary>
+    ///     GIVEN a fully-covered opaque sibling with <see cref="ViewportSettingsFlags.TransparentMouse"/>
+    ///     WHEN the SuperView draws
+    ///     THEN it is NOT culled, so <see cref="View.Draw(DrawContext?)"/> runs and <see cref="View.DoDrawComplete"/>
+    ///     repopulates its <see cref="View.CachedDrawnRegion"/> (which <see cref="View.SetNeedsDraw()"/> invalidated).
+    ///     Culling it would drop the view from mouse hit-testing (null cache → blanket removal).
+    /// </summary>
+    [Fact]
+    public void TransparentMouseCandidate_IsNotCulled_AndKeepsHitRegion ()
+    {
+        IDriver driver = CreateTestDriver (40, 20);
+
+        View bottom = new () { ViewportSettings = ViewportSettingsFlags.TransparentMouse };
+        View top = new ();
+        View super = BuildOverlappedStack (driver, bottom, top);
+
+        var bottomDraws = 0;
+        bottom.DrawComplete += (_, _) => bottomDraws++;
+
+        super.SetNeedsDraw ();
+        super.Draw ();
+
+        Assert.True (bottomDraws >= 1, $"TransparentMouse candidate must not be culled (got {bottomDraws}).");
+        Assert.NotNull (bottom.CachedDrawnRegion);
+
+        super.Dispose ();
+        driver.Dispose ();
+    }
+
+    /// <summary>
+    ///     GIVEN a fully-covered opaque sibling with a non-empty Margin (the Margin is
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> by default)
+    ///     WHEN the SuperView draws
+    ///     THEN it is NOT culled, so the Margin's hit-testing cache is not left stale.
+    /// </summary>
+    [Fact]
+    public void TransparentMouseMarginCandidate_IsNotCulled ()
+    {
+        IDriver driver = CreateTestDriver (40, 20);
+
+        View bottom = new ();
+        bottom.Margin.Thickness = new Thickness (1);
+        View top = new ();
+        View super = BuildOverlappedStack (driver, bottom, top);
+
+        var bottomDraws = 0;
+        bottom.DrawComplete += (_, _) => bottomDraws++;
+
+        super.SetNeedsDraw ();
+        super.Draw ();
+
+        Assert.True (bottomDraws >= 1, $"Candidate with a TransparentMouse Margin must not be culled (got {bottomDraws}).");
+
+        super.Dispose ();
+        driver.Dispose ();
+    }
 }
