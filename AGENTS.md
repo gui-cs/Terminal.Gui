@@ -134,6 +134,8 @@ Consult these files in `.claude/rules/` before editing code:
 - [Code Layout](/.claude/rules/code-layout.md) - Member ordering, backing fields
 - [Testing Patterns](/.claude/rules/testing-patterns.md) - Test writing conventions
 - [API Documentation](/.claude/rules/api-documentation.md) - XML doc requirements
+- [Logging & Tracing](/.claude/rules/logging-tracing.md) - No Console.WriteLine; use Logging/TestLogging/Trace
+- [Fragile Areas](/.claude/rules/fragile-areas.md) - Code that must not be refactored in passing
 
 ## Workflows
 
@@ -141,6 +143,10 @@ Process guides in `.claude/workflows/`:
 
 - [Build & Test Workflow](/.claude/workflows/build-test-workflow.md) - Build, test, and troubleshooting
 - [PR Workflow](/.claude/workflows/pr-workflow.md) - Submitting pull requests
+
+## Visual Verification (Agent Eyes)
+
+Don't ship UI changes blind. Use [`tuirec`](https://github.com/gui-cs/tuirec) to run any Terminal.Gui app in a PTY, inject keystrokes, and capture the result — see [Scripts/tuirec/README.md](Scripts/tuirec/README.md). The `.cast` output is asciinema v2 JSON (plain text): read it back to verify what actually rendered. The `.gif` is for humans — attach it to PRs that change visuals. For deterministic in-process assertions, use `InputInjector`/`VirtualTimeProvider` (`docfx/docs/input-injection.md`).
 
 ## Planning Mode
 

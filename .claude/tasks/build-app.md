@@ -242,6 +242,31 @@ ConfigurationManager.Enable (ConfigLocations.All);
 
 Available themes: `Default`, `Dark`, `Light`, `Amber Phosphor`, `Green Phosphor`, `Blue Phosphor`
 
+## Verify Your App Actually Works (Give Yourself Eyes)
+
+You cannot see a TUI from a build log. Before declaring an app done, **run it and observe it** with [`tuirec`](https://github.com/gui-cs/tuirec) — it spawns the app in a PTY, injects keystrokes, and records the terminal output:
+
+```powershell
+dotnet build -c Release
+$ks = 'wait:1000,Tab,Enter,wait:800,Escape'
+
+tuirec record `
+    --binary dotnet `
+    --args "./bin/Release/net10.0/MyApp.dll" `
+    --name MyApp `
+    --keystrokes $ks `
+    --startup-delay 2000 --drain 1500 `
+    --cols 120 --rows 30
+```
+
+Then **verify the output yourself**:
+
+1. **Read `artifacts/MyApp.cast`** — it is asciinema v2 JSON (plain text). Inspect the frames to confirm the UI rendered what you expect (controls visible, focus moved, dialog appeared).
+2. Grep the cast for failures: `Select-String -Path artifacts/MyApp.cast -Pattern "error|exception|usage:"`.
+3. Check `artifacts/MyApp.gif` exists and is > 100KB (a blank recording is typically < 50KB).
+
+See [Scripts/tuirec/README.md](../../Scripts/tuirec/README.md) for the full keystroke syntax, validation checklist, and troubleshooting table. For in-process assertions (no PTY), use `InputInjector` and `VirtualTimeProvider` — see `docfx/docs/input-injection.md`.
+
 ## Checklist for Building Apps
 
 - [ ] Project setup with correct packages
@@ -250,6 +275,7 @@ Available themes: `Default`, `Dark`, `Light`, `Amber Phosphor`, `Green Phosphor`
 - [ ] Layout using Pos/Dim (not hardcoded positions)
 - [ ] `-ed` events (`Accepted`) for side effects; `-ing` events (`Accepting`) only to cancel
 - [ ] Proper cleanup with `Dispose` pattern
+- [ ] Behavior verified by running the app (tuirec recording or input injection), not just by compiling
 
 ## What NOT to Do
 

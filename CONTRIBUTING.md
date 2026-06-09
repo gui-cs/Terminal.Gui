@@ -47,8 +47,8 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 ### Required Tools
 
-- **.NET SDK**: 8.0.0 (see `global.json`)
-- **Runtime**: .NET 8.x (latest GA)
+- **.NET SDK**: 10.0.100 (see `global.json`)
+- **Runtime**: .NET 10.x (latest GA)
 - **Optional**: ReSharper/Rider for code formatting (honor `.editorconfig` and `Terminal.sln.DotSettings`)
 
 ### Build Commands (In Order)
