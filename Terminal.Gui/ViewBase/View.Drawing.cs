@@ -660,9 +660,45 @@ public partial class View // Drawing APIs
         // SubViews earlier in the collection are drawn last (on top).
         // NOTE: Do not use SubViews or GetSubViews() here as GetSubViews can be overridden to return a different set of views or ordering.
         // NOTE: We need to draw exactly the views in InternalSubViews.
-        foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
+        View [] drawOrder = InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ().ToArray ();
+
+        // Occlusion culling (issue #5360): when Overlapped opaque siblings stack (e.g. Tabs pages,
+        // overlapped Windows), a lower-Z sibling that is fully covered by the higher-Z opaque peers
+        // already drawn produces no visible output — every cell it would draw, including its own
+        // RenderLineCanvas, is clipped away by the clip "holes" those peers punched in DoDrawComplete.
+        // Skipping such a sibling's Draw is therefore output-neutral. opaqueCoverage accumulates the
+        // screen region opaquely covered by higher-Z peers (iterated highest-Z first). The whole
+        // check is gated on at least one Overlapped sibling so the common (non-overlapping) path is
+        // zero-overhead.
+        bool considerOcclusion = Driver is { } && drawOrder.Length > 1 && drawOrder.Any (v => v.Arrangement.FastHasFlags (ViewArrangement.Overlapped));
+        Region? opaqueCoverage = null;
+
+        foreach (View view in drawOrder)
         {
+            Rectangle coveredScreenRect = Rectangle.Empty;
+            bool opaque = considerOcclusion && view.IsOpaqueForOcclusion (out coveredScreenRect);
+
+            if (opaque
+                && view.Arrangement.FastHasFlags (ViewArrangement.Overlapped)
+                && !view.SuperViewRendersLineCanvas
+                && view.ShadowStyle is null or ShadowStyles.None
+                && IsFullyCovered (view.FrameToScreen (), opaqueCoverage))
+            {
+                // Fully occluded by higher-Z opaque peers. Clear the draw flags to mirror a
+                // drawn-but-fully-clipped pass (Draw() would have called ClearNeedsDraw at its end);
+                // otherwise this view would stay dirty forever and keep the SuperView redrawing.
+                view.ClearNeedsDraw ();
+
+                continue;
+            }
+
             view.Draw (context);
+
+            if (opaque)
+            {
+                opaqueCoverage ??= new ();
+                opaqueCoverage.Union (coveredScreenRect);
+            }
 
             if (!view.SuperViewRendersLineCanvas)
             {
@@ -695,6 +731,77 @@ public partial class View // Drawing APIs
         // Store for compositing during RenderLineCanvas.
         // List is ordered highest-Z first (matching the iteration order above).
         _pendingOverlappedCellMaps = overlappedCellMaps;
+    }
+
+    /// <summary>
+    ///     Determines whether this view opaquely covers a screen rectangle — such that nothing drawn behind
+    ///     that rectangle can show through it. Used by <see cref="DrawSubViews"/> occlusion culling
+    ///     (issue #5360).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The view's content is opaque only when its content layer, <see cref="Border"/>, and
+    ///         <see cref="Padding"/> are not <see cref="ViewportSettingsFlags.Transparent"/>. The
+    ///         <see cref="Margin"/> is transparent by default; when it is, the opaquely-covered region is the
+    ///         area inside the Margin (<see cref="Border"/>'s frame). When the Margin is explicitly opaque,
+    ///         the full <see cref="Frame"/> is covered.
+    ///     </para>
+    ///     <para>
+    ///         This is the same notion of "opaque" used by <see cref="DoDrawComplete"/> to exclude a view's
+    ///         drawn area from the clip; here it is the area a higher-Z peer hides from the views drawn after
+    ///         it.
+    ///     </para>
+    /// </remarks>
+    /// <param name="coveredScreenRect">
+    ///     When this returns <see langword="true"/>, the screen-relative rectangle this view covers opaquely.
+    ///     <see cref="Rectangle.Empty"/> otherwise.
+    /// </param>
+    /// <returns><see langword="true"/> if the view opaquely covers <paramref name="coveredScreenRect"/>; otherwise <see langword="false"/>.</returns>
+    private bool IsOpaqueForOcclusion (out Rectangle coveredScreenRect)
+    {
+        coveredScreenRect = Rectangle.Empty;
+
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent)
+            || Border.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent)
+            || Padding.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent))
+        {
+            return false;
+        }
+
+        bool marginTransparent = Margin.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent);
+        coveredScreenRect = marginTransparent ? Border.FrameToScreen () : Margin.FrameToScreen ();
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Determines whether <paramref name="screenRect"/> is entirely contained within the region opaquely
+    ///     covered by higher-Z peers (<paramref name="opaqueCoverage"/>). Used by <see cref="DrawSubViews"/>
+    ///     occlusion culling (issue #5360).
+    /// </summary>
+    /// <param name="screenRect">The screen-relative rectangle to test.</param>
+    /// <param name="opaqueCoverage">
+    ///     The accumulated screen region covered opaquely by higher-Z peers, or <see langword="null"/> if no
+    ///     opaque peer has been drawn yet.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if <paramref name="screenRect"/> is non-empty and fully covered; otherwise
+    ///     <see langword="false"/>.
+    /// </returns>
+    private static bool IsFullyCovered (Rectangle screenRect, Region? opaqueCoverage)
+    {
+        if (screenRect.IsEmpty || opaqueCoverage is null)
+        {
+            return false;
+        }
+
+        // Subtract the covered region from the candidate's frame; if nothing is left, the candidate is
+        // fully covered. Using Region difference (rather than Region.Contains, which only tests a single
+        // stored rectangle) correctly handles coverage spread across multiple opaque peers.
+        Region remaining = new (screenRect);
+        remaining.Exclude (opaqueCoverage);
+
+        return remaining.IsEmpty ();
     }
 
     #endregion DrawSubViews
