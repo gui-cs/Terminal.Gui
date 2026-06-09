@@ -84,7 +84,7 @@ dotnet run
 **Terminal.Gui** - Cross-platform console UI toolkit for .NET (C# 14, net10.0)
 
 **Build:** `dotnet restore && dotnet build --no-restore`
-**Test:** `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`
+**Test:** `dotnet test --project Tests/UnitTestsParallelizable --no-build && dotnet test --project Tests/UnitTests.NonParallelizable --no-build`
 **Details:** [Build & Test Workflow](.claude/workflows/build-test-workflow.md)
 
 ### xUnit v3 Test Filtering (Microsoft Testing Platform)
@@ -145,7 +145,7 @@ Process guides in `.claude/workflows/`:
 ## Planning Mode
 
 When creating implementation plans:
-- **Create plan files in `./plans/`** (relative to repository root: `D:\s\gui-cs\Terminal.Gui\plans\`)
+- **Create plan files in `./plans/`** (relative to the repository root)
 - Use markdown format with clear sections
 - Include: problem statement, implementation steps, file changes, verification steps
 - Reference existing patterns and reuse opportunities from exploration

@@ -78,7 +78,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 1. **Non-parallel tests** (depend on static state, ~10 min timeout):
    ```bash
-   dotnet test --project Tests/UnitTests --no-build --verbosity normal
+   dotnet test --project Tests/UnitTests.NonParallelizable --no-build --verbosity normal
    ```
    - Uses `Application.Init` and static state
    - Cannot run in parallel

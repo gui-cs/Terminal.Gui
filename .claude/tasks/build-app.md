@@ -61,10 +61,9 @@ public sealed class MainWindow : Runnable
 
         // Add controls here
         Button button = new () { Text = "Click Me", X = Pos.Center (), Y = Pos.Center () };
-        button.Accepting += (_, e) =>
+        button.Accepted += (_, _) =>
         {
             MessageBox.Query (App!, "Hello", "Button clicked!", "OK");
-            e.Handled = true;
         };
 
         Add (button);
@@ -80,11 +79,10 @@ public sealed class LoginWindow : Runnable<string?>
     {
         // ... setup UI ...
 
-        loginButton.Accepting += (_, e) =>
+        loginButton.Accepted += (_, _) =>
         {
             Result = usernameField.Text;  // Set return value
             App!.RequestStop ();          // Close window
-            e.Handled = true;
         };
     }
 }
@@ -150,10 +148,19 @@ See `.claude/cookbook/common-patterns.md` for recipes including:
 
 ### Button Click
 ```csharp
-button.Accepting += (sender, e) =>
+// Simple side-effect handler — use Accepted (post-event)
+button.Accepted += (_, _) =>
 {
     // Handle the click
-    e.Handled = true;  // Prevent further processing
+};
+
+// Use Accepting (pre-event) ONLY to inspect or cancel the in-flight action
+button.Accepting += (_, e) =>
+{
+    if (!CanProceed ())
+    {
+        e.Handled = true;  // Cancel — prevents Accepted from firing
+    }
 };
 ```
 
@@ -200,7 +207,7 @@ Dialog dialog = new ()
     Title = "Custom Dialog",
     Width = 40,
     Height = 10,
-    Buttons = [new Button ("OK"), new Button ("Cancel")]
+    Buttons = [new Button { Text = "OK" }, new Button { Text = "Cancel" }]
 };
 // Add controls to dialog...
 app.Run (dialog);
@@ -241,12 +248,12 @@ Available themes: `Default`, `Dark`, `Light`, `Amber Phosphor`, `Green Phosphor`
 - [ ] Main window class inheriting from `Runnable` or `Runnable<T>`
 - [ ] Application lifecycle: Create -> Init -> Run -> Dispose
 - [ ] Layout using Pos/Dim (not hardcoded positions)
-- [ ] Event handlers with `e.Handled = true` when appropriate
+- [ ] `-ed` events (`Accepted`) for side effects; `-ing` events (`Accepting`) only to cancel
 - [ ] Proper cleanup with `Dispose` pattern
 
 ## What NOT to Do
 
 - Don't use `Application.Init()` / `Application.Shutdown()` (legacy static API)
 - Don't hardcode sizes - use `Dim.Fill()`, `Dim.Auto()`, `Dim.Percent()`
-- Don't forget `e.Handled = true` in Accepting handlers
+- Don't use `Accepting` for fire-and-forget side effects - use `Accepted`; reserve `Accepting` (with `e.Handled = true`) for canceling
 - Don't block the main thread - use `Application.AddTimeout` for async work
