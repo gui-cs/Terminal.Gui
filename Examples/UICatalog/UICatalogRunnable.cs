@@ -940,6 +940,9 @@ public sealed class UICatalogRunnable : Runnable
         dialog.Dispose ();
     }
 
+    // Height, in cell rows, of the fire band drawn along the bottom of the About Box.
+    private const int ABOUT_FIRE_ROWS = 6;
+
     private DoomFire? _aboutFire;
     private SixelEncoder? _aboutFireEncoder;
     private SixelToRender? _aboutFireSixel;
@@ -948,6 +951,7 @@ public sealed class UICatalogRunnable : Runnable
     private int _aboutFirePixelsPerColumn;
     private int _aboutFirePixelsPerRow;
     private int _aboutFireMaxColors;
+    private int _aboutFireBandRows;
     private bool _aboutFireActive;
 
     /// <summary>
@@ -1015,12 +1019,17 @@ public sealed class UICatalogRunnable : Runnable
         {
             Size size = dialog.Frame.Size;
 
-            if (size.Width < 1 || size.Height < 1)
+            if (size.Width < 3 || size.Height < 3)
             {
                 return true;
             }
 
-            _aboutFire = new (size.Width * _aboutFirePixelsPerColumn, size.Height * _aboutFirePixelsPerRow);
+            // Size the fire to a band that spans the dialog's interior width and sits just
+            // inside the bottom border — not the whole dialog.
+            int innerWidth = size.Width - 2;
+            _aboutFireBandRows = Math.Max (1, Math.Min (ABOUT_FIRE_ROWS, size.Height - 2));
+
+            _aboutFire = new (innerWidth * _aboutFirePixelsPerColumn, _aboutFireBandRows * _aboutFirePixelsPerRow);
             _aboutFireEncoder = new () { AvoidBottomScroll = true };
             _aboutFireEncoder.Quantizer.MaxColors = Math.Min (_aboutFireEncoder.Quantizer.MaxColors, _aboutFireMaxColors);
             _aboutFireEncoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_aboutFire.Palette);
@@ -1056,15 +1065,17 @@ public sealed class UICatalogRunnable : Runnable
         return true;
     }
 
-    /// <summary>Bottom-aligns the fire within the dialog's screen frame.</summary>
+    /// <summary>
+    ///     Positions the fire band inset one cell inside the dialog's left border, with its bottom edge
+    ///     resting just above the bottom border. Recomputed each frame so the band tracks a moved dialog.
+    /// </summary>
     private Point GetAboutFireScreenPosition (Dialog dialog)
     {
         Rectangle frameScreen = dialog.FrameToScreen ();
-        int resolutionHeight = Math.Max (1, _aboutFirePixelsPerRow);
-        int pixelHeight = Math.Max (1, frameScreen.Height * _aboutFirePixelsPerRow - 6);
-        int cellHeight = Math.Max (1, (pixelHeight + resolutionHeight - 1) / resolutionHeight);
+        int x = frameScreen.X + 1;
+        int y = frameScreen.Bottom - 1 - _aboutFireBandRows;
 
-        return new (frameScreen.X, Math.Max (frameScreen.Y, frameScreen.Bottom - cellHeight));
+        return new (x, Math.Max (frameScreen.Y + 1, y));
     }
 
     /// <summary>
