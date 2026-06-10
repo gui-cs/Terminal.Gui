@@ -271,6 +271,11 @@ After every recording, verify:
   ```
   Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
   ```
+- [ ] **Sixel content recorded on Linux/macOS** — sixel DCS cannot be captured
+      through Windows ConPTY. Confirm sixel made it into the cast with:
+  ```powershell
+  Select-String -Path artifacts/<name>.cast -Pattern 'u001bP' | Measure-Object
+  ```
 
 ---
 
@@ -278,6 +283,7 @@ After every recording, verify:
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
+| No sixel output on Windows | **Windows ConPTY strips sixel DCS** and does not pass through the DA1 sixel handshake — the app detects `Sixel support: False` | Record sixel content on Linux/macOS (see `tuirec agent-guide`). On Windows you can still verify the app's sixel code path runs (e.g., via an app-level force flag) by checking redraw activity in the `.cast`, but flame/image pixels will not appear |
 | Wide glyphs misaligned in GIF | Emoji/CJK chars are 2-cell wide; agg renders per-cell | Avoid emoji/CJK categories; use single-width ranges (Arrows, Box Drawing, etc.) |
 | Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
 | App doesn't quit | Wrong quit key or key not delivered | Use `Escape` (the default quit key); check `--kitty-keyboard` interaction |
