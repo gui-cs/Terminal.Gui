@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui;
+using UICatalog.Scenarios;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 using Trace = Terminal.Gui.Tracing.Trace;
 
@@ -931,8 +932,139 @@ public sealed class UICatalogRunnable : Runnable
 
         dialog.Add (tagline, logo, version, link);
         dialog.Buttons.ElementAt (0).SetFocus ();
+
+        StartAboutFire (dialog);
         App?.Run (dialog);
+        StopAboutFire ();
+
         dialog.Dispose ();
+    }
+
+    private DoomFire? _aboutFire;
+    private SixelEncoder? _aboutFireEncoder;
+    private SixelToRender? _aboutFireSixel;
+    private Dialog? _aboutFireDialog;
+    private int _aboutFireFrameCounter;
+    private int _aboutFirePixelsPerColumn;
+    private int _aboutFirePixelsPerRow;
+    private int _aboutFireMaxColors;
+    private bool _aboutFireActive;
+
+    /// <summary>
+    ///     Starts the DOOM fire sixel animation at the bottom of the About Box. Does nothing if the
+    ///     terminal does not support sixel.
+    /// </summary>
+    private void StartAboutFire (Dialog dialog)
+    {
+        SixelSupportResult? support = App?.Driver?.SixelSupport;
+
+        // Set UICATALOG_FORCE_ABOUT_FIRE=1 to force the fire where the terminal cannot
+        // advertise sixel (e.g., recording via Windows ConPTY, which strips sixel DCS).
+        if (Environment.GetEnvironmentVariable ("UICATALOG_FORCE_ABOUT_FIRE") == "1")
+        {
+            support = new () { IsSupported = true, SupportsTransparency = true };
+        }
+
+        if (support is not { IsSupported: true })
+        {
+            return;
+        }
+
+        _aboutFireDialog = dialog;
+        _aboutFirePixelsPerColumn = Math.Max (1, support.Resolution.Width);
+        _aboutFirePixelsPerRow = Math.Max (1, support.Resolution.Height);
+        _aboutFireMaxColors = support.MaxPaletteColors;
+        _aboutFireFrameCounter = 0;
+        _aboutFireActive = true;
+
+        App?.AddTimeout (TimeSpan.FromMilliseconds (30), AboutFireTimerCallback);
+    }
+
+    private void StopAboutFire ()
+    {
+        _aboutFireActive = false;
+
+        // ConcurrentQueue has no Remove — rebuild the queue without our sixel so the
+        // last frame does not linger on screen after the dialog closes.
+        if (_aboutFireSixel is { } fireSixel && App?.Driver?.GetOutput ().GetSixels () is { } sixels)
+        {
+            List<SixelToRender> keep = [.. sixels.Where (s => s != fireSixel)];
+            sixels.Clear ();
+
+            foreach (SixelToRender sixel in keep)
+            {
+                sixels.Enqueue (sixel);
+            }
+        }
+
+        _aboutFire = null;
+        _aboutFireEncoder = null;
+        _aboutFireSixel = null;
+        _aboutFireDialog = null;
+    }
+
+    private bool AboutFireTimerCallback ()
+    {
+        if (!_aboutFireActive || _aboutFireDialog is not { } dialog)
+        {
+            return false;
+        }
+
+        // Defer creation until the dialog has been laid out so the fire matches its frame.
+        if (_aboutFire is null)
+        {
+            Size size = dialog.Frame.Size;
+
+            if (size.Width < 1 || size.Height < 1)
+            {
+                return true;
+            }
+
+            _aboutFire = new (size.Width * _aboutFirePixelsPerColumn, size.Height * _aboutFirePixelsPerRow);
+            _aboutFireEncoder = new () { AvoidBottomScroll = true };
+            _aboutFireEncoder.Quantizer.MaxColors = Math.Min (_aboutFireEncoder.Quantizer.MaxColors, _aboutFireMaxColors);
+            _aboutFireEncoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_aboutFire.Palette);
+        }
+
+        _aboutFire.AdvanceFrame ();
+        _aboutFireFrameCounter++;
+
+        // Control frame rate by adjusting this. Lower number means more FPS.
+        if (_aboutFireFrameCounter % 2 != 0)
+        {
+            return true;
+        }
+
+        string sixelData = _aboutFireEncoder!.EncodeSixel (_aboutFire.GetFirePixels ());
+
+        if (_aboutFireSixel is null)
+        {
+            _aboutFireSixel = new () { SixelData = sixelData, ScreenPosition = GetAboutFireScreenPosition (dialog), Id = "aboutFireSixel", AlwaysRender = true };
+
+            App?.Driver?.GetOutput ().GetSixels ().Enqueue (_aboutFireSixel);
+        }
+        else
+        {
+            _aboutFireSixel.SixelData = sixelData;
+
+            // Recompute every frame — the dialog is movable.
+            _aboutFireSixel.ScreenPosition = GetAboutFireScreenPosition (dialog);
+        }
+
+        dialog.SetNeedsDraw ();
+
+        return true;
+    }
+
+    /// <summary>Bottom-aligns the fire within the dialog's screen frame.</summary>
+    private Point GetAboutFireScreenPosition (Dialog dialog)
+    {
+        Rectangle frameScreen = dialog.FrameToScreen ();
+        int resolutionHeight = Math.Max (1, _aboutFirePixelsPerRow);
+        int pixelHeight = Math.Max (1, frameScreen.Height * _aboutFirePixelsPerRow - 6);
+        int cellHeight = Math.Max (1, (pixelHeight + resolutionHeight - 1) / resolutionHeight);
+
+        return new (frameScreen.X, Math.Max (frameScreen.Y, frameScreen.Bottom - cellHeight));
     }
 
     /// <summary>
