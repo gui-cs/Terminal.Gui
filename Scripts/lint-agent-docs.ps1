@@ -110,6 +110,18 @@ foreach ($file in $files)
                 Add-Failure $file $lineNumber 'sdk-version' "claims .NET SDK $claimed but global.json pins $sdkVersion"
             }
         }
+
+        # Rule 6: target framework moniker must match global.json's SDK major.
+        # Catches stale `net8.0`-style TFMs left behind when the project moved on.
+        if ($line -match 'net(\d+)\.0(?![\d.])')
+        {
+            $tfmMajor = $Matches[1]
+
+            if ($tfmMajor -ne $sdkMajor)
+            {
+                Add-Failure $file $lineNumber 'stale-tfm' "references net$tfmMajor.0 but global.json pins .NET $sdkMajor (expected net$sdkMajor.0)"
+            }
+        }
     }
 }
 
