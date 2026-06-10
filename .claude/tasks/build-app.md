@@ -73,22 +73,27 @@ public sealed class MainWindow : Runnable
 
 ### With Return Value
 ```csharp
+// Usage:
+IApplication app = Application.Create ().Init ();
+string? username = app.Run<LoginWindow> ().GetResult<string> ();
+app.Dispose ();
+
 public sealed class LoginWindow : Runnable<string?>
 {
     public LoginWindow ()
     {
-        // ... setup UI ...
+        TextField usernameField = new () { X = 1, Y = 1, Width = 20 };
+        Button loginButton = new () { Text = "Login", X = 1, Y = 3, IsDefault = true };
 
         loginButton.Accepted += (_, _) =>
         {
             Result = usernameField.Text;  // Set return value
             App!.RequestStop ();          // Close window
         };
+
+        Add (usernameField, loginButton);
     }
 }
-
-// Usage:
-string? username = app.Run<LoginWindow> ().GetResult<string> ();
 ```
 
 ## Layout System
@@ -157,7 +162,7 @@ button.Accepted += (_, _) =>
 // Use Accepting (pre-event) ONLY to inspect or cancel the in-flight action
 button.Accepting += (_, e) =>
 {
-    if (!CanProceed ())
+    if (usernameField.Text.Length == 0)
     {
         e.Handled = true;  // Cancel — prevents Accepted from firing
     }
@@ -174,25 +179,32 @@ textField.TextChanged += (_, _) =>
 
 ### Selection Changed
 ```csharp
-listView.SelectedItemChanged += (_, e) =>
+// Typed views expose their data via IValue<T> — ListView is IValue<int?> (the selected index)
+listView.ValueChanged += (_, e) =>
 {
-    SelectedItem item = e.Value;
+    int? selectedIndex = e.NewValue;
 };
 ```
 
 ### Keyboard Shortcuts
 ```csharp
-// Add a key binding
-view.AddCommand (Command.Accept, myHandler);
-view.KeyBindings.Add (Key.F5, Command.Accept);
+// In your View subclass: add a command handler, then bind a key to it.
+// (AddCommand is protected — call it from inside the view, not on an instance.)
+AddCommand (Command.Refresh, () =>
+{
+    // Reload data here
+
+    return true;
+});
+KeyBindings.Add (Key.F5, Command.Refresh);
 ```
 
 ## Dialogs
 
 ### Message Box
 ```csharp
-int result = MessageBox.Query (App!, "Title", "Message", "Yes", "No");
-// result: 0 = Yes, 1 = No
+int? result = MessageBox.Query (App!, "Title", "Message", "Yes", "No");
+// result: 0 = Yes, 1 = No, null = dismissed without choosing
 ```
 
 ### Error Dialog
