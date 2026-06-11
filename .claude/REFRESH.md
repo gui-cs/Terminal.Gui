@@ -9,7 +9,7 @@
 3. **Use `[...]`** not `new () { ... }` for collections
 4. **SubView/SuperView** - never say "child", "parent", or "container"
 5. **Unused lambda params** - use `_` discard: `(_, _) => { }`
-6. **Local functions** - use camelCase: `void myLocalFunc ()`
+6. **Local functions** - use PascalCase: `void MyLocalFunc ()`
 7. **Backing fields** - place immediately before their property (ReSharper bug, must do manually)
 8. **SPACE BEFORE PARENTHESES** - `Method ()` not `Method()`, `array [i]` not `array[i]` (see `formatting.md`)
 9. **Braces on next line** - ALL opening braces on next line (Allman style)

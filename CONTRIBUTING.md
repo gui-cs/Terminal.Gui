@@ -25,7 +25,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 **Terminal.Gui** is a cross-platform UI toolkit for creating console-based graphical user interfaces in .NET. It's a large codebase (~1,050 C# files) providing a comprehensive framework for building interactive console applications with support for keyboard and mouse input, customizable views, and a robust event system.
 
 **Key characteristics:**
-- **Language**: C# (net8.0)
+- **Language**: C# 14 (net10.0)
 - **Platform**: Cross-platform (Windows, macOS, Linux)
 - **Architecture**: Console UI toolkit with driver-based architecture
 - **Version**: v2 (Beta), v1 (maintenance mode)
@@ -47,8 +47,8 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 ### Required Tools
 
-- **.NET SDK**: 8.0.0 (see `global.json`)
-- **Runtime**: .NET 8.x (latest GA)
+- **.NET SDK**: 10.0.100 (see `global.json`)
+- **Runtime**: .NET 10.x (latest GA)
 - **Optional**: ReSharper/Rider for code formatting (honor `.editorconfig` and `Terminal.sln.DotSettings`)
 
 ### Build Commands (In Order)
@@ -78,7 +78,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 1. **Non-parallel tests** (depend on static state, ~10 min timeout):
    ```bash
-   dotnet test --project Tests/UnitTests --no-build --verbosity normal
+   dotnet test --project Tests/UnitTests.NonParallelizable --no-build --verbosity normal
    ```
    - Uses `Application.Init` and static state
    - Cannot run in parallel

@@ -42,16 +42,16 @@ dotnet build --no-restore
 
 # Run all tests (two separate projects)
 dotnet test --project Tests/UnitTestsParallelizable --no-build
-dotnet test --project Tests/UnitTests --no-build
+dotnet test --project Tests/UnitTests.NonParallelizable --no-build
 
-# Run a single test by fully-qualified name
-dotnet test --project Tests/UnitTestsParallelizable --no-build --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
+# Run a single test by method name (xUnit v3 / Microsoft Testing Platform)
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "*MyTestMethod"
 
-# Run tests matching a trait or pattern
-dotnet test --project Tests/UnitTestsParallelizable --no-build --filter "ClassName~ButtonTests"
+# Run all tests in a class
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-class "*ButtonTests"
 ```
 
-New tests go in `Tests/UnitTestsParallelizable` (no static state dependencies). Only use `Tests/UnitTests` when testing `Application.Init`/`Shutdown` or other static state.
+New tests go in `Tests/UnitTestsParallelizable` (no static state dependencies). Only use `Tests/UnitTests.NonParallelizable` when testing `Application.Init`/`Shutdown` or other static state. Never add new tests to `Tests/UnitTests.Legacy`.
 
 ## Architecture Overview
 
@@ -191,10 +191,10 @@ All opening braces go on the next line. No exceptions.
 textField.TextChanged += (_, _) => { /* ... */ };
 ```
 
-### Local functions use camelCase
+### Local functions use PascalCase
 
 ```csharp
-void myLocalFunc () { }
+void MyLocalFunc () { }
 ```
 
 ### Backing fields directly above their property

@@ -27,7 +27,7 @@ Before submitting a PR, ensure:
 
 - [ ] **Build passes** locally: `dotnet build --no-restore`
 
-- [ ] **Tests pass** locally: `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`
+- [ ] **Tests pass** locally: `dotnet test --project Tests/UnitTestsParallelizable --no-build && dotnet test --project Tests/UnitTests.NonParallelizable --no-build`
 
 ## PR Description Template
 
@@ -70,7 +70,7 @@ dotnet build --configuration Debug --no-restore
 ### 2. Run Tests
 
 ```bash
-dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
+dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal && dotnet test --project Tests/UnitTests.NonParallelizable --no-build --verbosity normal
 ```
 
 **Expected:** All tests pass
@@ -106,7 +106,7 @@ git diff
 - ❌ Don't modify unrelated code
 - ❌ Don't remove/edit unrelated tests
 - ❌ Don't break existing functionality
-- ❌ Don't add tests to `UnitTests` if they can be parallelizable
+- ❌ Don't add tests to `UnitTests.NonParallelizable` if they can be parallelizable; never add tests to `UnitTests.Legacy`
 - ❌ Don't decrease code coverage
 - ❌ Don't introduce new warnings
 - ❌ Don't include commented-out code without explanation

@@ -68,8 +68,8 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
     }
 
     /// <summary>
-    ///     End-to-end check: a real <see cref="Key.PageDown"/> on the active tab still produces
-    ///     draw fan-out on inactive tabs, but layout work stays on the active tab.
+    ///     End-to-end check: a real <see cref="Key.PageDown"/> on the active tab keeps both
+    ///     layout and text drawing on the active tab.
     /// </summary>
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
@@ -169,21 +169,7 @@ public class TabsFanOutIntegrationTests (ITestOutputHelper outputHelper) : Tests
         outputHelper.WriteLine ($"Sum inactive DrawingText = {inactiveTextDraws}");
         outputHelper.WriteLine ($"Sum inactive SubViewsLaidOut = {inactiveLayouts}");
 
-        // Issue #5358 fix narrows draw fan-out at the View.Draw pipeline level (verified by
-        // TabsFanOutDiagnosticTests at synthetic level). At integration level a separate
-        // cascade source remains: ApplicationImpl.LayoutAndDraw passes force=true to
-        // View.Draw whenever any view needed layout, which calls SetNeedsDraw on the top
-        // runnable, which cascades to overlapping subviews via the existing SetNeedsDraw
-        // recursion. Removing that force=true uncovers stale-content bugs in the shrink/move
-        // path (covered by existing ShadowTests and BorderViewTests) and is out of scope
-        // for #5358. Until that broader fix lands, inactive tab pages still receive
-        // NeedsDraw via the LayoutAndDraw force path. Layout fan-out is already fully
-        // eliminated by PR #5373.
-        Assert.True (
-                     inactiveTextDraws > 0,
-                     $"Documents the remaining draw fan-out via ApplicationImpl.LayoutAndDraw's force=true path: " +
-                     $"inactive_total DrawingText={inactiveTextDraws}. Flip to Assert.Equal(0, inactiveTextDraws) " +
-                     "after the broader LayoutAndDraw cascade is addressed (out of scope for #5358).");
+        Assert.Equal (0, inactiveTextDraws);
 
         Assert.Equal (0, inactiveLayouts);
     }
