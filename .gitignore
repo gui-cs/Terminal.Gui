@@ -80,6 +80,8 @@ log.*
 # Claude Code local settings
 .claude/settings.local.json
 .claude/worktrees/
+# Session-local agent memory (machine-specific paths) - promote durable guidance to .claude/rules/ instead
+.claude/projects/
 .mcp.json
 .env
 tmpclaude-*-cwd
