@@ -17,6 +17,10 @@ jobs:
   publish:
     name: Build and Publish to Nuget.org
     runs-on: ubuntu-latest
+    env:
+      # The `secrets` context is not available in step `if` conditions;
+      # mirrored into env so the Editor-notify step can be skipped when unset.
+      EDITOR_DISPATCH_TOKEN: ${{ secrets.EDITOR_DISPATCH_TOKEN }}
 
     steps:
     - name: Checkout ${{ github.ref_name }}
@@ -128,7 +132,7 @@ jobs:
     # missing token degrades gracefully.
     # Requires EDITOR_DISPATCH_TOKEN: a PAT with `repo` scope on gui-cs/Editor.
     - name: Notify gui-cs/Editor of publish
-      if: ${{ secrets.EDITOR_DISPATCH_TOKEN != '' }}
+      if: env.EDITOR_DISPATCH_TOKEN != ''
       continue-on-error: true
       uses: peter-evans/repository-dispatch@v4
       with:
