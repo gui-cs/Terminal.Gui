@@ -205,7 +205,10 @@ public class Tabs : View, IValue<View?>, IDesignable
         return _tabCacheReadOnly;
     }
 
-    private void InvalidateTabCache () { _tabCacheDirty = true; }
+    private void InvalidateTabCache ()
+    {
+        _tabCacheDirty = true;
+    }
 
     private void RebuildTabCacheIfNeeded ()
     {
@@ -361,7 +364,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         List<View> subViewsOfThisTabs = new (base.GetSubViews (includeMargin, includeBorder, includePadding));
         IReadOnlyDictionary<View, int> tabIndex = GetTabIndexCache ();
 
-        // Reorder according to TabsCollection.
+        // Reorder according to TabCollection.
         subViewsOfThisTabs.Sort ((v1, v2) =>
                                  {
                                      int index1 = tabIndex.TryGetValue (v1, out int v1Index) ? v1Index : tabIndex.Count;
