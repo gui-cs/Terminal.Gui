@@ -5,6 +5,7 @@
 ///     [ConfigurationProperty(Scope = typeof(AppSettingsScope))] public static string? MyProperty { get; set; } = "MyValue";
 /// </example>
 [AttributeUsage (AttributeTargets.Property)]
+[Obsolete ("Use Settings POCOs with TuiConfigurationBuilder instead. Will be removed in a future version.")]
 public class ConfigurationPropertyAttribute : System.Attribute
 {
     /// <summary>

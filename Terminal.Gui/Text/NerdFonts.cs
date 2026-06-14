@@ -16,7 +16,11 @@ internal class NerdFonts
     ///     installed on the users machine to work correctly.  Defaults to <see langword="false"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static bool Enable { get; set; } = false;
+    public static bool Enable
+    {
+        get => NerdFontsSettings.Defaults.Enable;
+        set => NerdFontsSettings.Defaults.Enable = value;
+    }
 
     /// <summary>Mapping of file extension to <see cref="Glyphs"/> name.</summary>
     public Dictionary<string, string> ExtensionToIcon { get; set; } = new ()

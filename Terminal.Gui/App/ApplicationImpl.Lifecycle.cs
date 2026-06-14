@@ -2,6 +2,8 @@ using System.Diagnostics;
 using Wcwidth;
 using Trace = Terminal.Gui.Tracing.Trace;
 
+#pragma warning disable CS0618 // Obsolete - ConfigurationManager still used internally during transition
+
 namespace Terminal.Gui.App;
 
 internal partial class ApplicationImpl

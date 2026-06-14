@@ -7,6 +7,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Terminal.Gui.Tracing;
 
+#pragma warning disable CS0618 // Obsolete - ConfigProperty references ConfigurationManager/ConfigurationPropertyAttribute internally
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
@@ -19,6 +21,7 @@ namespace Terminal.Gui.Configuration;
 ///     serialization, a <see cref="JsonConverter"/> must be provided using the <see cref="JsonConverterAttribute"/>
 ///     attribute.
 /// </remarks>
+[Obsolete ("Being replaced by Microsoft.Extensions.Configuration. Will be removed in a future version.")]
 public class ConfigProperty
 {
     /// <summary>Describes the property.</summary>

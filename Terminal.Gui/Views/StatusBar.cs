@@ -1,3 +1,5 @@
+#pragma warning disable CS0618 // Obsolete - StatusBar uses [ConfigurationProperty] for DefaultSeparatorLineStyle during transition
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -12,8 +14,6 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class StatusBar : Bar, IDesignable
 {
-    private static LineStyle _defaultSeparatorLineStyle = LineStyle.Single; // Resources/config.json overrides
-
     /// <inheritdoc/>
     public StatusBar () : this ([]) { }
 
@@ -33,7 +33,7 @@ public class StatusBar : Bar, IDesignable
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
-        ConfigurationManager.Applied += OnConfigurationManagerApplied;
+        ThemeChanges.ThemeChanged += OnThemeChanged;
     }
 
     /// <inheritdoc />
@@ -45,10 +45,10 @@ public class StatusBar : Bar, IDesignable
             // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
             // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
             // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+            ThemeChanges.ThemeChanged -= OnThemeChanged;
         }
     }
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    private void OnThemeChanged (object? sender, App.EventArgs<string> e)
     {
         if (Border is { })
         {
@@ -62,8 +62,8 @@ public class StatusBar : Bar, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static LineStyle DefaultSeparatorLineStyle
     {
-        get => _defaultSeparatorLineStyle;
-        set => _defaultSeparatorLineStyle = value;
+        get => StatusBarSettings.Defaults.DefaultSeparatorLineStyle;
+        set => StatusBarSettings.Defaults.DefaultSeparatorLineStyle = value;
     }
 
     /// <inheritdoc />
@@ -180,6 +180,6 @@ public class StatusBar : Bar, IDesignable
     {
         base.Dispose (disposing);
 
-        ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+        ThemeChanges.ThemeChanged -= OnThemeChanged;
     }
 }

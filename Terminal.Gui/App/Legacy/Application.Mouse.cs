@@ -9,12 +9,12 @@ public static partial class Application // Mouse handling
     [Obsolete ("The legacy static Application object is going away.")]
     public static bool IsMouseDisabled
     {
-        get;
+        get => ApplicationSettings.Defaults.IsMouseDisabled;
         set
         {
-            bool oldValue = field;
-            field = value;
-            IsMouseDisabledChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, field));
+            bool oldValue = ApplicationSettings.Defaults.IsMouseDisabled;
+            ApplicationSettings.Defaults.IsMouseDisabled = value;
+            IsMouseDisabledChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, value));
         }
     }
 

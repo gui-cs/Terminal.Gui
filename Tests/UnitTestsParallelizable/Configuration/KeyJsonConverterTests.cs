@@ -45,8 +45,8 @@ public class KeyJsonConverterTests
         // Arrange
 
         // Act
-        string json = JsonSerializer.Serialize ((Key)key, ConfigurationManager.SerializerContext.Options);
-        var deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerContext.Options);
+        string json = JsonSerializer.Serialize ((Key)key, TuiSerializerContext.Instance.Options);
+        var deserializedKey = JsonSerializer.Deserialize<Key> (json, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal (expectedStringTo, deserializedKey!.ToString ());
@@ -60,7 +60,7 @@ public class KeyJsonConverterTests
 
         // Act
         string json = "\"Ctrl+Q\"";
-        Key? deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager.SerializerContext.Options);
+        Key? deserializedKey = JsonSerializer.Deserialize<Key> (json, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal (key, deserializedKey);
@@ -70,7 +70,7 @@ public class KeyJsonConverterTests
     public void Separator_Property_Serializes_As_Glyph ()
     {
         // Act
-        string json = JsonSerializer.Serialize (Key.Separator, ConfigurationManager.SerializerContext.Options);
+        string json = JsonSerializer.Serialize (Key.Separator, TuiSerializerContext.Instance.Options);
 
         // Assert
         Assert.Equal ($"\"{Key.Separator}\"", json);

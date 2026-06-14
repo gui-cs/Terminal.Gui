@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using Terminal.Gui.Tracing;
 
+#pragma warning disable CS0618 // Obsolete - MenuBar uses [ConfigurationProperty] for DefaultBorderStyle/DefaultKey during transition
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -118,7 +120,7 @@ public class MenuBar : Menu, IDesignable
 
         BorderStyle = DefaultBorderStyle;
 
-        ConfigurationManager.Applied += OnConfigurationManagerApplied;
+        ThemeChanges.ThemeChanged += OnThemeChanged;
 
         return;
 
@@ -439,11 +441,19 @@ public class MenuBar : Menu, IDesignable
     ///     Gets or sets the default Border Style for the MenuBar. The default is <see cref="LineStyle.None"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public new static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+    public new static LineStyle DefaultBorderStyle
+    {
+        get => MenuBarSettings.Defaults.DefaultBorderStyle;
+        set => MenuBarSettings.Defaults.DefaultBorderStyle = value;
+    }
 
     /// <summary>The default key for activating menu bars.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key DefaultKey { get; set; } = Key.F10;
+    public static Key DefaultKey
+    {
+        get => MenuBarSettings.Defaults.DefaultKey;
+        set => MenuBarSettings.Defaults.DefaultKey = value;
+    }
 
     /// <inheritdoc/>
     public override void EndInit ()
@@ -586,7 +596,7 @@ public class MenuBar : Menu, IDesignable
 
         if (disposing)
         {
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+            ThemeChanges.ThemeChanged -= OnThemeChanged;
         }
     }
 
@@ -780,7 +790,7 @@ public class MenuBar : Menu, IDesignable
             // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
             // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
             // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+            ThemeChanges.ThemeChanged -= OnThemeChanged;
         }
     }
 
@@ -862,7 +872,7 @@ public class MenuBar : Menu, IDesignable
         return false;
     }
 
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e) => BorderStyle = DefaultBorderStyle;
+    private void OnThemeChanged (object? sender, App.EventArgs<string> e) => BorderStyle = DefaultBorderStyle;
 
     private void OnEntryMenuOpenChanged (object? sender, ValueChangedEventArgs<bool> e)
     {

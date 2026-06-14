@@ -39,9 +39,10 @@ public static class Trace
     [JsonConverter (typeof (TraceCategoryJsonConverter))]
     public static TraceCategory EnabledCategories
     {
-        get => _asyncLocalEnabledCategories.Value;
+        get => TraceSettings.Defaults.EnabledCategories;
         set
         {
+            TraceSettings.Defaults.EnabledCategories = value;
             _asyncLocalEnabledCategories.Value = value;
             EnsureBackendIfEnabled ();
         }
