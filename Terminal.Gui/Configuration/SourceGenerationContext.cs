@@ -52,9 +52,12 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (AppModel))]
 
 [JsonSerializable (typeof (PlatformKeyBinding))]
+[JsonSerializable (typeof (PlatformMouseBinding))]
 
 [JsonSerializable (typeof (Dictionary<Command, PlatformKeyBinding>))]
+[JsonSerializable (typeof (Dictionary<Command, PlatformMouseBinding>))]
 [JsonSerializable (typeof (Dictionary<string, Dictionary<Command, PlatformKeyBinding>>))]
+[JsonSerializable (typeof (Dictionary<string, Dictionary<Command, PlatformMouseBinding>>))]
 
 internal partial class SourceGenerationContext : JsonSerializerContext
 { }

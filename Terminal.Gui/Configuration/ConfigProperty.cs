@@ -185,7 +185,16 @@ public class ConfigProperty
     /// <returns>True if the PropertyInfo has a ConfigurationPropertyAttribute; otherwise, false</returns>
     internal static bool HasConfigurationPropertyAttribute (PropertyInfo propertyInfo)
     {
-        return propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) != null;
+        try
+        {
+            return propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) != null;
+        }
+        catch (TypeLoadException)
+        {
+            // Foreign assemblies loaded into the process can carry broken custom-attribute metadata.
+            // Those properties are not Terminal.Gui configuration hosts and should not terminate the scan.
+            return false;
+        }
     }
 
     /// <summary>
@@ -510,17 +519,26 @@ public class ConfigProperty
         // Supplement the built-in list by discovering host types defined outside Terminal.Gui
         // (test suites, plugins, embedding apps). This remains important under NativeAOT for
         // consumer-rooted host types such as app-defined AppSettingsScope entries.
-        ScanLoadedAssembliesForConfigPropertyHosts (dict);
+        ScanLoadedAssembliesForConfigPropertyHosts (dict, AppDomain.CurrentDomain.GetAssemblies ());
 
         _classesWithConfigProps = dict.ToImmutableSortedDictionary ();
     }
 
     [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties.")]
     [RequiresUnreferencedCode ("Scanning for types via reflection is not trim-safe.")]
-    private static void ScanLoadedAssembliesForConfigPropertyHosts (Dictionary<string, Type> dict)
+    internal static ImmutableSortedDictionary<string, Type> ScanAssembliesForConfigPropertyHosts (IEnumerable<Assembly> assemblies)
     {
-        Assembly [] assemblies = AppDomain.CurrentDomain.GetAssemblies ();
+        Dictionary<string, Type> dict = new (StringComparer.InvariantCultureIgnoreCase);
 
+        ScanLoadedAssembliesForConfigPropertyHosts (dict, assemblies);
+
+        return dict.ToImmutableSortedDictionary ();
+    }
+
+    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties.")]
+    [RequiresUnreferencedCode ("Scanning for types via reflection is not trim-safe.")]
+    private static void ScanLoadedAssembliesForConfigPropertyHosts (Dictionary<string, Type> dict, IEnumerable<Assembly> assemblies)
+    {
         foreach (Assembly assembly in assemblies)
         {
             try

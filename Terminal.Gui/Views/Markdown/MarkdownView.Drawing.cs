@@ -1,3 +1,4 @@
+using System.Linq;
 namespace Terminal.Gui.Views;
 
 public partial class Markdown
@@ -19,6 +20,8 @@ public partial class Markdown
         SetAttribute (fillAttr);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
 
+        _visibleSixelIds.Clear ();
+
         int startRow = Viewport.Y;
         int endRow = Math.Min (Viewport.Y + Viewport.Height, _renderedLines.Count);
 
@@ -26,6 +29,15 @@ public partial class Markdown
         {
             int drawRow = contentRow - Viewport.Y;
             DrawRenderedLine (_renderedLines [contentRow], contentRow, drawRow);
+        }
+
+        // Cleanup sixels that are no longer visible
+        var toRemove = _sixelRenderMap.Keys.Where (id => !_visibleSixelIds.Contains (id)).ToList ();
+        foreach (var id in toRemove)
+        {
+            _sixelRenderMap [id].SixelData = null;
+            _sixelRenderMap [id].IsDirty = false;
+            _sixelRenderMap.Remove (id);
         }
 
         // Return false so SubViews (copy buttons) still draw on top
@@ -74,16 +86,17 @@ public partial class Markdown
         int startRow = Math.Max (start.Y, Viewport.Y);
         int endRow = Math.Min (end.Y, Viewport.Y + Viewport.Height - 1);
 
-        bool anySubViewRows = false;
+        var anySubViewRows = false;
 
         for (int lineIdx = startRow; lineIdx <= Math.Min (endRow, _renderedLines.Count - 1); lineIdx++)
         {
-            if (_renderedLines [lineIdx].IsTable || _renderedLines [lineIdx].IsCodeBlock)
+            if (!_renderedLines [lineIdx].IsTable && !_renderedLines [lineIdx].IsCodeBlock)
             {
-                anySubViewRows = true;
-
-                break;
+                continue;
             }
+            anySubViewRows = true;
+
+            break;
         }
 
         if (!anySubViewRows)
@@ -99,24 +112,42 @@ public partial class Markdown
         Rectangle viewportScreen = ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size));
         SetClip (new Region (viewportScreen));
 
-        SetAttribute (selAttr);
+        // Popovers draw before the MarkdownView in the application draw loop, so their menu
+        // items are already written to the screen buffer when we run.  The SetClip call above
+        // resets the clip to allow drawing over SubView areas, but it also undoes the clip
+        // exclusion that the popover's DoDrawComplete registered for its drawn cells.  Without
+        // a guard, we would overwrite those cells with stale ScreenContents graphemes, erasing
+        // the popover.  (Paragraph-text selection is drawn in DrawRenderedLine / OnDrawingSubViews
+        // before the clip reset, so it naturally inherits the popover's exclusion and is safe.)
+        // Compute the popover's content rect (screen-relative) and skip any cells inside it.
+        Rectangle? popoverScreenRect = null;
+
+        if (App?.Popovers?.GetActivePopover () is View { Visible: true } popoverView)
+        {
+            View? popoverContent = popoverView.SubViews.FirstOrDefault (v => v.Visible);
+
+            if (popoverContent is { })
+            {
+                popoverScreenRect = popoverContent.Frame;
+            }
+        }
 
         for (int lineIdx = startRow; lineIdx <= Math.Min (endRow, _renderedLines.Count - 1); lineIdx++)
         {
             RenderedLine line = _renderedLines [lineIdx];
 
-            if (!line.IsTable && !line.IsCodeBlock)
+            if (line is { IsTable: false, IsCodeBlock: false })
             {
                 continue;
             }
 
             int drawRow = lineIdx - Viewport.Y;
-            Point screenOrigin = ContentToScreen (new Point (0, drawRow));
+            Point screenOrigin = ContentToScreen (new Point (0, lineIdx));
             int screenRow = screenOrigin.Y;
             int screenStartCol = screenOrigin.X;
             int cols = Viewport.Width;
 
-            for (int col = 0; col < cols; col++)
+            for (var col = 0; col < cols; col++)
             {
                 int sc = screenStartCol + col;
 
@@ -125,13 +156,22 @@ public partial class Markdown
                     continue;
                 }
 
-                string grapheme = contents [screenRow, sc].Grapheme;
-
-                if (string.IsNullOrEmpty (grapheme))
+                if (popoverScreenRect is { } psr && psr.Contains (new Point (sc, screenRow)))
                 {
-                    grapheme = " ";
+                    continue;
                 }
 
+                int contentX = col + Viewport.X;
+
+                if (!IsInSelection (lineIdx, contentX))
+                {
+                    continue;
+                }
+
+                Cell cell = contents [screenRow, sc];
+                string grapheme = string.IsNullOrEmpty (cell.Grapheme) ? " " : cell.Grapheme;
+
+                SetAttribute (selAttr);
                 AddStr (col, drawRow, grapheme);
             }
         }
@@ -260,7 +300,7 @@ public partial class Markdown
     private Attribute GetAttributeForSegment (StyledSegment segment) =>
         MarkdownAttributeHelper.GetAttributeForSegment (this, segment, SyntaxHighlighter, UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null);
 
-    private void TryQueueSixel (string imageSource, Point screenPosition)
+    private void TryQueueSixel (string imageSource, Point viewPosition)
     {
         if (!EnableSixelImages || Driver is null)
         {
@@ -272,13 +312,29 @@ public partial class Markdown
             return;
         }
 
-        var queueId = $"{imageSource}:{screenPosition.X}:{screenPosition.Y}";
+        var queueId = $"{imageSource}:{viewPosition.X}:{viewPosition.Y}";
 
-        if (!_queuedSixelIds.Add (queueId))
+        if (!_visibleSixelIds.Add (queueId))
         {
             return;
         }
 
-        Driver.GetSixels ().Enqueue (new SixelToRender { Id = queueId, ScreenPosition = ContentToScreen (screenPosition), SixelData = sixelData });
+        if (_sixelRenderMap.TryGetValue (queueId, out SixelToRender? render))
+        {
+            render.IsDirty = true;
+
+            return;
+        }
+
+        var newRender = new SixelToRender
+        {
+            Id = queueId,
+            ScreenPosition = ContentToScreen (viewPosition),
+            SixelData = sixelData,
+            AlwaysRender = false,
+            IsDirty = true
+        };
+        _sixelRenderMap [queueId] = newRender;
+        Driver.GetSixels ().Enqueue (newRender);
     }
 }

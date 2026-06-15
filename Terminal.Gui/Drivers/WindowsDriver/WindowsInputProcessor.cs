@@ -156,25 +156,19 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
             }
         }
 
-        if (e.ControlKeyState != WindowsConsole.ControlKeyState.NoControlKeyPressed)
+        if ((e.ControlKeyState & (WindowsConsole.ControlKeyState.RightAltPressed | WindowsConsole.ControlKeyState.LeftAltPressed)) != 0)
         {
-            switch (e.ControlKeyState)
-            {
-                case WindowsConsole.ControlKeyState.RightAltPressed:
-                case WindowsConsole.ControlKeyState.LeftAltPressed:
-                    mouseFlags |= MouseFlags.Alt;
+            mouseFlags |= MouseFlags.Alt;
+        }
 
-                    break;
-                case WindowsConsole.ControlKeyState.RightControlPressed:
-                case WindowsConsole.ControlKeyState.LeftControlPressed:
-                    mouseFlags |= MouseFlags.Ctrl;
+        if ((e.ControlKeyState & (WindowsConsole.ControlKeyState.RightControlPressed | WindowsConsole.ControlKeyState.LeftControlPressed)) != 0)
+        {
+            mouseFlags |= MouseFlags.Ctrl;
+        }
 
-                    break;
-                case WindowsConsole.ControlKeyState.ShiftPressed:
-                    mouseFlags |= MouseFlags.Shift;
-
-                    break;
-            }
+        if ((e.ControlKeyState & WindowsConsole.ControlKeyState.ShiftPressed) != 0)
+        {
+            mouseFlags |= MouseFlags.Shift;
         }
 
         var result = new Mouse

@@ -102,6 +102,9 @@ public enum Command
     /// <summary>Moves to the start (e.g. the top or home).</summary>
     Start,
 
+    /// <summary>Moves or resets to the home position.</summary>
+    Home,
+
     /// <summary>Moves to the end (e.g. the bottom).</summary>
     End,
 
@@ -213,6 +216,28 @@ public enum Command
 
     /// <summary>Unix emulation.</summary>
     UnixEmulation,
+
+    /// <summary>Inserts a tab character or spaces at the cursor or selection.</summary>
+    InsertTab,
+
+    /// <summary>Removes one level of indentation from the current line or selection.</summary>
+    Unindent,
+
+    #endregion
+
+    #region Search Commands
+
+    /// <summary>Opens or activates a find/search UI.</summary>
+    Find,
+
+    /// <summary>Finds the next match.</summary>
+    FindNext,
+
+    /// <summary>Finds the previous match.</summary>
+    FindPrevious,
+
+    /// <summary>Opens or activates a find-and-replace UI.</summary>
+    Replace,
 
     #endregion
 
@@ -334,6 +359,45 @@ public enum Command
     ///     Invokes a user interface for editing or configuring something.
     /// </summary>
     Edit,
+
+    /// <summary>Centers the current item or viewport.</summary>
+    Center,
+
+    /// <summary>Zooms in.</summary>
+    ZoomIn,
+
+    /// <summary>Zooms out.</summary>
+    ZoomOut,
+
+    #endregion
+
+    #region Multi-Caret Commands
+
+    /// <summary>
+    ///     Adds an additional caret one line above the topmost caret (multi-caret editing),
+    ///     preserving the sticky visual column. Mirrors VS Code's
+    ///     <c>editor.action.insertCursorAbove</c>. Views that support multi-caret bind this
+    ///     through <see cref="View.KeyBindings"/> or their configurable default key bindings.
+    /// </summary>
+    InsertCaretAbove,
+
+    /// <summary>
+    ///     Adds an additional caret one line below the bottommost caret (multi-caret editing),
+    ///     preserving the sticky visual column. Mirrors VS Code's
+    ///     <c>editor.action.insertCursorBelow</c>. Views that support multi-caret bind this
+    ///     through <see cref="View.KeyBindings"/> or their configurable default key bindings.
+    /// </summary>
+    InsertCaretBelow,
+
+    #endregion
+
+    #region Mouse Selection Commands
+
+    /// <summary>Starts extending a selection via pointing-device input.</summary>
+    StartSelection,
+
+    /// <summary>Starts extending a rectangular selection via pointing-device input.</summary>
+    StartRectangleSelection,
 
     #endregion
 }

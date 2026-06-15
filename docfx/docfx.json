@@ -7,6 +7,12 @@
           "files": [
             "bin/Release/net10.0/Terminal.Gui.dll"
           ]
+        },
+        {
+          "src": "EditorRef/bin/Release/net10.0",
+          "files": [
+            "Terminal.Gui.Editor.dll"
+          ]
         }
       ],
       "dest": "api",

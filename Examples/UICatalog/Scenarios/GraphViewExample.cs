@@ -16,7 +16,7 @@ public class GraphViewExample : Scenario
     private ViewDiagnosticFlags _viewDiagnostics;
     private IApplication? _app;
     private Tabs? _tabs;
-    private FrameView? _aboutTextView;
+    private FrameView? _aboutFrame;
 
     /// <summary>
     ///     Gets the <see cref="GraphView"/> from the currently selected tab.
@@ -52,7 +52,7 @@ public class GraphViewExample : Scenario
         _tabs.Value = _tabs.SubViews.ElementAt (0);
 
         // About
-        _aboutTextView = new FrameView
+        _aboutFrame = new FrameView
         {
             Title = "About",
             X = 0,
@@ -62,9 +62,9 @@ public class GraphViewExample : Scenario
             BorderStyle = LineStyle.Dotted
         };
 
-        _tabs.Height = Dim.Fill (_aboutTextView);
+        _tabs.Height = Dim.Fill (_aboutFrame);
 
-        _tabs.ValueChanged += (_, args) => { _aboutTextView.Text = args.NewValue?.SubViews.OfType<GraphView> ().FirstOrDefault ()?.Text ?? string.Empty; };
+        _tabs.ValueChanged += (_, args) => { _aboutFrame.Text = args.NewValue?.SubViews.OfType<GraphView> ().FirstOrDefault ()?.Text ?? string.Empty; };
 
         // StatusBar
         StatusBar statusBar = new ([new Shortcut (Key.PageUp, "Zoom In", () => Zoom (0.5f)), new Shortcut (Key.PageDown, "Zoom Out", () => Zoom (2f))]);
@@ -98,7 +98,7 @@ public class GraphViewExample : Scenario
                                    ]));
 
         // Add views in order of visual appearance
-        window.Add (menu, _tabs, _aboutTextView, statusBar);
+        window.Add (menu, _tabs, _aboutFrame, statusBar);
 
         _viewDiagnostics = View.Diagnostics;
         app.Run (window);
@@ -106,7 +106,7 @@ public class GraphViewExample : Scenario
     }
 
     /// <summary>
-    ///     Creates a tab containing a <see cref="GraphView"/> and an about <see cref="TextView"/>,
+    ///     Creates a tab containing a <see cref="GraphView"/> and an about <see cref="FrameView"/>,
     ///     then invokes the setup action to configure the graph.
     /// </summary>
     private void CreateGraphTab (string tabTitle, string graphTitle, Action<GraphView> setupAction)

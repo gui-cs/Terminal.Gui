@@ -17,6 +17,15 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     private readonly TimeSpan _escTimeout = TimeSpan.FromMilliseconds (50);
 
     /// <summary>
+    ///     Timeout for detecting a stranded bracketed-paste session. If the terminal opens a paste with
+    ///     <c>ESC[200~</c> but never delivers the matching <c>ESC[201~</c> end marker (dropped
+    ///     connection, broken terminal), the buffered content is flushed after this duration so input
+    ///     resumes flowing. Pastes legitimately span seconds for large clipboards, so this is much
+    ///     longer than <see cref="_escTimeout"/>.
+    /// </summary>
+    private readonly TimeSpan _bracketedPasteTimeout = TimeSpan.FromSeconds (5);
+
+    /// <summary>
     ///     ANSI response parser for handling escape sequences from the input stream.
     /// </summary>
     internal AnsiResponseParser<TInputRecord> Parser { get; }
@@ -67,6 +76,8 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         // Enable keyboard handling
         Parser.HandleKeyboard = true;
 
+        Parser.Paste += (_, text) => RaisePasteEvent (text);
+
         Parser.Keyboard += (_, keyEvent) =>
                            {
                                Key normalizedKeyEvent = OnKeyboardEventParsed (keyEvent);
@@ -88,11 +99,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
                                                // Check if this is an incomplete mouse sequence (timing issue when Run() blocks)
 
-                                               Logging.Warning ($"{
-                                                   nameof (InputProcessorImpl<TInputRecord>)
-                                               } ignored unrecognized response '{
-                                                   cur
-                                               }'. See https://github.com/gui-cs/Terminal.Gui/issues/4587");
+                                               Logging.Warning ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'. See https://github.com/gui-cs/Terminal.Gui/issues/4587");
 
                                                AnsiSequenceSwallowed?.Invoke (this, cur);
 
@@ -120,8 +127,29 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
             ProcessAfterParsing (input);
         }
 
+        FlushStaleBracketedPasteIfNeeded ();
+
         // Check for expired deferred clicks
         CheckForExpiredMouseClicks ();
+    }
+
+    private void FlushStaleBracketedPasteIfNeeded ()
+    {
+        if (Parser.State is not AnsiResponseParserState.InBracketedPaste
+            and not AnsiResponseParserState.DiscardingBracketedPasteRemainder)
+        {
+            return;
+        }
+
+        if (_timeProvider.Now - Parser.LastBracketedPasteInputAt < _bracketedPasteTimeout)
+        {
+            return;
+        }
+
+        Logging.Warning (
+                         $"{nameof (InputProcessorImpl<TInputRecord>)} abandoning stale bracketed-paste state after {_bracketedPasteTimeout.TotalSeconds}s without activity");
+
+        Parser.FlushStaleBracketedPaste ();
     }
 
     /// <summary>
@@ -337,6 +365,16 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     /// <inheritdoc/>
     public event EventHandler<string>? AnsiSequenceSwallowed;
+
+    #endregion
+
+    #region Paste Events
+
+    /// <inheritdoc/>
+    public event EventHandler<string>? Paste;
+
+    /// <inheritdoc/>
+    public void RaisePasteEvent (string text) => Paste?.Invoke (this, text);
 
     #endregion
 

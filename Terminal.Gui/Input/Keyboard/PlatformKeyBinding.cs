@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Terminal.Gui;
+namespace Terminal.Gui.Input;
 
 /// <summary>
 ///     Defines the keys for a single command, optionally varying by platform.
@@ -67,12 +67,12 @@ public record PlatformKeyBinding
         }
 
         Key []? platKeys = PlatformDetection.GetCurrentPlatform () switch
-                           {
-                               TuiPlatform.Windows => Windows,
-                               TuiPlatform.Linux => Linux,
-                               TuiPlatform.Macos => Macos,
-                               _ => null
-                           };
+        {
+            TuiPlatform.Windows => Windows,
+            TuiPlatform.Linux => Linux,
+            TuiPlatform.Macos => Macos,
+            _ => null
+        };
 
         if (platKeys is null)
         {

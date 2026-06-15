@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///     action.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/ListView.gif" alt="ListView demo"/>
 ///     <para>
 ///         The <see cref="ListView"/> displays lists of data and allows the user to scroll through the data. Items in
 ///         the can be activated firing an event (with the ENTER key or a mouse double-click). If the
@@ -58,7 +59,8 @@ namespace Terminal.Gui.Views;
 ///             <term>Home / End</term> <description>Moves to the first or last item.</description>
 ///         </item>
 ///         <item>
-///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///             <term>Shift+&lt;movement&gt;</term>
+///             <description>Extends the selection in the given direction.</description>
 ///         </item>
 ///         <item>
 ///             <term>Ctrl+A</term> <description>Selects all items.</description>
@@ -76,7 +78,8 @@ namespace Terminal.Gui.Views;
 ///             <term>Click</term> <description>Activates (selects) the clicked item.</description>
 ///         </item>
 ///         <item>
-///             <term>Double-Click</term> <description>Accepts the clicked item (<see cref="Command.Accept"/>).</description>
+///             <term>Double-Click</term>
+///             <description>Accepts the clicked item (<see cref="Command.Accept"/>).</description>
 ///         </item>
 ///         <item>
 ///             <term>Wheel Up / Down</term> <description>Scrolls the list.</description>
@@ -94,6 +97,25 @@ public partial class ListView : View, IDesignable, IValue<int?>
         CanFocus = true;
 
         SetupBindingsAndCommands ();
+    }
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item 3", "List Item Quattro", "Last List Item"]);
+        Source = source;
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,CursorDown,wait:400,CursorDown,wait:400,CursorUp,wait:800";
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        Source?.Dispose ();
+        base.Dispose (disposing);
     }
 
     #region IListDataSource
@@ -166,7 +188,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
             {
                 field.CollectionChanged += SourceOnCollectionChanged;
                 SetContentSize (new Size (EffectiveMaxItemLength, field?.Count ?? Viewport.Height));
-                KeystrokeNavigator.Collection = field?.ToList ();
+                KeystrokeNavigator?.Collection = field?.ToList ();
             }
 
             SelectedItem = null;
@@ -230,7 +252,10 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
 
-    /// <summary>INTERNAL: Gets the width reserved for mark rendering (checkbox and space).</summary>
+    /// <summary>
+    ///     INTERNAL: Gets the columns reserved for mark rendering (mark glyph + separator column). Wide glyphs may
+    ///     consume the separator column.
+    /// </summary>
     private int MarkWidth => ShowMarks ? 2 : 0;
 
     /// <summary>INTERNAL: Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
@@ -240,11 +265,30 @@ public partial class ListView : View, IDesignable, IValue<int?>
 
     #region Keystroke Navigation
 
+    private IListCollectionNavigator? _keystrokeNavigator = new CollectionNavigator ();
+
     /// <summary>
-    ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as the
-    ///     user types.
+    ///     Gets or sets the <see cref="CollectionNavigator"/> that searches the <see cref="ListView.Source"/> collection as
+    ///     the user types. The default implementation is a <see cref="CollectionNavigator"/> that uses the string
+    ///     representation of the items in the collection. Set to <see langword="null"/> to disable keystroke navigation.
     /// </summary>
-    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator ();
+    /// <remarks>
+    ///     When a new navigator is assigned, its <see cref="IListCollectionNavigator.Collection"/> is automatically
+    ///     synchronized with the current <see cref="Source"/>.
+    /// </remarks>
+    public IListCollectionNavigator? KeystrokeNavigator
+    {
+        get => _keystrokeNavigator;
+        set
+        {
+            _keystrokeNavigator = value;
+
+            if (_keystrokeNavigator is { } && Source is { })
+            {
+                _keystrokeNavigator.Collection = Source.ToList ();
+            }
+        }
+    }
 
     /// <inheritdoc/>
     protected override bool OnKeyDown (Key key)
@@ -257,7 +301,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
         }
 
         // Enable user to find & select an item by typing text
-        if (!KeystrokeNavigator.Matcher.IsCompatibleKey (key))
+        if (KeystrokeNavigator is null || !KeystrokeNavigator.Matcher.IsCompatibleKey (key))
         {
             return false;
         }
@@ -277,20 +321,4 @@ public partial class ListView : View, IDesignable, IValue<int?>
     }
 
     #endregion Keystroke Navigation
-
-    /// <inheritdoc/>
-    public bool EnableForDesign ()
-    {
-        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item 3", "List Item Quattro", "Last List Item"]);
-        Source = source;
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        Source?.Dispose ();
-        base.Dispose (disposing);
-    }
 }

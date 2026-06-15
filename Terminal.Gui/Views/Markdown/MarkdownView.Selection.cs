@@ -130,9 +130,22 @@ public partial class Markdown
 
         (Point start, Point end) = GetNormalizedSelection ();
         List<string> outputLines = [];
-        bool inCodeBlock = false;
-
+        var inCodeBlock = false;
         string? currentCodeLanguage = null;
+
+        // Fences are injected only when the selection crosses a code-block boundary:
+        //   • Opening fence: emitted when entering a code block after selected non-code
+        //     content, and also when transitioning directly to an adjacent selected code
+        //     block whose opening fence has not yet been written.
+        //   • Closing fence: always when the selection crosses out of the code block into
+        //     non-code content — regardless of whether an opening fence was emitted.
+        //   • No trailing fence: when the selection ends inside a code block, no closing
+        //     fence is added; the selection ends mid-block.
+        // This produces no fences for a selection entirely within a code block, matching
+        // the behaviour of the copy-button on MarkdownCodeBlock. codeOpenFenceEmitted
+        // tracks whether the current selected code block already has its opening fence.
+        var selectionHasNonCodeContent = false;
+        var codeOpenFenceEmitted = false;
 
         // Track the last table instance that was output.  All placeholder rows for the
         // same table share the same TableData reference, so we use ReferenceEquals to
@@ -150,29 +163,53 @@ public partial class Markdown
 
                 if (!inCodeBlock)
                 {
-                    // Entering a code block: inject the opening fence with optional language tag
-                    outputLines.Add ($"```{nextCodeLanguage ?? string.Empty}");
                     inCodeBlock = true;
                     currentCodeLanguage = nextCodeLanguage;
+
+                    // Only inject the opening fence when non-code content has already been
+                    // output — that is, the selection crosses from outside into this code block.
+                    if (selectionHasNonCodeContent)
+                    {
+                        outputLines.Add ($"```{nextCodeLanguage ?? string.Empty}");
+                        codeOpenFenceEmitted = true;
+                    }
+                    else
+                    {
+                        codeOpenFenceEmitted = false;
+                    }
                 }
                 else if (!string.Equals (currentCodeLanguage, nextCodeLanguage, StringComparison.Ordinal))
                 {
-                    // Transitioning directly between two code blocks: close the current fence
-                    // and open the next one so adjacent fenced blocks are preserved.
-                    outputLines.Add ("```");
+                    // Transitioning directly between two adjacent code blocks of different
+                    // languages: close the current fence (if opened) and open the next one.
+                    if (codeOpenFenceEmitted)
+                    {
+                        outputLines.Add ("```");
+                    }
+
                     outputLines.Add ($"```{nextCodeLanguage ?? string.Empty}");
+                    codeOpenFenceEmitted = true;
                     currentCodeLanguage = nextCodeLanguage;
                 }
             }
             else if (inCodeBlock)
             {
-                // Leaving a code block: inject the closing fence
+                // Leaving a code block into non-code content: always inject the closing fence.
+                // The selection crosses the block's end boundary regardless of whether the
+                // opening fence was emitted (e.g., when the selection started inside the block).
                 outputLines.Add ("```");
+
                 inCodeBlock = false;
+                codeOpenFenceEmitted = false;
                 currentCodeLanguage = null;
+                selectionHasNonCodeContent = true;
+            }
+            else
+            {
+                selectionHasNonCodeContent = true;
             }
 
-            if (line.IsTable && line.TableData is { } tableData)
+            if (line is { IsTable: true, TableData: { } tableData })
             {
                 // Each table occupies several zero-width placeholder rows that all share the
                 // same TableData instance.  Only reconstruct the table markdown the first time
@@ -195,11 +232,6 @@ public partial class Markdown
             StringBuilder lineSb = new ();
             AppendLineText (lineSb, line, lineStartX, lineEndX);
             outputLines.Add (lineSb.ToString ());
-        }
-
-        if (inCodeBlock)
-        {
-            outputLines.Add ("```");
         }
 
         return string.Join ("\n", outputLines);
@@ -236,13 +268,13 @@ public partial class Markdown
         yield return "| " + string.Join (" | ", tableData.Headers) + " |";
 
         // Separator row — encode column alignment
-        IEnumerable<string> separators = tableData.ColumnAlignments.Select (
-            alignment => alignment switch
-            {
-                Alignment.Center => ":---:",
-                Alignment.End    => "---:",
-                _                => "---"
-            });
+        IEnumerable<string> separators = tableData.ColumnAlignments.Select (alignment => alignment switch
+                                                                                         {
+                                                                                             Alignment.Center => ":---:",
+                                                                                             Alignment.End => "---:",
+                                                                                             _ => "---"
+                                                                                         });
+
         yield return "| " + string.Join (" | ", separators) + " |";
 
         // Body rows
@@ -258,11 +290,7 @@ public partial class Markdown
 
         foreach (StyledSegment segment in line.Segments)
         {
-            // Translate the display bullet character back to standard markdown list syntax.
-            // The ListMarker may be "• " (plain), "• [x] " (done task), or "• [ ] " (open task).
-            string text = segment.StyleRole == MarkdownStyleRole.ListMarker && segment.Text.StartsWith ("• ")
-                              ? "- " + segment.Text [2..]
-                              : segment.Text;
+            string text = segment.StyleRole == MarkdownStyleRole.ListMarker ? TranslateListMarkerText (segment.Text) : segment.Text;
 
             foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
             {
@@ -286,6 +314,36 @@ public partial class Markdown
         }
     }
 
+    /// <summary>Converts rendered list marker text back to Markdown source marker text for selection and clipboard operations.</summary>
+    /// <param name="text">The rendered list marker text.</param>
+    /// <returns>The Markdown source marker text, or <paramref name="text"/> when it is not a rendered list marker.</returns>
+    private static string TranslateListMarkerText (string text)
+    {
+        const string BULLET_PREFIX = "• ";
+
+        if (!text.StartsWith (BULLET_PREFIX, StringComparison.Ordinal))
+        {
+            return text;
+        }
+
+        string remainder = text [BULLET_PREFIX.Length..];
+
+        var checkedGlyph = $"{Glyphs.CheckStateChecked} ";
+        var uncheckedGlyph = $"{Glyphs.CheckStateUnChecked} ";
+
+        if (remainder.StartsWith (checkedGlyph, StringComparison.Ordinal))
+        {
+            return "- [x] " + remainder [checkedGlyph.Length..];
+        }
+
+        if (remainder.StartsWith (uncheckedGlyph, StringComparison.Ordinal))
+        {
+            return "- [ ] " + remainder [uncheckedGlyph.Length..];
+        }
+
+        return "- " + remainder;
+    }
+
     private int GetLineDisplayWidth (int lineIdx)
     {
         if (lineIdx < 0 || lineIdx >= _renderedLines.Count)
@@ -300,7 +358,15 @@ public partial class Markdown
     {
         DisposeContextMenu ();
 
-        PopoverMenu menu = new ([new MenuItem (this, Command.SelectAll), new MenuItem (this, Command.Copy)])
+        List<View?> menuItems = [new MenuItem (this, Command.SelectAll), new MenuItem (this, Command.Copy)];
+
+        if (_contextMenuLinkUrl is { } url)
+        {
+            menuItems.Insert (0, null);
+            menuItems.Insert (0, new MenuItem ("Copy _Link", action: () => App?.Clipboard?.TrySetClipboardData (url)));
+        }
+
+        PopoverMenu menu = new (menuItems)
         {
 #if DEBUG
             Id = "markdownContextMenu"
@@ -340,6 +406,15 @@ public partial class Markdown
 
     private bool ShowContextMenu (Point? screenPosition = null)
     {
+        if (screenPosition is { } pos)
+        {
+            Point viewportPos = ScreenToViewport (pos);
+            int contentX = Viewport.X + viewportPos.X;
+            int contentY = Viewport.Y + viewportPos.Y;
+            _contextMenuLinkUrl = FindLinkUrlAt (contentX, contentY);
+            CreateContextMenu ();
+        }
+
         Point menuPosition = screenPosition ?? GetContextMenuScreenPosition ();
         ContextMenu?.MakeVisible (menuPosition);
 

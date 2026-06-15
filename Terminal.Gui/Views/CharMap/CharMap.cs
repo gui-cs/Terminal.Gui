@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///     A scrollable map of the Unicode codepoints.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/CharMap.gif" alt="CharMap demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>
@@ -61,6 +62,10 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
     // ReSharper disable once InconsistentNaming
     private static readonly int MAX_CODE_POINT = UnicodeRange.Ranges.Max (r => r.End);
+    private static readonly int MAX_ROW = MAX_CODE_POINT / 16;
+    private const int SURROGATE_ROW_START = 0xD800 / 16;
+    private const int SURROGATE_ROW_END = 0xDFFF / 16;
+    private const int SURROGATE_ROW_COUNT = SURROGATE_ROW_END - SURROGATE_ROW_START + 1;
 
     /// <summary>
     ///     Initializes a new instance.
@@ -147,16 +152,29 @@ public class CharMap : View, IDesignable, IValue<Rune>
         Cursor = new Cursor { Style = DefaultCursorStyle };
     }
 
-    // Visible rows management: each entry is the starting code point of a 16-wide row
-    private readonly List<int> _visibleRowStarts = [];
-    private readonly Dictionary<int, int> _rowStartToVisibleIndex = [];
+    // Visible rows management when filtering by Unicode category.
+    private List<int>? _visibleRowStarts;
+    private Dictionary<int, int>? _rowStartToVisibleIndex;
 
     private void RebuildVisibleRows ()
     {
+        if (!ShowUnicodeCategory.HasValue)
+        {
+            _visibleRowStarts = null;
+            _rowStartToVisibleIndex = null;
+            SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, VisibleRowCount * _rowHeight + HEADER_HEIGHT));
+            VerticalScrollBar.ScrollableContentSize = GetContentHeight ();
+
+            return;
+        }
+
+        _visibleRowStarts ??= [];
+        _rowStartToVisibleIndex ??= [];
+
         _visibleRowStarts.Clear ();
         _rowStartToVisibleIndex.Clear ();
 
-        int maxRow = MAX_CODE_POINT / 16;
+        int maxRow = MAX_ROW;
 
         for (var row = 0; row <= maxRow; row++)
         {
@@ -208,17 +226,107 @@ public class CharMap : View, IDesignable, IValue<Rune>
         }
 
         // Update content size to match visible rows
-        SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, _visibleRowStarts.Count * _rowHeight + HEADER_HEIGHT));
+        SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, VisibleRowCount * _rowHeight + HEADER_HEIGHT));
 
         // Keep vertical scrollbar aligned with new content size
         VerticalScrollBar.ScrollableContentSize = GetContentHeight ();
+    }
+
+    private int VisibleRowCount
+    {
+        get
+        {
+            if (ShowUnicodeCategory.HasValue)
+            {
+                return _visibleRowStarts?.Count ?? 0;
+            }
+
+            int rowCount = MAX_ROW + 1;
+
+            if (MAX_ROW >= SURROGATE_ROW_START)
+            {
+                rowCount -= Math.Min (MAX_ROW, SURROGATE_ROW_END) - SURROGATE_ROW_START + 1;
+            }
+
+            return rowCount;
+        }
     }
 
     private int VisibleRowIndexForCodePoint (int codePoint)
     {
         int start = codePoint / 16 * 16;
 
-        return _rowStartToVisibleIndex.GetValueOrDefault (start, -1);
+        if (ShowUnicodeCategory.HasValue)
+        {
+            return _rowStartToVisibleIndex?.GetValueOrDefault (start, -1) ?? -1;
+        }
+
+        int row = start / 16;
+
+        if (row > MAX_ROW || row is >= SURROGATE_ROW_START and <= SURROGATE_ROW_END)
+        {
+            return -1;
+        }
+
+        return row > SURROGATE_ROW_END ? row - SURROGATE_ROW_COUNT : row;
+    }
+
+    private bool TryGetVisibleRowStart (int visibleRow, out int rowStart)
+    {
+        if (visibleRow < 0 || visibleRow >= VisibleRowCount)
+        {
+            rowStart = 0;
+
+            return false;
+        }
+
+        if (ShowUnicodeCategory.HasValue)
+        {
+            rowStart = _visibleRowStarts! [visibleRow];
+
+            return true;
+        }
+
+        int row = visibleRow >= SURROGATE_ROW_START ? visibleRow + SURROGATE_ROW_COUNT : visibleRow;
+        rowStart = row * 16;
+
+        return rowStart <= MAX_CODE_POINT;
+    }
+
+    private bool TryGetNearestVisibleRowStart (int desiredRowStart, out int rowStart)
+    {
+        if (ShowUnicodeCategory.HasValue)
+        {
+            List<int>? visibleRowStarts = _visibleRowStarts;
+            int idx = visibleRowStarts?.FindIndex (s => s >= desiredRowStart) ?? -1;
+
+            if (idx < 0 && visibleRowStarts?.Count > 0)
+            {
+                idx = visibleRowStarts.Count - 1;
+            }
+
+            if (idx >= 0)
+            {
+                rowStart = visibleRowStarts! [idx];
+
+                return true;
+            }
+
+            rowStart = 0;
+
+            return false;
+        }
+
+        int row = Math.Clamp (desiredRowStart / 16, 0, MAX_ROW);
+
+        if (row is >= SURROGATE_ROW_START and <= SURROGATE_ROW_END)
+        {
+            row = SURROGATE_ROW_END + 1;
+        }
+
+        rowStart = Math.Min (row * 16, MAX_CODE_POINT);
+
+        return true;
     }
 
     private int _rowHeight = 1; // Height of each row of 16 glyphs - changing this is not tested
@@ -356,19 +464,11 @@ public class CharMap : View, IDesignable, IValue<Rune>
             // Ensure selection is on a visible row
             int desiredRowStart = SelectedCodePoint / 16 * 16;
 
-            if (!_rowStartToVisibleIndex.ContainsKey (desiredRowStart))
+            if (VisibleRowIndexForCodePoint (desiredRowStart) < 0)
             {
-                // Find nearest visible row (prefer next; fallback to last)
-                int idx = _visibleRowStarts.FindIndex (s => s >= desiredRowStart);
-
-                if (idx < 0 && _visibleRowStarts.Count > 0)
+                if (TryGetNearestVisibleRowStart (desiredRowStart, out int rowStart))
                 {
-                    idx = _visibleRowStarts.Count - 1;
-                }
-
-                if (idx >= 0)
-                {
-                    SelectedCodePoint = _visibleRowStarts [idx];
+                    SelectedCodePoint = rowStart;
                 }
             }
 
@@ -559,14 +659,13 @@ public class CharMap : View, IDesignable, IValue<Rune>
         };
         dlg.Add (label);
 
-        TextView json = new ()
+        Code json = new ()
         {
             X = 0,
             Y = Pos.Bottom (label),
             Width = Dim.Fill (0, 60),
             Height = Dim.Fill (0, 5),
-            ReadOnly = true,
-            WordWrap = true,
+            Language = "json",
             Text = decResponse
         };
 
@@ -692,7 +791,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
             // Which visible row is this?
             int visibleRow = (y + Viewport.Y - 1) / _rowHeight;
 
-            if (visibleRow < 0 || visibleRow >= _visibleRowStarts.Count)
+            if (!TryGetVisibleRowStart (visibleRow, out int rowStart))
             {
                 // No row at this y; clear label area and continue
                 Move (0, y);
@@ -700,8 +799,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
                 continue;
             }
-
-            int rowStart = _visibleRowStarts [visibleRow];
 
             // Draw the row label (U+XXXX_)
             SetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
@@ -1042,7 +1139,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
         int visibleRow = (position.Y - 1 - -Viewport.Y) / _rowHeight;
 
-        if (visibleRow < 0 || visibleRow >= _visibleRowStarts.Count)
+        if (!TryGetVisibleRowStart (visibleRow, out int rowStart))
         {
             codePoint = 0;
 
@@ -1056,7 +1153,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
             col = 15;
         }
 
-        codePoint = _visibleRowStarts [visibleRow] + col;
+        codePoint = rowStart + col;
 
         if (codePoint > MAX_CODE_POINT)
         {
@@ -1067,6 +1164,9 @@ public class CharMap : View, IDesignable, IValue<Rune>
     }
 
     #endregion Mouse Handling
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:300," + string.Join (",", Enumerable.Repeat ("PageDown,wait:100", 40)) + ",wait:500,Shift+F10,wait:1500";
 }
 
 /// <summary>

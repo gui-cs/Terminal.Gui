@@ -62,7 +62,7 @@ dotnet run
 ### Key Resources
 - **App Building Guide**: [.claude/tasks/build-app.md](.claude/tasks/build-app.md)
 - **Common Patterns**: [.claude/cookbook/common-patterns.md](.claude/cookbook/common-patterns.md)
-- **Examples**: `Examples/Example/` (minimal), `Examples/UICatalog/` (comprehensive)
+- **Examples**: `Examples/UICatalog/`, `Examples/ScenarioRunner/`, and [gui-cs/Examples](https://github.com/gui-cs/Examples)
 
 ### API Reference (Compressed)
 | Namespace | Contents |
@@ -84,7 +84,7 @@ dotnet run
 **Terminal.Gui** - Cross-platform console UI toolkit for .NET (C# 14, net10.0)
 
 **Build:** `dotnet restore && dotnet build --no-restore`
-**Test:** `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`
+**Test:** `dotnet test --project Tests/UnitTestsParallelizable --no-build && dotnet test --project Tests/UnitTests.NonParallelizable --no-build`
 **Details:** [Build & Test Workflow](.claude/workflows/build-test-workflow.md)
 
 ### xUnit v3 Test Filtering (Microsoft Testing Platform)
@@ -134,6 +134,8 @@ Consult these files in `.claude/rules/` before editing code:
 - [Code Layout](/.claude/rules/code-layout.md) - Member ordering, backing fields
 - [Testing Patterns](/.claude/rules/testing-patterns.md) - Test writing conventions
 - [API Documentation](/.claude/rules/api-documentation.md) - XML doc requirements
+- [Logging & Tracing](/.claude/rules/logging-tracing.md) - No Console.WriteLine; use Logging/TestLogging/Trace
+- [Fragile Areas](/.claude/rules/fragile-areas.md) - Code that must not be refactored in passing
 
 ## Workflows
 
@@ -142,10 +144,14 @@ Process guides in `.claude/workflows/`:
 - [Build & Test Workflow](/.claude/workflows/build-test-workflow.md) - Build, test, and troubleshooting
 - [PR Workflow](/.claude/workflows/pr-workflow.md) - Submitting pull requests
 
+## Visual Verification (Agent Eyes)
+
+Don't ship UI changes blind. Use [`tuirec`](https://github.com/gui-cs/tuirec) to run any Terminal.Gui app in a PTY, inject keystrokes, and capture the result — see [Scripts/tuirec/README.md](Scripts/tuirec/README.md). The `.cast` output is asciinema v2 JSON (plain text): read it back to verify what actually rendered. The `.gif` is for humans — attach it to PRs that change visuals. For deterministic in-process assertions, use `InputInjector`/`VirtualTimeProvider` (`docfx/docs/input-injection.md`).
+
 ## Planning Mode
 
 When creating implementation plans:
-- **Create plan files in `./plans/`** (relative to repository root: `D:\s\gui-cs\Terminal.Gui\plans\`)
+- **Create plan files in `./plans/`** (relative to the repository root)
 - Use markdown format with clear sections
 - Include: problem statement, implementation steps, file changes, verification steps
 - Reference existing patterns and reuse opportunities from exploration
@@ -385,7 +391,7 @@ Implementing `IValue<T>` requires `ValueChanging`, `ValueChanged`, and `ValueCha
 |Button|Class|Text,Accept event,IsDefault
 |Label|Class|Text display,TextAlignment
 |TextField|Class|Single-line input,Text,Secret
-|TextView|Class|Multi-line editor,Text,ReadOnly
+|Editor|Class|Multi-line editor,Text,ReadOnly
 |CheckBox|Class|CheckedState,AllowCheckStateNone
 |DropDownList|Class|Dropdown,Source,SelectedItem
 |ProgressBar|Class|Fraction,BidirectionalMarquee
@@ -503,7 +509,6 @@ Implementing `IValue<T>` requires `ValueChanging`, `ValueChanged`, and `ValueCha
 |IFileOperations|Interface|GetFiles,GetDirectories,Exists
 |FileSystemTreeBuilder|Class|Build file trees
 ```
-
 
 
 

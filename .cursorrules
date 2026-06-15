@@ -35,7 +35,7 @@ Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data about Terminal
 dotnet restore
 dotnet build --no-restore
 dotnet test --project Tests/UnitTestsParallelizable --no-build
-dotnet test --project Tests/UnitTests --no-build
+dotnet test --project Tests/UnitTests.NonParallelizable --no-build
 ```
 
 ---
@@ -122,4 +122,4 @@ Input flows: Driver → `IInputProcessor` → `KeyBindings`/`MouseBindings` → 
 | Common UI patterns | `.claude/cookbook/common-patterns.md` |
 | App building guide | `.claude/tasks/build-app.md` |
 | Deep-dive docs | `docfx/docs/` |
-| Working examples | `Examples/Example/`, `Examples/UICatalog/` |
+| Working examples | `Examples/UICatalog/`, `Examples/ScenarioRunner/`, `gui-cs/Examples` |

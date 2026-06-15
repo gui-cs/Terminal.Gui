@@ -78,7 +78,7 @@ internal static class UnixIOHelper
     /// <param name="timeout">Timeout in milliseconds (0 = non-blocking, -1 = infinite)</param>
     /// <returns>Number of file descriptors with events, or -1 on error</returns>
     [DllImport ("libc", SetLastError = true)]
-    public static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
+    public static extern int poll ([In][Out] Pollfd [] ufds, uint nfds, int timeout);
 
     /// <summary>
     ///     Read bytes from a file descriptor.
@@ -236,7 +236,20 @@ internal static class UnixIOHelper
         {
             int n = poll (pollMap, (uint)pollMap.Length, timeoutMs);
 
-            return n > 0;
+            if (n <= 0)
+            {
+                return false;
+            }
+
+            foreach (Pollfd pollfd in pollMap)
+            {
+                if ((pollfd.revents & (short)Condition.PollIn) != 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         catch
         {
@@ -245,7 +258,7 @@ internal static class UnixIOHelper
     }
 
     /// <summary>
-    ///     Reads bytes from stdin.
+    ///     Reads bytes from stdin (or the controlling TTY when stdin is redirected).
     /// </summary>
     /// <param name="buffer">Buffer to read into</param>
     /// <param name="bytesRead">Number of bytes actually read</param>
@@ -254,7 +267,16 @@ internal static class UnixIOHelper
     {
         try
         {
-            bytesRead = read (STDIN_FILENO, buffer, buffer.Length);
+            int fd = TerminalDevice.InputFd;
+
+            if (fd < 0)
+            {
+                bytesRead = 0;
+
+                return false;
+            }
+
+            bytesRead = read (fd, buffer, buffer.Length);
 
             return bytesRead >= 0;
         }
@@ -267,7 +289,7 @@ internal static class UnixIOHelper
     }
 
     /// <summary>
-    ///     Writes bytes to stdout.
+    ///     Writes bytes to stdout (or the controlling TTY when stdout is redirected).
     /// </summary>
     /// <param name="buffer">Buffer containing data to write</param>
     /// <returns>True if write was successful, false otherwise</returns>
@@ -275,7 +297,14 @@ internal static class UnixIOHelper
     {
         try
         {
-            int written = write (STDOUT_FILENO, buffer, buffer.Length);
+            int fd = TerminalDevice.OutputFd;
+
+            if (fd < 0)
+            {
+                return false;
+            }
+
+            int written = write (fd, buffer, buffer.Length);
 
             return written >= 0;
         }
@@ -305,14 +334,21 @@ internal static class UnixIOHelper
     }
 
     /// <summary>
-    ///     Flushes the stdin input queue.
+    ///     Flushes the stdin (or controlling TTY) input queue.
     /// </summary>
     /// <returns>True if flush was successful, false otherwise</returns>
     public static bool TryFlushStdin ()
     {
         try
         {
-            return tcflush (STDIN_FILENO, TCIFLUSH) == 0;
+            int fd = TerminalDevice.InputFd;
+
+            if (fd < 0)
+            {
+                return false;
+            }
+
+            return tcflush (fd, TCIFLUSH) == 0;
         }
         catch
         {
@@ -321,12 +357,19 @@ internal static class UnixIOHelper
     }
 
     /// <summary>
-    ///     Waits until all output written to stdout has been transmitted to the terminal.
+    ///     Waits until all output written to stdout (or the controlling TTY) has been transmitted to the terminal.
     ///     Prefers <c>tcdrain</c>; falls back to <c>fsync</c>.
     /// </summary>
     public static void FlushStdout ()
     {
-        if (tcdrain (STDOUT_FILENO) == 0)
+        int fd = TerminalDevice.OutputFd;
+
+        if (fd < 0)
+        {
+            return;
+        }
+
+        if (tcdrain (fd) == 0)
         {
             return;
         }
@@ -334,7 +377,7 @@ internal static class UnixIOHelper
         // fallback
         try
         {
-            fsync (STDOUT_FILENO);
+            fsync (fd);
         }
         catch
         {
@@ -350,7 +393,7 @@ internal static class UnixIOHelper
     public static bool IsTerminal (int fd) => isatty (fd) == 1;
 
     /// <summary>
-    ///     Gets the terminal size using ioctl.
+    ///     Gets the terminal size using ioctl on the controlling output device.
     /// </summary>
     /// <param name="size">Output size (width, height)</param>
     /// <returns>True if size was retrieved successfully, false otherwise</returns>
@@ -358,13 +401,22 @@ internal static class UnixIOHelper
     {
         try
         {
+            int fd = TerminalDevice.OutputFd;
+
+            if (fd < 0)
+            {
+                size = new Size (80, 25);
+
+                return false;
+            }
+
             var ioctlResult = 0;
             WinSize ws;
 
             if (RuntimeInformation.OSArchitecture == Architecture.Arm64
                 && (RuntimeInformation.IsOSPlatform (OSPlatform.OSX) || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD)))
             {
-                ioctlResult = ioctl_arm64 (STDOUT_FILENO,
+                ioctlResult = ioctl_arm64 (fd,
                                            TIOCGWINSZ,
                                            0,
                                            0,
@@ -376,7 +428,7 @@ internal static class UnixIOHelper
             }
             else
             {
-                ioctlResult = ioctl (STDOUT_FILENO, TIOCGWINSZ, out ws);
+                ioctlResult = ioctl (fd, TIOCGWINSZ, out ws);
             }
 
             if (ioctlResult == 0)
@@ -400,13 +452,21 @@ internal static class UnixIOHelper
     }
 
     /// <summary>
-    ///     Creates a poll map for monitoring stdin.
+    ///     Creates a poll map for monitoring terminal input (stdin or the controlling TTY when stdin is redirected).
     /// </summary>
+    /// <remarks>
+    ///     When <see cref="TerminalDevice.InputFd"/> reports no terminal device (-1), this method
+    ///     still returns a poll map populated with <see cref="STDIN_FILENO"/> rather than returning
+    ///     <see langword="null"/>. The fd will be invalid and <c>poll</c> will report
+    ///     <c>POLLNVAL</c>, so no input will be consumed; this preserves the non-null contract
+    ///     callers (e.g. <c>AnsiInput</c>) rely on for the lifetime of the input loop.
+    /// </remarks>
     /// <returns>Initialized Pollfd array</returns>
     public static Pollfd [] CreateStdinPollMap ()
     {
         Pollfd [] pollMap = new Pollfd [1];
-        pollMap [0].fd = STDIN_FILENO;
+        int fd = TerminalDevice.InputFd;
+        pollMap [0].fd = fd >= 0 ? fd : STDIN_FILENO;
         pollMap [0].events = (short)Condition.PollIn;
 
         return pollMap;

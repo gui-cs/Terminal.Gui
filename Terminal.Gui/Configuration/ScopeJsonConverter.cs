@@ -5,8 +5,6 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Terminal.Gui.Drawing;
-using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Configuration;
 
@@ -16,21 +14,23 @@ namespace Terminal.Gui.Configuration;
 /// </summary>
 /// <typeparam name="TScopeT"></typeparam>
 internal class ScopeJsonConverter<
-    [DynamicallyAccessedMembers (
-                                    DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
-                                    | DynamicallyAccessedMemberTypes.PublicProperties)]
-    TScopeT> : JsonConverter<TScopeT>
-    where TScopeT : Scope<TScopeT>
+    [DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
+                                 | DynamicallyAccessedMemberTypes.PublicProperties)]
+TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
 {
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Arbitrary property-level converter fallback is guarded by RuntimeFeature.IsDynamicCodeSupported and is unreachable under NativeAOT.")]
-    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "Arbitrary property-level converter fallback is only used when a consumer opts into a custom property-level JsonConverter on JIT-supported runtimes.")]
+    [UnconditionalSuppressMessage ("AOT",
+                                   "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                   Justification =
+                                       "Arbitrary property-level converter fallback is guarded by RuntimeFeature.IsDynamicCodeSupported and is unreachable under NativeAOT.")]
+    [UnconditionalSuppressMessage ("Trimming",
+                                   "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+                                   Justification =
+                                       "Arbitrary property-level converter fallback is only used when a consumer opts into a custom property-level JsonConverter on JIT-supported runtimes.")]
     public override TScopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
-            throw new JsonException (
-                                     $$"""Expected a JSON object ("{ "propName" : ... }"), but got "{{reader.TokenType}}"."""
-                                    );
+            throw new JsonException ($$"""Expected a JSON object ("{ "propName" : ... }"), but got "{{reader.TokenType}}".""");
         }
 
         var scope = (TScopeT)Activator.CreateInstance (typeof (TScopeT))!;
@@ -89,16 +89,11 @@ internal class ScopeJsonConverter<
                         continue;
                     }
 
-                    throw new JsonException (
-                                             $"{propertyName}: Unsupported configuration converter type \"{converterType.FullName}\" when dynamic code is unavailable."
-                                            );
+                    throw new JsonException ($"{propertyName}: Unsupported configuration converter type \"{converterType.FullName}\" when dynamic code is unavailable.");
                 }
-                else
-                {
-                    scope! [propertyName].PropertyValue = DeserializePropertyValue (ref reader, propertyType!, options);
-                }
+                scope! [propertyName].PropertyValue = DeserializePropertyValue (ref reader, propertyType!, options);
 
-                //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
+                // Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
             }
             else
             {
@@ -107,33 +102,29 @@ internal class ScopeJsonConverter<
                 // If so, don't add it to the dictionary but apply it to the underlying property on
                 // the scopeT.
                 // BUGBUG: This is terrible design. The only time it's used is for $schema though.
-                PropertyInfo? property = typeof (TScopeT)
-                                               .GetProperties ()
-                                               .Where (p =>
-                                                       {
-                                                            if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
-                                                           {
-                                                               var jsonPropertyNameAttribute =
-                                                                   p.GetCustomAttribute (
-                                                                                         typeof (JsonPropertyNameAttribute)
-                                                                                        ) as
-                                                                       JsonPropertyNameAttribute;
+                PropertyInfo? property = typeof (TScopeT).GetProperties ()
+                                                         .Where (p =>
+                                                                 {
+                                                                     if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
+                                                                     {
+                                                                         var jsonPropertyNameAttribute =
+                                                                             p.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as
+                                                                                 JsonPropertyNameAttribute;
 
-                                                               if (jsonPropertyNameAttribute?.Name == propertyName)
-                                                               {
-                                                                   // Bit of a hack, modifying propertyName in an enumerator...
-                                                                   propertyName = p.Name;
+                                                                         if (jsonPropertyNameAttribute?.Name == propertyName)
+                                                                         {
+                                                                             // Bit of a hack, modifying propertyName in an enumerator...
+                                                                             propertyName = p.Name;
 
-                                                                   return true;
-                                                               }
+                                                                             return true;
+                                                                         }
 
-                                                               return p.Name == propertyName;
-                                                           }
+                                                                         return p.Name == propertyName;
+                                                                     }
 
-                                                           return false;
-                                                       }
-                                                      )
-                                               .FirstOrDefault ();
+                                                                     return false;
+                                                                 })
+                                                         .FirstOrDefault ();
 
                 if (property is { })
                 {
@@ -155,17 +146,19 @@ internal class ScopeJsonConverter<
         throw new JsonException ($"{propertyName}: Json error in ScopeJsonConverter");
     }
 
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Arbitrary property-level converter fallback is guarded by RuntimeFeature.IsDynamicCodeSupported and is unreachable under NativeAOT.")]
-    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "Arbitrary property-level converter fallback is only used when a consumer opts into a custom property-level JsonConverter on JIT-supported runtimes.")]
+    [UnconditionalSuppressMessage ("AOT",
+                                   "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                   Justification =
+                                       "Arbitrary property-level converter fallback is guarded by RuntimeFeature.IsDynamicCodeSupported and is unreachable under NativeAOT.")]
+    [UnconditionalSuppressMessage ("Trimming",
+                                   "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+                                   Justification =
+                                       "Arbitrary property-level converter fallback is only used when a consumer opts into a custom property-level JsonConverter on JIT-supported runtimes.")]
     public override void Write (Utf8JsonWriter writer, TScopeT scope, JsonSerializerOptions options)
     {
         writer.WriteStartObject ();
 
-        IEnumerable<PropertyInfo> properties = typeof (TScopeT)
-                                                     .GetProperties ()
-                                                     .Where (p => p.GetCustomAttribute (typeof (JsonIncludeAttribute))
-                                                                  != null
-                                                            );
+        IEnumerable<PropertyInfo> properties = typeof (TScopeT).GetProperties ().Where (p => p.GetCustomAttribute (typeof (JsonIncludeAttribute)) != null);
 
         foreach (PropertyInfo p in properties)
         {
@@ -174,10 +167,9 @@ internal class ScopeJsonConverter<
             JsonSerializer.Serialize (writer, prop, p.PropertyType, ConfigurationManager.SerializerContext);
         }
 
-        foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
-                                                               .Where (cp => cp.Value.ScopeType == typeof (TScopeT).Name)
-                                                             where p.Value.HasValue
-                                                             select p)
+        foreach (KeyValuePair<string, ConfigProperty> p in from p in scope.Where (cp => cp.Value.ScopeType == typeof (TScopeT).Name)
+                                                           where p.Value.HasValue
+                                                           select p)
         {
             Type? propertyType = p.Value.PropertyInfo?.PropertyType;
             object? propertyValue = p.Value.PropertyValue;
@@ -189,8 +181,7 @@ internal class ScopeJsonConverter<
 
             writer.WritePropertyName (p.Key);
 
-            if (propertyType != null
-                && p.Value.ConverterType is { } converterType)
+            if (propertyType != null && p.Value.ConverterType is { } converterType)
             {
                 if (propertyValue is null)
                 {
@@ -209,46 +200,127 @@ internal class ScopeJsonConverter<
                     continue;
                 }
 
-                throw new JsonException (
-                                          $"{p.Key}: Unsupported configuration converter type \"{converterType.FullName}\" when dynamic code is unavailable."
-                                         );
+                throw new JsonException ($"{p.Key}: Unsupported configuration converter type \"{converterType.FullName}\" when dynamic code is unavailable.");
+            }
+            object? prop = propertyValue;
+
+            if (prop == null)
+            {
+                writer.WriteNullValue ();
             }
             else
             {
-                object? prop = propertyValue;
-
-                if (prop == null)
+                if (TryWriteEnumValue (writer, prop.GetType (), prop))
                 {
-                    writer.WriteNullValue ();
+                    continue;
                 }
-                else
+
+                JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (prop.GetType ());
+
+                if (jsonTypeInfo is null)
                 {
-                    if (TryWriteEnumValue (writer, prop.GetType (), prop))
-                    {
-                        continue;
-                    }
-
-                    JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (prop.GetType ());
-
-                    if (jsonTypeInfo is null)
-                    {
-                        throw new JsonException ($"{p.Key}: No source-generated JsonTypeInfo is registered for {prop.GetType ().FullName}.");
-                    }
-
-                    JsonSerializer.Serialize (writer, prop, jsonTypeInfo);
+                    throw new JsonException ($"{p.Key}: No source-generated JsonTypeInfo is registered for {prop.GetType ().FullName}.");
                 }
+
+                JsonSerializer.Serialize (writer, prop, jsonTypeInfo);
             }
         }
 
         writer.WriteEndObject ();
     }
 
-    private static bool TryReadWithKnownConverter (
-        ref Utf8JsonReader reader,
-        Type propertyType,
-        Type converterType,
-        JsonSerializerOptions options,
-        out object? value)
+    private static bool CanAcceptNullValue (Type propertyType) => !propertyType.IsValueType || Nullable.GetUnderlyingType (propertyType) is { };
+
+    private static object? DeserializePropertyValue (ref Utf8JsonReader reader, Type propertyType, JsonSerializerOptions options)
+    {
+        Type? nullableType = Nullable.GetUnderlyingType (propertyType);
+        Type enumType = nullableType ?? propertyType;
+
+        if (enumType.IsEnum)
+        {
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                return Enum.Parse (enumType, reader.GetString ()!, true);
+            }
+
+            if (reader.TokenType == JsonTokenType.Null && nullableType is { })
+            {
+                return null;
+            }
+        }
+
+        JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (propertyType);
+
+        if (jsonTypeInfo is null)
+        {
+            throw new JsonException ($"{propertyType.FullName}: No source-generated JsonTypeInfo is registered for this configuration property type.");
+        }
+
+        return JsonSerializer.Deserialize (ref reader, jsonTypeInfo);
+    }
+
+    private static bool ShouldSkipNullPropertyValue (Type? propertyType, object? propertyValue)
+    {
+        if (propertyValue is { })
+        {
+            return false;
+        }
+
+        if (propertyType is null)
+        {
+            return false;
+        }
+
+        return propertyType.IsValueType && Nullable.GetUnderlyingType (propertyType) is null;
+    }
+
+    [RequiresDynamicCode ("Instantiates arbitrary property-level JsonConverter types for JIT-only configuration paths.")]
+    [RequiresUnreferencedCode ("Arbitrary property-level JsonConverter types may access unreferenced members.")]
+    private static bool TryReadWithDynamicConverter (ref Utf8JsonReader reader,
+                                                     Type propertyType,
+                                                     Type converterType,
+                                                     JsonSerializerOptions options,
+                                                     out object? value)
+    {
+        if (!RuntimeFeature.IsDynamicCodeSupported)
+        {
+            value = null;
+
+            return false;
+        }
+
+        object converter = Activator.CreateInstance (converterType)!;
+
+        if (converter is JsonConverterFactory factory && factory.CanConvert (propertyType))
+        {
+            converter = factory.CreateConverter (propertyType, options)!;
+        }
+
+        try
+        {
+            Type helperType = typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType);
+            var readHelper = (ReadHelper)Activator.CreateInstance (helperType, converter)!;
+            value = readHelper.Read (ref reader, propertyType, options);
+
+            return true;
+        }
+        catch (NotSupportedException e)
+        {
+            throw new JsonException ($"{propertyType.Name}: Error reading property with converter \"{converterType.FullName}\".", e);
+        }
+        catch (TargetInvocationException)
+        {
+            value = JsonSerializer.Deserialize (ref reader, propertyType, options);
+
+            return true;
+        }
+    }
+
+    private static bool TryReadWithKnownConverter (ref Utf8JsonReader reader,
+                                                   Type propertyType,
+                                                   Type converterType,
+                                                   JsonSerializerOptions options,
+                                                   out object? value)
     {
         if (converterType == typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))
         {
@@ -276,92 +348,23 @@ internal class ScopeJsonConverter<
         return false;
     }
 
-    [RequiresDynamicCode ("Instantiates arbitrary property-level JsonConverter types for JIT-only configuration paths.")]
-    [RequiresUnreferencedCode ("Arbitrary property-level JsonConverter types may access unreferenced members.")]
-    private static bool TryReadWithDynamicConverter (
-        ref Utf8JsonReader reader,
-        Type propertyType,
-        Type converterType,
-        JsonSerializerOptions options,
-        out object? value)
+    private static bool TryWriteEnumValue (Utf8JsonWriter writer, Type propertyType, object value)
     {
-        if (!RuntimeFeature.IsDynamicCodeSupported)
-        {
-            value = null;
+        Type enumType = Nullable.GetUnderlyingType (propertyType) ?? propertyType;
 
+        if (!enumType.IsEnum)
+        {
             return false;
         }
 
-        object converter = Activator.CreateInstance (converterType)!;
+        writer.WriteStringValue (value.ToString ());
 
-        if (converter is JsonConverterFactory factory && factory.CanConvert (propertyType))
-        {
-            converter = factory.CreateConverter (propertyType, options)!;
-        }
-
-        try
-        {
-            Type helperType = typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType);
-            ReadHelper readHelper = (ReadHelper)Activator.CreateInstance (helperType, converter)!;
-            value = readHelper.Read (ref reader, propertyType, options);
-
-            return true;
-        }
-        catch (NotSupportedException e)
-        {
-            throw new JsonException ($"{propertyType.Name}: Error reading property with converter \"{converterType.FullName}\".", e);
-        }
-        catch (TargetInvocationException)
-        {
-            value = JsonSerializer.Deserialize (ref reader, propertyType, options);
-
-            return true;
-        }
-    }
-
-    private static bool TryWriteWithKnownConverter (
-        Utf8JsonWriter writer,
-        Type propertyType,
-        Type converterType,
-        object? value,
-        JsonSerializerOptions options)
-    {
-        if (converterType == typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))
-        {
-            new ConcurrentDictionaryJsonConverter<ThemeScope> ().Write (
-                                                                   writer,
-                                                                   (ConcurrentDictionary<string, ThemeScope>)value!,
-                                                                   options
-                                                                  );
-
-            return true;
-        }
-
-        if (converterType == typeof (DictionaryJsonConverter<Scheme?>))
-        {
-            new DictionaryJsonConverter<Scheme?> ().Write (writer, (Dictionary<string, Scheme?>)value!, options);
-
-            return true;
-        }
-
-        if (converterType == typeof (TraceCategoryJsonConverter))
-        {
-            new TraceCategoryJsonConverter ().Write (writer, (TraceCategory)value!, options);
-
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     [RequiresDynamicCode ("Instantiates arbitrary property-level JsonConverter types for JIT-only configuration paths.")]
     [RequiresUnreferencedCode ("Arbitrary property-level JsonConverter types may access unreferenced members.")]
-    private static bool TryWriteWithDynamicConverter (
-        Utf8JsonWriter writer,
-        Type propertyType,
-        Type converterType,
-        object value,
-        JsonSerializerOptions options)
+    private static bool TryWriteWithDynamicConverter (Utf8JsonWriter writer, Type propertyType, Type converterType, object value, JsonSerializerOptions options)
     {
         if (!RuntimeFeature.IsDynamicCodeSupported)
         {
@@ -388,72 +391,36 @@ internal class ScopeJsonConverter<
 
             return true;
         }
-        catch (TargetInvocationException e) when (e.InnerException is not null)
+        catch (TargetInvocationException e) when (e.InnerException is { })
         {
             throw new JsonException ($"{propertyType.Name}: Error writing property with converter \"{converterType.FullName}\".", e.InnerException);
         }
     }
 
-    private static object? DeserializePropertyValue (ref Utf8JsonReader reader, Type propertyType, JsonSerializerOptions options)
+    private static bool TryWriteWithKnownConverter (Utf8JsonWriter writer, Type propertyType, Type converterType, object? value, JsonSerializerOptions options)
     {
-        Type? nullableType = Nullable.GetUnderlyingType (propertyType);
-        Type enumType = nullableType ?? propertyType;
-
-        if (enumType.IsEnum)
+        if (converterType == typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))
         {
-            if (reader.TokenType == JsonTokenType.String)
-            {
-                return Enum.Parse (enumType, reader.GetString ()!, ignoreCase: true);
-            }
+            new ConcurrentDictionaryJsonConverter<ThemeScope> ().Write (writer, (ConcurrentDictionary<string, ThemeScope>)value!, options);
 
-            if (reader.TokenType == JsonTokenType.Null && nullableType is not null)
-            {
-                return null;
-            }
+            return true;
         }
 
-        JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (propertyType);
-
-        if (jsonTypeInfo is null)
+        if (converterType == typeof (DictionaryJsonConverter<Scheme?>))
         {
-            throw new JsonException ($"{propertyType.FullName}: No source-generated JsonTypeInfo is registered for this configuration property type.");
+            new DictionaryJsonConverter<Scheme?> ().Write (writer, (Dictionary<string, Scheme?>)value!, options);
+
+            return true;
         }
 
-        return JsonSerializer.Deserialize (ref reader, jsonTypeInfo);
-    }
-
-    private static bool ShouldSkipNullPropertyValue (Type? propertyType, object? propertyValue)
-    {
-        if (propertyValue is not null)
+        if (converterType == typeof (TraceCategoryJsonConverter))
         {
-            return false;
+            new TraceCategoryJsonConverter ().Write (writer, (TraceCategory)value!, options);
+
+            return true;
         }
 
-        if (propertyType is null)
-        {
-            return false;
-        }
-
-        return propertyType.IsValueType && Nullable.GetUnderlyingType (propertyType) is null;
-    }
-
-    private static bool CanAcceptNullValue (Type propertyType)
-    {
-        return !propertyType.IsValueType || Nullable.GetUnderlyingType (propertyType) is not null;
-    }
-
-    private static bool TryWriteEnumValue (Utf8JsonWriter writer, Type propertyType, object value)
-    {
-        Type enumType = Nullable.GetUnderlyingType (propertyType) ?? propertyType;
-
-        if (!enumType.IsEnum)
-        {
-            return false;
-        }
-
-        writer.WriteStringValue (value.ToString ());
-
-        return true;
+        return false;
     }
 
     internal abstract class ReadHelper
@@ -466,10 +433,7 @@ internal class ScopeJsonConverter<
     {
         private readonly ReadDelegate _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read");
 
-        public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
-        {
-            return _readDelegate.Invoke (ref reader, type, options);
-        }
+        public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options) => _readDelegate.Invoke (ref reader, type, options);
 
         private delegate TValue ReadDelegate (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
     }

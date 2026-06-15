@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using Terminal.Gui.Tracing;
 
@@ -70,6 +70,7 @@ internal class DriverImpl : IDriver
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
         _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.SyntheticMouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
+        _inputProcessor.Paste += (s, e) => Paste?.Invoke (s, e);
         _outputBuffer = outputBuffer;
         _output = output;
         _ansiRequestScheduler = ansiRequestScheduler;
@@ -78,7 +79,7 @@ internal class DriverImpl : IDriver
         _terminalSize = new Size (outputBuffer.Cols, outputBuffer.Rows);
         AnsiStartupGate = ansiStartupGate;
 
-        CreateClipboard ();
+        Clipboard = CreateClipboard ();
 
         Driver.Force16ColorsChanged += OnDriverOnForce16ColorsChanged;
     }
@@ -157,27 +158,61 @@ internal class DriverImpl : IDriver
     public IAnsiStartupGate? AnsiStartupGate { get; }
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard { get; set; } = new FakeClipboard ();
+    public IClipboard? Clipboard { get; set; }
 
     /// <inheritdoc/>
     public ProgressIndicator? ProgressIndicator { get; internal set; }
 
-    private void CreateClipboard ()
+    internal static IClipboard CreateClipboard (
+        Func<bool> isWindows,
+        Func<bool> isMac,
+        Func<bool> isWsl,
+        Func<bool> isLinux,
+        Func<IClipboard> createWindowsClipboard,
+        Func<IClipboard> createMacClipboard,
+        Func<IClipboard> createWslClipboard,
+        Func<IClipboard> createUnixClipboard,
+        IClipboard fallbackClipboard
+    )
+    {
+        if (isWindows ())
+        {
+            return createWindowsClipboard ();
+        }
+
+        if (isMac ())
+        {
+            return createMacClipboard ();
+        }
+
+        if (isWsl ())
+        {
+            return createWslClipboard ();
+        }
+
+        if (!isLinux ())
+        {
+            return fallbackClipboard;
+        }
+
+        IClipboard unixClipboard = createUnixClipboard ();
+
+        return !unixClipboard.IsSupported ? fallbackClipboard : unixClipboard;
+    }
+
+    private static IClipboard CreateClipboard ()
     {
         PlatformID p = Environment.OSVersion.Platform;
 
-        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
-        {
-            Clipboard = new WindowsClipboard ();
-        }
-        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
-        {
-            Clipboard = new MacOSXClipboard ();
-        }
-        else if (PlatformDetection.IsWSL ())
-        {
-            Clipboard = new WSLClipboard ();
-        }
+        return CreateClipboard (() => p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows,
+                                () => RuntimeInformation.IsOSPlatform (OSPlatform.OSX),
+                                PlatformDetection.IsWSL,
+                                PlatformDetection.IsLinux,
+                                () => new WindowsClipboard (),
+                                () => new MacOSXClipboard (),
+                                () => new WSLClipboard (),
+                                () => new UnixClipboard (),
+                                new FakeClipboard ());
     }
 
     internal void InitializeProgressIndicator ()
@@ -269,6 +304,22 @@ internal class DriverImpl : IDriver
     #endregion Screen and Display
 
     #region Color Support
+
+    /// <inheritdoc/>
+    public SixelSupportResult? SixelSupport { get; private set; }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
+
+    /// <summary>
+    ///     Sets the terminal's sixel support result (detected during initialization).
+    /// </summary>
+    internal void SetSixelSupport (SixelSupportResult result)
+    {
+        SixelSupportResult? old = SixelSupport;
+        SixelSupport = result;
+        SixelSupportChanged?.Invoke (this, new ValueChangedEventArgs<SixelSupportResult?> (old, result));
+    }
 
     /// <inheritdoc/>
     public bool SupportsTrueColor => !IsLegacyConsole;
@@ -468,6 +519,9 @@ internal class DriverImpl : IDriver
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
+
+    /// <summary>Event fired when a bracketed paste is received from the terminal.</summary>
+    public event EventHandler<string>? Paste;
 
     #endregion Input Events
 

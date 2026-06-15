@@ -48,6 +48,8 @@ namespace Terminal.Gui.Configuration;
 /// </summary>
 public static class ConfigurationManager
 {
+    private static readonly Lock _appNameLock = new ();
+
     /// <summary>The backing property for <see cref="Settings"/> (config settings of <see cref="SettingsScope"/>).</summary>
     /// <remarks>
     ///     Is <see langword="null"/> until <see cref="UpdateToCurrentValues"/> is called. Gets set to a new instance by
@@ -59,6 +61,121 @@ public static class ConfigurationManager
 #pragma warning disable IDE1006 // Naming Styles
     private static readonly ReaderWriterLockSlim _settingsLockSlim = new ();
 #pragma warning restore IDE1006 // Naming Styles
+
+    /// <summary>Name of the running application. By default, this property is set to the application's assembly name.</summary>
+    public static string AppName
+    {
+        get
+        {
+            lock (_appNameLock)
+            {
+                return field;
+            }
+        }
+        set
+        {
+            lock (_appNameLock)
+            {
+                field = value;
+            }
+        }
+    } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0].Trim ()!;
+
+    #region AppSettings
+
+    /// <summary>
+    ///     Gets or sets the application-specific configuration settings (config properties with the
+    ///     <see cref="AppSettingsScope"/> scope.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
+    [JsonPropertyName ("AppSettings")]
+    public static AppSettingsScope? AppSettings
+    {
+        [UnconditionalSuppressMessage ("AOT",
+                                       "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                       Justification =
+                                           "UpdateToCurrentValues uses reflection only to read static property values from types preserved by ConfigPropertyHostTypes.")]
+        get
+        {
+            if (!IsInitialized ())
+            {
+                // We're being called from the module initializer.
+                // Hard coded default value is an empty AppSettingsScope
+                var appSettings = new AppSettingsScope ();
+                appSettings.LoadHardCodedDefaults ();
+
+                return appSettings;
+            }
+
+            if (Settings is null || !Settings.TryGetValue ("AppSettings", out ConfigProperty? appSettingsConfigProperty))
+            {
+                throw new InvalidOperationException ("Settings is null.");
+            }
+
+            {
+                if (!appSettingsConfigProperty.HasValue)
+                {
+                    var appSettings = new AppSettingsScope ();
+                    appSettings.UpdateToCurrentValues ();
+
+                    return appSettings;
+                }
+
+                return (appSettingsConfigProperty.PropertyValue as AppSettingsScope)!;
+            }
+        }
+        set
+        {
+            if (!IsInitialized ())
+            {
+                throw new InvalidOperationException ("AppSettings cannot be set before ConfigurationManager is initialized.");
+            }
+
+            // Check if the AppSettings is the same as the previous one
+            if (value != Settings! ["AppSettings"].PropertyValue)
+            {
+                // Update the backing store
+                Settings ["AppSettings"].PropertyValue = value;
+
+                // Instance.OnThemeChanged (previousThemeValue);
+            }
+        }
+    }
+
+    #endregion AppSettings
+
+    /// <summary>Returns an empty Json document with just the $schema tag.</summary>
+    /// <returns></returns>
+    public static string GetEmptyConfig ()
+    {
+        var emptyScope = new SettingsScope ();
+        emptyScope.Clear ();
+
+        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext);
+    }
+
+    /// <summary>Returns a Json document containing the hard-coded config.</summary>
+    /// <returns></returns>
+    public static string GetHardCodedConfig ()
+    {
+        var emptyScope = new SettingsScope ();
+        emptyScope.LoadHardCodedDefaults ();
+        IEnumerable<KeyValuePair<string, ConfigProperty>>? settings = GetHardCodedConfigPropertiesByScope ("SettingsScope");
+
+        if (settings is null)
+        {
+            throw new InvalidOperationException ("GetHardCodedConfigPropertiesByScope returned null.");
+        }
+
+        Dictionary<string, ConfigProperty> settingsDict = settings.ToDictionary ();
+
+        foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
+        {
+            emptyScope [p.Key].PropertyValue = settingsDict [p.Key].PropertyValue;
+        }
+
+        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext);
+    }
 
     /// <summary>
     ///     The root object of Terminal.Gui configuration settings / JSON schema.
@@ -90,6 +207,72 @@ public static class ConfigurationManager
             {
                 _settingsLockSlim.ExitWriteLock ();
             }
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: Retrieves all configuration properties that belong to a specific scope from the hard coded value cache.
+    ///     The items in the collection are references to the original <see cref="ConfigProperty"/> objects in the
+    ///     cache. They contain the hard coded values and have <see cref="ConfigProperty.Immutable"/> set.
+    /// </summary>
+    internal static IEnumerable<KeyValuePair<string, ConfigProperty>> GetHardCodedConfigPropertiesByScope (string scopeType)
+    {
+        // AOT Note: This method does NOT need the RequiresUnreferencedCode attribute as it is not using reflection
+        // and is not using any dynamic code. _allConfigProperties is a static property that is set in the module initializer
+        // and is not using any dynamic code. In addition, ScopeType are registered in SourceGenerationContext.
+
+        // Filter properties by scope
+        IEnumerable<KeyValuePair<string, ConfigProperty>>? cache = GetHardCodedConfigPropertyCache ();
+
+        if (cache is null)
+        {
+            throw new InvalidOperationException ("GetHardCodedConfigPropertyCache returned null");
+        }
+
+        if (string.IsNullOrEmpty (scopeType))
+        {
+            return cache;
+        }
+
+        // Use the cached ScopeType property instead of reflection
+        IEnumerable<KeyValuePair<string, ConfigProperty>> scopedCache = cache.Where (cp => cp.Value.ScopeType == scopeType);
+
+        return scopedCache!;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Retrieves all uninitialized configuration properties that belong to a specific scope from the cache.
+    ///     The items in the collection are references to the original <see cref="ConfigProperty"/> objects in the
+    ///     cache. They do not have values and have <see cref="ConfigProperty.Immutable"/> set.
+    /// </summary>
+    internal static IEnumerable<KeyValuePair<string, ConfigProperty>> GetUninitializedConfigPropertiesByScope (string scopeType)
+    {
+        // AOT Note: This method does NOT need the RequiresUnreferencedCode attribute as it is not using reflection
+        // and is not using any dynamic code. _allConfigProperties is a static property that is set in the module initializer
+        // and is not using any dynamic code. In addition, ScopeType are registered in SourceGenerationContext.
+
+        if (_uninitializedConfigPropertiesCache is null)
+        {
+            throw new InvalidOperationException ("_allConfigPropertiesCache has not been set.");
+        }
+
+        if (string.IsNullOrEmpty (scopeType))
+        {
+            return _uninitializedConfigPropertiesCache;
+        }
+
+        lock (_uninitializedConfigPropertiesCacheCacheLock)
+        {
+            // Filter properties by scope using the cached ScopeType property instead of reflection
+            IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _uninitializedConfigPropertiesCache.Where (cp => cp.Value.ScopeType == scopeType);
+
+            Debug.Assert (filtered is { });
+
+            IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope =
+                filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
+            Debug.Assert (configPropertiesByScope.All (v => !v.Value.HasValue));
+
+            return configPropertiesByScope;
         }
     }
 
@@ -162,8 +345,13 @@ public static class ConfigurationManager
     ///     For ConfigurationManager to access config resources, <see cref="IsEnabled"/> needs to be
     ///     set to <see langword="true"/> after this method has been called.
     /// </summary>
-    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "All config property host types are statically rooted via ConfigPropertyHostTypes and registered in SourceGenerationContext. DeepCloner and Apply use source-generated serialization for known types.")]
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Reflection-heavy paths are guarded by RuntimeFeature.IsDynamicCodeSupported and are dead code under AOT.")]
+    [UnconditionalSuppressMessage ("Trimming",
+                                   "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code",
+                                   Justification =
+                                       "All config property host types are statically rooted via ConfigPropertyHostTypes and registered in SourceGenerationContext. DeepCloner and Apply use source-generated serialization for known types.")]
+    [UnconditionalSuppressMessage ("AOT",
+                                   "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                   Justification = "Reflection-heavy paths are guarded by RuntimeFeature.IsDynamicCodeSupported and are dead code under AOT.")]
     internal static void Initialize ()
     {
         lock (_initializedLock)
@@ -326,7 +514,7 @@ public static class ConfigurationManager
 
         try
         {
-            _settings = new ();
+            _settings = new SettingsScope ();
             _settings.LoadHardCodedDefaults ();
         }
         finally
@@ -379,7 +567,7 @@ public static class ConfigurationManager
         SourcesManager!.Sources.Clear ();
         SourcesManager.AddSource (ConfigLocations.HardCoded, "HardCoded");
 
-        Settings = new ();
+        Settings = new SettingsScope ();
         Settings.LoadHardCodedDefaults ();
         ThemeManager.LoadHardCodedDefaults ();
         AppSettings!.LoadHardCodedDefaults ();
@@ -422,7 +610,7 @@ public static class ConfigurationManager
     /// </summary>
     public static void OnUpdated ()
     {
-        //Logging.Trace (@"");
+        // Logging.Trace (@"");
 
         if (!IsEnabled)
         {
@@ -431,7 +619,7 @@ public static class ConfigurationManager
 
         // Use a local copy of the event delegate when invoking it to avoid race conditions.
         EventHandler<ConfigurationManagerEventArgs>? handler = Updated;
-        handler?.Invoke (null, new ());
+        handler?.Invoke (null, new ConfigurationManagerEventArgs ());
     }
 
     /// <summary>Event fired when the configuration has been updated from a configuration source or reset.</summary>
@@ -509,7 +697,7 @@ public static class ConfigurationManager
 
         // Use a local copy of the event delegate when invoking it to avoid race conditions.
         EventHandler<ConfigurationManagerEventArgs>? handler = Applied;
-        handler?.Invoke (null, new ());
+        handler?.Invoke (null, new ConfigurationManagerEventArgs ());
 
         // TODO: Refactor ConfigurationManager to not use an event handler for this.
         // Instead, have it call a method on any class appropriately attributed
@@ -526,30 +714,28 @@ public static class ConfigurationManager
     // `Sources` - A source is a location where a configuration can be stored. Sources are defined in the `ConfigLocations` enum.
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static readonly SourceGenerationContext SerializerContext = new (
-                                                                              new ()
-                                                                              {
-                                                                                  // Be relaxed
-                                                                                  ReadCommentHandling = JsonCommentHandling.Skip,
-                                                                                  PropertyNameCaseInsensitive = true,
-                                                                                  DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-                                                                                  WriteIndented = true,
-                                                                                  AllowTrailingCommas = true,
+    internal static readonly SourceGenerationContext SerializerContext = new (new JsonSerializerOptions
+    {
+        // Be relaxed
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        PropertyNameCaseInsensitive = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        WriteIndented = true,
+        AllowTrailingCommas = true,
+        Converters =
+        {
+            // We override the standard Rune converter to support specifying Glyphs in
+            // a flexible way
+            new RuneJsonConverter (),
 
-                                                                                  Converters =
-                                                                                   {
-                                                                                       // We override the standard Rune converter to support specifying Glyphs in
-                                                                                       // a flexible way
-                                                                                       new RuneJsonConverter (),
+            // Override Key to support "Ctrl+Q" format.
+            new KeyJsonConverter ()
+        },
 
-                                                                                       // Override Key to support "Ctrl+Q" format.
-                                                                                       new KeyJsonConverter ()
-                                                                                   },
-
-                                                                                  // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
-                                                                                  Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                                                                                  TypeInfoResolver = SourceGenerationContext.Default
-                                                                              });
+        // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        TypeInfoResolver = SourceGenerationContext.Default
+    });
 
     private static SourcesManager? _sourcesManager = new ();
     private static readonly object _sourcesManagerLock = new ();
@@ -603,66 +789,6 @@ public static class ConfigurationManager
     internal static readonly string ConfigFilename = "config.json";
 
     #endregion Sources
-
-    #region AppSettings
-
-    /// <summary>
-    ///     Gets or sets the application-specific configuration settings (config properties with the
-    ///     <see cref="AppSettingsScope"/> scope.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-    [JsonPropertyName ("AppSettings")]
-    public static AppSettingsScope? AppSettings
-    {
-        [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "UpdateToCurrentValues uses reflection only to read static property values from types preserved by ConfigPropertyHostTypes.")]
-        get
-        {
-            if (!IsInitialized ())
-            {
-                // We're being called from the module initializer.
-                // Hard coded default value is an empty AppSettingsScope
-                var appSettings = new AppSettingsScope ();
-                appSettings.LoadHardCodedDefaults ();
-
-                return appSettings;
-            }
-
-            if (Settings is null || !Settings.TryGetValue ("AppSettings", out ConfigProperty? appSettingsConfigProperty))
-            {
-                throw new InvalidOperationException ("Settings is null.");
-            }
-
-            {
-                if (!appSettingsConfigProperty.HasValue)
-                {
-                    var appSettings = new AppSettingsScope ();
-                    appSettings.UpdateToCurrentValues ();
-
-                    return appSettings;
-                }
-
-                return (appSettingsConfigProperty.PropertyValue as AppSettingsScope)!;
-            }
-        }
-        set
-        {
-            if (!IsInitialized ())
-            {
-                throw new InvalidOperationException ("AppSettings cannot be set before ConfigurationManager is initialized.");
-            }
-
-            // Check if the AppSettings is the same as the previous one
-            if (value != Settings! ["AppSettings"].PropertyValue)
-            {
-                // Update the backing store
-                Settings ["AppSettings"].PropertyValue = value;
-
-                //Instance.OnThemeChanged (previousThemeValue);
-            }
-        }
-    }
-
-    #endregion AppSettings
 
     #region Error Logging
 
@@ -725,8 +851,7 @@ public static class ConfigurationManager
         {
             if (_jsonErrors.Length > 0)
             {
-                Console.WriteLine (
-                                   @"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files"
+                Console.WriteLine (@"Terminal.Gui ConfigurationManager encountered these errors while reading configuration files"
                                    + @"(set ThrowOnJsonErrors to have these caught during execution):");
                 Console.WriteLine (_jsonErrors.ToString ());
             }
@@ -734,124 +859,4 @@ public static class ConfigurationManager
     }
 
     #endregion Error Logging
-
-    /// <summary>Returns an empty Json document with just the $schema tag.</summary>
-    /// <returns></returns>
-    public static string GetEmptyConfig ()
-    {
-        var emptyScope = new SettingsScope ();
-        emptyScope.Clear ();
-
-        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext);
-    }
-
-    /// <summary>Returns a Json document containing the hard-coded config.</summary>
-    /// <returns></returns>
-    public static string GetHardCodedConfig ()
-    {
-        var emptyScope = new SettingsScope ();
-        emptyScope.LoadHardCodedDefaults ();
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? settings = GetHardCodedConfigPropertiesByScope ("SettingsScope");
-
-        if (settings is null)
-        {
-            throw new InvalidOperationException ("GetHardCodedConfigPropertiesByScope returned null.");
-        }
-
-        Dictionary<string, ConfigProperty> settingsDict = settings.ToDictionary ();
-
-        foreach (KeyValuePair<string, ConfigProperty> p in Settings!.Where (cp => cp.Value.PropertyInfo is { }))
-        {
-            emptyScope [p.Key].PropertyValue = settingsDict [p.Key].PropertyValue;
-        }
-
-        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext);
-    }
-
-    private static readonly Lock _appNameLock = new ();
-
-    /// <summary>Name of the running application. By default, this property is set to the application's assembly name.</summary>
-    public static string AppName
-    {
-        get
-        {
-            lock (_appNameLock)
-            {
-                return field;
-            }
-        }
-        set
-        {
-            lock (_appNameLock)
-            {
-                field = value;
-            }
-        }
-    } = Assembly.GetEntryAssembly ()?.FullName?.Split (',') [0].Trim ()!;
-
-    /// <summary>
-    ///     INTERNAL: Retrieves all uninitialized configuration properties that belong to a specific scope from the cache.
-    ///     The items in the collection are references to the original <see cref="ConfigProperty"/> objects in the
-    ///     cache. They do not have values and have <see cref="ConfigProperty.Immutable"/> set.
-    /// </summary>
-    internal static IEnumerable<KeyValuePair<string, ConfigProperty>> GetUninitializedConfigPropertiesByScope (string scopeType)
-    {
-        // AOT Note: This method does NOT need the RequiresUnreferencedCode attribute as it is not using reflection
-        // and is not using any dynamic code. _allConfigProperties is a static property that is set in the module initializer
-        // and is not using any dynamic code. In addition, ScopeType are registered in SourceGenerationContext.
-
-        if (_uninitializedConfigPropertiesCache is null)
-        {
-            throw new InvalidOperationException ("_allConfigPropertiesCache has not been set.");
-        }
-
-        if (string.IsNullOrEmpty (scopeType))
-        {
-            return _uninitializedConfigPropertiesCache;
-        }
-
-        lock (_uninitializedConfigPropertiesCacheCacheLock)
-        {
-            // Filter properties by scope using the cached ScopeType property instead of reflection
-            IEnumerable<KeyValuePair<string, ConfigProperty>>? filtered = _uninitializedConfigPropertiesCache.Where (cp => cp.Value.ScopeType == scopeType);
-
-            Debug.Assert (filtered is { });
-
-            IEnumerable<KeyValuePair<string, ConfigProperty>> configPropertiesByScope =
-                filtered as KeyValuePair<string, ConfigProperty> [] ?? filtered.ToArray ();
-            Debug.Assert (configPropertiesByScope.All (v => !v.Value.HasValue));
-
-            return configPropertiesByScope;
-        }
-    }
-
-    /// <summary>
-    ///     INTERNAL: Retrieves all configuration properties that belong to a specific scope from the hard coded value cache.
-    ///     The items in the collection are references to the original <see cref="ConfigProperty"/> objects in the
-    ///     cache. They contain the hard coded values and have <see cref="ConfigProperty.Immutable"/> set.
-    /// </summary>
-    internal static IEnumerable<KeyValuePair<string, ConfigProperty>> GetHardCodedConfigPropertiesByScope (string scopeType)
-    {
-        // AOT Note: This method does NOT need the RequiresUnreferencedCode attribute as it is not using reflection
-        // and is not using any dynamic code. _allConfigProperties is a static property that is set in the module initializer
-        // and is not using any dynamic code. In addition, ScopeType are registered in SourceGenerationContext.
-
-        // Filter properties by scope
-        IEnumerable<KeyValuePair<string, ConfigProperty>>? cache = GetHardCodedConfigPropertyCache ();
-
-        if (cache is null)
-        {
-            throw new InvalidOperationException ("GetHardCodedConfigPropertyCache returned null");
-        }
-
-        if (string.IsNullOrEmpty (scopeType))
-        {
-            return cache;
-        }
-
-        // Use the cached ScopeType property instead of reflection
-        IEnumerable<KeyValuePair<string, ConfigProperty>> scopedCache = cache.Where (cp => cp.Value.ScopeType == scopeType);
-
-        return scopedCache!;
-    }
 }

@@ -33,7 +33,25 @@ public partial class Markdown
                         return true;
                     });
 
+        // Home (without Ctrl) also scrolls to top — this is a read-only view with no cursor
+        AddCommand (Command.LeftStart,
+                    () =>
+                    {
+                        Viewport = Viewport with { Y = 0 };
+
+                        return true;
+                    });
+
         AddCommand (Command.End,
+                    () =>
+                    {
+                        Viewport = Viewport with { Y = Math.Max (GetContentHeight () - Viewport.Height, 0) };
+
+                        return true;
+                    });
+
+        // End (without Ctrl) also scrolls to bottom — this is a read-only view with no cursor
+        AddCommand (Command.RightEnd,
                     () =>
                     {
                         Viewport = Viewport with { Y = Math.Max (GetContentHeight () - Viewport.Height, 0) };
@@ -59,7 +77,10 @@ public partial class Markdown
 
         // The base class binds LeftButtonReleased → Activate; remove that so Activate
         // fires only on LeftButtonClicked (not twice per click which would clear selection).
+        // Also remove the base class Ctrl+LeftButtonReleased → Context binding so that
+        // Ctrl+Click can follow links without triggering the context menu popover.
         MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased | MouseFlags.Ctrl);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
 
         // Right-click is handled directly in OnMouseEvent so that the view can be focused
@@ -132,7 +153,15 @@ public partial class Markdown
     /// </remarks>
     protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (behavior is { } && behavior != TabStop)
+        // Cancel auto-advance (behavior==null, used by SetHasFocusTrue) so that gaining
+        // focus doesn't automatically drill into a table SubView or link region.
+        // Only explicit Tab navigation (behavior==TabStop) should cycle through links.
+        if (behavior is null)
+        {
+            return true;
+        }
+
+        if (behavior != TabStop)
         {
             return false;
         }
@@ -273,6 +302,28 @@ public partial class Markdown
 
             return;
         }
+    }
+
+    /// <summary>
+    ///     Returns the URL of the link region at content coordinates (<paramref name="contentX"/>,
+    ///     <paramref name="contentY"/>), or <see langword="null"/> if no link covers that position.
+    /// </summary>
+    private string? FindLinkUrlAt (int contentX, int contentY)
+    {
+        foreach (MarkdownLinkRegion region in _linkRegions)
+        {
+            if (region.Line != contentY)
+            {
+                continue;
+            }
+
+            if (contentX >= region.StartX && contentX < region.EndXExclusive)
+            {
+                return region.Url;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>

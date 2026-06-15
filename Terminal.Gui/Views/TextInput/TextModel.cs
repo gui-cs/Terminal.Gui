@@ -1225,11 +1225,11 @@ internal class TextModel
         }
 
         return runeType switch
-               {
-                   RuneType.IsSymbol or RuneType.IsPunctuation => rt is RuneType.IsSymbol or RuneType.IsPunctuation,
-                   RuneType.IsWhiteSpace or RuneType.IsLetterOrDigit or RuneType.IsUnknown => rt == runeType,
-                   _ => throw new ArgumentOutOfRangeException (nameof (runeType), runeType, null)
-               };
+        {
+            RuneType.IsSymbol or RuneType.IsPunctuation => rt is RuneType.IsSymbol or RuneType.IsPunctuation,
+            RuneType.IsWhiteSpace or RuneType.IsLetterOrDigit or RuneType.IsUnknown => rt == runeType,
+            _ => throw new ArgumentOutOfRangeException (nameof (runeType), runeType, null)
+        };
     }
 
     internal static bool MatchWholeWord (string source, string matchText, int index = 0)

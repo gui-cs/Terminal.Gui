@@ -58,13 +58,27 @@ public abstract class OutputBase
     // Last URL used for tracking hyperlink state
     private string? _lastUrl = null;
 
+    // Rows that contained URLs in the last rendered frame; used to emit OSC 8 close
+    // before re-rendering a row that has since lost all URL cells, so terminals don't
+    // keep stale hyperlink metadata.
+    private readonly HashSet<int> _rowsWithUrls = [];
+
+    // Identifies the buffer state we last synced _rowsWithUrls against. When the buffer
+    // is replaced, resized, or its URL maps are wiped, this stops matching and we drop
+    // the stale tracking before reading it.
+    private IOutputBuffer? _lastTrackedBuffer;
+    private int _lastTrackedRows;
+    private int _lastTrackedCols;
+    private int _lastTrackedUrlVersion;
+
     private readonly StringBuilder _lastOutputStringBuilder = new ();
     private bool _clearLastOutputPending;
 
     /// <summary>
-    ///     Writes dirty cells from the buffer to the console. Hides cursor, iterates rows/cols,
-    ///     skips clean cells, batches dirty cells into ANSI sequences, wraps URLs with OSC 8,
-    ///     then renders sixel images. Cursor visibility is managed by <c>ApplicationMainLoop.SetCursor()</c>.
+    ///     Writes dirty cells from the buffer to the console. Iterates rows/cols, skips clean cells,
+    ///     batches dirty cells into ANSI sequences, emits OSC 8 hyperlink start/close around URL cells,
+    ///     and finally renders queued sixel images. Cursor visibility is managed by
+    ///     <c>ApplicationMainLoop.SetCursor()</c>.
     /// </summary>
     public virtual void Write (IOutputBuffer buffer)
     {
@@ -76,6 +90,14 @@ public abstract class OutputBase
         int cols = buffer.Cols;
         Attribute? redrawAttr = null;
         int lastCol = -1;
+
+        InvalidateRowsWithUrlsIfStale (buffer, rows, cols);
+
+        // Raster images must be written before dirty cells so later text draws above them.
+        if (!IsLegacyConsole)
+        {
+            RenderRasterImages (buffer);
+        }
 
         // Process each row
         for (int row = top; row < rows; row++)
@@ -93,8 +115,21 @@ public abstract class OutputBase
                 return;
             }
 
+            if (!IsLegacyConsole && buffer is OutputBufferImpl outputBuffer)
+            {
+                outputBuffer.SyncAutoUrlsForRow (row);
+            }
+
+            bool rowHadUrlsPreviously = _rowsWithUrls.Contains (row);
+            bool rowHasUrlsNow = !IsLegacyConsole && RowContainsUrls (buffer, row, cols);
+
             outputStringBuilder.Clear ();
             _lastUrl = null; // Reset URL state at the start of each row
+
+            if (!IsLegacyConsole && rowHadUrlsPreviously && !rowHasUrlsNow)
+            {
+                outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+            }
 
             // Process columns in row
             for (int col = left; col < cols; col++)
@@ -170,31 +205,49 @@ public abstract class OutputBase
                 }
             }
 
-            // Flush buffered output for row
-            if (outputStringBuilder.Length <= 0)
+            // Track row's URL status BEFORE the early-exit so _rowsWithUrls stays consistent
+            // with the buffer state — even for rows whose cells were all flushed via WriteToConsole
+            // during the inner loop (leaving outputStringBuilder empty at this point).
+            if (!IsLegacyConsole)
+            {
+                if (rowHasUrlsNow)
+                {
+                    _rowsWithUrls.Add (row);
+                }
+                else
+                {
+                    _rowsWithUrls.Remove (row);
+                }
+            }
+
+            // Flush buffered output for row. Even when nothing remains buffered, an OSC 8 hyperlink
+            // may still be open in the terminal because it was started in a prior batch flushed by
+            // WriteToConsole and the row ended (or only clean cells followed) before any cell with
+            // a different URL closed it. Emit the close so the link does not bleed into later rows.
+            if (outputStringBuilder.Length <= 0 && _lastUrl is null)
             {
                 continue;
             }
 
             if (IsLegacyConsole)
             {
-                Write (outputStringBuilder);
-            }
-            else
-            {
-                SetCursorPositionImpl (lastCol, row);
-
-                // Close any open hyperlink before processing URLs
-                if (_lastUrl is { })
+                if (outputStringBuilder.Length > 0)
                 {
-                    outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
-                    _lastUrl = null;
+                    Write (outputStringBuilder);
                 }
 
-                // Wrap URLs with OSC 8 hyperlink sequences
-                StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);
-                Write (processed);
+                continue;
             }
+
+            if (_lastUrl is { })
+            {
+                outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+                _lastUrl = null;
+            }
+
+            SetCursorPositionImpl (lastCol, row);
+
+            Write (outputStringBuilder);
         }
 
         if (IsLegacyConsole)
@@ -205,13 +258,14 @@ public abstract class OutputBase
         // Render queued sixel images
         foreach (SixelToRender s in GetSixels ())
         {
-            if (string.IsNullOrWhiteSpace (s.SixelData))
+            if (string.IsNullOrWhiteSpace (s.SixelData) || (!s.IsDirty && !s.AlwaysRender))
             {
                 continue;
             }
 
             SetCursorPositionImpl (s.ScreenPosition.X, s.ScreenPosition.Y);
             Write (new StringBuilder (s.SixelData));
+            s.IsDirty = false;
         }
     }
 
@@ -352,10 +406,14 @@ public abstract class OutputBase
                 lastUrl = null;
             }
 
-            // Add newline at end of row if requested
+            // Add newline at end of row if requested. Use a fixed '\n', NOT
+            // StringBuilder.AppendLine () / Environment.NewLine: ToAnsi produces a portable
+            // escape-sequence stream that must be byte-identical regardless of the OS it ran
+            // on (golden snapshots, cross-platform diffing). Terminals map LF -> CRLF via the
+            // ONLCR tty discipline, so a '\n' row break still recreates the screen correctly.
             if (addNewlines)
             {
-                output.AppendLine ();
+                output.Append ('\n');
             }
         }
     }
@@ -431,39 +489,219 @@ public abstract class OutputBase
                     }
                 }
 
-                output.AppendLine ();
+                // Fixed '\n' (not Environment.NewLine) — keep legacy-console output portable too.
+                output.Append ('\n');
             }
 
             return output.ToString ();
         }
 
-        StringBuilder ansiOutput = new ();
-        Attribute? lastAttr = null;
+        if (buffer is OutputBufferImpl outputBuffer)
+        {
+            outputBuffer.SyncAutoUrlsForAllRows ();
+        }
 
+        StringBuilder ansiOutput = new ();
+        bool wroteRasterImages = AppendRasterImageAnsi (buffer, ansiOutput);
+
+        if (wroteRasterImages)
+        {
+            ansiOutput.Append (EscSeqUtils.CSI_SetCursorPosition (1, 1));
+        }
+
+        Attribute? lastAttr = null;
         BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
 
         return ansiOutput.ToString ();
     }
 
+    private void RenderRasterImages (IOutputBuffer buffer)
+    {
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            if (!command.IsDirty && !command.AlwaysRender)
+            {
+                continue;
+            }
+
+            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            {
+                if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
+                {
+                    continue;
+                }
+
+                SetCursorPositionImpl (visibleCells.X, visibleCells.Y);
+                Write (new StringBuilder (GetRasterImageSixelData (command, visibleCells, pixels)));
+            }
+
+            command.IsDirty = false;
+        }
+    }
+
+    private static bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output)
+    {
+        bool wroteRasterImages = false;
+
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            {
+                if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
+                {
+
+                    continue;
+                }
+
+                output.Append (EscSeqUtils.CSI_SetCursorPosition (visibleCells.Y + 1, visibleCells.X + 1));
+                output.Append (GetRasterImageSixelData (command, visibleCells, pixels));
+                wroteRasterImages = true;
+            }
+        }
+
+        return wroteRasterImages;
+    }
+
+    private static string GetRasterImageSixelData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)
+    {
+        if (command.EncodedSixel is { } encodedSixel && visibleCells == command.DestinationCells)
+        {
+            return encodedSixel;
+        }
+
+        SixelEncoder encoder = command.Encoder ?? new ();
+
+        return encoder.EncodeSixel (pixels);
+    }
+
+    private static IEnumerable<Rectangle> GetVisibleRasterCellRectangles (RasterImageCommand command)
+    {
+        if (command.Pixels is null || command.DestinationCells.Width <= 0 || command.DestinationCells.Height <= 0)
+        {
+            yield break;
+        }
+
+        if (command.Clip is null)
+        {
+            yield return command.DestinationCells;
+
+            yield break;
+        }
+
+        foreach (Rectangle clipRect in command.Clip.GetRectangles ())
+        {
+            Rectangle visible = Rectangle.Intersect (command.DestinationCells, clipRect);
+
+            if (visible.Width <= 0 || visible.Height <= 0)
+            {
+                continue;
+            }
+
+            yield return visible;
+        }
+    }
+
+    private static bool TryCropRasterImagePixels (Color [,] source,
+                                                 Rectangle destinationCells,
+                                                 Rectangle visibleCells,
+                                                 out Color [,] pixels)
+    {
+        pixels = source;
+
+        int sourceWidth = source.GetLength (0);
+        int sourceHeight = source.GetLength (1);
+
+        if (sourceWidth <= 0
+            || sourceHeight <= 0
+            || destinationCells.Width <= 0
+            || destinationCells.Height <= 0
+            || visibleCells.Width <= 0
+            || visibleCells.Height <= 0)
+        {
+            return false;
+        }
+
+        int xStart = ScaleCellOffsetToPixels (visibleCells.X - destinationCells.X, destinationCells.Width, sourceWidth);
+        int xEnd = ScaleCellOffsetToPixels (visibleCells.Right - destinationCells.X, destinationCells.Width, sourceWidth);
+        int yStart = ScaleCellOffsetToPixels (visibleCells.Y - destinationCells.Y, destinationCells.Height, sourceHeight);
+        int yEnd = ScaleCellOffsetToPixels (visibleCells.Bottom - destinationCells.Y, destinationCells.Height, sourceHeight);
+
+        xStart = Math.Clamp (xStart, 0, sourceWidth);
+        xEnd = Math.Clamp (xEnd, xStart, sourceWidth);
+        yStart = Math.Clamp (yStart, 0, sourceHeight);
+        yEnd = Math.Clamp (yEnd, yStart, sourceHeight);
+
+        int width = xEnd - xStart;
+        int height = yEnd - yStart;
+
+        if (width <= 0 || height <= 0)
+        {
+            return false;
+        }
+
+        if (width == sourceWidth && height == sourceHeight)
+        {
+            pixels = source;
+
+            return true;
+        }
+
+        pixels = new Color [width, height];
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                pixels [x, y] = source [xStart + x, yStart + y];
+            }
+        }
+
+        return true;
+    }
+
+    private static int ScaleCellOffsetToPixels (int cellOffset, int cellCount, int pixelCount) =>
+        (int)((long)cellOffset * pixelCount / cellCount);
+
     /// <summary>
-    ///     Writes buffered output to console, wrapping URLs with OSC 8 hyperlinks (non-legacy only),
-    ///     then clears the buffer and advances <paramref name="lastCol"/> by <paramref name="outputWidth"/>.
+    ///     Writes buffered output to console, then clears the buffer and advances
+    ///     <paramref name="lastCol"/> by <paramref name="outputWidth"/>.
     /// </summary>
     private void WriteToConsole (StringBuilder output, ref int lastCol, ref int outputWidth)
     {
-        if (IsLegacyConsole)
-        {
-            Write (output);
-        }
-        else
-        {
-            // Wrap URLs with OSC 8 hyperlink sequences
-            StringBuilder processed = Osc8UrlLinker.WrapOsc8 (output);
-            Write (processed);
-        }
+        Write (output);
 
         output.Clear ();
         lastCol += outputWidth;
         outputWidth = 0;
+    }
+
+    private static bool RowContainsUrls (IOutputBuffer buffer, int row, int cols)
+    {
+        for (int col = 0; col < cols; col++)
+        {
+            if (!string.IsNullOrEmpty (buffer.GetCellUrl (col, row)))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void InvalidateRowsWithUrlsIfStale (IOutputBuffer buffer, int rows, int cols)
+    {
+        int urlVersion = buffer is OutputBufferImpl outputBuffer ? outputBuffer.UrlStateVersion : 0;
+
+        if (!ReferenceEquals (_lastTrackedBuffer, buffer)
+            || _lastTrackedRows != rows
+            || _lastTrackedCols != cols
+            || _lastTrackedUrlVersion != urlVersion)
+        {
+            _rowsWithUrls.Clear ();
+            _lastTrackedBuffer = buffer;
+            _lastTrackedRows = rows;
+            _lastTrackedCols = cols;
+            _lastTrackedUrlVersion = urlVersion;
+        }
     }
 }

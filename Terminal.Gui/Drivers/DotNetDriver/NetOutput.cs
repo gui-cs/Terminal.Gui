@@ -189,17 +189,14 @@ public class NetOutput : OutputBase, IOutput
         // Best-effort: mirror behavior of ANSI/Unix outputs for consoles that accept CSI sequences.
         try
         {
-            // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
+            // Disable bracketed paste and mouse events while suspended.
+            Write (EscSeqUtils.CSI_DisableBracketedPaste);
             Write (EscSeqUtils.CSI_DisableMouseEvents);
 
             // Check if we have a real console first
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
             {
-                Logging.Information ($"Console redirected (Output: {
-                    Console.IsOutputRedirected
-                }, Input: {
-                    Console.IsInputRedirected
-                }). Running in degraded mode.");
+                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
 
                 return;
             }
@@ -227,8 +224,9 @@ public class NetOutput : OutputBase, IOutput
         }
         finally
         {
-            // Enable mouse events to allow mouse events to be sent to the application when it is resumed.
+            // Re-enable mouse events and bracketed paste after resume.
             Write (EscSeqUtils.CSI_EnableMouseEvents);
+            Write (EscSeqUtils.CSI_EnableBracketedPaste);
         }
     }
 }

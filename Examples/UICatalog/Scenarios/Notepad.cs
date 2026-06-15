@@ -1,13 +1,17 @@
-﻿// ReSharper disable AccessToDisposedClosure
+// ReSharper disable AccessToDisposedClosure
 
 #nullable enable
+
+using Terminal.Gui.Document;
+using Terminal.Gui.Editor;
+using Terminal.Gui.Highlighting;
 
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Notepad", "Multi-tab text editor using the Tabs control.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Tabs")]
-[ScenarioCategory ("TextView")]
+[ScenarioCategory ("Editor")]
 public class Notepad : Scenario
 {
     private IApplication? _app;
@@ -271,8 +275,8 @@ public class Notepad : Scenario
         }
 
         OpenedFile tab = new (this) { Title = tabName, File = fileInfo };
-        tab.CreateAndAddTextView (fileInfo);
-        tab.RegisterTextViewEvents ();
+        tab.CreateAndAddEditor (fileInfo);
+        tab.RegisterEditorEvents ();
 
         _focusedTabs.Add (tab);
         _focusedTabs.Value = tab;
@@ -321,7 +325,7 @@ public class Notepad : Scenario
 
     /// <summary>
     ///     Walks up the directory tree from the current directory looking for the repository root
-    ///     (identified by Terminal.sln).
+    ///     (identified by Terminal.slnx).
     /// </summary>
     private static string? FindRepoRoot ()
     {
@@ -329,7 +333,7 @@ public class Notepad : Scenario
 
         while (dir is { })
         {
-            if (File.Exists (Path.Combine (dir.FullName, "Terminal.sln")))
+            if (File.Exists (Path.Combine (dir.FullName, "Terminal.slnx")))
             {
                 return dir.FullName;
             }
@@ -344,7 +348,7 @@ public class Notepad : Scenario
     {
         if (_focusedTabs?.Value is OpenedFile tab)
         {
-            return tab.TextView?.Text.Length ?? 0;
+            return tab.EditorControl?.Text.Length ?? 0;
         }
 
         return 0;
@@ -360,14 +364,14 @@ public class Notepad : Scenario
 
         if (e.NewValue is OpenedFile tab)
         {
-            len = tab.TextView?.Text.Length ?? 0;
+            len = tab.EditorControl?.Text.Length ?? 0;
         }
 
         LenShortcut.Title = $"Len:{len}";
 
         //if (e.NewValue is OpenedFile openedTab)
         //{
-        //    openedTab.TextView?.SetFocus ();
+        //    openedTab.EditorControl?.SetFocus ();
         //}
     }
 
@@ -375,17 +379,19 @@ public class Notepad : Scenario
     {
         public FileInfo? File { get; set; }
 
-        /// <summary>Gets whether this tab is a pristine new document — never opened to a file and has no content.</summary>
-        public bool IsPristine => File is null && string.IsNullOrEmpty (TextView?.Text);
+        /// <summary>Gets whether this tab is a pristine new document &#8212; never opened to a file and has no content.</summary>
+        public bool IsPristine => File is null && string.IsNullOrEmpty (EditorControl?.Text);
 
-        public TextView? TextView { get; private set; }
+        public Editor? EditorControl { get; private set; }
 
         /// <summary>The text of the tab the last time it was saved.</summary>
         private string? _savedText;
 
-        public bool UnsavedChanges => TextView is { } && !string.Equals (_savedText, TextView.Text);
+        private EventHandler<DocumentChangeEventArgs>? _documentChangedHandler;
 
-        public void CreateAndAddTextView (FileInfo? file)
+        public bool UnsavedChanges => EditorControl is { } editor && !string.Equals (_savedText, editor.Text);
+
+        public void CreateAndAddEditor (FileInfo? file)
         {
             var initialText = string.Empty;
 
@@ -394,25 +400,30 @@ public class Notepad : Scenario
                 initialText = System.IO.File.ReadAllText (file.FullName);
             }
 
-            TextView = new TextView
+            EditorControl = new ()
             {
                 X = 0,
                 Y = 0,
                 Width = Dim.Fill (),
-                Height = Dim.Fill (),
-                Text = initialText,
-                TabKeyAddsTab = false
+                Height = Dim.Fill ()
             };
+
+            if (file is { Extension: { Length: > 0 } ext })
+            {
+                EditorControl.HighlightingDefinition = HighlightingManager.Instance.GetDefinitionByExtension (ext);
+            }
+
+            EditorControl.Text = initialText;
 
             _savedText = initialText;
 
-            Add (TextView);
+            Add (EditorControl);
         }
 
         /// <summary>Loads a file into an existing tab, replacing its content.</summary>
         public void LoadFile (FileInfo file)
         {
-            if (TextView is null)
+            if (EditorControl is null)
             {
                 return;
             }
@@ -424,51 +435,64 @@ public class Notepad : Scenario
                 text = System.IO.File.ReadAllText (file.FullName);
             }
 
-            // Set _savedText first so the ContentsChanged handler sees matching text (not dirty).
+            // Set _savedText first so the DocumentChanged handler sees matching text (not dirty).
             _savedText = text;
-            TextView.Text = text;
+            EditorControl.Text = text;
         }
 
-        public void RegisterTextViewEvents ()
+        public void RegisterEditorEvents ()
         {
-            if (TextView is null)
+            if (EditorControl is null)
             {
                 return;
             }
 
             // when user makes changes rename tab to indicate unsaved
-            TextView.ContentsChanged += (_, _) =>
-                                        {
-                                            // if current text doesn't match saved text
-                                            bool areDiff = UnsavedChanges;
+            _documentChangedHandler = (_, _) =>
+                                      {
+                                          // if current text doesn't match saved text
+                                          bool areDiff = UnsavedChanges;
 
-                                            if (areDiff)
-                                            {
-                                                if (!Title.EndsWith ('*'))
-                                                {
-                                                    Title = Title + "*";
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (Title.EndsWith ('*'))
-                                                {
-                                                    Title = Title.TrimEnd ('*');
-                                                }
-                                            }
+                                          if (areDiff)
+                                          {
+                                              if (!Title.EndsWith ('*'))
+                                              {
+                                                  Title = Title + "*";
+                                              }
+                                          }
+                                          else
+                                          {
+                                              if (Title.EndsWith ('*'))
+                                              {
+                                                  Title = Title.TrimEnd ('*');
+                                              }
+                                          }
 
-                                            notepad.LenShortcut?.Title = $"Len:{TextView.Text.Length}";
-                                        };
+                                          notepad.LenShortcut?.Title = $"Len:{EditorControl.Text.Length}";
+                                      };
+
+            EditorControl.Document!.Changed += _documentChangedHandler;
+        }
+
+        protected override void Dispose (bool disposing)
+        {
+            if (disposing && _documentChangedHandler is { } && EditorControl?.Document is { } doc)
+            {
+                doc.Changed -= _documentChangedHandler;
+                _documentChangedHandler = null;
+            }
+
+            base.Dispose (disposing);
         }
 
         internal void Save ()
         {
-            if (TextView is null || File is null || string.IsNullOrWhiteSpace (File.FullName))
+            if (EditorControl is null || File is null || string.IsNullOrWhiteSpace (File.FullName))
             {
                 return;
             }
 
-            string newText = TextView.Text;
+            string newText = EditorControl.Text;
 
             System.IO.File.WriteAllText (File.FullName, newText);
             _savedText = newText;

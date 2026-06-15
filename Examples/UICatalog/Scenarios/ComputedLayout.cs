@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using Terminal.Gui.Editor;
 
 namespace UICatalog.Scenarios;
 
@@ -17,10 +15,7 @@ public class ComputedLayout : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window window = new ()
-        {
-            Title = GetQuitKeyAndName ()
-        };
+        using Window window = new () { Title = GetQuitKeyAndName () };
 
         // Demonstrate using Dim to create a horizontal ruler that always measures the parent window's width
         const string rule = "|123456789";
@@ -51,20 +46,20 @@ public class ComputedLayout : Scenario
         };
 
         window.SubViewsLaidOut += (_, _) =>
-                               {
-                                   if (horizontalRuler.Viewport.Width == 0 || horizontalRuler.Viewport.Height == 0)
-                                   {
-                                       return;
-                                   }
+                                  {
+                                      if (horizontalRuler.Viewport.Width == 0 || horizontalRuler.Viewport.Height == 0)
+                                      {
+                                          return;
+                                      }
 
-                                   horizontalRuler.Text =
-                                       rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length)) [
-                                        ..horizontalRuler.Viewport.Width];
+                                      horizontalRuler.Text =
+                                          rule.Repeat ((int)Math.Ceiling (horizontalRuler.Viewport.Width / (double)rule.Length))
+                                              [..horizontalRuler.Viewport.Width];
 
-                                   verticalRuler.Text =
-                                       vrule.Repeat ((int)Math.Ceiling (verticalRuler.Viewport.Height * 2 / (double)rule.Length))
-                                           [..(verticalRuler.Viewport.Height * 2)];
-                               };
+                                      verticalRuler.Text =
+                                          vrule.Repeat ((int)Math.Ceiling (verticalRuler.Viewport.Height * 2 / (double)rule.Length))
+                                              [..(verticalRuler.Viewport.Height * 2)];
+                                  };
 
         window.Add (verticalRuler);
 
@@ -81,202 +76,175 @@ public class ComputedLayout : Scenario
 
         Window subWin = new ()
         {
-            X = Pos.Center (), Y = 2, Width = Dim.Fill (margin), Height = 7,
+            X = Pos.Center (),
+            Y = 2,
+            Width = Dim.Fill (margin),
+            Height = 7,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped
         };
 
         subWin.Initialized += (_, _) =>
                               {
-                                  subWin.Title =
-                                      $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
+                                  subWin.Title = $"{subWin.GetType ().Name} {{X={subWin.X},Y={subWin.Y},Width={subWin.Width},Height={subWin.Height}}}";
                               };
         window.Add (subWin);
 
         var i = 1;
         var txt = "Resize the terminal to see computed layout in action.";
         List<Label> labelList = new ();
-        labelList.Add (new() { Text = "The lines below show different alignment" });
+        labelList.Add (new Label { Text = "The lines below show different alignment" });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Start,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Start,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.End,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.End,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Center,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Center,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Fill,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Fill,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
         subWin.Add (labelList.ToArray ());
 
         FrameView frameView = new () { X = 2, Y = Pos.Bottom (subWin), Width = 30, Height = 7 };
 
         frameView.Initialized += (sender, _) =>
                                  {
-                                     FrameView fv = (FrameView)sender!;
+                                     var fv = (FrameView)sender!;
 
-                                     fv.Title =
-                                         $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+                                     fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
                                  };
         i = 1;
-        labelList = new ();
-        labelList.Add (new() { Text = "The lines below show different alignment" });
+        labelList = new List<Label> ();
+        labelList.Add (new Label { Text = "The lines below show different alignment" });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Start,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Start,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.End,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.End,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Center,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Center,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Fill,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Fill,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
         frameView.Add (labelList.ToArray ());
         window.Add (frameView);
 
-        frameView = new()
-        {
-            X = Pos.Right (frameView), Y = Pos.Top (frameView), Width = Dim.Fill (), Height = 7
-        };
+        frameView = new FrameView { X = Pos.Right (frameView), Y = Pos.Top (frameView), Width = Dim.Fill (), Height = 7 };
 
         frameView.Initialized += (sender, _) =>
                                  {
-                                     FrameView fv = (FrameView)sender!;
+                                     var fv = (FrameView)sender!;
 
-                                     fv.Title =
-                                         $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
+                                     fv.Title = $"{frameView.GetType ().Name} {{X={fv.X},Y={fv.Y},Width={fv.Width},Height={fv.Height}}}";
                                  };
 
-        labelList = new ();
-        labelList.Add (new() { Text = "The lines below show different alignment" });
+        labelList = new List<Label> ();
+        labelList.Add (new Label { Text = "The lines below show different alignment" });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Start,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Start,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.End,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.End,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Center,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Center,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
 
-        labelList.Add (
-                       new()
-                       {
-                           TextAlignment = Alignment.Fill,
-                           Width = Dim.Fill (),
-                           X = 0,
-                           Y = Pos.Bottom (labelList.LastOrDefault ()),
-                           SchemeName = "Dialog",
-                           Text = $"{i++}-{txt}"
-                       }
-                      );
+        labelList.Add (new Label
+        {
+            TextAlignment = Alignment.Fill,
+            Width = Dim.Fill (),
+            X = 0,
+            Y = Pos.Bottom (labelList.LastOrDefault ()),
+            SchemeName = "Dialog",
+            Text = $"{i++}-{txt}"
+        });
         frameView.Add (labelList.ToArray ());
         window.Add (frameView);
 
         // Demonstrate Dim & Pos using percentages - a TextField that is 30% height and 80% wide
-        var textView = new TextView
+        Editor editor = new ()
         {
             X = Pos.Center (),
             Y = Pos.Percent (50),
@@ -285,16 +253,10 @@ public class ComputedLayout : Scenario
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent)
         };
 
-        textView.Text =
-            "This TextView should horizontally & vertically centered and \n10% of the screeen height, and 80% of its width.";
-        window.Add (textView);
+        editor.Text = "This Editor should horizontally & vertically centered and \n10% of the screen height, and 80% of its width.";
+        window.Add (editor);
 
-        var oddballButton = new Button
-        {
-            Text = "These buttons demo convoluted PosCombine scenarios",
-            X = Pos.Center (),
-            Y = Pos.Bottom (textView) + 1
-        };
+        var oddballButton = new Button { Text = "These buttons demo convoluted PosCombine scenarios", X = Pos.Center (), Y = Pos.Bottom (editor) + 1 };
         window.Add (oddballButton);
 
         #region Issue2358
@@ -302,67 +264,56 @@ public class ComputedLayout : Scenario
         // Demonstrate odd-ball Combine scenarios
         // Until https://github.com/gui-cs/Terminal.Gui/issues/2358 is fixed these won't work right
 
-        oddballButton = new() { Text = "Center + 0", X = Pos.Center () + 0, Y = Pos.Bottom (oddballButton) };
+        oddballButton = new Button { Text = "Center + 0", X = Pos.Center () + 0, Y = Pos.Bottom (oddballButton) };
         window.Add (oddballButton);
 
-        oddballButton = new() { Text = "Center + 1", X = Pos.Center () + 1, Y = Pos.Bottom (oddballButton) };
+        oddballButton = new Button { Text = "Center + 1", X = Pos.Center () + 1, Y = Pos.Bottom (oddballButton) };
         window.Add (oddballButton);
 
-        oddballButton = new() { Text = "0 + Center", X = 0 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
+        oddballButton = new Button { Text = "0 + Center", X = 0 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
         window.Add (oddballButton);
 
-        oddballButton = new() { Text = "1 + Center", X = 1 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
+        oddballButton = new Button { Text = "1 + Center", X = 1 + Pos.Center (), Y = Pos.Bottom (oddballButton) };
         window.Add (oddballButton);
 
-        oddballButton = new() { Text = "Center - 1", X = Pos.Center () - 1, Y = Pos.Bottom (oddballButton) };
+        oddballButton = new Button { Text = "Center - 1", X = Pos.Center () - 1, Y = Pos.Bottom (oddballButton) };
         window.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
-        oddballButton = new()
+        oddballButton = new Button
         {
-            Text = "Center + Center - Percent(50)",
-            X = Pos.Center () + Pos.Center () - Pos.Percent (50),
-            Y = Pos.Bottom (oddballButton)
+            Text = "Center + Center - Percent(50)", X = Pos.Center () + Pos.Center () - Pos.Percent (50), Y = Pos.Bottom (oddballButton)
         };
         window.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
-        oddballButton = new()
+        oddballButton = new Button
         {
-            Text = "Percent(50) + Center - Percent(50)",
-            X = Pos.Percent (50) + Pos.Center () - Pos.Percent (50),
-            Y = Pos.Bottom (oddballButton)
+            Text = "Percent(50) + Center - Percent(50)", X = Pos.Percent (50) + Pos.Center () - Pos.Percent (50), Y = Pos.Bottom (oddballButton)
         };
         window.Add (oddballButton);
 
         // This demonstrates nonsense: it the same as using Pos.AnchorEnd (100/2=50 + 100/2=50 = 100 - 50)
         // The `- Pos.Percent(5)` is there so at least something is visible
-        oddballButton = new()
+        oddballButton = new Button
         {
-            Text = "Center + Percent(50) - Percent(50)",
-            X = Pos.Center () + Pos.Percent (50) - Pos.Percent (50),
-            Y = Pos.Bottom (oddballButton)
+            Text = "Center + Percent(50) - Percent(50)", X = Pos.Center () + Pos.Percent (50) - Pos.Percent (50), Y = Pos.Bottom (oddballButton)
         };
         window.Add (oddballButton);
 
         #endregion
 
         // This demonstrates nonsense: Same as At(0)
-        oddballButton = new()
+        oddballButton = new Button
         {
-            Text = "Center - Center - Percent(50)",
-            X = Pos.Center () + Pos.Center () - Pos.Percent (50),
-            Y = Pos.Bottom (oddballButton)
+            Text = "Center - Center - Percent(50)", X = Pos.Center () + Pos.Center () - Pos.Percent (50), Y = Pos.Bottom (oddballButton)
         };
         window.Add (oddballButton);
 
         // This demonstrates combining Percents)
-        oddballButton = new()
-        {
-            Text = "Percent(40) + Percent(10)", X = Pos.Percent (40) + Pos.Percent (10), Y = Pos.Bottom (oddballButton)
-        };
+        oddballButton = new Button { Text = "Percent(40) + Percent(10)", X = Pos.Percent (40) + Pos.Percent (10), Y = Pos.Bottom (oddballButton) };
         window.Add (oddballButton);
 
         // Demonstrate AnchorEnd - Button is anchored to bottom/right
@@ -396,8 +347,7 @@ public class ComputedLayout : Scenario
         // This is intentionally convoluted to illustrate potential bugs.
         var anchorEndLabel2 = new TextField
         {
-            Text =
-                "This TextField should be the 4th to last line (AnchorEnd (3) - 1).",
+            Text = "This TextField should be the 4th to last line (AnchorEnd (3) - 1).",
             TextAlignment = Alignment.Start,
             SchemeName = "Menu",
             Width = Dim.Fill (5),
@@ -409,12 +359,7 @@ public class ComputedLayout : Scenario
         // Demonstrate AnchorEnd() in combination with Pos.Align to align a set of buttons centered across the
         // bottom - 1
         // This is intentionally convoluted to illustrate potential bugs.
-        var leftButton = new Button
-        {
-            Text = "Left",
-            X = Pos.Align (Alignment.Center),
-            Y = Pos.AnchorEnd () - 1
-        };
+        var leftButton = new Button { Text = "Left", X = Pos.Align (Alignment.Center), Y = Pos.AnchorEnd () - 1 };
 
         leftButton.Accepting += (_, _) =>
                                 {
@@ -424,12 +369,7 @@ public class ComputedLayout : Scenario
                                 };
 
         // show positioning vertically using Pos.AnchorEnd
-        var centerButton = new Button
-        {
-            Text = "Center",
-            X = Pos.Align (Alignment.Center),
-            Y = Pos.AnchorEnd (2)
-        };
+        var centerButton = new Button { Text = "Center", X = Pos.Align (Alignment.Center), Y = Pos.AnchorEnd (2) };
 
         centerButton.Accepting += (_, _) =>
                                   {
@@ -439,12 +379,7 @@ public class ComputedLayout : Scenario
                                   };
 
         // show positioning vertically using another window and Pos.Bottom
-        var rightButton = new Button
-        {
-            Text = "Right",
-            X = Pos.Align (Alignment.Center),
-            Y = Pos.Y (centerButton)
-        };
+        var rightButton = new Button { Text = "Right", X = Pos.Align (Alignment.Center), Y = Pos.Y (centerButton) };
 
         rightButton.Accepting += (_, _) =>
                                  {

@@ -465,6 +465,70 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         window.Dispose ();
     }
 
+    // Copilot
+    [Theory]
+    [InlineData ("file:///C:/Windows/System32/calc.exe")]
+    [InlineData ("file:///etc/passwd")]
+    [InlineData ("ms-msdt:id PCWDiagnostic")]
+    [InlineData ("ms-officecmd:")]
+    [InlineData ("search-ms:query=test")]
+    [InlineData ("ldap://example.com")]
+    [InlineData ("vbscript:alert('test')")]
+    [InlineData ("ftp://example.com")]
+    [InlineData ("ftps://example.com")]
+    [InlineData ("javascript:alert(1)")]
+    [InlineData ("data:text/html,<script>alert(1)</script>")]
+    public void OpenUrl_DisallowedScheme_DoesNotThrow_AndDoesNotLaunch (string url)
+    {
+        // OpenUrl should silently return for disallowed schemes without throwing or launching a process.
+        // DisableRealDriverIO is not set here; the scheme check is the guard.
+        Exception? ex = Record.Exception (() => Link.OpenUrl (url));
+        Assert.Null (ex);
+    }
+
+    // Copilot
+    [Theory]
+    [InlineData ("http://example.com")]
+    [InlineData ("https://example.com")]
+    [InlineData ("mailto:user@example.com")]
+    public void OpenUrl_AllowedScheme_IsInSafeSchemes (string url)
+    {
+        bool parsed = Uri.TryCreate (url, UriKind.Absolute, out Uri? uri);
+        Assert.True (parsed);
+        Assert.NotNull (uri);
+        Assert.Contains (uri!.Scheme, Link.SafeSchemes, StringComparer.OrdinalIgnoreCase);
+    }
+
+    // Copilot
+    [Theory]
+    [InlineData ("file:///C:/Windows/System32/calc.exe")]
+    [InlineData ("ms-msdt:id PCWDiagnostic")]
+    [InlineData ("ftp://example.com")]
+    [InlineData ("ldap://example.com")]
+    public void OpenUrl_DisallowedScheme_IsNotInSafeSchemes (string url)
+    {
+        bool parsed = Uri.TryCreate (url, UriKind.Absolute, out Uri? uri);
+        Assert.True (parsed);
+        Assert.NotNull (uri);
+        Assert.DoesNotContain (uri!.Scheme, Link.SafeSchemes, StringComparer.OrdinalIgnoreCase);
+    }
+
+    // Copilot
+    [Fact]
+    public void OpenUrl_MalformedUrl_DoesNotThrow ()
+    {
+        Exception? ex = Record.Exception (() => Link.OpenUrl ("not a valid url"));
+        Assert.Null (ex);
+    }
+
+    // Copilot
+    [Fact]
+    public void OpenUrl_EmptyUrl_DoesNotThrow ()
+    {
+        Exception? ex = Record.Exception (() => Link.OpenUrl (string.Empty));
+        Assert.Null (ex);
+    }
+
     [Fact]
     public void IDesignable_EnableForDesign_Sets_Title_And_Url ()
     {

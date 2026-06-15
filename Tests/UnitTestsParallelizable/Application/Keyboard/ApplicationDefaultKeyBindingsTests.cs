@@ -7,6 +7,7 @@ namespace ApplicationTests.Keyboard;
 /// <summary>
 ///     Tests for <see cref="Application.DefaultKeyBindings"/> static property.
 /// </summary>
+[Collection ("Application Tests")]
 public class ApplicationDefaultKeyBindingsTests
 {
     [Fact]

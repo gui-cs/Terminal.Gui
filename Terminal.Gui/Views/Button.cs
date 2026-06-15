@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Raises the <see cref="View.Accepting"/> and <see cref="View.Accepted"/> events when the user presses
@@ -6,6 +6,7 @@
 ///     <c>Enter</c>, or <c>Space</c> or clicks with the mouse.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Button.gif" alt="Button demo"/>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
 ///         Button can act as the default <see cref="Command.Accept"/> handler for all peer-Views. See
@@ -43,6 +44,7 @@
 /// </remarks>
 public class Button : View, IDesignable, IAcceptTarget
 {
+    private readonly TextFormatter _interiorTextFormatter = new ();
     private readonly Rune _leftBracket;
     private readonly Rune _leftDefault;
     private readonly Rune _rightBracket;
@@ -71,6 +73,10 @@ public class Button : View, IDesignable, IAcceptTarget
         _leftDefault = Glyphs.LeftDefaultIndicator;
         _rightDefault = Glyphs.RightDefaultIndicator;
 
+        _interiorTextFormatter.Alignment = Alignment.Center;
+        _interiorTextFormatter.VerticalAlignment = Alignment.Center;
+        _interiorTextFormatter.HotKeySpecifier = HotKeySpecifier;
+
         Height = Dim.Auto (DimAutoStyle.Text);
         Width = Dim.Auto (DimAutoStyle.Text);
 
@@ -94,7 +100,7 @@ public class Button : View, IDesignable, IAcceptTarget
 
     /// <summary>
     ///     Called before the Button's initial <see cref="View.ShadowStyle"/> is applied during construction.
-    ///     Override to change or suppress the default shadow — set <see cref="ValueChangingEventArgs{T}.NewValue"/>
+    ///     Override to change or suppress the default shadow � set <see cref="ValueChangingEventArgs{T}.NewValue"/>
     ///     to the desired style, or set <see cref="ValueChangingEventArgs{T}.Handled"/> to
     ///     <see langword="true"/> to skip applying any shadow.
     /// </summary>
@@ -117,10 +123,10 @@ public class Button : View, IDesignable, IAcceptTarget
     {
         ValueChangingEventArgs<ShadowStyles?> args = new (null, DefaultShadow);
 
-        // 1. Virtual method — subclasses override to change/suppress the default shadow.
+        // 1. Virtual method � subclasses override to change/suppress the default shadow.
         OnInitializingShadowStyle (args);
 
-        // 2. Event — external subscribers get a chance to customize.
+        // 2. Event � external subscribers get a chance to customize.
         InitializingShadowStyle?.Invoke (this, args);
 
         // 3. Apply the (potentially modified) shadow style unless already handled.
@@ -137,23 +143,23 @@ public class Button : View, IDesignable, IAcceptTarget
     {
         if (mouseHoldRepeat.HasValue)
         {
-            // MouseHoldRepeat enabled: Remove ALL Click/Release/Press bindings, add only configured event→HotKey
+            // MouseHoldRepeat enabled: Remove ALL Click/Release/Press bindings, add only configured event?HotKey
             MouseBindings.Remove (MouseFlags.LeftButtonPressed);
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonDoubleClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonTripleClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
 
-            // Add configured mouse event→HotKey binding
+            // Add configured mouse event?HotKey binding
             MouseBindings.Add (mouseHoldRepeat.Value, Command.Accept);
         }
         else
         {
-            // MouseHoldRepeat disabled: Remove ALL Click/Release/Press bindings, add only Clicked→HotKey
+            // MouseHoldRepeat disabled: Remove ALL Click/Release/Press bindings, add only Clicked?HotKey
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
 
-            // Add Clicked→HotKey bindings (default behavior)
+            // Add Clicked?HotKey bindings (default behavior)
             MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
             MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
             MouseBindings.Add (MouseFlags.LeftButtonTripleClicked, Command.Accept);
@@ -167,13 +173,18 @@ public class Button : View, IDesignable, IAcceptTarget
     {
         base.Text = e.Value;
         TextFormatter.HotKeySpecifier = HotKeySpecifier;
+        _interiorTextFormatter.HotKeySpecifier = HotKeySpecifier;
     }
 
     /// <inheritdoc/>
     public override string Text { get => Title; set => base.Text = Title = value; }
 
     /// <inheritdoc/>
-    public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set => _interiorTextFormatter.HotKeySpecifier = TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
+    }
 
     /// <inheritdoc/>
     public bool IsDefault
@@ -208,26 +219,113 @@ public class Button : View, IDesignable, IAcceptTarget
     protected override void UpdateTextFormatterText ()
     {
         base.UpdateTextFormatterText ();
+        TextFormatter.Text = GetDecoratedText ();
+    }
 
-        if (NoDecorations)
+    /// <inheritdoc/>
+    protected override bool OnDrawingText (DrawContext? context)
+    {
+        if (NoDecorations || Driver is null)
         {
-            TextFormatter.Text = Text;
+            return base.OnDrawingText (context);
         }
-        else if (IsDefault)
+
+        Rectangle drawRect = new (ContentToScreen (Point.Empty), GetContentSize ());
+
+        if (drawRect.Width < 2 || drawRect.Height < 1)
         {
-            TextFormatter.Text = $"{_leftBracket}{_leftDefault} {Text} {_rightDefault}{_rightBracket}";
+            return base.OnDrawingText (context);
         }
-        else
+
+        Rectangle interiorRect = new (drawRect.X + 1, drawRect.Y, drawRect.Width - 2, drawRect.Height);
+        Attribute normalAttr = HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal);
+        Attribute hotAttr = HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
+        string interiorText = GetInteriorText ();
+
+        // Mirror all TextFormatter settings onto _interiorTextFormatter. Guard each assignment
+        // so NeedsFormat is not set when a value is unchanged.
+        if (_interiorTextFormatter.Text != interiorText)
         {
-            if (NoPadding)
-            {
-                TextFormatter.Text = $"{_leftBracket}{Text}{_rightBracket}";
-            }
-            else
-            {
-                TextFormatter.Text = $"{_leftBracket} {Text} {_rightBracket}";
-            }
+            _interiorTextFormatter.Text = interiorText;
         }
+
+        if (_interiorTextFormatter.Alignment != TextAlignment)
+        {
+            _interiorTextFormatter.Alignment = TextAlignment;
+        }
+
+        if (_interiorTextFormatter.VerticalAlignment != VerticalTextAlignment)
+        {
+            _interiorTextFormatter.VerticalAlignment = VerticalTextAlignment;
+        }
+
+        if (_interiorTextFormatter.Direction != TextDirection)
+        {
+            _interiorTextFormatter.Direction = TextDirection;
+        }
+
+        if (_interiorTextFormatter.PreserveTrailingSpaces != PreserveTrailingSpaces)
+        {
+            _interiorTextFormatter.PreserveTrailingSpaces = PreserveTrailingSpaces;
+        }
+
+        if (_interiorTextFormatter.MultiLine != TextFormatter.MultiLine)
+        {
+            _interiorTextFormatter.MultiLine = TextFormatter.MultiLine;
+        }
+
+        if (_interiorTextFormatter.WordWrap != TextFormatter.WordWrap)
+        {
+            _interiorTextFormatter.WordWrap = TextFormatter.WordWrap;
+        }
+
+        if (_interiorTextFormatter.TabWidth != TextFormatter.TabWidth)
+        {
+            _interiorTextFormatter.TabWidth = TextFormatter.TabWidth;
+        }
+
+        if (_interiorTextFormatter.PreserveTabs != TextFormatter.PreserveTabs)
+        {
+            _interiorTextFormatter.PreserveTabs = TextFormatter.PreserveTabs;
+        }
+
+        if (_interiorTextFormatter.ConstrainToWidth != interiorRect.Width)
+        {
+            _interiorTextFormatter.ConstrainToWidth = interiorRect.Width;
+        }
+
+        if (_interiorTextFormatter.ConstrainToHeight != interiorRect.Height)
+        {
+            _interiorTextFormatter.ConstrainToHeight = interiorRect.Height;
+        }
+
+        Region? interiorDrawRegion = (interiorRect.Width > 0 && !string.IsNullOrEmpty (interiorText))
+            ? _interiorTextFormatter.GetDrawRegion (interiorRect)
+            : null;
+
+        context?.AddDrawnRegion (new Region (drawRect));
+
+        int delimiterRow = GetDelimiterRow (drawRect, interiorDrawRegion);
+
+        // Fill the entire content area with the focus/normal attribute to ensure continuous
+        // highlight across all rows and across the bracket columns.
+        Driver.SetAttribute (normalAttr);
+        Driver.FillRect (drawRect);
+
+        Driver.Move (drawRect.X, delimiterRow);
+        Driver.AddRune (_leftBracket);
+
+        Driver.Move (drawRect.X + drawRect.Width - 1, delimiterRow);
+        Driver.AddRune (_rightBracket);
+
+        if (interiorDrawRegion is not null)
+        {
+            _interiorTextFormatter.Draw (Driver, interiorRect, normalAttr, hotAttr, Rectangle.Empty);
+        }
+
+        SetSubViewNeedsDrawDownHierarchy ();
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -236,5 +334,55 @@ public class Button : View, IDesignable, IAcceptTarget
         Title = "_Button";
 
         return true;
+    }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
+
+    // GetDecoratedText (called by UpdateTextFormatterText for Dim.Auto sizing) and GetInteriorText
+    // (called by OnDrawingText for rendering) must remain in sync when modifying button text formatting.
+    private string GetDecoratedText ()
+    {
+        if (NoDecorations)
+        {
+            return Text;
+        }
+
+        return $"{_leftBracket}{GetInteriorText ()}{_rightBracket}";
+    }
+
+    private string GetInteriorText ()
+    {
+        if (IsDefault)
+        {
+            return $"{_leftDefault} {Text} {_rightDefault}";
+        }
+
+        if (NoPadding)
+        {
+            return Text;
+        }
+
+        return $" {Text} ";
+    }
+
+    private int GetDelimiterRow (Rectangle drawRect, Region? interiorDrawRegion)
+    {
+        if (interiorDrawRegion is not null)
+        {
+            Rectangle interiorBounds = interiorDrawRegion.GetBounds ();
+
+            if (!interiorBounds.IsEmpty)
+            {
+                return interiorBounds.Y;
+            }
+        }
+
+        return VerticalTextAlignment switch
+        {
+            Alignment.End => drawRect.Y + drawRect.Height - 1,
+            Alignment.Center => drawRect.Y + (drawRect.Height - 1) / 2,
+            _ => drawRect.Y
+        };
     }
 }

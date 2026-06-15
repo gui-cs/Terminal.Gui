@@ -252,6 +252,99 @@ public partial class TextView
         }
     }
 
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Normalizes line endings (CR and CRLF → LF) so the text model sees a single newline form,
+    ///     and strips C0/C1 control chars except tab and newline. Mirrors Windows Terminal's
+    ///     <c>FilterStringForPaste</c>.
+    /// </remarks>
+    protected override string OnSanitizingPaste (string raw)
+    {
+        StringBuilder sb = new (raw.Length);
+
+        for (var i = 0; i < raw.Length; i++)
+        {
+            char c = raw [i];
+
+            if (c == '\r')
+            {
+                sb.Append ('\n');
+
+                if (i + 1 < raw.Length && raw [i + 1] == '\n')
+                {
+                    i++;
+                }
+
+                continue;
+            }
+
+            if (c == '\n' || c == '\t' || (c >= 0x20 && c < 0x7F) || c >= 0xA0)
+            {
+                sb.Append (c);
+            }
+        }
+
+        return sb.ToString ();
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Returns <see langword="true"/> even when <see cref="ReadOnly"/> so that <c>Ctrl+V</c>
+    ///     does not bubble to a parent view that might also bind paste.
+    /// </remarks>
+    protected override bool OnPaste (string text)
+    {
+        if (_isReadOnly)
+        {
+            return true;
+        }
+
+        ResetColumnTrack ();
+        SetWrapModel ();
+
+        // Preserves the legacy clipboard "Copy without selection → Paste inserts as new line above"
+        // behavior. _copyWithoutSelection is set only by this view's own Copy() command, so
+        // bracketed paste (which has no preceding Copy) naturally skips this branch.
+        if (!CurrentPasteUsesPayload && _copyWithoutSelection && text.FirstOrDefault (x => x is '\n' or '\r') == 0)
+        {
+            List<Cell> runeList = Cell.ToCellList (text);
+            List<Cell> currentLine = GetCurrentLine ();
+            _historyText.Add ([ [.. currentLine]], InsertionPoint);
+            List<List<Cell>> addedLine = [ [.. currentLine], runeList];
+            _historyText.Add ([.. addedLine], InsertionPoint, TextEditingLineStatus.Added);
+            _model.AddLine (CurrentRow, runeList);
+            SetNeedsDraw ();
+            CurrentRow++;
+            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+
+            OnContentsChanged ();
+        }
+        else
+        {
+            if (IsSelecting)
+            {
+                ClearRegion ();
+            }
+
+            _copyWithoutSelection = false;
+            InsertAllText (text, true);
+
+            if (IsSelecting)
+            {
+                _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Original);
+            }
+        }
+
+        UpdateWrapModel ();
+        IsSelecting = false;
+        DoNeededAction ();
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override bool ShouldRaisePastedEvent (string text) => !_isReadOnly;
+
     /// <summary>Replaces all the text based on the match case.</summary>
     /// <param name="textToFind">The text to find.</param>
     /// <param name="matchCase">The match case setting.</param>
@@ -286,7 +379,7 @@ public partial class TextView
         var endCol = (int)(end & 0xffffffff);
         List<Cell> line = _model.GetLine (startRow);
 
-        _historyText.Add ([[.. line]], new Point (startCol, startRow));
+        _historyText.Add ([ [.. line]], new Point (startCol, startRow));
 
         List<List<Cell>> removedLines = [];
 
@@ -456,7 +549,7 @@ public partial class TextView
 
         List<Cell> line = GetCurrentLine ();
 
-        _historyText.Add ([[.. line]], InsertionPoint);
+        _historyText.Add ([ [.. line]], InsertionPoint);
 
         // Optimize single line
         if (lines.Count == 1)
@@ -464,7 +557,7 @@ public partial class TextView
             line.InsertRange (CurrentColumn, lines [0]);
             CurrentColumn += lines [0].Count;
 
-            _historyText.Add ([[.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([ [.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             if (!_wordWrap && CurrentColumn - Viewport.X > Viewport.Width)
             {
@@ -491,7 +584,7 @@ public partial class TextView
         // First line is inserted at the current location, the rest is appended
         line.InsertRange (CurrentColumn, lines [0]);
 
-        List<List<Cell>> addedLines = [[.. line]];
+        List<List<Cell>> addedLines = [ [.. line]];
 
         for (var i = 1; i < lines.Count; i++)
         {
@@ -516,7 +609,7 @@ public partial class TextView
         CurrentColumn = rest is { } ? lastPosition : lines [^1].Count;
         AdjustViewport ();
 
-        _historyText.Add ([[.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. line]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
         OnContentsChanged ();
@@ -532,7 +625,7 @@ public partial class TextView
 
         SetWrapModel ();
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
 
         if (IsSelecting)
         {
@@ -574,7 +667,7 @@ public partial class TextView
             }
         }
 
-        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
         OnContentsChanged ();

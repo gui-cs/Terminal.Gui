@@ -7,7 +7,7 @@ namespace Terminal.Gui.Text;
 /// <summary>Extends <see cref="System.Text.Rune"/> to support TUI text manipulation.</summary>
 public static class RuneExtensions
 {
-    private static readonly Lock _wcwidthLock = new Lock ();
+    private static readonly Lock _wcwidthLock = new();
 
     /// <summary>Maximum Unicode code point.</summary>
     public static readonly int MaxUnicodeCodePoint = 0x10FFFF;
@@ -198,11 +198,11 @@ public static class RuneExtensions
     }
 
     /// <summary>
-    ///     Ensures the rune is not a control character and can be displayed by translating characters below 0x20 to
-    ///     equivalent, printable, Unicode chars.
+    ///     Ensures the rune is not a control character and can be displayed by translating C0 controls (U+0000–U+001F),
+    ///     DEL (U+007F), and C1 controls (U+0080–U+009F) to printable Unicode equivalents via the +U+2400 offset.
     /// </summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
-    /// <param name="rune"></param>
-    /// <returns></returns>
+    /// <param name="rune">The rune to make printable.</param>
+    /// <returns>A printable rune safe for terminal display.</returns>
     public static Rune MakePrintable (this Rune rune) { return Rune.IsControl (rune) ? new (rune.Value + 0x2400) : rune; }
 }

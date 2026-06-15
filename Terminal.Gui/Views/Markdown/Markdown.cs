@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 ///     more.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Markdown.gif" alt="Markdown demo"/>
 ///     <para>
 ///         Set the <see cref="Text"/> property to supply content. The view parses the Markdown,
 ///         performs word-wrap layout, and draws styled output. Fenced code blocks receive a
@@ -36,7 +37,7 @@ namespace Terminal.Gui.Views;
 ///         </item>
 ///         <item>
 ///             <term>Shift+F10 / Right-click</term>
-///             <description>Opens a context menu with <b>Select All</b> and <b>Copy</b> items.</description>
+///             <description>Opens a context menu with <b>Select All</b> and <b>Copy</b> items. Right-clicking on a hyperlink also adds a <b>Copy Link</b> item that copies the URL to the clipboard.</description>
 ///         </item>
 ///     </list>
 ///     <para>Default mouse bindings:</para>
@@ -63,7 +64,8 @@ public partial class Markdown : View, IDesignable
     private readonly List<IntermediateBlock> _blocks = [];
     private readonly List<RenderedLine> _renderedLines = [];
     private readonly List<MarkdownLinkRegion> _linkRegions = [];
-    private readonly HashSet<string> _queuedSixelIds = [];
+    private readonly Dictionary<string, SixelToRender> _sixelRenderMap = [];
+    private readonly HashSet<string> _visibleSixelIds = [];
     private readonly Dictionary<string, int> _headingAnchors = new (StringComparer.OrdinalIgnoreCase);
     private readonly List<MarkdownCodeBlock> _codeBlockViews = [];
     private readonly List<MarkdownTable> _tableViews = [];
@@ -74,6 +76,7 @@ public partial class Markdown : View, IDesignable
     private int _layoutWidth = -1;
     private int _maxLineWidth;
     private int _activeLinkIndex = -1;
+    private string? _contextMenuLinkUrl;
     private bool _inLayout;
     private bool _scrollToTopPending;
     private int _externalContentWidth;
@@ -87,9 +90,57 @@ public partial class Markdown : View, IDesignable
         SetupBindingsAndCommands ();
     }
 
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     If <see cref="View.CanFocus"/> is <see langword="false"/> and a valid <see cref="View.HotKey"/>
+    ///     is set, the hotkey is forwarded to the next peer in <see cref="View.SuperView"/>'s
+    ///     <see cref="View.SubViews"/> — mirroring <see cref="Label"/> so that a non-focusable
+    ///     <see cref="Markdown"/> describing a focusable view (e.g. a <see cref="TextField"/>) moves
+    ///     focus to that view when its hotkey is pressed.
+    /// </remarks>
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        // If Markdown can't focus, forward HotKey to the next peer in the SubView list
+        if (CanFocus || !HotKey.IsValid)
+        {
+            return base.OnActivating (args);
+        }
+        int me = SuperView?.SubViews.IndexOf (this) ?? -1;
+
+        if (me == -1 || !(me < SuperView?.SubViews.Count - 1))
+        {
+            return base.OnActivating (args);
+        }
+        bool handled = SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
+
+        if (!handled)
+        {
+            return base.OnActivating (args);
+        }
+        args.Handled = true;
+
+        return true;
+    }
+
     /// <summary>Gets or sets the Markdown-formatted text displayed by this view.</summary>
     /// <value>The raw Markdown string. Setting this property triggers reparsing, re-layout, and a redraw.</value>
     public override string Text { get => _markdown; set => SetMarkdown (value); }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Unlike <see cref="Label"/>, <see cref="Markdown"/> derives <see cref="View.HotKey"/>
+    ///     from <see cref="Text"/> (the raw markdown) rather than <see cref="View.Title"/>,
+    ///     because <see cref="Text"/> does not flow through <c>Title</c>.
+    /// </remarks>
+    public override Rune HotKeySpecifier
+    {
+        get => base.HotKeySpecifier;
+        set
+        {
+            TitleTextFormatter.HotKeySpecifier = TextFormatter.HotKeySpecifier = value;
+            UpdateHotKeyFromMarkdown ();
+        }
+    }
 
     /// <summary>Gets or sets the Markdig <see cref="Markdig.MarkdownPipeline"/> used for parsing.</summary>
     /// <value>
@@ -266,11 +317,34 @@ public partial class Markdown : View, IDesignable
         }
 
         _markdown = value;
+        UpdateHotKeyFromMarkdown ();
         _scrollToTopPending = true;
         InvalidateParsedAndLayout ();
 
         OnMarkdownChanged ();
         MarkdownChanged?.Invoke (this, EventArgs.Empty);
+    }
+
+    private void UpdateHotKeyFromMarkdown ()
+    {
+        if (HotKeySpecifier == new Rune ('\xFFFF'))
+        {
+            HotKey = Key.Empty;
+
+            return;
+        }
+
+        if (TextFormatter.FindHotKey (_markdown, HotKeySpecifier, out _, out Key hotKey))
+        {
+            if (HotKey != hotKey)
+            {
+                HotKey = hotKey;
+            }
+
+            return;
+        }
+
+        HotKey = Key.Empty;
     }
 
     private void InvalidateParsedAndLayout ()
@@ -280,6 +354,9 @@ public partial class Markdown : View, IDesignable
         _blocks.Clear ();
         _renderedLines.Clear ();
         _linkRegions.Clear ();
+        foreach (var render in _sixelRenderMap.Values) { render.SixelData = null; }
+        _sixelRenderMap.Clear ();
+        _visibleSixelIds.Clear ();
         _activeLinkIndex = -1;
         _headingAnchors.Clear ();
         RemoveCodeBlockViews ();
@@ -326,6 +403,16 @@ public partial class Markdown : View, IDesignable
         RemoveThematicBreakViews ();
 
         BuildRenderedLines ();
+
+        // Clear any auto-focus that Add() triggered when a focusable table was added
+        // while this view has focus. Tables should only receive focus via explicit Tab.
+        // The cascade from HasFocus=false calls OnAdvancingFocus(Forward, TabStop) which
+        // just sets _activeLinkIndex without focusing another table — safe here.
+        if (Focused is MarkdownTable)
+        {
+            Focused.HasFocus = false;
+            _activeLinkIndex = -1;
+        }
 
         // Update content size so the viewport knows the scrollable extent
         int contentWidth = Math.Max (effectiveWidth, _maxLineWidth);
@@ -406,54 +493,68 @@ public partial class Markdown : View, IDesignable
     }
 
     /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:300," + string.Join (",", Enumerable.Repeat ("CursorDown,wait:80", 50)) + ",wait:800";
+
+    /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
         SyntaxHighlighter = new TextMateSyntaxHighlighter ();
         Text = DefaultMarkdownSample;
+
+        // Opt-in: prevent Link.OpenUrl from being called in the designer.
+        LinkClicked += (_, e) => e.Handled = true;
 
         return true;
     }
 
     /// <summary>Gets a short but comprehensive Markdown sample covering common features.</summary>
     public static string DefaultMarkdownSample { get; } = """
-                                                          # Terminal.GuiMarkdown Sample 🚀
+                                                          # Terminal.Gui Markdown Sample 🚀
+
+                                                          ## TOC
+
+                                                          * [Basic Formatting](#basic-formatting)
+                                                          * [Links](#links)
+                                                          * [Checklist](#checklist)
+                                                          * [Code Blocks](#code-blocks)
+                                                          * [Tables](#tables)
+                                                          * [Separators](#separators)
+                                                          * [Block Quotes](#block-quotes)
+
+                                                          ## Basic Formatting
 
                                                           Rich text with **bold**, *italic*, `inline code`, and ~~strikethrough~~.
 
-                                                          ## Links & Images
+                                                          ## Links
 
-                                                          API Docs:
-
-                                                          * [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
-                                                          * [MarkdownTable](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) for more info.
-                                                          * [MarkdownCodeBlock](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownCodeBlock.html) for more info.
+                                                          * [Markdown API docs](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
 
                                                           ## Checklist
 
-                                                          - [x] Bold & italic ✅
-                                                          - [x] Code blocks 🔧
-                                                          - [ ] Emojis 🎉
+                                                          - [x] Text with **bold**, *italic*, `inline code`, and ~~strikethrough~~ ✅
+                                                          - [x] Inline `Code` 🔧
+                                                          - [x] [Links](https://github.com/gui-cs) 🎉
+                                                          - [ ] Images 😒
 
-                                                          ## Code Block (csharp)
+                                                          ## Code Blocks
+
+                                                          **csharp** code block with syntax highlighting:
 
                                                           ```csharp
                                                           Console.WriteLine ("Hello, Terminal.Gui! 🌍");
                                                           var x = 42;
                                                           ```
 
-                                                          ## Code Block (markdown)
+                                                          **markdown** code block illustrating nested markdown:
 
                                                           ```md
                                                           # Heading 1
 
-                                                          Text
-
-                                                          ## Heading 2
+                                                          Plain text. *Formatted text* with **bold** and `inline code`.
 
                                                           Link:  [SyntaxHighlighting](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
 
                                                           - [x] Checked
-                                                          - [ ] Not Checked
 
                                                           | Col | Col2 |
                                                           |-----|:----:|
@@ -461,25 +562,30 @@ public partial class Markdown : View, IDesignable
                                                           | B   | Two  |
                                                           ```
 
-                                                          ## Table
+                                                          ## Tables
 
-                                                          | Feature       | Status        |
-                                                          |---------------|---------------|
-                                                          | Markdown      | ✅ Totally!   |
-                                                          | Tables        | ✅ For sure!  |
-                                                          | Code blocks   | ✅ Awesome!   |
-                                                          | Emojis 🎉    | ✅ Whoa!      |
+                                                          **table** with links, emojis, and markdown in cells:
 
-                                                          ### Table (centered column 2)
+                                                          | Feature        | Status        |
+                                                          |----------------|---------------|
+                                                          | [Links](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! |
+                                                          | Inline `code`  | ✅ *Awesome!*   |
+                                                          | Emojis 🎉      | ✅ **Whoa!**      |
 
-                                                          ## Table
+                                                          **table** with different alignments:
 
                                                           | First         | Second |
                                                           |---------------|:------:|
-                                                          | Row 1         | Czech: ✅ me out. I'm long. |
-                                                          | Row 2 👋      | ✅ Shorter  |
+                                                          | Row 1         | Czech (✅) me out. I'm long and centered. |
+                                                          | Row 2 👋     | 🔛 I'm shorter but still centered 🔛 |
+
+                                                          ## Separators
+
+                                                          This text is before the thematic break.
 
                                                           ---
+
+                                                          And this text is after. Thematic breaks are rendered as full-width horizontal lines that automatically adjust to the layout width.
 
                                                           ## Block Quotes
 

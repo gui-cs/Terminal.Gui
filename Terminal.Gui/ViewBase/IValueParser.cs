@@ -83,7 +83,7 @@ public static class IValueParser
             return false;
         }
 
-        object?[] args = [input, null, null];
+        object? [] args = [input, null, null];
         var success = (bool)tryParse.Invoke (null, args)!;
 
         if (!success)

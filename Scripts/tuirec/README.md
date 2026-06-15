@@ -1,0 +1,377 @@
+# Recording Terminal.Gui Apps with `tuirec`
+
+Use this guide when an issue or PR asks for a GIF/video capture of a Terminal.Gui
+app or scenario. The recording tool is [`gui-cs/tuirec`](https://github.com/gui-cs/tuirec) —
+a Go CLI that spawns the target app in a PTY, injects keystrokes, records terminal
+output as an asciinema v2 cast, and renders an animated GIF via `agg`.
+
+## Install
+
+```powershell
+# Requires Go 1.22+
+go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+tuirec --version
+
+# agg is auto-downloaded on first use — no separate install needed.
+```
+
+Verify: `tuirec --version`. If not on PATH, add `$(go env GOPATH)\bin` to PATH.
+
+## Quick Start — Recording a UICatalog Scenario
+
+```powershell
+# 1. Build ScenarioRunner (do this ONCE before recording)
+dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
+
+# 2. Record (cross-platform: use dotnet to run the DLL)
+$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
+$ks = 'wait:1200,Tab,Tab,wait:400,A,wait:1800,B,o,wait:1800,E,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
+
+tuirec record `
+    --binary dotnet `
+    --args "$dll,run,Character Map" `
+    --name CharacterMap `
+    --title "Character Map" `
+    --keystrokes $ks `
+    --startup-delay 2000 `
+    --drain 1500 `
+    --cols 120 --rows 30 `
+    --open --copy
+```
+
+Output: `artifacts/CharacterMap.gif` and `artifacts/CharacterMap.cast`.
+
+Copy the GIF to the scenario directory:
+```powershell
+Copy-Item artifacts/CharacterMap.gif Examples/UICatalog/Scenarios/CharacterMap/CharacterMap.gif
+```
+
+---
+
+## Recording UICatalog Scenarios
+
+### Prerequisites
+
+1. **Build ScenarioRunner** — always build before recording to avoid startup noise:
+   ```powershell
+   dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release
+   ```
+2. **Know the scenario name** — list available scenarios:
+   ```powershell
+   dotnet run --project Examples/ScenarioRunner -c Release --no-build -- list
+   ```
+
+### Finding the Right Keystrokes
+
+Each scenario has a `GetDemoKeyStrokes()` method that defines a canonical
+interaction sequence for benchmarking. **Use this as your starting point:**
+
+```powershell
+# Find the demo keystrokes for a scenario:
+grep -n "GetDemoKeyStrokes" Examples/UICatalog/Scenarios/<ScenarioFile>.cs
+```
+
+The demo keystrokes show what keys the scenario expects and what UI flow is
+interesting. Translate them to tuirec syntax:
+
+| Terminal.Gui Key | tuirec Token |
+|---|---|
+| `Key.CursorDown` | `CursorDown` |
+| `Key.CursorLeft` | `CursorLeft` |
+| `Key.Tab` | `Tab` |
+| `Key.Tab.WithShift` | `Shift+Tab` |
+| `Key.Enter` | `Enter` |
+| `Key.Esc` | `Esc` |
+| `Key.B` | `B` (or `` `B` `` for literal) |
+
+### Composing the Keystroke Script
+
+**Principles for a great recording:**
+
+1. **Start with `wait:1000`** — let the UI render fully after startup-delay.
+2. **Add `wait:` between logical steps** — `wait:500` to `wait:1500` between
+   groups of actions so viewers can follow what's happening.
+3. **Keep it short** — 10–20 seconds of real-time interaction. Fewer keystrokes
+   with generous waits beats many rapid keystrokes.
+4. **Show variety** — demonstrate 2–3 features of the scenario, not just
+   scrolling. Navigate between controls, trigger category changes, etc.
+5. **End with `Escape`** — the default Terminal.Gui quit key.
+6. **Avoid wide glyphs** — Emoji and CJK characters cause misaligned rendering
+   in terminal recordings (agg renders each cell as monospace but wide glyphs
+   consume 2 cells). Prefer categories with single-width characters (Arrows,
+   Box Drawing, Block Elements, Mathematical Operators, etc.).
+
+### Template Command
+
+```powershell
+$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
+$ks = '<your keystroke script here>'
+
+tuirec record `
+    --binary dotnet `
+    --args "$dll,run,<Scenario Name>" `
+    --name <ScenarioName> `
+    --title "<Scenario Name>" `
+    --keystrokes $ks `
+    --startup-delay 2000 `
+    --drain 2000 `
+    --cols 120 --rows 30 `
+    --verbosity high `
+    --open --copy
+
+# Copy GIF to scenario directory
+Copy-Item artifacts/<ScenarioName>.gif Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
+```
+
+### Output File Placement
+
+GIFs live **alongside the `.cs` file they document**:
+
+| What | Where |
+|------|-------|
+| Scenario in a subdirectory | `Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif` |
+| Scenario directly in `Scenarios/` | `Examples/UICatalog/Scenarios/<ScenarioName>.gif` |
+| View-derived class | `docfx/images/views/<ViewName>.gif` |
+
+Use `--name <ScenarioName>` (PascalCase matching the class name) so the output
+file is named correctly. The `--name` value determines the artifact filenames.
+
+### Critical: `--kitty-keyboard` Decision
+
+**Known bug ([gui-cs/tuirec#54](https://github.com/gui-cs/tuirec/issues/54)):**
+tuirec currently encodes navigation keys (`CursorUp`, `CursorDown`, `CursorLeft`,
+`CursorRight`, `PageUp`, `PageDown`, `Home`, `End`) incorrectly under
+`--kitty-keyboard` — it sends fabricated CSI u codepoints that the Kitty spec
+doesn't define. Terminal.Gui ignores or misinterprets these sequences.
+
+**Workaround until fixed:**
+- **Omit `--kitty-keyboard`** for demos that use navigation keys.
+- **Add `--kitty-keyboard`** only when you need modifier disambiguation for
+  non-navigation keys (`Ctrl+M` vs Enter, `Ctrl+I` vs Tab, `Ctrl+Q`, etc.)
+  and the demo doesn't rely on arrow/page/home/end keys.
+
+Once the bug is fixed, `--kitty-keyboard` should be the default for all
+Terminal.Gui recordings (it provides cleaner modifier handling).
+
+### `--args` for ScenarioRunner
+
+The `--args` flag uses **comma-separated** values (not space-separated):
+
+```powershell
+--args "run,Character Map"      # Correct: two args ["run", "Character Map"]
+--args "run Character Map"      # WRONG: one arg "run Character Map"
+```
+
+### PowerShell Quoting
+
+Always assign keystrokes to a **single-quoted** `$ks` variable to preserve
+backtick literals:
+
+```powershell
+# Correct — single quotes prevent PowerShell backtick interpolation:
+$ks = 'wait:1000,`search text`,Enter,wait:500,Escape'
+
+# WRONG — PowerShell eats the backticks:
+--keystrokes "wait:1000,`search text`,Enter"
+```
+
+### Example: Character Map Scenario
+
+```powershell
+$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
+
+# Navigate to category list, browse Arrows → Box Drawing → Emoji, then context menu
+$ks = 'wait:1200,Tab,Tab,wait:400,A,wait:1800,B,o,wait:1800,E,wait:1800,Tab,wait:400,CursorDown,CursorDown,CursorDown,wait:400,Shift+F10,wait:1500,Escape,wait:400,Escape'
+
+tuirec record `
+    --binary dotnet `
+    --args "$dll,run,Character Map" `
+    --name CharacterMap `
+    --title "Character Map" `
+    --keystrokes $ks `
+    --startup-delay 2000 `
+    --drain 1500 `
+    --cols 120 --rows 30 `
+    --open --copy
+```
+
+**Script breakdown:**
+
+| Step | Tokens | What happens |
+|------|--------|--------------|
+| 1 | `wait:1200` | Let the CharMap UI fully render |
+| 2 | `Tab,Tab` | Move focus to category list |
+| 3 | `A` | CollectionNavigator jumps to "Arrows" |
+| 4 | `wait:1800` | Pause so viewer sees arrow characters |
+| 5 | `B,o` | Type "Bo" — jumps to "Box Drawing" |
+| 6 | `wait:1800` | Pause so viewer sees box-drawing characters |
+| 7 | `E` | Type "E" — jumps to "Emoji" |
+| 8 | `wait:1800` | Pause so viewer sees emoji characters |
+| 9 | `Tab` | Return focus to charmap grid |
+| 10 | `CursorDown` ×3 | Navigate to a glyph |
+| 11 | `Shift+F10` | Open context menu (Copy Glyph / Copy Code Point) |
+| 12 | `wait:1500,Escape` | Let viewer see the menu, then dismiss |
+| 13 | `Escape` | Quit |
+
+**Key techniques demonstrated:**
+- **CollectionNavigator typing** — type category name prefixes to jump directly
+  (much better than scrolling through dozens of categories with arrow keys)
+- **Context menu** — `Shift+F10` (the `PopoverMenu.DefaultKey`) shows the
+  right-click menu on the selected glyph
+- **Generous waits** — 1800ms between feature demonstrations so viewers
+  can absorb each state change
+
+---
+
+## Recording Individual View Sub-classes with EnableForDesign
+
+(Coming soon — will use a dedicated design-mode runner that instantiates
+a single View with `EnableForDesign()` and records its interactions.)
+
+---
+
+## Recording Standalone Example Apps
+
+For apps in `Examples/` that are not UICatalog scenarios:
+
+```powershell
+$dll = "./Examples/<AppName>/bin/Release/net10.0/<AppName>.dll"
+$ks = 'wait:1000,<keystrokes>,Escape'
+
+tuirec record `
+    --binary dotnet `
+    --args "$dll" `
+    --name <app-id> `
+    --title "<App Name> Demo" `
+    --keystrokes $ks `
+    --startup-delay 2000 `
+    --drain 2000 `
+    --cols 120 --rows 30 `
+    --open --copy
+```
+
+---
+
+## Verifying Placement and Size (measure — don't eyeball)
+
+**The recurring trap.** Confirming a sixel *appears* in the GIF — or that agg
+rendered it faithfully at the cursor cell the app requested — does **not** prove
+it is correct. A pixel-perfect render of a raster that was *built from the wrong
+cell size* is still the wrong size on screen. "Looks present" and "pipeline is
+faithful" are proxies. The invariant you must actually check is:
+
+> **Does the rendered sixel cover the cells the app intended — in both position
+> and size?**
+
+Verify that with a measurement, not your eyes. A ~4% size error is invisible by
+sight and obvious by arithmetic.
+
+**Why this bites with tuirec specifically.** tuirec advertises a sixel cell
+resolution (e.g. `8×17` px) that does **not** match agg's actual rendered font
+cell (~`8.3×18.8` px at the default `--font-size 14`) — see
+[#84](https://github.com/gui-cs/tuirec/issues/84). An app that *correctly* sizes
+its raster as `cells × reportedResolution` (and fills exactly on a real sixel
+terminal) therefore renders ~4% **undersized** under tuirec. Do not "fix" the app
+for this; verify it and attribute it correctly.
+
+**The check — calibrate agg's real cell, then reconcile:**
+
+1. Extract a frame from the GIF (any decoder; e.g. ImageSharp
+   `Image.Load(gif).Frames.CloneFrame(i)`).
+2. Measure agg's **actual** cell size from a *known* grid reference — e.g. a
+   border/box that spans a known number of columns:
+   `cellPx = borderSpanPx / (spannedCells)`. (Don't trust `imageWidth / cols` —
+   agg adds margins.)
+3. Read the resolution the **app** used from the cast: the sixel DCS header
+   `P…q"asp;asp;WIDTH;HEIGHT` gives raster pixel size; divide by the raster's
+   cell count to get the app's px-per-cell.
+4. **If agg's measured cell ≠ the app's px-per-cell, the sixel is mis-sized —
+   and that is the tuirec mismatch ([#84](https://github.com/gui-cs/tuirec/issues/84)),
+   not an app bug.** Then confirm the sixel's rendered bounding box actually spans
+   the target region (the columns/rows it was meant to cover), not merely that it
+   exists.
+
+Run this whenever a sixel is sized or aligned to the text grid (bordered image
+views, insets, bottom bands — anything grid-anchored). It turns "I think it looks
+right" into a number, which is the only thing that catches sub-cell and
+few-percent errors.
+
+> **General principle (applies beyond sixel):** verify the *invariant the change
+> was supposed to satisfy*, measured against the design intent — not that the tool
+> ran, the file is non-empty, or the screenshot "has the thing in it." When you've
+> just fixed one symptom, the next bug often hides in the dimension you didn't
+> measure.
+
+## Validation Checklist
+
+After every recording, verify:
+
+- [ ] `tuirec record` exited with code 0 and wrote both `.gif` and `.cast`.
+- [ ] **Error check** — no errors in the cast:
+  ```powershell
+  Select-String -Path artifacts/<name>.cast -Pattern "error|unknown|not found|usage:" -CaseSensitive:$false
+  ```
+- [ ] **GIF is not blank** — file size > 100KB for a typical scenario recording.
+      (A blank/static GIF is typically < 50KB.)
+- [ ] **Visual check** — open the GIF (`--open` flag) and confirm:
+  - The app content is visible (menu bar, controls, content).
+  - The interaction sequence is visible (scrolling, focus changes, etc.).
+  - The recording ends cleanly (no frozen frame or abrupt cutoff).
+- [ ] **Output path is correct** — scenario GIFs go with their scenario code:
+  ```
+  Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
+  ```
+- [ ] **Sixel content recorded on Linux/macOS** — sixel DCS cannot be captured
+      through Windows ConPTY. Confirm sixel made it into the cast with:
+  ```powershell
+  Select-String -Path artifacts/<name>.cast -Pattern 'u001bP' | Measure-Object
+  ```
+- [ ] **Grid-anchored sixel measured, not eyeballed** — if the sixel is sized or
+      aligned to the text grid, calibrate agg's real cell and confirm the rendered
+      bbox covers the target columns/rows (see *Verifying Placement and Size*
+      above). A ~4% undersize from [#84](https://github.com/gui-cs/tuirec/issues/84)
+      is invisible by sight.
+
+---
+
+## Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| No sixel output on Windows | **Windows ConPTY strips sixel DCS** and does not pass through the DA1 sixel handshake — the app detects `Sixel support: False` | Record sixel content on Linux/macOS (see `tuirec agent-guide`). On Windows you can still verify the app's sixel code path runs (e.g., via an app-level force flag) by checking redraw activity in the `.cast`, but flame/image pixels will not appear |
+| Sixel renders ~4% too small / short of a border | tuirec advertises a cell resolution that doesn't match agg's rendered font cell ([#84](https://github.com/gui-cs/tuirec/issues/84)) | App is correct (fills on a real terminal). Verify by measurement (see *Verifying Placement and Size*); attribute to tuirec, not the app. Until fixed, only a tuirec-specific over-render hack would close the gap |
+| Wide glyphs misaligned in GIF | Emoji/CJK chars are 2-cell wide; agg renders per-cell | Avoid emoji/CJK categories; use single-width ranges (Arrows, Box Drawing, etc.) |
+| Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
+| App doesn't quit | Wrong quit key or key not delivered | Use `Escape` (the default quit key); check `--kitty-keyboard` interaction |
+| Blank frames at start/end | Pre/postroll not trimmed | `--trim` is on by default in v0.4.2+; ensure tuirec is up-to-date |
+| GIF validation: 1 frame | `--trim` removes all frames for static views | Use `--trim=false` for views with no visual change during demo |
+| Recording times out | App stuck / wrong keystrokes | Check with `--verbosity high`, fix script |
+| `--binary` permission error | Relative path on Windows | Use `./` prefix or absolute path with forward slashes |
+| Backtick text missing | PowerShell interpolation | Use single-quoted `$ks` variable |
+
+---
+
+## Agent Workflow Summary
+
+When asked to record a scenario GIF:
+
+1. **Build** — `dotnet build Examples/ScenarioRunner -c Release`
+2. **Find scenario name** — `dotnet run --project Examples/ScenarioRunner -c Release --no-build -- list`
+3. **Read `GetDemoKeyStrokes()`** — find it in the scenario source file
+4. **Compose keystrokes** — translate to tuirec syntax, add waits, keep short
+5. **Record** — `tuirec record --binary ... --args "run,<Name>" --keystrokes $ks ...`
+6. **Validate** — error-grep the cast, check GIF file size, confirm the interaction
+   played. For anything sized/aligned to the grid (sixels especially),
+   **measure** placement and size against the design intent — do not stop at
+   "the screenshot has the thing in it" (see *Verifying Placement and Size*).
+7. **If nav keys fail** — remove `--kitty-keyboard` and retry
+8. **Report** — share the output paths and exact command used
+
+---
+
+## Reference
+
+- **tuirec repo:** https://github.com/gui-cs/tuirec
+- **Full keystroke syntax:** `tuirec agent-guide` (embeds the complete reference)
+- **CLI flags:** `tuirec record --help`
+- **ScenarioRunner:** `Examples/ScenarioRunner/` — CLI that runs individual UICatalog scenarios

@@ -2,6 +2,7 @@
 
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using TextMateSharp.Grammars;
 
 // ReSharper disable AccessToDisposedClosure
@@ -16,6 +17,7 @@ public class Deepdives : Scenario
     private static readonly HttpClient _httpClient = new ();
 
     private const string DOCS_API_URL = "https://api.github.com/repos/gui-cs/Terminal.Gui/contents/docfx/docs?ref=develop";
+    private const string INCLUDES_API_URL = "https://api.github.com/repos/gui-cs/Terminal.Gui/contents/docfx/includes?ref=develop";
 
     private IApplication? _app;
     private ListView? _docList;
@@ -27,6 +29,7 @@ public class Deepdives : Scenario
     private bool _updatingContentWidth;
 
     private List<DocEntry> _docs = [];
+    private readonly Dictionary<string, string> _includes = new (StringComparer.OrdinalIgnoreCase);
 
     public override void Main ()
     {
@@ -41,7 +44,8 @@ public class Deepdives : Scenario
             X = 0,
             Y = 0,
             Width = 30,
-            Height = Dim.Fill (1)
+            Height = Dim.Fill (1),
+            TabStop = TabBehavior.TabStop
         };
 
         _docList = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -55,7 +59,8 @@ public class Deepdives : Scenario
             X = Pos.Right (listFrame),
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill (1)
+            Height = Dim.Fill (1),
+            TabStop = TabBehavior.TabStop
         };
 
         _markdownView = new Markdown { Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter () };
@@ -65,7 +70,7 @@ public class Deepdives : Scenario
         _markdownView.LinkClicked += (_, e) =>
                                      {
                                          _statusShortcut?.Title = e.Url;
-
+                                         SelectDocFromLink (e.Url);
                                          e.Handled = true;
                                      };
 
@@ -115,7 +120,7 @@ public class Deepdives : Scenario
         {
             ReadOnly = true,
             CanFocus = false,
-            Value = (Enum.TryParse (_markdownView.SyntaxHighlighter.ThemeName, out ThemeName theme) ? theme : ThemeName.DarkPlus),
+            Value = !Enum.TryParse (_markdownView.SyntaxHighlighter.ThemeName, out ThemeName theme) ? ThemeName.DarkPlus : theme,
             Autocomplete = null
         };
 
@@ -133,16 +138,16 @@ public class Deepdives : Scenario
 
         // Auto-select a light or dark syntax theme based on the terminal's actual background color.
         _app.Driver!.DefaultAttributeChanged += (_, e) =>
-                                                 {
-                                                     if (_markdownView is null || e.NewValue is not { } attr)
-                                                     {
-                                                         return;
-                                                     }
+                                                {
+                                                    if (_markdownView is null || e.NewValue is not { } attr)
+                                                    {
+                                                        return;
+                                                    }
 
-                                                     ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
-                                                     _markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
-                                                     themeDropDown.Value = autoTheme;
-                                                 };
+                                                    ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
+                                                    _markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
+                                                    themeDropDown.Value = autoTheme;
+                                                };
 
         CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = _markdownView.UseThemeBackground ? CheckState.Checked : CheckState.UnChecked };
 
@@ -173,6 +178,7 @@ public class Deepdives : Scenario
         window.Initialized += (_, _) =>
                               {
                                   _ = LoadDocListAsync ();
+                                  _ = LoadIncludesAsync ();
                                   SyncContentWidthToViewport ();
                               };
 
@@ -252,6 +258,58 @@ public class Deepdives : Scenario
         _ = LoadDocContentAsync (entry);
     }
 
+    private void SelectDocFromLink (string url)
+    {
+        if (_docList is null || _docs.Count == 0)
+        {
+            return;
+        }
+
+        string relativePath = url;
+
+        if (relativePath.StartsWith ("~/docs/", StringComparison.Ordinal))
+        {
+            relativePath = relativePath ["~/docs/".Length..];
+        }
+
+        int queryIndex = relativePath.IndexOf ('?');
+
+        if (queryIndex >= 0)
+        {
+            relativePath = relativePath [..queryIndex];
+        }
+
+        int anchorIndex = relativePath.IndexOf ('#');
+
+        if (anchorIndex >= 0)
+        {
+            relativePath = relativePath [..anchorIndex];
+        }
+
+        if (string.IsNullOrWhiteSpace (relativePath))
+        {
+            return;
+        }
+
+        int slashIndex = relativePath.LastIndexOf ('/');
+        string docName = slashIndex >= 0 ? relativePath [(slashIndex + 1)..] : relativePath;
+        docName = Uri.UnescapeDataString (docName);
+
+        int docIndex = _docs.FindIndex (d => string.Equals (d.Name, docName, StringComparison.OrdinalIgnoreCase));
+
+        if (docIndex < 0 && !docName.EndsWith (".md", StringComparison.OrdinalIgnoreCase))
+        {
+            docIndex = _docs.FindIndex (d => string.Equals (d.Name, $"{docName}.md", StringComparison.OrdinalIgnoreCase));
+        }
+
+        if (docIndex < 0)
+        {
+            return;
+        }
+        _docList.SelectedItem = docIndex;
+        _statusShortcut?.Title = _docs [docIndex].Name;
+    }
+
     private async Task LoadDocContentAsync (DocEntry entry)
     {
         ShowSpinner ($"Loading {entry.Name}...");
@@ -259,6 +317,7 @@ public class Deepdives : Scenario
         try
         {
             string content = await _httpClient.GetStringAsync (entry.DownloadUrl).ConfigureAwait (false);
+            content = ExpandIncludes (content);
 
             _app?.Invoke (() =>
                           {
@@ -297,6 +356,60 @@ public class Deepdives : Scenario
         _spinner?.Visible = false;
 
         _statusShortcut?.Title = message;
+    }
+
+    private static readonly Regex _includeRegex =
+        new (@"\[!INCLUDE\s+\[.*?\]\((?:~/|\.\./)includes/(.+?)\)\]", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    private string ExpandIncludes (string content) =>
+        _includeRegex.Replace (content,
+                               match =>
+                               {
+                                   string fileName = match.Groups [1].Value;
+
+                                   return _includes.TryGetValue (fileName, out string? includeContent) ? includeContent : match.Value;
+                               });
+
+    private async Task LoadIncludesAsync ()
+    {
+        try
+        {
+            string json = await _httpClient.GetStringAsync (INCLUDES_API_URL).ConfigureAwait (false);
+
+            using JsonDocument doc = JsonDocument.Parse (json);
+
+            List<Task> tasks = [];
+
+            foreach (JsonElement element in doc.RootElement.EnumerateArray ())
+            {
+                string? name = element.GetProperty ("name").GetString ();
+                string? downloadUrl = element.GetProperty ("download_url").GetString ();
+
+                if (name is { } && downloadUrl is { } && name.EndsWith (".md", StringComparison.OrdinalIgnoreCase))
+                {
+                    tasks.Add (FetchInclude (name, downloadUrl));
+                }
+            }
+
+            await Task.WhenAll (tasks).ConfigureAwait (false);
+        }
+        catch
+        {
+            // Non-critical — includes just won't expand
+        }
+    }
+
+    private async Task FetchInclude (string name, string url)
+    {
+        try
+        {
+            string content = await _httpClient.GetStringAsync (url).ConfigureAwait (false);
+            _includes [name] = content;
+        }
+        catch
+        {
+            // Skip failed includes
+        }
     }
 
     private sealed record DocEntry (string Name, string DownloadUrl);

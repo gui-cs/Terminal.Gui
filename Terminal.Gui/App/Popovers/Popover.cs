@@ -49,7 +49,7 @@ namespace Terminal.Gui.App;
 ///         popover.MakeVisible ();
 ///     </code>
 /// </remarks>
-public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : View, new ()
+public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : View, new()
 {
     private CommandBridge? _contentCommandBridge;
 

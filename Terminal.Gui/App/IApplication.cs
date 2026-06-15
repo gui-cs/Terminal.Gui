@@ -294,7 +294,7 @@ public interface IApplication : IDisposable
     ///         session.
     ///     </para>
     /// </remarks>
-    Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
+    Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new();
 
     /// <summary>
     ///     Runs a new Session creating a <see cref="IRunnable"/>-derived object of type <typeparamref name="TRunnable"/>
@@ -340,7 +340,7 @@ public interface IApplication : IDisposable
     ///         The caller is responsible for disposing the object returned by this method.
     ///     </para>
     /// </remarks>
-    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new();
 
     #region Iteration & Invoke
 
@@ -596,6 +596,13 @@ public interface IApplication : IDisposable
     ///         If the <see cref="IDriver"/> has not been initialized, this will return a default size of 2048x2048; useful
     ///         for unit tests.
     ///     </para>
+    ///     <para>
+    ///         In <see cref="AppModel.FullScreen"/> mode, setting this property delegates to
+    ///         <see cref="IDriver.SetScreenSize(int,int)"/> when the Driver has been initialized. If the Driver
+    ///         is <see langword="null"/> (before <see cref="IApplication.Init(string?)"/> or after disposal),
+    ///         the setter raises <see cref="ScreenChanged"/> with the current getter value but does not call the Driver.
+    ///         To simulate a terminal resize in tests, prefer calling <see cref="IDriver.SetScreenSize(int,int)"/> directly.
+    ///     </para>
     /// </remarks>
     Rectangle Screen { get; set; }
 
@@ -670,6 +677,34 @@ public interface IApplication : IDisposable
     ///     </para>
     /// </remarks>
     IMouse Mouse { get; set; }
+
+    /// <summary>
+    ///     Raised when the terminal delivers a bracketed paste. Fires before the paste is dispatched
+    ///     to the focused view; set <see cref="System.ComponentModel.HandledEventArgs.Handled"/> on
+    ///     the event arguments to <see langword="true"/> to prevent the focused view from receiving
+    ///     the paste.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Bracketed paste mode is enabled automatically by the driver. On terminals that do not
+    ///         support bracketed paste (or have it disabled by user configuration) the pasted text is
+    ///         delivered as ordinary key events and this event does not fire.
+    ///     </para>
+    /// </remarks>
+    event EventHandler<PasteEventArgs>? Paste;
+
+    /// <summary>
+    ///     Raises the <see cref="Paste"/> event with <paramref name="text"/>, then dispatches the
+    ///     paste to the focused view by invoking <see cref="Command.Paste"/> with a dedicated
+    ///     command-context paste payload if not already handled. The default
+    ///     <see cref="Command.Paste"/> handler on <see cref="View"/> sanitizes the payload, raises
+    ///     <see cref="View.Pasting"/>, and delegates insertion to the focused view's
+    ///     <see cref="View.OnPaste"/> override. If the focused view consumes the paste and reports
+    ///     a final-text segment for the pasted range, the handler raises <see cref="View.Pasted"/>.
+    /// </summary>
+    /// <param name="text">The pasted content with bracketing markers stripped.</param>
+    /// <returns><see langword="true"/> if the paste was handled.</returns>
+    bool RaisePasteEvent (string text);
 
     #endregion Input (Mouse/Keyboard)
 

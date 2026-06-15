@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     Displays a clickable hyperlink with optional display text and a target URL.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Link.gif" alt="Link demo"/>
 ///     <para>
 ///         <see cref="Link"/> has three independent text-related properties:
 ///     </para>
@@ -104,47 +105,113 @@ public class Link : View, IDesignable
     }
 
     /// <summary>
+    ///     The set of URI schemes that <see cref="OpenUrl"/> is permitted to open. Only <c>http</c>, <c>https</c>, and
+    ///     <c>mailto</c> are allowed by default. Callers that explicitly require additional schemes may modify this set,
+    ///     but doing so widens the attack surface when <see cref="Url"/> is populated from untrusted input.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <c>file://</c> URIs are intentionally excluded from the default set because they allow local filesystem
+    ///         access and can be used to invoke registered shell handlers on Windows. Applications that display
+    ///         user-controlled content (Markdown, RSS, log output, etc.) are therefore protected by default.
+    ///     </para>
+    ///     <para>
+    ///         <b>Migration path for applications that need <c>file://</c> or other non-default schemes:</b>
+    ///     </para>
+    ///     <para>
+    ///         <b>Option 1 — Per-link handling via <see cref="Markdown.LinkClicked"/>.</b> Handle the URL in the event
+    ///         and set <c>e.Handled = true</c> to prevent <see cref="OpenUrl"/> from being called:
+    ///         <code>
+    /// markdownView.LinkClicked += (_, e) =>
+    /// {
+    ///     if (e.Url.StartsWith("file://", StringComparison.OrdinalIgnoreCase))
+    ///     {
+    ///         // Handle the file link yourself.
+    ///         e.Handled = true;
+    ///     }
+    /// };
+    ///         </code>
+    ///     </para>
+    ///     <para>
+    ///         <b>Option 2 — Global opt-in at application startup.</b> To allow <c>file://</c> links across the entire
+    ///         application, add the scheme to this set before any links are activated:
+    ///         <code>
+    /// Link.SafeSchemes.Add("file");
+    ///         </code>
+    ///         Only do this in applications where <c>file://</c> URIs originate from trusted content.
+    ///     </para>
+    /// </remarks>
+    public static readonly HashSet<string> SafeSchemes = new (StringComparer.OrdinalIgnoreCase)
+    {
+        "http", "https", "mailto"
+    };
+
+    /// <summary>
     ///     Opens the specified URL in the default web browser using a platform-specific mechanism.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         On Windows, uses <c>cmd /c start</c>. On macOS, uses <c>open</c>. On Linux, uses <c>xdg-open</c>.
+    ///         Only URLs whose scheme is listed in <see cref="SafeSchemes"/> (<c>http</c>, <c>https</c>, <c>mailto</c> by
+    ///         default) are opened. URLs with any other scheme (e.g. <c>file</c>, <c>ftp</c>, or Windows protocol
+    ///         handlers such as <c>ms-msdt</c>) are silently ignored.
     ///     </para>
     ///     <para>
-    ///         Ampersands in the URL are escaped on Windows to prevent shell interpretation.
+    ///         On Windows, uses <see cref="ProcessStartInfo.UseShellExecute"/> so the URL is dispatched directly by the
+    ///         OS shell without passing through <c>cmd.exe</c>. On macOS, uses <c>open</c>. On Linux, uses
+    ///         <c>xdg-open</c>.
+    ///     </para>
+    ///     <para>
+    ///         Any exception thrown by the underlying process launch (e.g. no default browser registered,
+    ///         permission denied) is caught and logged via <see cref="Logging.Warning"/>; the method never
+    ///         propagates such exceptions to the caller.
+    ///     </para>
+    ///     <para>
+    ///         Callers that populate <see cref="Url"/> from untrusted input (markdown, RSS feeds, network data, etc.)
+    ///         must ensure the value is validated before it reaches this method.
     ///     </para>
     /// </remarks>
-    /// <param name="url">The URL to open. Should be a well-formed absolute URI.</param>
+    /// <param name="url">The URL to open. Must be a well-formed absolute URI with an allowed scheme.</param>
     public static void OpenUrl (string url)
     {
-        if (!Uri.IsWellFormedUriString (url, UriKind.Absolute) || Environment.GetEnvironmentVariable ("DisableRealDriverIO") == "1")
+        if (!Uri.TryCreate (url, UriKind.Absolute, out Uri? parsed) || parsed is null || !SafeSchemes.Contains (parsed.Scheme))
         {
             return;
         }
 
-        if (PlatformDetection.IsWindows ())
+        if (Environment.GetEnvironmentVariable ("DisableRealDriverIO") == "1")
         {
-            url = url.Replace ("&", "^&");
-            Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
+            return;
         }
-        else if (PlatformDetection.IsMac ())
-        {
-            Process.Start ("open", url);
-        }
-        else if (PlatformDetection.IsLinux ())
-        {
-            using Process process = new ();
 
-            process.StartInfo = new ProcessStartInfo
+        try
+        {
+            if (PlatformDetection.IsWindows ())
             {
-                FileName = "xdg-open",
-                Arguments = url,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            process.Start ();
+                Process.Start (new ProcessStartInfo (url) { UseShellExecute = true });
+            }
+            else if (PlatformDetection.IsMac ())
+            {
+                Process.Start ("open", url);
+            }
+            else if (PlatformDetection.IsLinux ())
+            {
+                using Process process = new ();
+
+                process.StartInfo = new ProcessStartInfo
+                {
+                    FileName = "xdg-open",
+                    Arguments = url,
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    CreateNoWindow = true,
+                    UseShellExecute = false
+                };
+                process.Start ();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"OpenUrl failed for '{url}': {ex.Message}");
         }
     }
 
@@ -382,6 +449,9 @@ public class Link : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
 
 
 }

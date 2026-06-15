@@ -132,22 +132,45 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Ensures the text is not a control character and can be displayed by translating characters below 0x20 to
-    ///     equivalent, printable, Unicode chars.
+    ///     Ensures the text does not contain control characters that could be emitted verbatim to the terminal,
+    ///     by translating C0 controls (U+0000–U+001F), DEL (U+007F), and C1 controls (U+0080–U+009F) to
+    ///     printable Unicode equivalents via the +U+2400 offset. Multi-character graphemes whose first
+    ///     character is a control are replaced with a space.
     /// </summary>
-    /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
+    /// <remarks>
+    ///     <para>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</para>
+    ///     <para>
+    ///         Per UAX #29, control characters are always grapheme cluster boundaries. A well-formed grapheme
+    ///         cluster produced by <see cref="System.Globalization.StringInfo.GetTextElementEnumerator(string)"/>
+    ///         cannot contain embedded controls, so only the first character needs to be checked.
+    ///     </para>
+    /// </remarks>
     /// <param name="str">The text.</param>
-    /// <returns></returns>
+    /// <returns>A string safe for terminal display.</returns>
     public static string MakePrintable (this string str)
     {
-        if (str.Length > 1)
+        if (string.IsNullOrEmpty (str))
         {
             return str;
         }
 
-        char ch = str [0];
+        char first = str [0];
 
-        return char.IsControl (ch) ? new string ((char)(ch + 0x2400), 1) : str;
+        // Fast path: single-char grapheme (covers the vast majority of calls)
+        if (str.Length == 1)
+        {
+            return char.IsControl (first) ? new string ((char)(first + 0x2400), 1) : str;
+        }
+
+        // Multi-char grapheme: per UAX #29, control characters are grapheme cluster boundaries,
+        // so a well-formed cluster from GetTextElementEnumerator cannot contain embedded controls.
+        // We only need to check the first character defensively for malformed input.
+        if (char.IsControl (first))
+        {
+            return " ";
+        }
+
+        return str;
     }
 
     /// <summary>Repeats the string <paramref name="n"/> times.</summary>

@@ -40,6 +40,55 @@ public class AnsiMouseParserTests
         }
     }
 
+    // Copilot - GPT-5.5
+    [Theory]
+    [InlineData (4, MouseFlags.LeftButtonPressed | MouseFlags.Shift)]
+    [InlineData (5, MouseFlags.MiddleButtonPressed | MouseFlags.Shift)]
+    [InlineData (6, MouseFlags.RightButtonPressed | MouseFlags.Shift)]
+    [InlineData (12, MouseFlags.LeftButtonPressed | MouseFlags.Shift | MouseFlags.Alt)]
+    [InlineData (20, MouseFlags.LeftButtonPressed | MouseFlags.Shift | MouseFlags.Ctrl)]
+    [InlineData (28, MouseFlags.LeftButtonPressed | MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)]
+    public void ProcessMouseInput_DecodesSgrShiftButtonPressModifiers (int buttonCode, MouseFlags expectedFlags)
+    {
+        Mouse? result = _parser.ProcessMouseInput ($"\u001b[<{buttonCode};10;20M");
+
+        Assert.NotNull (result);
+        Assert.Equal (expectedFlags, result!.Flags);
+    }
+
+    // Copilot - GPT-5.5
+    [Theory]
+    [InlineData (36, MouseFlags.LeftButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift)]
+    [InlineData (37, MouseFlags.MiddleButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift)]
+    [InlineData (38, MouseFlags.RightButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift)]
+    [InlineData (44, MouseFlags.LeftButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift | MouseFlags.Alt)]
+    [InlineData (52, MouseFlags.LeftButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift | MouseFlags.Ctrl)]
+    [InlineData (60, MouseFlags.LeftButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)]
+    public void ProcessMouseInput_DecodesSgrShiftDragModifiers (int buttonCode, MouseFlags expectedFlags)
+    {
+        Mouse? result = _parser.ProcessMouseInput ($"\u001b[<{buttonCode};10;20M");
+
+        Assert.NotNull (result);
+        Assert.Equal (expectedFlags, result!.Flags);
+    }
+
+    // Copilot - GPT-5.5
+    [Theory]
+    [InlineData (MouseFlags.LeftButtonPressed | MouseFlags.Shift, "\u001b[<4;11;21M")]
+    [InlineData (MouseFlags.MiddleButtonPressed | MouseFlags.Shift, "\u001b[<5;11;21M")]
+    [InlineData (MouseFlags.RightButtonPressed | MouseFlags.Shift, "\u001b[<6;11;21M")]
+    [InlineData (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift, "\u001b[<36;11;21M")]
+    [InlineData (MouseFlags.MiddleButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift, "\u001b[<37;11;21M")]
+    [InlineData (MouseFlags.RightButtonPressed | MouseFlags.PositionReport | MouseFlags.Shift, "\u001b[<38;11;21M")]
+    public void Encode_UsesSgrShiftModifierBit (MouseFlags flags, string expected)
+    {
+        Mouse mouse = new () { ScreenPosition = new (10, 20), Flags = flags };
+
+        string result = AnsiMouseEncoder.Encode (mouse);
+
+        Assert.Equal (expected, result);
+    }
+
     /// <summary>
     /// Tests that ProcessMouseInput sets ScreenPosition and NOT Position.
     /// Position is View-relative and should only be set by ApplicationMouse or View.Mouse code.

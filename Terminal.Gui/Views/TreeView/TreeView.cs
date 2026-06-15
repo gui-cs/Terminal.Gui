@@ -8,6 +8,9 @@ namespace Terminal.Gui.Views;
 ///     Convenience implementation of generic <see cref="TreeView{T}"/> for any tree were all nodes implement
 ///     <see cref="ITreeNode"/>. <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/TreeView.gif" alt="TreeView demo"/>
+/// </remarks>
 public class TreeView : TreeView<ITreeNode>, IDesignable
 {
     /// <summary>
@@ -21,6 +24,9 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
         TreeBuilder = new TreeNodeBuilder ();
         AspectGetter = o => o.Text;
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,CursorDown,wait:400,CursorDown,wait:400,Space,wait:400,Space,wait:400,CursorDown,wait:400,Space,wait:800";
 
     /// <inheritdoc/>
     public bool EnableForDesign ()

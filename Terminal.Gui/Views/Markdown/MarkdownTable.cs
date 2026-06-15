@@ -40,6 +40,10 @@ public sealed class MarkdownTable : View, IDesignable
     // Last width used for column computation — tracks when recalculation is needed
     private int _lastComputedWidth;
 
+    // Link regions within the table, built after layout
+    private readonly List<TableLinkRegion> _linkRegions = [];
+    private int _activeLinkIndex = -1;
+
     private static readonly TableData _emptyData = new ([], [], []);
 
     /// <summary>Initializes a new empty <see cref="MarkdownTable"/>.</summary>
@@ -53,7 +57,16 @@ public sealed class MarkdownTable : View, IDesignable
         Border.Thickness = new Thickness (0);
         Padding.Thickness = new Thickness (0);
         Margin.Thickness = new Thickness (0);
+
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+        AddCommand (Command.Accept, () => ActivateCurrentLink ());
     }
+
+    /// <summary>
+    ///     Raised when a hyperlink inside a table cell is clicked.
+    ///     Set <see cref="MarkdownLinkEventArgs.Handled"/> to prevent default navigation.
+    /// </summary>
+    public event EventHandler<MarkdownLinkEventArgs>? LinkClicked;
 
     /// <summary>
     ///     Gets or sets an optional syntax highlighter used to resolve theme-based attributes for
@@ -91,11 +104,11 @@ public sealed class MarkdownTable : View, IDesignable
             for (var i = 0; i < _data.ColumnCount; i++)
             {
                 seps [i] = _data.ColumnAlignments [i] switch
-                           {
-                               Alignment.Center => ":---:",
-                               Alignment.End => "---:",
-                               _ => "---"
-                           };
+                {
+                    Alignment.Center => ":---:",
+                    Alignment.End => "---:",
+                    _ => "---"
+                };
             }
 
             lines.Add ($"| {string.Join (" | ", seps)} |");
@@ -176,6 +189,8 @@ public sealed class MarkdownTable : View, IDesignable
 
         RenderedHeight = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
         Height = RenderedHeight;
+
+        BuildLinkRegions ();
     }
 
     /// <summary>
@@ -183,6 +198,9 @@ public sealed class MarkdownTable : View, IDesignable
     ///     This value is always current, unlike <see cref="View.Frame"/> which updates only after layout.
     /// </summary>
     internal int RenderedHeight { get; private set; }
+
+    /// <summary>Gets whether this table contains any navigable link regions.</summary>
+    internal bool HasLinks => _linkRegions.Count > 0;
 
     /// <summary>Gets the total rendered height of this table in lines (simple estimate).</summary>
     /// <remarks>
@@ -200,6 +218,276 @@ public sealed class MarkdownTable : View, IDesignable
         base.OnSubViewLayout (args);
 
         Recalculate (Frame.Width);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse, MouseEvent.Position: { } pos })
+        {
+            return;
+        }
+
+        if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
+        {
+            return;
+        }
+
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
+        int linkIndex = HitTestLinkIndex (pos.X, pos.Y);
+
+        if (linkIndex < 0)
+        {
+            return;
+        }
+
+        // Set active link to the clicked link region
+        _activeLinkIndex = linkIndex;
+        SetNeedsDraw ();
+
+        RaiseLinkClicked (_linkRegions [linkIndex].Url);
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Cycles through link regions on Tab / Shift+Tab. Returns <see langword="false"/>
+    ///     when there are no more links in that direction, allowing focus to leave the view.
+    /// </remarks>
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        if (behavior is { } && behavior != TabStop)
+        {
+            return false;
+        }
+
+        if (_linkRegions.Count == 0)
+        {
+            return false;
+        }
+
+        int delta = direction == NavigationDirection.Forward ? 1 : -1;
+
+        if (_activeLinkIndex < 0)
+        {
+            // First entry — select first or last link
+            _activeLinkIndex = delta > 0 ? 0 : _linkRegions.Count - 1;
+            SetNeedsDraw ();
+
+            return true;
+        }
+
+        int next = _activeLinkIndex + delta;
+
+        // If we've gone past either end, clear selection and let focus leave
+        if (next < 0 || next >= _linkRegions.Count)
+        {
+            _activeLinkIndex = -1;
+            SetNeedsDraw ();
+
+            return false;
+        }
+
+        _activeLinkIndex = next;
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
+    {
+        if (!newHasFocus)
+        {
+            _activeLinkIndex = -1;
+            SetNeedsDraw ();
+        }
+
+        base.OnHasFocusChanged (newHasFocus, previousFocusedView, focusedView);
+    }
+
+    /// <summary>Activates the currently highlighted link (Enter key).</summary>
+    private bool ActivateCurrentLink ()
+    {
+        if (_activeLinkIndex < 0 || _activeLinkIndex >= _linkRegions.Count)
+        {
+            return false;
+        }
+
+        RaiseLinkClicked (_linkRegions [_activeLinkIndex].Url);
+
+        return true;
+    }
+
+    /// <summary>Raises <see cref="LinkClicked"/> and opens the URL if not handled.</summary>
+    private void RaiseLinkClicked (string url)
+    {
+        MarkdownLinkEventArgs args = new (url);
+        LinkClicked?.Invoke (this, args);
+
+        if (!args.Handled && !url.StartsWith ('#'))
+        {
+            Link.OpenUrl (url);
+        }
+    }
+
+    /// <summary>
+    ///     Returns the link region index at the given viewport position, or -1 if none.
+    /// </summary>
+    private int HitTestLinkIndex (int viewportX, int viewportY)
+    {
+        (string url, int rowIndex, int colIndex)? hit = HitTestLinkRegion (viewportX, viewportY);
+
+        if (hit is null)
+        {
+            return -1;
+        }
+
+        for (var i = 0; i < _linkRegions.Count; i++)
+        {
+            TableLinkRegion region = _linkRegions [i];
+
+            if (region.RowIndex == hit.Value.rowIndex && region.ColIndex == hit.Value.colIndex && region.Url == hit.Value.url)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    /// <summary>
+    ///     Returns the URL and cell position (row/col) of the link at the given viewport position,
+    ///     or <see langword="null"/> if no link segment occupies that position.
+    /// </summary>
+    private (string url, int rowIndex, int colIndex)? HitTestLinkRegion (int viewportX, int viewportY)
+    {
+        if (_columnWidths.Length == 0)
+        {
+            return null;
+        }
+
+        // Determine which row the click is in.
+        // Layout: row 0 = top border, rows 1..headerRowHeight = header,
+        //         headerRowHeight+1 = separator, then body rows, last row = bottom border.
+        int y = viewportY;
+        y--; // skip top border
+
+        if (y < 0)
+        {
+            return null;
+        }
+
+        List<StyledSegment> []? cellSegments = null;
+        int rowIndex = -1; // -1 = header
+
+        if (y < _headerRowHeight)
+        {
+            // Click in the header row
+            cellSegments = _headerSegments;
+            rowIndex = -1;
+        }
+        else
+        {
+            y -= _headerRowHeight;
+            y--; // skip separator line
+
+            if (y < 0)
+            {
+                return null;
+            }
+
+            // Walk body rows
+            for (var r = 0; r < _bodyRowHeights.Length; r++)
+            {
+                if (y < _bodyRowHeights [r])
+                {
+                    cellSegments = _rowSegments [r];
+                    rowIndex = r;
+
+                    break;
+                }
+
+                y -= _bodyRowHeights [r];
+            }
+        }
+
+        if (cellSegments is null)
+        {
+            return null;
+        }
+
+        // Determine which column the click is in.
+        int x = viewportX;
+        x--; // skip left border
+        int col = -1;
+
+        for (var c = 0; c < _columnWidths.Length; c++)
+        {
+            if (x < _columnWidths [c])
+            {
+                col = c;
+
+                break;
+            }
+
+            x -= _columnWidths [c] + 1; // column width + separator
+        }
+
+        if (col < 0 || col >= cellSegments.Length)
+        {
+            return null;
+        }
+
+        // Word-wrap the cell and find the segment at the click position within the line.
+        int innerWidth = _columnWidths [col] - 2;
+        List<List<StyledSegment>> wrappedLines = WrapSegments (cellSegments [col], innerWidth);
+
+        // 'y' is now the line-in-row offset (already computed above for multi-line rows)
+        if (y < 0 || y >= wrappedLines.Count)
+        {
+            return null;
+        }
+
+        List<StyledSegment> lineSegs = wrappedLines [y];
+
+        // Compute text width for alignment padding
+        var textWidth = 0;
+
+        foreach (StyledSegment seg in lineSegs)
+        {
+            textWidth += seg.Text.GetColumns ();
+        }
+
+        Alignment alignment = col < _data.ColumnAlignments.Length ? _data.ColumnAlignments [col] : Alignment.Start;
+        int padLeft = CalculateLeftPadding (_columnWidths [col], Math.Min (textWidth, innerWidth), alignment);
+
+        // x is relative to column start; subtract padding to get text-relative position.
+        int textX = x - padLeft;
+
+        if (textX < 0)
+        {
+            return null;
+        }
+
+        var runX = 0;
+
+        foreach (StyledSegment seg in lineSegs)
+        {
+            int segWidth = seg.Text.GetColumns ();
+
+            if (textX >= runX && textX < runX + segWidth && !string.IsNullOrWhiteSpace (seg.Url))
+            {
+                return (seg.Url, rowIndex, col);
+            }
+
+            runX += segWidth;
+        }
+
+        return null;
     }
 
     /// <inheritdoc/>
@@ -226,7 +514,7 @@ public sealed class MarkdownTable : View, IDesignable
         var y = 1; // Below top border
 
         // Header row
-        DrawWrappedRow (_headerSegments, _data.ColumnAlignments, y, _headerRowHeight, true);
+        DrawWrappedRow (_headerSegments, _data.ColumnAlignments, y, _headerRowHeight, true, -1);
         y += _headerRowHeight;
 
         // Skip header separator (1 line)
@@ -235,12 +523,12 @@ public sealed class MarkdownTable : View, IDesignable
         // Body rows
         for (var r = 0; r < _rowSegments.Length; r++)
         {
-            DrawWrappedRow (_rowSegments [r], _data.ColumnAlignments, y, _bodyRowHeights [r], false);
+            DrawWrappedRow (_rowSegments [r], _data.ColumnAlignments, y, _bodyRowHeights [r], false, r);
             y += _bodyRowHeights [r];
         }
     }
 
-    private void DrawWrappedRow (List<StyledSegment> [] cellSegments, Alignment [] alignments, int startY, int rowHeight, bool isHeader)
+    private void DrawWrappedRow (List<StyledSegment> [] cellSegments, Alignment [] alignments, int startY, int rowHeight, bool isHeader, int rowIndex)
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
         Color? themeBg = UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null;
@@ -306,19 +594,44 @@ public sealed class MarkdownTable : View, IDesignable
                         attr = attr with { Style = attr.Style | TextStyle.Bold };
                     }
 
-                    SetAttribute (attr);
+                    bool hasUrl = !string.IsNullOrWhiteSpace (seg.Url);
+                    bool isAbsoluteUrl = hasUrl && Uri.IsWellFormedUriString (seg.Url, UriKind.Absolute);
+                    bool isActive = hasUrl && HasFocus && IsActiveLinkAt (rowIndex, col, seg.Url!);
 
-                    foreach (string grapheme in GraphemeHelper.GetGraphemes (seg.Text))
+                    if (isActive)
                     {
-                        int gw = Math.Max (grapheme.GetColumns (), 1);
+                        attr = new Attribute (attr.Background, attr.Foreground, attr.Style);
+                    }
 
-                        if (drawX - x >= colWidth - 1)
+                    // Set OSC8 URL for link segments (only absolute URIs)
+                    if (isAbsoluteUrl && Driver is { })
+                    {
+                        Driver.CurrentUrl = seg.Url;
+                    }
+
+                    try
+                    {
+                        SetAttribute (attr);
+
+                        foreach (string grapheme in GraphemeHelper.GetGraphemes (seg.Text))
                         {
-                            break;
-                        }
+                            int gw = Math.Max (grapheme.GetColumns (), 1);
 
-                        AddStr (drawX, y, grapheme);
-                        drawX += gw;
+                            if (drawX - x >= colWidth - 1)
+                            {
+                                break;
+                            }
+
+                            AddStr (drawX, y, grapheme);
+                            drawX += gw;
+                        }
+                    }
+                    finally
+                    {
+                        if (isAbsoluteUrl && Driver is { })
+                        {
+                            Driver.CurrentUrl = null;
+                        }
                     }
                 }
 
@@ -383,7 +696,7 @@ public sealed class MarkdownTable : View, IDesignable
     {
         if (maxWidth <= 0)
         {
-            return [[]];
+            return [ []];
         }
 
         List<List<StyledSegment>> lines = [];
@@ -437,7 +750,7 @@ public sealed class MarkdownTable : View, IDesignable
                         hardChunk = firstGrapheme;
                     }
 
-                    currentLine.Add (new StyledSegment (hardChunk, segment.StyleRole, segment.Url, segment.ImageSource));
+                    currentLine.Add (new StyledSegment (hardChunk, segment.StyleRole, segment.Url, segment.ImageSource, segment.Attribute, segment.Role));
                     lines.Add (currentLine);
                     currentLine = [];
                     currentWidth = 0;
@@ -448,7 +761,7 @@ public sealed class MarkdownTable : View, IDesignable
                     continue;
                 }
 
-                currentLine.Add (new StyledSegment (chunk, segment.StyleRole, segment.Url, segment.ImageSource));
+                currentLine.Add (new StyledSegment (chunk, segment.StyleRole, segment.Url, segment.ImageSource, segment.Attribute, segment.Role));
                 currentWidth += chunkWidth;
             }
         }
@@ -763,11 +1076,11 @@ public sealed class MarkdownTable : View, IDesignable
         int usableTextWidth = Math.Min (textWidth, innerWidth);
 
         return alignment switch
-               {
-                   Alignment.Center => 1 + Math.Max ((innerWidth - usableTextWidth) / 2, 0),
-                   Alignment.End => 1 + Math.Max (innerWidth - usableTextWidth, 0),
-                   _ => 1
-               };
+        {
+            Alignment.Center => 1 + Math.Max ((innerWidth - usableTextWidth) / 2, 0),
+            Alignment.End => 1 + Math.Max (innerWidth - usableTextWidth, 0),
+            _ => 1
+        };
     }
 
     private static string TruncateToWidth (string text, int maxWidth)
@@ -796,6 +1109,89 @@ public sealed class MarkdownTable : View, IDesignable
         return text [..charCount];
     }
 
+    /// <summary>
+    ///     Returns <see langword="true"/> if the segment at the given row/col with the given URL is the currently active
+    ///     link.
+    /// </summary>
+    private bool IsActiveLinkAt (int rowIndex, int colIndex, string url)
+    {
+        if (_activeLinkIndex < 0 || _activeLinkIndex >= _linkRegions.Count)
+        {
+            return false;
+        }
+
+        TableLinkRegion active = _linkRegions [_activeLinkIndex];
+
+        return active.RowIndex == rowIndex && active.ColIndex == colIndex && active.Url == url;
+    }
+
+    /// <summary>
+    ///     Builds the list of navigable link regions by scanning all cell segments.
+    ///     Called after <see cref="Recalculate"/>.
+    /// </summary>
+    private void BuildLinkRegions ()
+    {
+        _linkRegions.Clear ();
+        _activeLinkIndex = -1;
+
+        ScanCellSegments (_headerSegments, -1);
+
+        for (var r = 0; r < _rowSegments.Length; r++)
+        {
+            ScanCellSegments (_rowSegments [r], r);
+        }
+
+        bool hasLinks = _linkRegions.Count > 0;
+
+        // For standalone usage (SuperView is NOT a Markdown), setting CanFocus here enables
+        // keyboard navigation to the table. When hosted inside MarkdownView, BuildRenderedLines
+        // explicitly overrides CanFocus=false before Add() so these lines have no lasting effect.
+        CanFocus = hasLinks;
+        TabStop = hasLinks ? TabBehavior.TabStop : TabBehavior.NoStop;
+
+        return;
+
+        void ScanCellSegments (List<StyledSegment> [] cellSegments, int rowIndex)
+        {
+            for (var col = 0; col < cellSegments.Length; col++)
+            {
+                string? lastUrlInCell = null;
+
+                foreach (StyledSegment seg in cellSegments [col])
+                {
+                    if (string.IsNullOrWhiteSpace (seg.Url))
+                    {
+                        lastUrlInCell = null;
+
+                        continue;
+                    }
+
+                    // Avoid duplicates from multi-segment rendering of the same link within one cell
+                    if (seg.Url == lastUrlInCell)
+                    {
+                        continue;
+                    }
+
+                    lastUrlInCell = seg.Url;
+                    _linkRegions.Add (new TableLinkRegion { Url = seg.Url!, RowIndex = rowIndex, ColIndex = col });
+                }
+            }
+        }
+    }
+
+    /// <summary>A navigable link within the table. Tracks URL and cell position for unique identification.</summary>
+    private sealed class TableLinkRegion
+    {
+        /// <summary>The target URL of the link.</summary>
+        public string Url { get; init; } = "";
+
+        /// <summary>Row index: -1 for header, 0..N for body rows.</summary>
+        public int RowIndex { get; init; }
+
+        /// <summary>Column index within the row.</summary>
+        public int ColIndex { get; init; }
+    }
+
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
@@ -804,10 +1200,13 @@ public sealed class MarkdownTable : View, IDesignable
         Text = """
                | Feature | *Status (centered)* | **Owner** |
                |---------|:-----------------:|-------|
-               | **Markdown** | ✅ Totally! | @tig |
+               | [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! | @tig |
                | *Tables*     | ✅ For **sure!** | [tig](https://github.com/tig) |
                | `Code`       | ✅ `printf ("Awesome!");` | ??? |
                """;
+
+        // Opt-in: prevent Link.OpenUrl from being called in the designer.
+        LinkClicked += (_, e) => e.Handled = true;
 
         return true;
     }

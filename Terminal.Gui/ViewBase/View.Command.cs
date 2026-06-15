@@ -22,6 +22,16 @@ public partial class View // Command APIs
 
         // NotBound - Invoked if no handler is bound
         AddCommand (Command.NotBound, DefaultCommandNotBoundHandler);
+
+        // Paste - Default handler resolves payload (bracketed paste payload or clipboard),
+        // sanitizes, raises Pasting/Pasted, and delegates insertion to OnPaste.
+        AddCommand (Command.Paste, DefaultPasteHandler);
+
+        // Context - By default, route through the NotBound handler so that
+        // CommandNotBound fires (allowing subscribers to handle it). This keeps
+        // Command.Context as a "supported" command for mouse-binding purposes
+        // while not silently swallowing the invocation.
+        AddCommand (Command.Context, DefaultCommandNotBoundHandler);
     }
 
     #region Command Management
@@ -296,19 +306,41 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Called when a command that has not been bound is invoked.
+    ///     Called when a command that has not been bound (via <c>AddCommand</c>) is invoked on this View.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> and return <see langword="true"/> to indicate the event was
     ///     handled and processing should stop.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is part of the command bubbling pipeline. When a <see cref="MouseBindings"/> entry fires a command
+    ///         that has no <c>AddCommand</c> handler, this method is called. If the command is in an ancestor's
+    ///         <see cref="CommandsToBubbleUp"/> list, <see cref="TryBubbleUp"/> will forward it to that ancestor.
+    ///     </para>
+    ///     <para>
+    ///         Adding a <see cref="MouseBindings"/> entry without a corresponding <c>AddCommand</c> handler is
+    ///         intentional and idiomatic — it signals that the command should bubble to an ancestor.
+    ///     </para>
+    /// </remarks>
     /// <param name="args">The event arguments.</param>
     /// <returns><see langword="true"/> to stop processing.</returns>
     protected virtual bool OnCommandNotBound (CommandEventArgs args) => false;
 
     /// <summary>
-    ///     Cancelable event raised when a command that has not been bound is invoked.
+    ///     Cancelable event raised when a command that has not been bound (via <c>AddCommand</c>) is invoked.
     ///     Set CommandEventArgs.Handled to <see langword="true"/> to indicate the event was handled and processing should
     ///     stop.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This event fires as part of the command bubbling mechanism. A common use case is a SubView that binds
+    ///         mouse-wheel events to scroll commands (via <see cref="MouseBindings"/>) without adding a local handler.
+    ///         The unhandled command fires this event, and if not cancelled here, <see cref="TryBubbleUp"/> forwards
+    ///         the command to the nearest ancestor whose <see cref="CommandsToBubbleUp"/> includes it.
+    ///     </para>
+    ///     <para>
+    ///         See also: <see cref="CommandsToBubbleUp"/>, <see cref="TryBubbleUp"/>.
+    ///     </para>
+    /// </remarks>
     public event EventHandler<CommandEventArgs>? CommandNotBound;
 
     #region Accept
@@ -499,6 +531,16 @@ public partial class View // Command APIs
     ///     <para>
     ///         See <see cref="View.RaiseAccepting"/> for more information.
     ///     </para>
+    ///     <para>
+    ///         <strong>When to use:</strong> Subscribe to <see cref="Accepting"/> only when you need to inspect or cancel the
+    ///         in-flight Accept operation (e.g., set <c>e.Handled = true</c> to prevent the accept). For simple side-effects
+    ///         that don't need to cancel, subscribe to <see cref="Accepted"/> instead — it is lighter-weight and communicates
+    ///         intent more clearly.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Rule of thumb:</strong> If your handler doesn't read or set anything on <see cref="CommandEventArgs"/>
+    ///         (no <c>e.Handled</c>, no inspection of context), use <see cref="Accepted"/>.
+    ///     </para>
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepting;
 
@@ -542,6 +584,19 @@ public partial class View // Command APIs
     ///     </para>
     ///     <para>
     ///         See <see cref="RaiseAccepted"/> for more information.
+    ///     </para>
+    ///     <para>
+    ///         <strong>When to use:</strong> Subscribe to <see cref="Accepted"/> for fire-and-forget side-effects — things that
+    ///         happen <em>after</em> the accept has completed and cannot be cancelled. This is the right choice for the vast
+    ///         majority of button-click–style handlers.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Example:</strong>
+    ///         <code>
+    ///             button.Accepted += (_, _) =&gt; DoTheThing ();   // correct — side-effect only
+    ///             button.Accepting += (_, e) =&gt; { if (!CanProceed ()) e.Handled = true; }; // correct — cancels
+    ///             button.Accepting += (_, _) =&gt; DoTheThing (); // wrong — use Accepted instead
+    ///         </code>
     ///     </para>
     /// </remarks>
     public event EventHandler<CommandEventArgs>? Accepted;
@@ -843,6 +898,18 @@ public partial class View // Command APIs
     ///     Set CommandEventArgs.Handled to <see langword="true"/> to indicate the event was handled and processing should
     ///     stop.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <strong>When to use:</strong> Subscribe to <see cref="Activating"/> only when you need to inspect or cancel the
+    ///         in-flight Activate operation (e.g., set <c>e.Handled = true</c> to prevent the state change). For simple
+    ///         side-effects that don't need to cancel, subscribe to <see cref="Activated"/> instead — it is lighter-weight and
+    ///         communicates intent more clearly.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Rule of thumb:</strong> If your handler doesn't read or set anything on <see cref="CommandEventArgs"/>
+    ///         (no <c>e.Handled</c>, no inspection of context), use <see cref="Activated"/>.
+    ///     </para>
+    /// </remarks>
     public event EventHandler<CommandEventArgs>? Activating;
 
     /// <summary>
@@ -913,6 +980,16 @@ public partial class View // Command APIs
     ///     Event raised when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the
     ///     View to change state or preparing it for interaction.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Unlike <see cref="Activating"/>, this event cannot be cancelled. It is raised after the View has activated.
+    ///     </para>
+    ///     <para>
+    ///         <strong>When to use:</strong> Subscribe to <see cref="Activated"/> for fire-and-forget side-effects — things
+    ///         that happen <em>after</em> the activation has completed and cannot be cancelled. This is the right choice for
+    ///         the vast majority of state-change–reaction handlers.
+    ///     </para>
+    /// </remarks>
     public event EventHandler<EventArgs<ICommandContext?>>? Activated;
 
     #endregion Activate
@@ -928,7 +1005,7 @@ public partial class View // Command APIs
     {
         Trace.Command (this, ctx, "Entry");
 
-        if (RaiseHandlingHotKey (ctx) is true)
+        if (!CanBeVisible (this) || RaiseHandlingHotKey (ctx) is true)
         {
             // The hotkey was cancelled by OnHandlingHotKey or HandlingHotKey event.
             // Return false so the key is not consumed and can be processed as normal input
@@ -1211,17 +1288,32 @@ public partial class View // Command APIs
 
     /// <summary>
     ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews
-    ///     or from SubViews within this View's adornments (Padding, Border).
+    ///     or from SubViews within this View's adornments (Padding, Border, Margin).
     ///     When a SubView raises a command that is not handled, and the command is in the SuperView's
     ///     <see cref="CommandsToBubbleUp"/> list, the command will be invoked on the SuperView.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         For SubViews inside an <see cref="AdornmentView"/> (e.g., a button in Padding or Border),
-    ///         the bubble target is <see cref="IAdornment.Parent"/> rather than <see cref="SuperView"/>.
+    ///         For SubViews inside an <see cref="AdornmentView"/> (e.g., a view in Padding or Border),
+    ///         the bubble target is <see cref="IAdornment.Parent"/> (the owning View) rather than
+    ///         <see cref="SuperView"/>. This means a view added to <c>editor.Padding</c> will bubble
+    ///         commands directly to <c>editor</c>, not to the <c>PaddingView</c>.
     ///     </para>
     ///     <para>
-    ///         e.g. to enable <see cref="Command.Activate"/> bubbling for hierarchical views:
+    ///         <b>Mouse-wheel forwarding pattern:</b> A SubView can add a <see cref="MouseBindings"/> entry
+    ///         (e.g., <c>MouseBindings.Add(MouseFlags.WheeledUp, Command.ScrollUp)</c>) without calling
+    ///         <c>AddCommand</c> for the command. The unhandled command will fire
+    ///         <see cref="CommandNotBound"/> and then bubble via <see cref="TryBubbleUp"/> to the nearest
+    ///         ancestor whose <see cref="CommandsToBubbleUp"/> contains it.
+    ///     </para>
+    ///     <para>
+    ///         Example — enable scroll command bubbling:
+    ///         <code>
+    ///             editor.CommandsToBubbleUp = [Command.ScrollUp, Command.ScrollDown];
+    ///         </code>
+    ///     </para>
+    ///     <para>
+    ///         Example — enable <see cref="Command.Activate"/> bubbling for hierarchical views:
     ///         <code>
     ///             menuBar.CommandsToBubbleUp = [Command.Activate];
     ///         </code>

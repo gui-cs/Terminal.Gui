@@ -2,6 +2,9 @@
 
 ## Applications Built with Terminal.Gui
 
+- **[clet](https://github.com/gui-cs/clet)** - CLI-lets: simple CLI commands that prompt the user with rich TUI inputs (select, confirm, file picker, date, color, etc.) and return typed JSON. One binary, every prompt, JSON out. Works for humans and AI agents alike.
+  ![clet](https://raw.githubusercontent.com/gui-cs/clet/develop/docs/images/hero.png)
+  ⠀
 - **[UI Catalog](https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
   ![Sample app](../images/sample.gif)  
   ⠀
@@ -19,6 +22,9 @@
   ⠀
 - **[TerminalGuiDesigner](https://github.com/tznind/TerminalGuiDesigner)** - Cross platform view designer for building Terminal.Gui applications.
   ![TerminalGuiDesigner](../images/TerminalGuiDesigner.gif)
+
+- **[hui](https://github.com/YourRobotOverlord/hui)** - Syncs Philips Hue entertainment lights to system audio on Windows, with an interactive Terminal.Gui UI and a CLI mode.
+  ![hui](https://github.com/user-attachments/assets/8b4a493d-ac74-4876-88e4-fa56a6ff40f7)
 
 - **[Capital and Cargo](https://github.com/dhorions/Capital-and-Cargo)** - A retro console game where you buy, sell, produce and transport goods built with Terminal.Gui
   ![image](https://github.com/gui-cs/Terminal.Gui/assets/1682004/ed89f3d6-020f-4a8a-ae18-e057514f4c43)

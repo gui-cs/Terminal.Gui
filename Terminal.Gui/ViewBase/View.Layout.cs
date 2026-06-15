@@ -95,6 +95,7 @@ public partial class View // Layout APIs
             return false;
         }
 
+        Rectangle? oldFrame = _frame;
         var oldViewport = Rectangle.Empty;
 
         if (IsInitialized)
@@ -110,6 +111,24 @@ public partial class View // Layout APIs
 
         SetNeedsDraw ();
         SetNeedsLayout ();
+
+        // Issue #5358: when Frame shrinks or moves, the SuperView's old-frame area is now
+        // uncovered and must be cleared on the next draw. Invalidate the union of the old and
+        // new frames on the SuperView so its region-aware ClearViewport repaints just that area.
+        // SetFrame is the single source of truth for this invalidation for both direct Frame
+        // assignment and layout-driven frame updates.
+        //
+        // Issue #5359: Frames are in SuperView CONTENT coords, but SetNeedsDraw expects
+        // SuperView VIEWPORT-LOCAL coords. Translate by subtracting the SuperView's scroll
+        // offset (Viewport.Location).
+        if (oldFrame is { } prev && SuperView is { })
+        {
+            Rectangle invalidationContent = Rectangle.Union (prev, frame);
+            Point superScroll = SuperView.Viewport.Location;
+            Rectangle invalidationViewport = invalidationContent;
+            invalidationViewport.Offset (-superScroll.X, -superScroll.Y);
+            SuperView.SetNeedsDraw (invalidationViewport);
+        }
 
         // BUGBUG: When SetFrame is called from Frame_set, this event gets raised BEFORE OnResizeNeeded. Is that OK?
         OnFrameChanged (in frame);
@@ -555,18 +574,36 @@ public partial class View // Layout APIs
     ///     </para>
     /// </remarks>
     /// <param name="contentSize"></param>
-    /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
+    /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependency was not ready). </returns>
     public bool Layout (Size contentSize)
     {
+        bool needsDrawAfterLayout = _needsDrawAfterLayout;
+        _needsDrawAfterLayout = false;
+        Rectangle originalFrame = Frame;
+
         if (!SetRelativeLayout (contentSize))
         {
+            _needsDrawAfterLayout = needsDrawAfterLayout;
+
             return false;
         }
+
+        bool frameChanged = Frame != originalFrame;
         LayoutSubViews ();
 
-        // A layout was performed so a draw is needed
-        // NeedsLayout may still be true if a dependent View still needs layout after SubViewsLaidOut event
-        SetNeedsDraw ();
+        if (frameChanged || needsDrawAfterLayout)
+        {
+            // Ancestor-only layout propagation should not force redraw when a peer view is merely
+            // recomputed during dependency resolution. Draw after layout only when this view was
+            // directly invalidated for layout or its resolved frame actually changed.
+            SetNeedsDraw ();
+
+            // NOTE (#5358, review feedback item 4): the SuperView invalidation for frame
+            // changes is handled in SetFrame, which is the single source of truth for Frame
+            // mutation. Both direct (view.Frame = ...) and layout-driven (SetRelativeLayout
+            // → SetFrame) paths go through it, so calling SuperView.SetNeedsDraw(union) here
+            // too would be redundant and would do the cascade work twice on the hot path.
+        }
 
         return true;
     }
@@ -680,7 +717,16 @@ public partial class View // Layout APIs
         {
             // Set the frame. Do NOT use `Frame = newFrame` as it overwrites X, Y, Width, and Height
             // SetFrame will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
-            SetFrame (newFrame);
+            _suppressNeedsDrawAfterLayout = true;
+
+            try
+            {
+                SetFrame (newFrame);
+            }
+            finally
+            {
+                _suppressNeedsDrawAfterLayout = false;
+            }
 
             // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
             // BUGBUG: other logic in the property setters does not get executed.  Specifically:
@@ -880,8 +926,11 @@ public partial class View // Layout APIs
     /// </value>
     public bool NeedsLayout { get; internal set; } = true;
 
+    private bool _needsDrawAfterLayout = true;
+    private bool _suppressNeedsDrawAfterLayout;
+
     /// <summary>
-    ///     Sets <see cref="NeedsLayout"/> to return <see langword="true"/>, indicating this View and all of it's subviews
+    ///     Sets <see cref="NeedsLayout"/> to return <see langword="true"/>, indicating this View and all of its subviews
     ///     (including adornments) need to be laid out in the next Application iteration.
     /// </summary>
     /// <remarks>
@@ -892,22 +941,33 @@ public partial class View // Layout APIs
     /// </remarks>
     public void SetNeedsLayout ()
     {
+        if (!_suppressNeedsDrawAfterLayout)
+        {
+            _needsDrawAfterLayout = true;
+        }
+
+        MarkSubtreeNeedsLayout ();
+
+        TextFormatter.NeedsFormat = true;
+
+        if (SuperView is { NeedsLayout: false } superView)
+        {
+            superView.MarkAncestorsNeedLayout ();
+        }
+
+        if (this is AdornmentView adornment && adornment.Adornment?.Parent is { NeedsLayout: false } adornmentParent)
+        {
+            adornmentParent.MarkAncestorsNeedLayout ();
+        }
+    }
+
+    // Marks this view and every descendant in its own subtree (including adornment subview
+    // trees) as needing layout. Does NOT propagate to SuperView or Adornment.Parent. See
+    // <see cref="SetNeedsLayout"/> and issue #5357.
+    private void MarkSubtreeNeedsLayout ()
+    {
         NeedsLayout = true;
-
-        if (Margin.View is { SubViews.Count: > 0 })
-        {
-            Margin.View.SetNeedsLayout ();
-        }
-
-        if (Border.View is { SubViews.Count: > 0 })
-        {
-            Border.View.SetNeedsLayout ();
-        }
-
-        if (Padding.View is { SubViews.Count: > 0 })
-        {
-            Padding.View.SetNeedsLayout ();
-        }
+        MarkAdornmentSubViewTrees ();
 
         // TODO: Optimize this - see Setting_Thickness_Causes_Adornment_SubView_Layout
         // Use a stack to avoid recursion
@@ -923,44 +983,59 @@ public partial class View // Layout APIs
             {
                 continue;
             }
+
             current.NeedsLayout = true;
-
-            if (current.Margin.View is { SubViews.Count: > 0 })
-            {
-                current.Margin.View.SetNeedsLayout ();
-            }
-
-            if (current.Border.View is { SubViews.Count: > 0 })
-            {
-                current.Border.View.SetNeedsLayout ();
-            }
-
-            if (current.Padding.View is { SubViews.Count: > 0 })
-            {
-                current.Padding.View.SetNeedsLayout ();
-            }
+            current.MarkAdornmentSubViewTrees ();
 
             foreach (View subview in current.SubViews)
             {
                 stack.Push (subview);
             }
         }
+    }
 
-        TextFormatter.NeedsFormat = true;
-
-        if (SuperView is { NeedsLayout: false })
+    // Marks this view's Margin/Border/Padding view trees as needing layout when they have
+    // subviews. Adornment subview trees live separately from the regular SubViews tree.
+    private void MarkAdornmentSubViewTrees ()
+    {
+        if (Margin.View is { SubViews.Count: > 0 })
         {
-            SuperView?.SetNeedsLayout ();
+            Margin.View.MarkSubtreeNeedsLayout ();
         }
 
-        if (this is not AdornmentView adornment)
+        if (Border.View is { SubViews.Count: > 0 })
+        {
+            Border.View.MarkSubtreeNeedsLayout ();
+        }
+
+        if (Padding.View is { SubViews.Count: > 0 })
+        {
+            Padding.View.MarkSubtreeNeedsLayout ();
+        }
+    }
+
+    // Walks up the ancestor chain marking each ancestor as needing layout, without descending
+    // into the ancestor's regular SubViews tree or any uninvolved ancestor adornment subview
+    // trees. Stops at any ancestor already marked, mirroring the early-exit guards in the
+    // original recursive call. See issue #5357.
+    private void MarkAncestorsNeedLayout ()
+    {
+        if (NeedsLayout)
         {
             return;
         }
 
-        if (adornment.Adornment?.Parent is { NeedsLayout: false })
+        NeedsLayout = true;
+        TextFormatter.NeedsFormat = true;
+
+        if (SuperView is { NeedsLayout: false } superView)
         {
-            adornment.Adornment.Parent?.SetNeedsLayout ();
+            superView.MarkAncestorsNeedLayout ();
+        }
+
+        if (this is AdornmentView adornment && adornment.Adornment?.Parent is { NeedsLayout: false } adornmentParent)
+        {
+            adornmentParent.MarkAncestorsNeedLayout ();
         }
     }
 

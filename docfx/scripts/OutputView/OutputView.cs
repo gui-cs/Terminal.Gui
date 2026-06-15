@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using AnsiConsoleToHtml;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
@@ -33,6 +32,10 @@ string? outputFile = null;
 string [] commandArgs = Environment.GetCommandLineArgs ();
 var ansi = false;
 var addBorderFrame = false;
+var live = false;
+var queryKeyStrokes = false;
+var cols = 80;
+var rows = 20;
 
 for (var i = 0; i < commandArgs.Length; i++)
 {
@@ -60,6 +63,30 @@ for (var i = 0; i < commandArgs.Length; i++)
     {
         ansi = true;
     }
+    else if (commandArgs [i] == "--live" || commandArgs [i] == "-l")
+    {
+        live = true;
+    }
+    else if (commandArgs [i] == "--keystrokes" || commandArgs [i] == "-k")
+    {
+        queryKeyStrokes = true;
+    }
+    else if (commandArgs [i].StartsWith ("--cols=", StringComparison.OrdinalIgnoreCase))
+    {
+        cols = int.Parse (commandArgs [i] ["--cols=".Length..]);
+    }
+    else if (commandArgs [i] == "--cols" && i + 1 < commandArgs.Length)
+    {
+        cols = int.Parse (commandArgs [i + 1]);
+    }
+    else if (commandArgs [i].StartsWith ("--rows=", StringComparison.OrdinalIgnoreCase))
+    {
+        rows = int.Parse (commandArgs [i] ["--rows=".Length..]);
+    }
+    else if (commandArgs [i] == "--rows" && i + 1 < commandArgs.Length)
+    {
+        rows = int.Parse (commandArgs [i + 1]);
+    }
 }
 
 if (string.IsNullOrEmpty (viewName))
@@ -69,71 +96,174 @@ if (string.IsNullOrEmpty (viewName))
     return;
 }
 
+// If --keystrokes, just query the view's demo keystrokes and exit
+if (queryKeyStrokes)
+{
+    Type? type = ViewDemoWindow.ResolveViewType (viewName);
+
+    if (type is null)
+    {
+        Console.Error.WriteLine ($"`{viewName}` type is not a valid Terminal.Gui View type.");
+        Environment.Exit (1);
+
+        return;
+    }
+
+    View? view = ViewDemoWindow.CreateView (type);
+
+    if (view is null)
+    {
+        Console.WriteLine ("");
+
+        return;
+    }
+
+    if (view is IDesignable designable)
+    {
+        string? keystrokes = designable.GetDemoKeyStrokes ();
+        Console.WriteLine (keystrokes ?? "");
+    }
+    else
+    {
+        Console.WriteLine ("");
+    }
+
+    return;
+}
+
 ViewDemoWindow.ViewName = viewName;
 ViewDemoWindow.AddBorderFrame = addBorderFrame;
+ViewDemoWindow.IsLiveMode = live;
+ViewDemoWindow.Cols = cols;
+ViewDemoWindow.Rows = rows;
 
 IApplication app = Application.Create ();
 app.Init (DriverRegistry.Names.ANSI);
 
-// Force 16 colors and end after first iteration
-app.StopAfterFirstIteration = true;
-app.Driver!.Force16Colors = !ansi;
-app.Driver!.SetScreenSize (80, 20);
-
-var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
-
-if (result is { })
+if (live)
 {
-    Console.WriteLine (result);
-
-    return;
-}
-
-// Run it again, since it set the Screen size to just fit
-app.Run<ViewDemoWindow> ().GetResult<string> ();
-
-string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
-app.Dispose ();
-
-if (string.IsNullOrEmpty (output))
-{
-    Console.WriteLine (@"No output was generated.");
-
-    return;
-}
-
-if (ansi)
-{
-    output = AnsiConsole.ToHtml (output);
-}
-
-// Write to file or console
-if (!string.IsNullOrEmpty (outputFile))
-{
-    File.WriteAllText (outputFile, output);
+    app.Driver!.SetScreenSize (cols, rows);
+    app.Run<ViewDemoWindow> ();
+    app.Dispose ();
 }
 else
 {
-    Console.WriteLine (output);
+    // Original mode: stop after first iteration and capture output
+    app.StopAfterFirstIteration = true;
+    app.Driver!.Force16Colors = !ansi;
+    app.Driver!.SetScreenSize (cols, rows);
+
+    var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+
+    if (result is { })
+    {
+        Console.WriteLine (result);
+        app.Dispose ();
+
+        return;
+    }
+
+    // Run it again, since it set the Screen size to just fit
+    app.Run<ViewDemoWindow> ().GetResult<string> ();
+
+    string output = ansi ? app.Driver.ToAnsi () : app.ToString ().Trim ();
+    app.Dispose ();
+
+    if (string.IsNullOrEmpty (output))
+    {
+        Console.WriteLine (@"No output was generated.");
+
+        return;
+    }
+
+    if (ansi)
+    {
+        output = AnsiConsoleToHtml.AnsiConsole.ToHtml (output);
+    }
+
+    // Write to file or console
+    if (!string.IsNullOrEmpty (outputFile))
+    {
+        File.WriteAllText (outputFile, output);
+    }
+    else
+    {
+        Console.WriteLine (output);
+    }
 }
 
 // Defines a top-level window with border and title
 internal class ViewDemoWindow : Runnable<string>
 {
     public static string? ViewName { get; set; }
+    public static bool IsLiveMode { get; set; }
+    public static int Cols { get; set; } = 80;
+    public static int Rows { get; set; } = 20;
 
     public ViewDemoWindow ()
     {
-        // Limit the size of the window to 80x20, which works good for most views
-        Width = 80;
-        Height = 20;
+        Width = Cols;
+        Height = Rows;
 
-        // Use only white on black
-        SetScheme (new Scheme (new Attribute (ColorName16.White, ColorName16.Black)));
+        if (!IsLiveMode)
+        {
+            // Use only white on black for static HTML/ANSI capture
+            SetScheme (new Scheme (new Attribute (ColorName16.White, ColorName16.Black)));
+        }
+        else
+        {
+            // In live mode, don't let child Accept bubble up and stop the app
+            CommandsToBubbleUp = [];
+        }
+
         BorderStyle = LineStyle.None;
     }
 
     public static bool AddBorderFrame { get; set; }
+
+    /// <summary>
+    ///     Resolves a view type name to its <see cref="Type"/>, handling generic types like "ListView`1".
+    /// </summary>
+    public static Type? ResolveViewType (string viewName)
+    {
+        string normalizedViewName = NormalizeDocfxGenericName (viewName);
+
+        // Try direct resolution first
+        Type? type = Type.GetType ($"Terminal.Gui.Views.{normalizedViewName}, Terminal.Gui", false, true);
+
+        if (type is not null)
+        {
+            return type;
+        }
+
+        // Search the assembly for types matching by name (handles generics)
+        System.Reflection.Assembly asm = typeof (View).Assembly;
+
+        return asm.GetTypes ()
+                  .FirstOrDefault (t => t.IsClass
+                                        && !t.IsAbstract
+                                        && t.IsSubclassOf (typeof (View))
+                                        && string.Equals (t.Name, normalizedViewName, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private static string NormalizeDocfxGenericName (string viewName)
+    {
+        int suffixSeparator = viewName.LastIndexOf ('-');
+
+        if (suffixSeparator < 0)
+        {
+            return viewName;
+        }
+
+        string suffix = viewName [(suffixSeparator + 1)..];
+
+        if (!int.TryParse (suffix, out _))
+        {
+            return viewName;
+        }
+
+        return $"{viewName [..suffixSeparator]}`{suffix}";
+    }
 
     /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsRunning)
@@ -146,7 +276,7 @@ internal class ViewDemoWindow : Runnable<string>
         }
 
         // Convert ViewName to type that's in the Terminal.Gui assembly:
-        var type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
+        Type? type = ResolveViewType (ViewName!);
 
         if (type is null)
         {
@@ -171,13 +301,21 @@ internal class ViewDemoWindow : Runnable<string>
         Add (view);
 
         Layout ();
-        App?.Driver?.SetScreenSize (view.Frame.Width, view.Frame.Height);
+
+        if (!IsLiveMode)
+        {
+            App?.Driver?.SetScreenSize (view.Frame.Width, view.Frame.Height);
+        }
     }
 
-    private static View? CreateView (Type type)
+    public static View? CreateView (Type type)
     {
+        if (type.IsGenericTypeDefinition && type == typeof (Prompt<,>))
+        {
+            type = type.MakeGenericType (typeof (TextField), typeof (string));
+        }
         // If we are to create a generic Type
-        if (type.IsGenericType)
+        else if (type.IsGenericTypeDefinition)
         {
             // For each of the <T> arguments
             List<Type> typeArguments = new ();
@@ -208,11 +346,15 @@ internal class ViewDemoWindow : Runnable<string>
         }
 
         // Instantiate view
-        var view = (View)Activator.CreateInstance (type)!;
+        View view = (View)Activator.CreateInstance (type)!;
 
-        if (view is IDesignable designable)
+        if (view.GetType ().IsGenericType && view.GetType ().GetGenericTypeDefinition () == typeof (Prompt<,>))
         {
-            var demoText = "This is some demo text.";
+            ConfigurePrompt (view);
+        }
+        else if (view is IDesignable designable)
+        {
+            string demoText = "This is some demo text.";
             designable.EnableForDesign (ref demoText);
         }
         else
@@ -220,9 +362,31 @@ internal class ViewDemoWindow : Runnable<string>
             view.Text = "This is some demo text.";
         }
 
+        if (view is FileDialog)
+        {
+            view.Width = Dim.Fill ();
+            view.Height = Dim.Fill ();
+        }
+
         //view.Title = $"View: {type.Name}";
 
         return view;
+    }
+
+    private static void ConfigurePrompt (View view)
+    {
+        view.Title = "Prompt";
+
+        System.Reflection.MethodInfo? getWrappedView = view.GetType ().GetMethod ("GetWrappedView");
+        View? wrappedView = getWrappedView?.Invoke (view, null) as View;
+
+        if (wrappedView is null)
+        {
+            return;
+        }
+
+        wrappedView.Text = "What is your name?";
+        wrappedView.Width = 32;
     }
 
     private static void ViewInitialized (object? sender, EventArgs e)

@@ -180,7 +180,7 @@ public partial class Markdown
 
             string marker = list.IsOrdered ? $"{listItem.Order}. " : "• ";
             string itemPrefix = prefix + marker;
-            string itemCont = contPrefix + new string (' ', marker.Length);
+            string itemCont = contPrefix + new string (' ', marker.GetColumns ());
 
             var isFirst = true;
 
@@ -194,9 +194,10 @@ public partial class Markdown
                     {
                         bool done = tl.Checked;
                         MarkdownStyleRole role = done ? MarkdownStyleRole.TaskDone : MarkdownStyleRole.TaskTodo;
-                        string checkbox = done ? "[x] " : "[ ] ";
+                        string checkbox = done ? $"{Glyphs.CheckStateChecked} " : $"{Glyphs.CheckStateUnChecked} ";
                         string taskPrefix = itemPrefix + checkbox;
-                        string taskCont = contPrefix + new string (' ', marker.Length + 4);
+                        // To align wrapped task text after variable-width glyph markers, include the trailing space in the continuation indent.
+                        string taskCont = contPrefix + new string (' ', marker.GetColumns () + checkbox.GetColumns ());
 
                         List<InlineRun> runs = WalkInlines (firstInline.NextSibling, role);
                         TrimLeadingSpace (runs);
@@ -534,7 +535,7 @@ public partial class Markdown
     {
         if (codeLines.Count == 0)
         {
-            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock)], false, isCodeBlock: true, language: language));
+            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock, role: VisualRole.Code)], false, isCodeBlock: true, language: language));
 
             return;
         }
@@ -547,7 +548,7 @@ public partial class Markdown
 
             if (SyntaxHighlighter is null)
             {
-                runs = [new InlineRun (line, MarkdownStyleRole.CodeBlock)];
+                runs = [new InlineRun (line, MarkdownStyleRole.CodeBlock, role: VisualRole.Code)];
             }
             else
             {
@@ -555,10 +556,11 @@ public partial class Markdown
                 List<InlineRun> converted = [];
 
                 converted.AddRange (highlighted.Select (segment => new InlineRun (segment.Text,
-                                                                                  segment.StyleRole,
-                                                                                  segment.Url,
-                                                                                  segment.ImageSource,
-                                                                                  segment.Attribute)));
+                                                                                   segment.StyleRole,
+                                                                                   segment.Url,
+                                                                                   segment.ImageSource,
+                                                                                   segment.Attribute,
+                                                                                   segment.Role)));
 
                 runs = converted;
             }

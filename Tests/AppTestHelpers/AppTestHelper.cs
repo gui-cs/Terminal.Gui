@@ -1,5 +1,6 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Drawing;
+using System.Runtime.ExceptionServices;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Time;
@@ -108,7 +109,8 @@ public partial class AppTestHelper : IDisposable
     }
 
     /// <summary>
-    ///     Constructor for tests that need to run the application with Application.Run.
+    ///     Constructor for tests that need to run the application with IApplication.RunAsync.
+    ///     The runnable observes the helper's linked cancellation token, including timeout cancellation.
     /// </summary>
     internal AppTestHelper (Func<IRunnable> runnableBuilder, int width, int height, string driverName, TextWriter? logWriter = null, TimeSpan? timeout = null)
     {
@@ -120,7 +122,7 @@ public partial class AppTestHelper : IDisposable
         CommonInit (width, height, timeout);
 
         // Start the application in a background thread
-        _runTask = Task.Run (() =>
+        _runTask = Task.Run (async () =>
                              {
                                  _loggerScope = Logging.PushLogger (_testLogger!);
 
@@ -140,27 +142,36 @@ public partial class AppTestHelper : IDisposable
                                          _booting.Release ();
                                      }
 
-                                     if (App is { Initialized: true })
+                                     if (App is { Initialized: true } app)
                                      {
-                                         IRunnable runnable = runnableBuilder ();
+                                         IRunnable? runnable = null;
 
-                                         runnable.IsRunningChanged += (s, e) =>
-                                                                      {
-                                                                          if (!e.Value)
-                                                                          {
-                                                                              Finished = true;
-                                                                          }
-                                                                      };
-                                         App?.Run (runnable); // This will block, but it's on a background thread now
-
-                                         if (runnable is View runnableView)
+                                         try
                                          {
-                                             runnableView.Dispose ();
-                                         }
+                                             runnable = runnableBuilder ();
 
-                                         //Logging.Trace ("Application.Run completed");
-                                         App?.Dispose ();
-                                         _runCancellationTokenSource.Cancel ();
+                                             runnable.IsRunningChanged += (_, e) =>
+                                                                          {
+                                                                              if (!e.Value)
+                                                                              {
+                                                                                  Finished = true;
+                                                                              }
+                                                                          };
+
+                                             CancellationToken helperCancellationToken = _ansiInput.ExternalCancellationTokenSource!.Token;
+                                             await app.RunAsync (runnable, helperCancellationToken);
+                                         }
+                                         finally
+                                         {
+                                             if (runnable is View runnableView)
+                                             {
+                                                 runnableView.Dispose ();
+                                             }
+
+                                             //Logging.Trace ("Application.Run completed");
+                                             app.Dispose ();
+                                             _runCancellationTokenSource.Cancel ();
+                                         }
                                      }
                                  }
                                  catch (OperationCanceledException)
@@ -321,29 +332,42 @@ public partial class AppTestHelper : IDisposable
         {
             action = app => { };
         }
+
         CancellationTokenSource ctsActionCompleted = new ();
+        Exception? actionException = null;
 
         App?.Invoke (app =>
-                     {
-                         try
-                         {
-                             action (app);
+        {
+            try
+            {
+                action (app);
 
-                             //Logging.Trace ("Action completed");
-                             ctsActionCompleted.Cancel ();
-                         }
-                         catch (Exception e)
-                         {
-                             Logging.Warning ($"Action failed with exception: {e}");
-                             _backgroundException = e;
-                             _ansiInput.ExternalCancellationTokenSource?.Cancel ();
-                         }
-                     });
+                //Logging.Trace ("Action completed");
+                ctsActionCompleted.Cancel ();
+            }
+            catch (Exception e)
+            {
+                Logging.Warning ($"Action failed with exception: {e}");
+                _backgroundException = e;
+                actionException = e;
+                _ansiInput.ExternalCancellationTokenSource?.Cancel ();
+            }
+        });
 
-        // Blocks until either the token or the hardStopToken is cancelled.
-        // With linked tokens, we only need to wait on _runCancellationTokenSource and ctsLocal
-        // ExternalCancellationTokenSource is redundant because it's linked to _runCancellationTokenSource
-        WaitHandle.WaitAny ([_runCancellationTokenSource.Token.WaitHandle, ctsActionCompleted.Token.WaitHandle]);
+        // Blocks until either the action completes, the run stops, or the timeout/hard-stop token is cancelled.
+        WaitHandle [] waitHandles =
+        [
+            _runCancellationTokenSource.Token.WaitHandle,
+            ctsActionCompleted.Token.WaitHandle,
+            _ansiInput.ExternalCancellationTokenSource!.Token.WaitHandle
+        ];
+
+        WaitHandle.WaitAny (waitHandles);
+
+        if (actionException is { })
+        {
+            ExceptionDispatchInfo.Capture (actionException).Throw ();
+        }
 
         // Logging.Trace ($"Return from WaitIteration");
         return this;
@@ -414,6 +438,17 @@ public partial class AppTestHelper : IDisposable
 
                            writer?.WriteLine (text);
                        });
+
+    /// <summary>
+    ///     Cancels the linked token observed by the running application.
+    /// </summary>
+    /// <returns></returns>
+    public AppTestHelper CancelRun ()
+    {
+        _ansiInput.ExternalCancellationTokenSource?.Cancel ();
+
+        return this;
+    }
 
     /// <summary>
     ///     Stops the application and waits for the background thread to exit.

@@ -39,7 +39,7 @@ public class AnsiOutput : OutputBase, IOutput
     // Tracks which underlying platform APIs are in use
     private readonly AnsiPlatform _platform;
 
-    private Size _consoleSize = new (80, 25);
+    private Size _consoleSize;
     private IOutputBuffer? _lastBuffer;
 
     private readonly WindowsVTOutputHelper? _windowsVTOutput;
@@ -71,7 +71,6 @@ public class AnsiOutput : OutputBase, IOutput
         _platform = AnsiPlatform.Degraded;
 
         _lastBuffer = new OutputBufferImpl ();
-        _lastBuffer.SetSize (80, 25);
         _currentCursor = new Cursor ();
 
         try
@@ -86,6 +85,9 @@ public class AnsiOutput : OutputBase, IOutput
             // Check if we have a real console first
             if (!IsAttachedToTerminal)
             {
+                _consoleSize = new Size (80, 25);
+                _lastBuffer.SetSize (_consoleSize.Width, _consoleSize.Height);
+
                 Trace.Lifecycle (nameof (AnsiOutput), "Init", "No real terminal attached. Running in degraded mode.");
 
                 return;
@@ -111,8 +113,20 @@ public class AnsiOutput : OutputBase, IOutput
             }
             else if (PlatformDetection.IsUnixLike ())
             {
-                // duplicate stdout so we don't mess with Console.Out's FD
-                int fdCopy = UnixIOHelper.dup (UnixIOHelper.STDOUT_FILENO);
+                // duplicate the controlling terminal output fd so we don't mess with it.
+                // When stdout is redirected this is /dev/tty rather than STDOUT_FILENO,
+                // allowing TUI rendering to appear on the real terminal even when the
+                // app's stdout participates in a shell pipeline.
+                int outputFd = TerminalDevice.OutputFd;
+
+                if (outputFd < 0)
+                {
+                    Trace.Lifecycle (nameof (AnsiOutput), "Init", "Console output stream is not writable. Running in degraded mode.");
+
+                    return;
+                }
+
+                int fdCopy = UnixIOHelper.dup (outputFd);
 
                 if (fdCopy == -1)
                 {
@@ -133,6 +147,7 @@ public class AnsiOutput : OutputBase, IOutput
 
                 // TODO: Move Input related CSI sequences to AnsiInput
                 Write (EscSeqUtils.CSI_EnableMouseEvents);
+                Write (EscSeqUtils.CSI_EnableBracketedPaste);
             }
             else
             {
@@ -144,6 +159,7 @@ public class AnsiOutput : OutputBase, IOutput
 
                 // TODO: Move Input related CSI sequences to AnsiInput
                 Write (EscSeqUtils.CSI_EnableMouseEvents);
+                Write (EscSeqUtils.CSI_EnableBracketedPaste);
             }
 
             // Flush to ensure all sequences are sent
@@ -370,6 +386,7 @@ public class AnsiOutput : OutputBase, IOutput
             }
 
             // Restore terminal state: disable mouse, reset attributes, show cursor
+            Write (EscSeqUtils.CSI_DisableBracketedPaste);
             Write (EscSeqUtils.CSI_DisableMouseEvents);
             Write (EscSeqUtils.CSI_ResetAttributes);
 
@@ -399,6 +416,11 @@ public class AnsiOutput : OutputBase, IOutput
         finally
         {
             Trace.Lifecycle (nameof (AnsiOutput), "Dispose", "Flushing output and releasing resources.");
+
+            if (_platform == AnsiPlatform.WindowsVT)
+            {
+                WindowsVTInputHelper.WakePendingRead ();
+            }
 
             _windowsVTOutput?.Dispose ();
         }

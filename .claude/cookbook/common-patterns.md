@@ -14,6 +14,8 @@
 8. [Data Table](#data-table)
 9. [Tree View](#tree-view)
 10. [Status Bar with Shortcuts](#status-bar-with-shortcuts)
+11. [Scrollable Content Container](#scrollable-content-container)
+12. [Standard Application Layout](#standard-application-layout)
 
 ---
 
@@ -44,7 +46,7 @@ public sealed class FormWindow : Runnable<FormData?>
             X = 1,
             Y = 7,
             Width = Dim.Fill (1),
-            ColorScheme = Colors.ColorSchemes ["Error"]
+            SchemeName = "Error"
         };
 
         Button submitButton = new ()
@@ -94,11 +96,13 @@ public record FormData (string Name, string Email, int Age);
 A scrollable list with item selection and actions.
 
 ```csharp
+using System.Collections.ObjectModel;
+
 public sealed class ListWindow : Runnable
 {
     private readonly ListView _listView;
     private readonly Label _detailLabel;
-    private readonly List<string> _items = ["Apple", "Banana", "Cherry", "Date", "Elderberry"];
+    private readonly ObservableCollection<string> _items = ["Apple", "Banana", "Cherry", "Date", "Elderberry"];
 
     public ListWindow ()
     {
@@ -129,21 +133,21 @@ public sealed class ListWindow : Runnable
             Y = Pos.AnchorEnd (1)
         };
 
-        _listView.SelectedItemChanged += (_, e) =>
+        // ListView is IValue<int?> — the selected index. SelectedItem is int?.
+        _listView.ValueChanged += (_, e) =>
         {
-            if (e.Value >= 0 && e.Value < _items.Count)
+            if (e.NewValue is int index && index < _items.Count)
             {
-                _detailLabel.Text = $"Selected: {_items [e.Value]}";
+                _detailLabel.Text = $"Selected: {_items [index]}";
             }
         };
 
-        selectButton.Accepting += (_, e) =>
+        selectButton.Accepted += (_, _) =>
         {
-            if (_listView.SelectedItem >= 0)
+            if (_listView.SelectedItem is int selected)
             {
-                MessageBox.Query (App!, "Selection", $"You selected: {_items [_listView.SelectedItem]}", "OK");
+                MessageBox.Query (App!, "Selection", $"You selected: {_items [selected]}", "OK");
             }
-            e.Handled = true;
         };
 
         Add (_listView, _detailLabel, selectButton);
@@ -164,43 +168,33 @@ public sealed class MenuApp : Runnable
     {
         Title = "Menu Demo";
 
-        MenuBar menuBar = new ()
-        {
-            Menus =
-            [
-                new MenuBarItem (
-                    "File",
-                    [
-                        new MenuItem ("New", "", () => NewFile (), null, null, KeyCode.N | KeyCode.CtrlMask),
-                        new MenuItem ("Open...", "", () => OpenFile (), null, null, KeyCode.O | KeyCode.CtrlMask),
-                        new MenuItem ("Save", "", () => SaveFile (), null, null, KeyCode.S | KeyCode.CtrlMask),
-                        null, // Separator
-                        new MenuItem ("Exit", "", () => App!.RequestStop (), null, null, KeyCode.Q | KeyCode.CtrlMask)
-                    ]),
-                new MenuBarItem (
-                    "Edit",
-                    [
-                        new MenuItem ("Cut", "", null, null, null, KeyCode.X | KeyCode.CtrlMask),
-                        new MenuItem ("Copy", "", null, null, null, KeyCode.C | KeyCode.CtrlMask),
-                        new MenuItem ("Paste", "", null, null, null, KeyCode.V | KeyCode.CtrlMask)
-                    ]),
-                new MenuBarItem (
-                    "Help",
-                    [
-                        new MenuItem ("About...", "", () => ShowAbout ())
-                    ])
-            ]
-        };
+        MenuBar menuBar = new ();
 
-        TextView editor = new ()
+        menuBar.Add (new MenuBarItem ("_File",
+                                      [
+                                          new MenuItem { Title = "_New", Key = Key.N.WithCtrl, Action = NewFile },
+                                          new MenuItem { Title = "_Open...", Key = Key.O.WithCtrl, Action = OpenFile },
+                                          new MenuItem { Title = "_Save", Key = Key.S.WithCtrl, Action = SaveFile },
+                                          new Line (), // Separator
+                                          new MenuItem { Title = "_Quit", Key = Key.Q.WithCtrl, Action = () => App!.RequestStop () }
+                                      ]));
+
+        menuBar.Add (new MenuBarItem ("_Help",
+                                      [
+                                          new MenuItem { Title = "_About...", Action = ShowAbout }
+                                      ]));
+
+        // Main content area below the menu bar. (For a real multi-line editor,
+        // use gui-cs/Editor's EditorView — the core TextView is deprecated.)
+        View content = new ()
         {
             X = 0,
-            Y = 1,
+            Y = Pos.Bottom (menuBar),
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
 
-        Add (menuBar, editor);
+        Add (menuBar, content);
     }
 
     private void NewFile () => MessageBox.Query (App!, "New", "New file created", "OK");
@@ -214,7 +208,7 @@ public sealed class MenuApp : Runnable
 
 ## Split View Layout
 
-Horizontal or vertical split layout with resizable panes.
+Side-by-side panes positioned with `Pos`/`Dim`. (`TileView` does not exist in v2 — use plain views and `ViewArrangement` for user-resizable panes.)
 
 ```csharp
 public sealed class SplitWindow : Runnable
@@ -223,27 +217,27 @@ public sealed class SplitWindow : Runnable
     {
         Title = "Split View Demo";
 
-        TileView tileView = new ()
+        FrameView leftPane = new ()
         {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
+            Title = "Left Pane",
+            Width = Dim.Percent (50),
             Height = Dim.Fill (),
-            Orientation = Orientation.Vertical  // or Horizontal
-        };
 
-        // Left pane
-        FrameView leftPane = new () { Title = "Left Pane" };
+            // Let the user resize this pane with mouse or keyboard (optional)
+            Arrangement = ViewArrangement.RightResizable
+        };
         leftPane.Add (new Label { Text = "Left content", X = 1, Y = 1 });
 
-        // Right pane
-        FrameView rightPane = new () { Title = "Right Pane" };
+        FrameView rightPane = new ()
+        {
+            Title = "Right Pane",
+            X = Pos.Right (leftPane),
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
         rightPane.Add (new Label { Text = "Right content", X = 1, Y = 1 });
 
-        tileView.Tiles.ElementAt (0).ContentView.Add (leftPane);
-        tileView.Tiles.ElementAt (1).ContentView.Add (rightPane);
-
-        Add (tileView);
+        Add (leftPane, rightPane);
     }
 }
 ```
@@ -252,7 +246,7 @@ public sealed class SplitWindow : Runnable
 
 ## Tab View
 
-Tabbed interface with multiple content pages.
+Tabbed interface with multiple content pages. (v1's `TabView` is now `Tabs`: each added `View` becomes a tab, and its `Title` is the tab label.)
 
 ```csharp
 public sealed class TabbedWindow : Runnable
@@ -261,29 +255,25 @@ public sealed class TabbedWindow : Runnable
     {
         Title = "Tabbed Interface";
 
-        TabView tabView = new ()
-        {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        Tabs tabs = new ();
 
-        // Tab 1: Settings
-        View settingsTab = new ();
+        // Tab 1: Settings — Title becomes the tab label
+        View settingsTab = new () { Title = "Settings" };
         settingsTab.Add (
             new Label { Text = "Enable Feature:", X = 1, Y = 1 },
             new CheckBox { X = 20, Y = 1, Text = "Enabled" }
         );
 
         // Tab 2: About
-        View aboutTab = new ();
+        View aboutTab = new () { Title = "About" };
         aboutTab.Add (new Label { Text = "Version 1.0.0", X = 1, Y = 1 });
 
-        tabView.AddTab (new Tab { DisplayText = "Settings", View = settingsTab }, false);
-        tabView.AddTab (new Tab { DisplayText = "About", View = aboutTab }, false);
+        tabs.Add (settingsTab, aboutTab);
 
-        Add (tabView);
+        // Tabs is IValue<View?> — set Value to switch tabs programmatically
+        tabs.Value = settingsTab;
+
+        Add (tabs);
     }
 }
 ```
@@ -338,9 +328,14 @@ public sealed class ProgressWindow : Runnable
         Add (_statusLabel, _progressBar, cancelButton);
     }
 
-    public override void OnLoaded ()
+    protected override void OnIsRunningChanged (bool newIsRunning)
     {
-        base.OnLoaded ();
+        base.OnIsRunningChanged (newIsRunning);
+
+        if (!newIsRunning)
+        {
+            return;
+        }
 
         // Start simulated work
         App!.AddTimeout (TimeSpan.FromMilliseconds (100), () =>
@@ -374,7 +369,7 @@ private void OpenFile ()
     {
         Title = "Open File",
         AllowsMultipleSelection = false,
-        DirectoryPath = Environment.CurrentDirectory
+        Path = Environment.CurrentDirectory  // Starting directory
     };
 
     // Optional: filter by extension
@@ -395,15 +390,15 @@ private void SaveFile ()
     SaveDialog dialog = new ()
     {
         Title = "Save File",
-        DirectoryPath = Environment.CurrentDirectory,
-        FileName = "document.txt"
+        Path = Environment.CurrentDirectory  // Starting directory
     };
 
     App!.Run (dialog);
 
+    // FileName is the name portion of the chosen Path (null if canceled)
     if (!dialog.Canceled && !string.IsNullOrEmpty (dialog.FileName))
     {
-        string path = dialog.FileName;
+        string path = dialog.Path;
         // Save to path...
     }
 }
@@ -436,6 +431,8 @@ private void OpenMultipleFiles ()
 Display tabular data with TableView.
 
 ```csharp
+using System.Data;
+
 public sealed class DataTableWindow : Runnable
 {
     public DataTableWindow ()
@@ -472,12 +469,21 @@ public sealed class DataTableWindow : Runnable
             Text = "Select a row"
         };
 
-        tableView.SelectedCellChanged += (_, e) =>
+        // TableView is IValue<TableSelection?> — ValueChanged fires when the selection moves.
+        // SelectedCell is a Point: X = column, Y = row.
+        tableView.ValueChanged += (_, e) =>
         {
-            if (e.NewRow >= 0 && e.NewRow < table.Rows.Count)
+            if (e.NewValue is not { } selection)
             {
-                DataRow row = table.Rows [e.NewRow];
-                statusLabel.Text = $"Selected: {row ["Name"]} - ${row ["Price"]}";
+                return;
+            }
+
+            int row = selection.SelectedCell.Y;
+
+            if (row >= 0 && row < table.Rows.Count)
+            {
+                DataRow dataRow = table.Rows [row];
+                statusLabel.Text = $"Selected: {dataRow ["Name"]} - ${dataRow ["Price"]}";
             }
         };
 
@@ -493,6 +499,8 @@ public sealed class DataTableWindow : Runnable
 Hierarchical data display.
 
 ```csharp
+using System.IO;
+
 public sealed class TreeWindow : Runnable
 {
     public TreeWindow ()
@@ -552,7 +560,12 @@ public sealed class TreeWindow : Runnable
 
 ## Status Bar with Shortcuts
 
-Application status bar with keyboard shortcuts.
+`StatusBar` auto-positions at the bottom (`Y = Pos.AnchorEnd ()`, `Width = Dim.Fill ()`)
+— **do NOT set `Y` or `Width` manually**. Content above it should use `Dim.Fill (1)` to
+leave room.
+
+For shortcuts that need to work app-wide (not just when focused), set `BindKeyToApplication = true`
+and handle the `Accepting` event (not `Action`).
 
 ```csharp
 public sealed class StatusBarApp : Runnable
@@ -561,51 +574,93 @@ public sealed class StatusBarApp : Runnable
     {
         Title = "Status Bar Demo";
 
-        TextView editor = new ()
+        // Main content area. (For a real multi-line editor, use gui-cs/Editor's
+        // EditorView — the core TextView is deprecated.)
+        View content = new ()
         {
-            X = 0,
-            Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill (1)  // Leave room for status bar
+            Height = Dim.Fill (1)  // Leave 1 row for StatusBar
         };
 
-        StatusBar statusBar = new ()
+        StatusBar statusBar = new ();
+        // StatusBar auto-positions at bottom — do NOT set Y or Width
+
+        Shortcut saveShortcut = new ()
         {
-            Y = Pos.AnchorEnd (1),
-            Visible = true
+            Title = "Save",
+            Key = Key.S.WithCtrl,
+            BindKeyToApplication = true
         };
 
-        statusBar.Add (
-            new Shortcut
-            {
-                Title = "New",
-                Key = Key.N.WithCtrl,
-                Action = () => MessageBox.Query (App!, "New", "Creating new file...", "OK")
-            },
-            new Shortcut
-            {
-                Title = "Save",
-                Key = Key.S.WithCtrl,
-                Action = () => MessageBox.Query (App!, "Save", "Saving file...", "OK")
-            },
-            new Shortcut
-            {
-                Title = "Quit",
-                Key = Key.Q.WithCtrl,
-                Action = () => App!.RequestStop ()
-            }
-        );
+        saveShortcut.Accepting += (_, e) =>
+                                  {
+                                      MessageBox.Query (App!, "Save", "Saving...", "OK");
+                                      e.Handled = true;
+                                  };
 
-        Add (editor, statusBar);
+        Shortcut quitShortcut = new ()
+        {
+            Title = "Quit",
+            Key = Key.Q.WithCtrl,
+            BindKeyToApplication = true
+        };
+
+        quitShortcut.Accepting += (_, e) =>
+                                  {
+                                      App?.RequestStop ();
+                                      e.Handled = true;
+                                  };
+
+        statusBar.Add (saveShortcut, quitShortcut);
+        Add (content, statusBar);
     }
 }
 ```
 
 ---
 
+## Scrollable Content Container
+
+To make a `View` scrollable, set `ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar`.
+**Do NOT create custom subclasses just for scrolling** — the built-in scrollbar handles mouse
+wheel, drag, and viewport management automatically.
+
+```csharp
+// ✅ Correct — just set the flag on a plain View
+View container = new ()
+{
+    Width = Dim.Fill (),
+    Height = Dim.Fill (),
+    CanFocus = true
+};
+
+container.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+
+// Add subviews stacked vertically
+View? previous = null;
+
+foreach (View item in items)
+{
+    item.Y = previous is { } ? Pos.Bottom (previous) : 0;
+    item.Width = Dim.Fill ();
+    container.Add (item);
+    previous = item;
+}
+
+// ❌ Wrong — do NOT create a custom subclass just for scrolling
+// internal class ScrollableContainer : View { ... AddCommand(...) ... }
+```
+
+Only subclass (like `AllViewsView` does) when you need **additional** keyboard command
+bindings (e.g., arrow keys for line-by-line scrolling, PageUp/PageDown, Home/End) beyond
+what the scrollbar provides. Even then, prefer adding bindings in the owning `Runnable`
+if possible.
+
+---
+
 ## Tips for All Patterns
 
-1. **Always use `e.Handled = true`** in `Accepting` event handlers
+1. **Use `-ed` events (`Accepted`) for side effects**; use `Accepting` + `e.Handled = true` only to inspect or cancel
 2. **Use `Dim.Fill()` and `Pos.Center()`** instead of hardcoded values
 3. **Call `App!.RequestStop()`** to close the current window
 4. **Use `MessageBox.Query`** for simple dialogs

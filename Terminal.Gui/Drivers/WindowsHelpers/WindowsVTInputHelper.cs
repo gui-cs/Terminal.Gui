@@ -31,9 +31,6 @@ internal sealed class WindowsVTInputHelper : IDisposable
     // to use GetNumberOfConsoleInputEvents to poll for availability. With such APIs, this helper class would be unnecessary.
     // If this were the case, the only API the ANSI driver would require on Windows is GetStdHandle and ReadFile.
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
-
     [DllImport ("kernel32.dll")]
     private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
 
@@ -48,13 +45,21 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool CancelIoEx (nint hFile, nint lpOverlapped);
+
     [DllImport ("kernel32.dll")]
     private static extern uint GetConsoleCP ();
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool SetConsoleCP (uint wCodePageID);
+
     #endregion
 
+    private const int ERROR_NOT_FOUND = 1168;
+    private const int ERROR_OPERATION_ABORTED = 995;
+
     // Console mode flags
-    private const int STD_INPUT_HANDLE = -10;
     private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
     private const uint ENABLE_PROCESSED_INPUT = 0x0001;
     private const uint ENABLE_LINE_INPUT = 0x0002;
@@ -65,6 +70,22 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
     private uint _originalConsoleMode;
     private bool _disposed;
+
+    private const uint CP_UTF8 = 65001;
+
+    private readonly uint _originalConsoleCP;
+
+    public WindowsVTInputHelper ()
+    {
+        _originalConsoleCP = GetConsoleCP ();
+
+        if (_originalConsoleCP == CP_UTF8 || SetConsoleCP (CP_UTF8))
+        {
+            return;
+        }
+        int error = Marshal.GetLastWin32Error ();
+        Logging.Warning ($"{nameof (WindowsVTInputHelper)}: Failed to set console input code page to UTF-8. Win32 error: {error}");
+    }
 
     /// <summary>
     ///     Gets whether VTS input mode was successfully enabled.
@@ -110,7 +131,10 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
-            InputHandle = GetStdHandle (STD_INPUT_HANDLE);
+            // Use the controlling terminal input handle: when stdin is redirected (e.g. piping
+            // input into the app) this is the handle obtained from CONIN$ rather than the
+            // standard input handle, so VT input still reaches the real console.
+            InputHandle = TerminalDevice.InputHandle;
 
             if (InputHandle == nint.Zero || InputHandle == new nint (-1))
             {
@@ -184,6 +208,12 @@ internal sealed class WindowsVTInputHelper : IDisposable
             if (!success)
             {
                 int error = Marshal.GetLastWin32Error ();
+
+                if (error == ERROR_OPERATION_ABORTED)
+                {
+                    return false;
+                }
+
                 Logging.Warning ($"{nameof (WindowsVTInputHelper)}: ReadFile failed with error code: {error}");
 
                 return false;
@@ -227,6 +257,7 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
+            SetConsoleCP (_originalConsoleCP);
             SetConsoleMode (InputHandle, _originalConsoleMode);
             IsEnabled = false;
         }
@@ -253,6 +284,36 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// </summary>
     /// <returns><c>true</c> if there is at least one input event available.</returns>
     public bool Peek () => GetNumberOfConsoleInputEvents (InputHandle, out uint count) && count > 0;
+
+    /// <summary>
+    ///     Cancels any pending synchronous <see cref="ReadFile"/> on the Windows console input handle.
+    /// </summary>
+    public static void WakePendingRead ()
+    {
+        if (!RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+        {
+            return;
+        }
+
+        nint inputHandle = TerminalDevice.InputHandle;
+
+        if (inputHandle == nint.Zero || inputHandle == new nint (-1))
+        {
+            return;
+        }
+
+        if (CancelIoEx (inputHandle, nint.Zero))
+        {
+            return;
+        }
+
+        int error = Marshal.GetLastWin32Error ();
+
+        if (error != ERROR_NOT_FOUND)
+        {
+            Logging.Warning ($"{nameof (WindowsVTInputHelper)}: CancelIoEx failed with error code: {error}");
+        }
+    }
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);

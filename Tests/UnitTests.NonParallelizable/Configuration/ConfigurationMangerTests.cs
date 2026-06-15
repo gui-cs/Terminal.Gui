@@ -55,6 +55,73 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void HardCodedDefaultCache_KeyBindingDictionaries_Are_Typed_Deep_Copies ()
+    {
+        // Copilot
+        Assert.False (IsEnabled);
+        Application.ResetState (true);
+
+        try
+        {
+            AssertKeyBindingDictionaryIsDeepCopy ("Application.DefaultKeyBindings", Application.DefaultKeyBindings!);
+            AssertKeyBindingDictionaryIsDeepCopy ("View.DefaultKeyBindings", View.DefaultKeyBindings!);
+        }
+        finally
+        {
+            Disable (true);
+            Application.ResetState (true);
+        }
+
+        static void AssertKeyBindingDictionaryIsDeepCopy (string propertyName, Dictionary<Command, PlatformKeyBinding> currentBindings)
+        {
+            FrozenDictionary<string, ConfigProperty> cache = GetHardCodedConfigPropertyCache ();
+            Dictionary<Command, PlatformKeyBinding> cachedBindings = Assert.IsType<Dictionary<Command, PlatformKeyBinding>> (cache [propertyName].PropertyValue);
+
+            Assert.NotSame (currentBindings, cachedBindings);
+            Assert.NotEmpty (cachedBindings);
+
+            KeyValuePair<Command, PlatformKeyBinding> cachedEntry = cachedBindings.First (kvp => HasAnyKeys (kvp.Value));
+            PlatformKeyBinding currentBinding = currentBindings [cachedEntry.Key];
+
+            Assert.NotSame (currentBinding, cachedEntry.Value);
+            AssertKeyArraysAreDeepCopies (currentBinding.All, cachedEntry.Value.All);
+            AssertKeyArraysAreDeepCopies (currentBinding.Windows, cachedEntry.Value.Windows);
+            AssertKeyArraysAreDeepCopies (currentBinding.Linux, cachedEntry.Value.Linux);
+            AssertKeyArraysAreDeepCopies (currentBinding.Macos, cachedEntry.Value.Macos);
+        }
+
+        static bool HasAnyKeys (PlatformKeyBinding binding)
+        {
+            return binding.All is { Length: > 0 }
+                   || binding.Windows is { Length: > 0 }
+                   || binding.Linux is { Length: > 0 }
+                   || binding.Macos is { Length: > 0 };
+        }
+
+#pragma warning disable CS8632 // Nullable annotations document the nullable PlatformKeyBinding properties in this non-nullable test file.
+        static void AssertKeyArraysAreDeepCopies (Key []? currentKeys, Key []? cachedKeys)
+#pragma warning restore CS8632
+        {
+            if (currentKeys is null)
+            {
+                Assert.Null (cachedKeys);
+
+                return;
+            }
+
+            Assert.NotNull (cachedKeys);
+            Assert.NotSame (currentKeys, cachedKeys);
+            Assert.Equal (currentKeys.Length, cachedKeys.Length);
+
+            for (var i = 0; i < currentKeys.Length; i++)
+            {
+                Assert.NotSame (currentKeys [i], cachedKeys [i]);
+                Assert.Equal (currentKeys [i], cachedKeys [i]);
+            }
+        }
+    }
+
+    [Fact]
     public void HardCoded_Default_Theme_Uses_Fully_Populated_Cache_Values ()
     {
         // Copilot
@@ -72,7 +139,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
                          );
             Assert.Equal (
                           CursorStyle.BlinkingBlock,
-                          (CursorStyle)defaultTheme ["LinearRange.DefaultCursorStyle"].PropertyValue!
+                          (CursorStyle)defaultTheme ["LinearRangeDefaults.DefaultCursorStyle"].PropertyValue!
                          );
         }
         finally

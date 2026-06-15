@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace Terminal.Gui.Drivers;
 
@@ -21,14 +22,28 @@ public class OutputBufferImpl : IOutputBuffer
     private int _rows;
 
     /// <summary>
-    ///     Maps cell positions to URLs for OSC 8 hyperlink support.
-    ///     Only stores entries for cells that actually have URLs, minimizing memory overhead.
+    ///     Maps cell positions to explicitly assigned URLs for OSC 8 hyperlink support.
     /// </summary>
-    private Dictionary<Point, string>? _urlMap;
+    private Dictionary<Point, string>? _explicitUrlMap;
+
+    /// <summary>
+    ///     Maps cell positions to auto-detected URLs found in plain text content.
+    /// </summary>
+    private Dictionary<Point, string>? _autoUrlMap;
+
+    private int _urlStateVersion;
+
+    /// <summary>
+    ///     Monotonic counter incremented when URL state is wiped (e.g. via
+    ///     <see cref="ClearContents(bool)"/> or <see cref="SetSize"/>). Consumers
+    ///     that cache per-frame URL-row tracking can compare to detect resets.
+    /// </summary>
+    internal int UrlStateVersion => _urlStateVersion;
 
     private Rune _column1ReplacementChar = Glyphs.WideGlyphReplacement;
 
     private Region? _clip;
+    private readonly List<RasterImageCommand> _rasterImages = [];
 
     /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when
@@ -58,15 +73,21 @@ public class OutputBufferImpl : IOutputBuffer
     /// <returns>The URL if one exists, otherwise null.</returns>
     public string? GetCellUrl (int col, int row)
     {
-        // Fast-path: skip locking when no URLs have been set
-        if (_urlMap is null)
+        if (_explicitUrlMap is null && _autoUrlMap is null)
         {
             return null;
         }
 
         lock (_contentsLock)
         {
-            return _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
+            Point point = new (col, row);
+
+            if (_explicitUrlMap?.TryGetValue (point, out string? explicitUrl) == true)
+            {
+                return explicitUrl;
+            }
+
+            return _autoUrlMap?.TryGetValue (point, out string? autoUrl) == true ? autoUrl : null;
         }
     }
 
@@ -93,6 +114,7 @@ public class OutputBufferImpl : IOutputBuffer
         {
             _rows = value;
             ClearContents ();
+            _rasterImages.Clear ();
         }
     }
 
@@ -104,6 +126,7 @@ public class OutputBufferImpl : IOutputBuffer
         {
             _cols = value;
             ClearContents ();
+            _rasterImages.Clear ();
         }
     }
 
@@ -207,6 +230,7 @@ public class OutputBufferImpl : IOutputBuffer
             _cols = cols;
             _rows = rows;
             ClearContentsCore (!InlineMode);
+            _rasterImages.Clear ();
         }
     }
 
@@ -238,7 +262,7 @@ public class OutputBufferImpl : IOutputBuffer
                     // So we inline the logic instead.
                     SetAttributeAndDirty (c, r);
                     InvalidateOverlappedWideGlyph (c, r);
-                    string grapheme = rune != default (Rune) ? rune.ToString () : " ";
+                    string grapheme = rune != default (Rune) ? rune.ToString ().MakePrintable () : " ";
                     WriteGraphemeByWidth (c, r, grapheme, grapheme.GetColumns (), clipBounds);
                 }
             }
@@ -270,6 +294,111 @@ public class OutputBufferImpl : IOutputBuffer
         Row = row;
     }
 
+    /// <inheritdoc/>
+    public void AddRasterImage (RasterImageCommand command)
+    {
+        ArgumentNullException.ThrowIfNull (command);
+        ArgumentException.ThrowIfNullOrEmpty (command.Id);
+
+        if (command.Pixels is null)
+        {
+            throw new ArgumentException ("Raster image pixels are required.", nameof (command));
+        }
+
+        if (command.DestinationCells.Width <= 0 || command.DestinationCells.Height <= 0)
+        {
+            throw new ArgumentException ("Raster image destination must have a positive size.", nameof (command));
+        }
+
+        lock (_contentsLock)
+        {
+            command.Clip = Clip?.Clone ();
+            int index = _rasterImages.FindIndex (existing => existing.Id == command.Id);
+
+            if (index >= 0)
+            {
+                MarkRasterImageCellsDirty (_rasterImages [index]);
+                MarkRasterImageCellsClean (command);
+                _rasterImages [index] = command;
+
+                return;
+            }
+
+            MarkRasterImageCellsClean (command);
+            _rasterImages.Add (command);
+        }
+    }
+
+    /// <inheritdoc/>
+    public void RemoveRasterImage (string id)
+    {
+        ArgumentException.ThrowIfNullOrEmpty (id);
+
+        lock (_contentsLock)
+        {
+            for (int i = _rasterImages.Count - 1; i >= 0; i--)
+            {
+                if (_rasterImages [i].Id != id)
+                {
+
+                    continue;
+                }
+
+                MarkRasterImageCellsDirty (_rasterImages [i]);
+                _rasterImages.RemoveAt (i);
+            }
+        }
+    }
+
+    /// <inheritdoc/>
+    public IReadOnlyList<RasterImageCommand> GetRasterImages ()
+    {
+        lock (_contentsLock)
+        {
+            return _rasterImages.ToArray ();
+        }
+    }
+
+    private void MarkRasterImageCellsClean (RasterImageCommand command)
+    {
+        SetRasterImageCellsDirtyState (command, false);
+    }
+
+    private void MarkRasterImageCellsDirty (RasterImageCommand command)
+    {
+        SetRasterImageCellsDirtyState (command, true);
+    }
+
+    private void SetRasterImageCellsDirtyState (RasterImageCommand command, bool isDirty)
+    {
+        if (Contents is null)
+        {
+            return;
+        }
+
+        Region clip = command.Clip ?? new (Screen);
+
+        foreach (Rectangle clipRect in clip.GetRectangles ())
+        {
+            Rectangle visible = Rectangle.Intersect (Rectangle.Intersect (command.DestinationCells, clipRect), Screen);
+
+            if (visible.Width <= 0 || visible.Height <= 0)
+            {
+
+                continue;
+            }
+
+            for (int row = visible.Y; row < visible.Bottom; row++)
+            {
+                for (int col = visible.X; col < visible.Right; col++)
+                {
+                    Contents [row, col].IsDirty = isDirty;
+                    DirtyLines [row] |= isDirty;
+                }
+            }
+        }
+    }
+
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
     /// <param name="initiallyDirty">
     ///     When <see langword="true"/> (the default), all cells are marked dirty so the first render
@@ -298,8 +427,14 @@ public class OutputBufferImpl : IOutputBuffer
 
         DirtyLines = new bool [Rows];
 
-        // Clear the URL map
-        _urlMap?.Clear ();
+        // Null out (rather than Clear) so GetCellUrl's null fast-path stays effective
+        // for the lifetime of the buffer until URLs are introduced again.
+        if (_explicitUrlMap is { } || _autoUrlMap is { })
+        {
+            _explicitUrlMap = null;
+            _autoUrlMap = null;
+            _urlStateVersion++;
+        }
 
         for (var row = 0; row < Rows; row++)
         {
@@ -409,10 +544,15 @@ public class OutputBufferImpl : IOutputBuffer
         Contents! [row, col].Attribute = CurrentAttribute;
         Contents [row, col].IsDirty = true;
 
-        // If CurrentUrl is set, store it in the URL map
+        // Update the URL map: store CurrentUrl, or clear any stale entry so cells
+        // overdrawn by non-link content are not wrapped in OSC 8 sequences.
         if (!string.IsNullOrEmpty (CurrentUrl))
         {
             SetCellUrl (col, row, CurrentUrl);
+        }
+        else
+        {
+            _explicitUrlMap?.Remove (new Point (col, row));
         }
     }
 
@@ -424,8 +564,91 @@ public class OutputBufferImpl : IOutputBuffer
     /// <param name="url">The URL to associate with this cell.</param>
     private void SetCellUrl (int col, int row, string url)
     {
-        _urlMap ??= [];
-        _urlMap [new Point (col, row)] = url;
+        _explicitUrlMap ??= [];
+        _explicitUrlMap [new Point (col, row)] = url;
+    }
+
+    internal void SyncAutoUrlsForRow (int row)
+    {
+        lock (_contentsLock)
+        {
+            SyncAutoUrlsForRowCore (row);
+        }
+    }
+
+    internal void SyncAutoUrlsForAllRows ()
+    {
+        lock (_contentsLock)
+        {
+            for (int row = 0; row < Rows; row++)
+            {
+                SyncAutoUrlsForRowCore (row);
+            }
+        }
+    }
+
+    private void SyncAutoUrlsForRowCore (int row)
+    {
+        if (Contents is null || row < 0 || row >= Rows)
+        {
+            return;
+        }
+
+        if (_autoUrlMap is { Count: > 0 })
+        {
+            for (int col = 0; col < Cols; col++)
+            {
+                _autoUrlMap.Remove (new Point (col, row));
+            }
+        }
+
+        // Build the row text and a parallel char-to-column map so grapheme clusters
+        // wider than a single char (ZWJ emoji, base + combining mark) don't shift the
+        // detected URL out of alignment with its actual columns.
+        StringBuilder rowText = new (Cols);
+        int [] colByChar = new int [Cols * 2];
+        int charCount = 0;
+
+        for (int col = 0; col < Cols; col++)
+        {
+            string grapheme = Contents [row, col].Grapheme;
+            string append = string.IsNullOrEmpty (grapheme) ? " " : grapheme;
+            rowText.Append (append);
+
+            if (charCount + append.Length > colByChar.Length)
+            {
+                Array.Resize (ref colByChar, Math.Max (colByChar.Length * 2, charCount + append.Length));
+            }
+
+            for (int k = 0; k < append.Length; k++)
+            {
+                colByChar [charCount++] = col;
+            }
+        }
+
+        foreach (Osc8UrlLinker.UrlRange range in Osc8UrlLinker.FindUrls (rowText.ToString ()))
+        {
+            if (range.Start >= charCount)
+            {
+                continue;
+            }
+
+            int startCol = colByChar [range.Start];
+            int lastCharIdx = range.Start + range.Length - 1;
+            int endCol = lastCharIdx < charCount ? colByChar [lastCharIdx] + 1 : Cols;
+            endCol = Math.Min (endCol, Cols);
+
+            for (int col = startCol; col < endCol; col++)
+            {
+                _autoUrlMap ??= [];
+                _autoUrlMap [new Point (col, row)] = range.Url;
+            }
+        }
+
+        if (_autoUrlMap is { Count: 0 })
+        {
+            _autoUrlMap = null;
+        }
     }
 
     /// <summary>

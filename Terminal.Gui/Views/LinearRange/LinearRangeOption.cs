@@ -1,8 +1,8 @@
 namespace Terminal.Gui.Views;
 
- /// <summary>Represents an option in a <see cref="LinearRange{T}"/> .</summary>
- /// <typeparam name="T">Data type of the option.</typeparam>
- public class LinearRangeOption<T>
+/// <summary>Represents an option in a <see cref="LinearRange{T}"/> .</summary>
+/// <typeparam name="T">Data type of the option.</typeparam>
+public class LinearRangeOption<T>
 {
     /// <summary>Creates a new empty instance of the <see cref="LinearRangeOption{T}"/> class.</summary>
     public LinearRangeOption () { }
@@ -25,7 +25,7 @@ namespace Terminal.Gui.Views;
     public string? Legend { get; set; }
 
     /// <summary>
-    ///     Abbreviation of the Legend. When the <see cref="LinearRange{T}.MinimumInnerSpacing"/> too small to fit
+    ///     Abbreviation of the Legend. Used when the inner spacing is too small to fit
     ///     <see cref="Legend"/>.
     /// </summary>
     public Rune LegendAbbr { get; set; }

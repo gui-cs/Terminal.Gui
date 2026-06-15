@@ -1,11 +1,15 @@
 using System.Collections.ObjectModel;
 using System.IO.Abstractions;
+using Terminal.Gui.FileServices;
 
 namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     The base-class for <see cref="OpenDialog"/> and <see cref="SaveDialog"/>
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/FileDialog.gif" alt="FileDialog demo"/>
+/// </remarks>
 public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
 {
     /// <summary>Gets the Path separators for the operating system</summary>
@@ -206,8 +210,10 @@ public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
         _tableViewContainer.Add (_tableView);
 
         _tableView.Style.ShowHorizontalHeaderOverline = false;
-        _tableView.Style.ShowVerticalCellLines = false;
-        _tableView.Style.ShowVerticalHeaderLines = false;
+        _tableView.Style.ShowVerticalCellLines = true;
+        _tableView.Style.ShowVerticalCellLineForFirstColumn = false;
+        _tableView.Style.ShowVerticalCellLineForLastColumn = false;
+        _tableView.Style.ShowVerticalHeaderLines = true;
         _tableView.Style.AlwaysShowHeaders = true;
         _tableView.Style.ShowHorizontalHeaderUnderline = false;
         _tableView.Style.ShowHorizontalBottomLine = false;
@@ -312,6 +318,11 @@ public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
             _typeFilterDropDown?.Visible = true;
             _typeFilterDropDown?.Source = new ListWrapper<string> (new ObservableCollection<string> (AllowedTypes.Select (a => a.ToString ()!).ToList ()));
             _typeFilterDropDown?.Value = AllowedTypes [0].ToString () ?? string.Empty;
+
+            if (State is { })
+            {
+                RefreshState ();
+            }
         }
 
         // if no path has been provided
@@ -522,7 +533,7 @@ public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
                     }
                 }
 
-                if (f.FileSystemInfo is IDirectoryInfo sub)
+                if (f.FileSystemInfo is IDirectoryInfo sub && !FileSystemTreeBuilder.IsReparsePoint (sub))
                 {
                     RecursiveFind (sub);
                 }
@@ -580,6 +591,9 @@ public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
                                 });
         }
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Alt+T,wait:300,Shift+Tab,Shift+Tab,wait:300,CursorRight,wait:300,Tab,wait:300,Alt+T,wait:300,Alt+F,wait:300,`.md`,wait:800,Shift+Tab,wait:300,Enter,wait:800";
 
     bool IDesignable.EnableForDesign ()
     {

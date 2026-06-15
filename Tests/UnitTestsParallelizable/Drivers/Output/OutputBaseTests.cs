@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 
 namespace DriverTests.Output;
 
@@ -17,8 +17,9 @@ public class OutputBaseTests
         buffer.AddStr ("A");
         string ansi = output.ToAnsi (buffer);
 
-        // Assert: single grapheme plus newline (BuildAnsiForRegion appends a newline per row)
-        Assert.Contains ("A" + Environment.NewLine, ansi);
+        // Assert: single grapheme plus a fixed '\n' row break. ToAnsi is platform-independent
+        // by contract — it must NOT emit Environment.NewLine.
+        Assert.Contains ("A\n", ansi);
     }
 
     [Theory]
@@ -72,8 +73,9 @@ public class OutputBaseTests
             Assert.DoesNotContain ('\u001b', ansi);
         }
 
-        // Grapheme and newline should always be present
-        Assert.Contains ("X" + Environment.NewLine, ansi);
+        // Grapheme and a fixed '\n' row break should always be present (ToAnsi is portable;
+        // it must NOT emit Environment.NewLine).
+        Assert.Contains ("X\n", ansi);
 
         driver.Dispose ();
     }
@@ -360,6 +362,215 @@ public class OutputBaseTests
         Assert.True (secondStart < 0, "No OSC 8 start should appear on row 1");
     }
 
+    // Copilot - GPT-5.4
+    // Regression coverage for plain-text URL auto-linking used by TextView/Editor.
+    // If a previously auto-linked URL is overwritten by non-URL text, the redraw must
+    // explicitly clear hyperlink state before writing the replacement text.
+    [Fact]
+    public void Write_AutoDetectedUrl_ThenPlainText_EmitsOsc8CloseBeforeReplacement ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (24, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("plain replacement      ");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int replacementIdx = result.IndexOf ("plain replacement", StringComparison.Ordinal);
+        int endIdx = result.IndexOf (end, StringComparison.Ordinal);
+
+        Assert.DoesNotContain (start, result);
+        Assert.True (replacementIdx >= 0, "Replacement text was not emitted");
+        Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before replacement text");
+    }
+
+    // Copilot - GPT-5.4
+    // Regression coverage for deleting all text in the Editor scenario.
+    // Clearing a row that previously contained an auto-detected URL must emit an OSC 8
+    // close so terminals do not keep hyperlink metadata at the former URL location.
+    [Fact]
+    public void Write_AutoDetectedUrl_ThenSpaces_EmitsOsc8CloseBeforeClearingCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (24, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("                        ");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int replacementIdx = result.IndexOf ("                        ", StringComparison.Ordinal);
+        int endIdx = result.IndexOf (end, StringComparison.Ordinal);
+
+        // Assert
+        Assert.True (replacementIdx >= 0, "Replacement spaces were not emitted");
+        Assert.True (endIdx >= 0 && endIdx < replacementIdx, "OSC 8 close must be emitted before replacement spaces");
+    }
+
+    // Claude - Opus 4.7
+    // Regression coverage for the char-vs-column mismatch in SyncAutoUrlsForRowCore.
+    // When a multi-codepoint grapheme (ZWJ emoji, base + combining mark) precedes a URL
+    // on the same row, the URL's char offset in the concatenated row text diverges from
+    // its column position. The fix builds a char-to-column map so the auto-URL metadata
+    // lands on the actual URL cells, not shifted by the extra char count.
+    [Fact]
+    public void Write_AutoDetectedUrl_AfterMultiCharGrapheme_LinkAlignsWithUrlColumns ()
+    {
+        // Arrange — combining acute (U+0301) appended to 'e' yields a 2-char grapheme
+        // occupying a single column. Without the fix, the URL would be tagged starting
+        // one column past where it actually renders.
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (40, 1);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("é https://example.com");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+
+        int startIdx = result.IndexOf (start, StringComparison.Ordinal);
+
+        // Assert — the visible URL text must follow the OSC 8 start sequence with no
+        // characters between them. Search strictly after the start sequence so we don't
+        // match the URL embedded as the OSC parameter inside the start sequence itself.
+        Assert.True (startIdx >= 0, "OSC 8 start sequence was not emitted");
+
+        int afterStart = startIdx + start.Length;
+        int visibleUrlIdx = result.IndexOf ("https://example.com", afterStart, StringComparison.Ordinal);
+
+        Assert.Equal (afterStart, visibleUrlIdx);
+    }
+
+    // Claude - Opus 4.7
+    // Regression coverage for stale _rowsWithUrls tracking on resize. After a SetSize call
+    // the buffer's URL maps are wiped, so OutputBase must drop its row tracking too.
+    // Otherwise the next render emits a spurious OSC 8 close at the start of any row index
+    // that previously contained a URL.
+    [Fact]
+    public void Write_AfterResize_DoesNotEmitSpuriousOsc8Close ()
+    {
+        // Arrange — render a URL, then resize (which clears URL maps) and render plain text.
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (40, 2);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        // SetSize wipes URL state; row 0 used to have a URL.
+        buffer.SetSize (40, 2);
+
+        buffer.Move (0, 0);
+        buffer.AddStr ("plain text only");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        // Assert — no OSC 8 close should appear because row 0 no longer has any URL state
+        // and the buffer was reset between writes.
+        Assert.DoesNotContain (end, result);
+    }
+
+    // Claude - Opus 4.7
+    // After clearing URL state, GetCellUrl's null fast-path should be re-armed so subsequent
+    // cell lookups skip the lock entirely. This guards against the regression where
+    // ClearContents called .Clear() on the maps but left them allocated, defeating the
+    // fast-path for the lifetime of the buffer.
+    [Fact]
+    public void GetCellUrl_AfterUrlSetThenCleared_RestoresNullFastPath ()
+    {
+        // Arrange
+        OutputBufferImpl buffer = new () { Rows = 1, Cols = 10 };
+        buffer.SetSize (10, 1);
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("https://x");
+        buffer.CurrentUrl = null;
+
+        Assert.NotNull (buffer.GetCellUrl (0, 0));
+
+        // Act
+        buffer.ClearContents (true);
+
+        // Assert — second call should hit the null fast-path. We can't directly observe the
+        // lock skip, but we can verify state was wiped and the version counter advanced so
+        // OutputBase tracking is invalidated.
+        Assert.Null (buffer.GetCellUrl (0, 0));
+        Assert.True (buffer.UrlStateVersion > 0);
+    }
+
+    // Claude - Opus 4.7
+    // Regression coverage for _rowsWithUrls bookkeeping when the per-row flush happens entirely
+    // via WriteToConsole (i.e. the end-of-row Write path takes the empty-builder early-exit).
+    // Before the fix, the Add/Remove of the row index lived after the early-exit, so a row that
+    // lost its URL via overwrite but had clean trailing cells (causing the builder to flush
+    // mid-loop and end empty) kept a stale row-tracking entry — leading to a spurious row-start
+    // OSC 8 close on subsequent frames.
+    [Fact]
+    public void Write_RowLosesUrl_BuilderFlushedMidLoop_RemovesRowTracking ()
+    {
+        // Arrange — buffer with a URL on row 0, then overwrite the URL cells with non-URL
+        // content followed by clean cells (so the builder flushes mid-loop and the row exits
+        // with an empty builder, taking the early-exit).
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (40, 1);
+
+        // Frame 1: write URL covering cols 0-18, trailing space cells stay as ' '.
+        buffer.Move (0, 0);
+        buffer.AddStr ("https://example.com");
+        output.Write (buffer);
+
+        // Frame 2: overwrite the URL cells with Y characters. Cells 0-19 become dirty (19
+        // Y's plus the adjacent-dirty mark on cell 19). Cells 20-39 stay clean — they will
+        // trigger the WriteToConsole flush and leave the row with an empty builder.
+        buffer.Move (0, 0);
+        buffer.AddStr ("YYYYYYYYYYYYYYYYYYY");
+        output.Write (buffer);
+
+        // Frame 3: trivial change. With the fix, row 0 has been removed from _rowsWithUrls,
+        // so no OSC 8 close is emitted at the start of row 0. Without the fix, the stale
+        // entry causes a spurious OSC 8 close.
+        buffer.Move (0, 0);
+        buffer.AddStr ("X");
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        // Assert — frame 3 must NOT emit an OSC 8 close because frame 2's row no longer
+        // has any URL state, and _rowsWithUrls must reflect that even when the early-exit
+        // path is taken.
+        Assert.DoesNotContain (end, result);
+    }
+
     // Copilot
     [Fact]
     public void ToAnsi_LegacyConsole_NoOsc8 ()
@@ -443,5 +654,696 @@ public class OutputBaseTests
         Assert.Equal (driver.GetSixels (), app.Driver.GetSixels ());
 
         app.Dispose ();
+    }
+
+    // Claude - Opus 4.7
+    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // When dirty cells with a URL are flushed mid-row because a clean cell follows,
+    // the OSC 8 hyperlink remains open in the terminal. If no more dirty cells appear
+    // on the row, the end-of-row code must still emit the OSC 8 close sequence so the
+    // hyperlink does not bleed into the next row.
+    [Fact]
+    public void Write_UrlFollowedByCleanCells_ClosesHyperlinkAtRowEnd ()
+    {
+        // Arrange: 5-col row. URL at cols 0-1, clean cells at cols 2-4.
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (5, 1);
+
+        // First frame: write URL cells then clear dirty by flushing
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("AB");
+        buffer.CurrentUrl = null;
+        output.Write (buffer);
+
+        // Second frame: only re-mark the URL cells dirty so cols 2-4 stay clean.
+        buffer.Contents! [0, 0].IsDirty = true;
+        buffer.Contents! [0, 1].IsDirty = true;
+        buffer.DirtyLines [0] = true;
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert: every OSC 8 start sequence is followed by an OSC 8 close before the row ends.
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int startIdx = result.IndexOf (start, StringComparison.Ordinal);
+        Assert.True (startIdx >= 0, "OSC 8 start sequence not emitted");
+
+        int endIdx = result.IndexOf (end, startIdx + start.Length, StringComparison.Ordinal);
+        Assert.True (endIdx > startIdx, "OSC 8 hyperlink was not closed before the row ended");
+    }
+
+    // Claude - Opus 4.7
+    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // When a Link's display area shrinks (or a Link is replaced), the cells previously
+    // associated with a URL may be overdrawn by content that has no URL. Those cells
+    // must be removed from the URL map so OSC 8 sequences are not re-emitted for them.
+    [Fact]
+    public void AddStr_NoCurrentUrl_ClearsStaleUrlMapping ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (5, 1);
+
+        // First write: cells get associated with a URL
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("HELLO");
+        buffer.CurrentUrl = null;
+
+        Assert.Equal ("https://example.com", buffer.GetCellUrl (0, 0));
+        Assert.Equal ("https://example.com", buffer.GetCellUrl (4, 0));
+
+        // Act: overwrite cells with no CurrentUrl set (simulates a non-link view redrawing)
+        buffer.Move (0, 0);
+        buffer.AddStr ("WORLD");
+
+        // Assert: stale URL associations are cleared
+        Assert.Null (buffer.GetCellUrl (0, 0));
+        Assert.Null (buffer.GetCellUrl (1, 0));
+        Assert.Null (buffer.GetCellUrl (2, 0));
+        Assert.Null (buffer.GetCellUrl (3, 0));
+        Assert.Null (buffer.GetCellUrl (4, 0));
+
+        // And the rendered output for the second frame contains no OSC 8 sequences
+        string result = output.ToAnsi (buffer);
+        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink ("https://example.com"), result);
+    }
+
+    // Claude - Opus 4.7
+    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // When CurrentUrl changes from one URL to another for the same cell, the URL map
+    // should reflect the new URL (verifying the URL clear path does not break re-assignment).
+    [Fact]
+    public void AddStr_DifferentUrl_OverwritesUrlMapping ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (3, 1);
+
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://one.com";
+        buffer.AddStr ("ABC");
+
+        // Act: rewrite same cells with a different URL
+        buffer.Move (0, 0);
+        buffer.CurrentUrl = "https://two.com";
+        buffer.AddStr ("ABC");
+
+        // Assert: cells now report the new URL
+        Assert.Equal ("https://two.com", buffer.GetCellUrl (0, 0));
+        Assert.Equal ("https://two.com", buffer.GetCellUrl (1, 0));
+        Assert.Equal ("https://two.com", buffer.GetCellUrl (2, 0));
+    }
+
+    [Fact]
+    public void Write_SkipsSixel_WhenIsDirtyIsFalse ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "SKIPPED-SIXEL",
+            ScreenPosition = new (0, 0),
+            IsDirty = false
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Act
+        output.Write (buffer);
+
+        // Assert: sixel data should NOT have been emitted
+        Assert.DoesNotContain ("SKIPPED-SIXEL", output.GetLastOutput ());
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void Write_ClearsIsDirty_AfterWritingSixel ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "DIRTY-SIXEL",
+            ScreenPosition = new (0, 0),
+            IsDirty = true
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Act
+        output.Write (buffer);
+
+        // Assert: sixel was emitted and IsDirty was cleared
+        Assert.Contains ("DIRTY-SIXEL", output.GetLastOutput ());
+        Assert.False (s.IsDirty);
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void Write_SecondFrame_SkipsSixel_WhenIsDirtyWasClearedByFirstFrame ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "ONCE-SIXEL",
+            ScreenPosition = new (0, 0),
+            IsDirty = true
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Frame 1: should emit
+        output.Write (buffer);
+        Assert.Contains ("ONCE-SIXEL", output.GetLastOutput ());
+        Assert.False (s.IsDirty);
+
+        // Frame 2: re-dirty the buffer so Write traverses rows, but sixel should be skipped
+        buffer.Move (0, 0);
+        buffer.AddStr ("X");
+        output.Write (buffer);
+        Assert.DoesNotContain ("ONCE-SIXEL", output.GetLastOutput ());
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void Write_AlwaysRender_BypassesIsDirtyCheck ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "ALWAYS-SIXEL",
+            ScreenPosition = new (0, 0),
+            IsDirty = false,
+            AlwaysRender = true
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Act
+        output.Write (buffer);
+
+        // Assert: sixel was emitted even though IsDirty was false
+        Assert.Contains ("ALWAYS-SIXEL", output.GetLastOutput ());
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void Write_AlwaysRender_EmitsEveryFrame ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+        buffer.AddStr (".");
+
+        SixelToRender s = new ()
+        {
+            SixelData = "EVERY-FRAME",
+            ScreenPosition = new (0, 0),
+            IsDirty = false,
+            AlwaysRender = true
+        };
+
+        IDriver driver = new DriverImpl (
+                                         new AnsiComponentFactory (),
+                                         new AnsiInputProcessor (null!),
+                                         new OutputBufferImpl (),
+                                         output,
+                                         new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                         new SizeMonitorImpl (output));
+
+        driver.GetSixels ().Enqueue (s);
+
+        // Frame 1
+        output.Write (buffer);
+        Assert.Contains ("EVERY-FRAME", output.GetLastOutput ());
+
+        // Frame 2: re-dirty buffer so Write traverses, sixel should still emit
+        buffer.Move (0, 0);
+        buffer.AddStr ("Y");
+        output.Write (buffer);
+        Assert.Contains ("EVERY-FRAME", output.GetLastOutput ());
+
+        driver.Dispose ();
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void AddRasterImage_CapturesCurrentClip ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (1, 1, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (4, 4, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        };
+
+        // Act
+        buffer.AddRasterImage (command);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        // Assert
+        RasterImageCommand captured = Assert.Single (buffer.GetRasterImages ());
+        Assert.NotNull (captured.Clip);
+        Assert.Equal (new Rectangle (1, 1, 2, 2), captured.Clip!.GetBounds ());
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void ToAnsi_RasterImage_CropsToClipAndMovesCursor ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (1, 1, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (4, 4, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        Assert.Contains (EscSeqUtils.CSI_SetCursorPosition (2, 2), ansi);
+        Assert.Contains ("\u001bP0;0;0q\"1;1;2;2", ansi);
+        Assert.DoesNotContain ("\u001bP0;0;0q\"1;1;4;4", ansi);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void ToAnsi_RasterImage_SkipsWhenClipDoesNotIntersect ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (3, 3, 1, 1));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        Assert.DoesNotContain ("\u001bP", ansi);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void ToAnsi_RasterImage_RendersBeforeLaterTextCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+        buffer.Move (0, 0);
+        buffer.AddStr ("\u03a9");
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        int imageIndex = ansi.IndexOf ("\u001bP", StringComparison.Ordinal);
+        int resetAfterImageIndex = ansi.IndexOf (EscSeqUtils.CSI_SetCursorPosition (1, 1), imageIndex, StringComparison.Ordinal);
+        int textIndex = ansi.IndexOf ("\u03a9", StringComparison.Ordinal);
+        Assert.InRange (imageIndex, 0, resetAfterImageIndex - 1);
+        Assert.InRange (resetAfterImageIndex, imageIndex + 1, textIndex - 1);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void ToAnsi_RasterImage_UsesEncodedSixelForFullVisibleRectangle ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        string encodedSixel = "\u001bPpre-encoded\u001b\\";
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        Assert.Contains (encodedSixel, ansi);
+        Assert.DoesNotContain ("\"1;1;2;2", ansi);
+    }
+
+    // Copilot - GPT-5.5
+    [Theory]
+    [InlineData (null)]
+    [InlineData ("")]
+    public void AddRasterImage_RequiresId (string? id)
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+
+        RasterImageCommand command = new ()
+        {
+            Id = id,
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        // Act & Assert
+        Assert.ThrowsAny<ArgumentException> (() => buffer.AddRasterImage (command));
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void AddRasterImage_ReplacingExistingInvalidatesOldOnlyCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        RasterImageCommand oldCommand = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (4, 4, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        };
+
+        buffer.AddRasterImage (oldCommand);
+        buffer.DirtyLines [3] = false;
+
+        RasterImageCommand newCommand = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (0, 255, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        // Act
+        buffer.AddRasterImage (newCommand);
+
+        // Assert
+        RasterImageCommand captured = Assert.Single (buffer.GetRasterImages ());
+        Assert.Equal (new Rectangle (0, 0, 2, 2), captured.DestinationCells);
+        Assert.True (buffer.Contents! [3, 3].IsDirty);
+        Assert.True (buffer.DirtyLines [3]);
+        Assert.False (buffer.Contents [0, 0].IsDirty);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void RemoveRasterImage_InvalidatesCoveredCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+        buffer.DirtyLines [0] = false;
+
+        // Act
+        buffer.RemoveRasterImage ("image");
+
+        // Assert
+        Assert.Empty (buffer.GetRasterImages ());
+        Assert.True (buffer.Contents! [0, 0].IsDirty);
+        Assert.True (buffer.DirtyLines [0]);
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void GetRasterImages_ReturnsReadOnlySnapshot ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        IReadOnlyList<RasterImageCommand> images = buffer.GetRasterImages ();
+
+        // Assert
+        IList<RasterImageCommand> list = Assert.IsAssignableFrom<IList<RasterImageCommand>> (images);
+        Assert.Throws<NotSupportedException> (() => list.Clear ());
+        Assert.Single (buffer.GetRasterImages ());
+    }
+
+    // Copilot - GPT-5.5
+    [Fact]
+    public void Write_RasterImage_RendersBeforeLaterDirtyCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+        buffer.Move (0, 0);
+        buffer.AddStr ("\u03a9");
+
+        // Act
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        // Assert
+        int imageIndex = rendered.IndexOf ("\u001bP", StringComparison.Ordinal);
+        int textIndex = rendered.IndexOf ("\u03a9", StringComparison.Ordinal);
+        Assert.InRange (imageIndex, 0, textIndex - 1);
+    }
+
+    [Fact]
+    public void DriverImpl_SixelSupport_DefaultsToNull ()
+    {
+        // Arrange & Act
+        DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 new AnsiOutput (),
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        // Assert
+        Assert.Null (driver.SixelSupport);
+
+        driver.Dispose ();
+    }
+
+    [Fact]
+    public void DriverImpl_SetSixelSupport_RaisesSixelSupportChangedEvent ()
+    {
+        // Arrange
+        using DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 new AnsiOutput (),
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        SixelSupportResult firstResult = new ()
+        {
+            IsSupported = true,
+            MaxPaletteColors = 256,
+            SupportsTransparency = false
+        };
+
+        SixelSupportResult secondResult = new ()
+        {
+            IsSupported = true,
+            MaxPaletteColors = 512,
+            SupportsTransparency = true
+        };
+
+        List<ValueChangedEventArgs<SixelSupportResult?>> raisedArgs = [];
+
+        driver.SixelSupportChanged += (_, e) => raisedArgs.Add (e);
+
+        // Act 1: first call, old value should be null
+        driver.SetSixelSupport (firstResult);
+
+        // Assert 1
+        Assert.Single (raisedArgs);
+        Assert.Null (raisedArgs [0].OldValue);
+        Assert.Same (firstResult, raisedArgs [0].NewValue);
+
+        // Act 2: second call, old value should be firstResult
+        driver.SetSixelSupport (secondResult);
+
+        // Assert 2
+        Assert.Equal (2, raisedArgs.Count);
+        Assert.Same (firstResult, raisedArgs [1].OldValue);
+        Assert.Same (secondResult, raisedArgs [1].NewValue);
+    }
+
+    [Fact]
+    public void DriverImpl_SetSixelSupport_StoresResult ()
+    {
+        // Arrange
+        DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 new AnsiOutput (),
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        SixelSupportResult result = new ()
+        {
+            IsSupported = true,
+            MaxPaletteColors = 512,
+            SupportsTransparency = true
+        };
+
+        // Act
+        driver.SetSixelSupport (result);
+
+        // Assert
+        Assert.NotNull (driver.SixelSupport);
+        Assert.True (driver.SixelSupport!.IsSupported);
+        Assert.Equal (512, driver.SixelSupport.MaxPaletteColors);
+        Assert.True (driver.SixelSupport.SupportsTransparency);
+
+        driver.Dispose ();
+    }
+
+    private static Color [,] CreateSolidImage (int width, int height, Color color)
+    {
+        Color [,] image = new Color [width, height];
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                image [x, y] = color;
+            }
+        }
+
+        return image;
     }
 }

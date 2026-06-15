@@ -279,6 +279,43 @@ public static class EscSeqUtils
 
     #endregion Mouse
 
+    #region Bracketed Paste
+
+    /// <summary>
+    ///     ESC [ ? 2004 h - Enable bracketed paste mode.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When bracketed paste mode is enabled, the terminal wraps pasted content with the start
+    ///         marker <see cref="CSI_BracketedPasteStart"/> (<c>ESC[200~</c>) and the end marker
+    ///         <see cref="CSI_BracketedPasteEnd"/> (<c>ESC[201~</c>). This lets applications distinguish
+    ///         pasted text from typed input and handle large pastes efficiently.
+    ///     </para>
+    ///     <para>
+    ///         Supported by xterm, Windows Terminal, iTerm2, and most modern terminal emulators.
+    ///     </para>
+    /// </remarks>
+    public static readonly string CSI_EnableBracketedPaste = CSI + "?2004h";
+
+    /// <summary>
+    ///     ESC [ ? 2004 l - Disable bracketed paste mode.
+    /// </summary>
+    public static readonly string CSI_DisableBracketedPaste = CSI + "?2004l";
+
+    /// <summary>
+    ///     ESC [ 200 ~ - Sequence emitted by the terminal at the start of pasted content when
+    ///     bracketed paste mode is enabled via <see cref="CSI_EnableBracketedPaste"/>.
+    /// </summary>
+    public static readonly string CSI_BracketedPasteStart = CSI + "200~";
+
+    /// <summary>
+    ///     ESC [ 201 ~ - Sequence emitted by the terminal at the end of pasted content when
+    ///     bracketed paste mode is enabled via <see cref="CSI_EnableBracketedPaste"/>.
+    /// </summary>
+    public static readonly string CSI_BracketedPasteEnd = CSI + "201~";
+
+    #endregion Bracketed Paste
+
     #region Keyboard
 
     /// <summary>
@@ -411,9 +448,9 @@ public static class EscSeqUtils
                 //uint ck = ConsoleKeyMapping.MapKeyCodeToConsoleKey ((KeyCode)consoleKeyInfo.KeyChar, out bool isConsoleKey);
 
                 //if (isConsoleKey)
-            {
-                key = consoleKeyInfo.Key; // (ConsoleKey)ck;
-            }
+                {
+                    key = consoleKeyInfo.Key; // (ConsoleKey)ck;
+                }
 
                 newConsoleKeyInfo = new ConsoleKeyInfo (keyChar,
                                                         key,
@@ -635,15 +672,7 @@ public static class EscSeqUtils
         {
             var tooLongCursorPositionSequence = $"{CSI}{row};{col}H";
 
-            throw new InvalidOperationException ($"{
-                nameof (CSI_WriteCursorPosition)
-            } buffer (len: {
-                buffer.Length
-            }) is too short for cursor position sequence '{
-                tooLongCursorPositionSequence
-            }' (len: {
-                tooLongCursorPositionSequence.Length
-            }).");
+            throw new InvalidOperationException ($"{nameof (CSI_WriteCursorPosition)} buffer (len: {buffer.Length}) is too short for cursor position sequence '{tooLongCursorPositionSequence}' (len: {tooLongCursorPositionSequence.Length}).");
         }
 
         ReadOnlySpan<char> cursorPositionSequence = buffer [..charsWritten];

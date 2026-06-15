@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 //  Item HotKey - Focus item. Activate (Toggle) item. Do NOT Accept.
 // Focused:
 //  Space key - Activate (Toggle) focused item. Do NOT Accept.
-//  Enter key - Activate (Toggle) and Accept the focused item.
+//  Enter key - Accept. Do NOT Toggle.
 //  HotKey - No-op.
 //  Item HotKey - Focus item, Activate (Toggle), and do NOT Accept.
 
@@ -16,6 +16,9 @@ namespace Terminal.Gui.Views;
 ///     <see cref="FlagSelector{TFlagsEnum}"/> provides a type-safe version where a `[Flags]` <see langword="enum"/> can be
 ///     provided.
 /// </summary>
+/// <remarks>
+/// <img src="../images/views/FlagSelector.gif" alt="FlagSelector demo"/>
+/// </remarks>
 public class FlagSelector : SelectorBase, IDesignable
 {
     /// <summary>
@@ -59,6 +62,11 @@ public class FlagSelector : SelectorBase, IDesignable
     ///     Consumes: FlagSelector owns toggle semantics.
     /// </summary>
     protected override bool ConsumeDispatch => true;
+
+    /// <summary>
+    ///     FlagSelector does not toggle on Enter — Enter only accepts.
+    /// </summary>
+    protected override bool ActivateOnAccept => false;
 
     // Set by OnHandlingHotKey to suppress the Activate that DefaultHotKeyHandler
     // fires after RaiseHandlingHotKey. Checked and cleared in GetDispatchTarget.
@@ -300,6 +308,9 @@ public class FlagSelector : SelectorBase, IDesignable
             SetLayout ();
         }
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:400,Space,wait:600,CursorDown,wait:400,Space,wait:800";
 
     /// <inheritdoc/>
     public bool EnableForDesign ()

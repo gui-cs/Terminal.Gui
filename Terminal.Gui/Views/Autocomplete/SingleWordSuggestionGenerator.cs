@@ -1,5 +1,5 @@
 #nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     <see cref="ISuggestionGenerator"/> which suggests from a collection of words those that match the

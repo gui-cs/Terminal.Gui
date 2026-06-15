@@ -128,6 +128,19 @@ public interface IDriver : IDisposable
 
     #region Color Support
 
+    /// <summary>
+    ///     Gets the terminal's sixel support capabilities, detected during driver initialization.
+    /// </summary>
+    /// <remarks>
+    ///     <see langword="null"/> if detection has not been performed.
+    /// </remarks>
+    SixelSupportResult? SixelSupport { get; }
+
+    /// <summary>
+    ///     Raised when <see cref="SixelSupport"/> changes (e.g. after terminal color detection completes).
+    /// </summary>
+    event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
+
     /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
     bool SupportsTrueColor { get; }
 
@@ -410,6 +423,13 @@ public interface IDriver : IDisposable
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<Mouse>? MouseEvent;
+
+    /// <summary>
+    ///     Event fired when a bracketed paste is received from the terminal. The string contains the
+    ///     raw pasted text with the ANSI bracketing markers stripped. Only fires on terminals that
+    ///     support bracketed paste mode (most modern terminals).
+    /// </summary>
+    event EventHandler<string>? Paste;
 
     #endregion Input Events
 

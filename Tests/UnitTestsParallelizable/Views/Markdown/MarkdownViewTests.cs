@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using System.Text;
 using JetBrains.Annotations;
 using UnitTests;
 
@@ -201,6 +202,326 @@ public class MarkdownViewTests (ITestOutputHelper output)
         window.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void Mouse_Click_On_Link_In_Table_Cell_Raises_LinkClicked ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [select](https://example.com) | Pick one item |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        window.Add (markdownView);
+
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // The table is a SubView of the Markdown view. Find it.
+        MarkdownTable? tableView = null;
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable t)
+            {
+                tableView = t;
+
+                break;
+            }
+        }
+
+        Assert.NotNull (tableView);
+
+        // Click on the link text in the first body row, first column.
+        // Table layout: row 0 = top border, row 1 = header, row 2 = separator, row 3 = body row.
+        // Column layout: col 0 starts after left border (x=1), with 1 char padding = x=2.
+        tableView.NewMouseEvent (new Mouse { Position = new Point (2, 3), Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.Equal ("https://example.com", clickedUrl);
+
+        window.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Tab_Navigation_Cycles_Through_Table_Links ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = new ();
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Find the table SubView
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+        Assert.True (tableView.CanFocus);
+
+        // Give focus to the table
+        tableView.SetFocus ();
+
+        // Activate to check first focused link
+        tableView.InvokeCommand (Command.Accept);
+
+        // Advance focus forward
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+
+        // Should have activated two distinct links
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Contains ("https://a.com", activatedUrls);
+        Assert.Contains ("https://b.com", activatedUrls);
+
+        window.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Enter_Activates_Focused_Table_Link ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | info |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        // Focus the table — the first link becomes active
+        tableView.SetFocus ();
+
+        // Simulate Enter key via Command.Accept
+        tableView.InvokeCommand (Command.Accept);
+
+        Assert.Equal ("https://a.com", clickedUrl);
+
+        window.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void ShiftTab_Navigation_Cycles_Backwards_Through_Table_Links ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = new ();
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        // Focus the table — first link (alpha) becomes active on focus gain
+        tableView.SetFocus ();
+
+        // Advance forward to second link (beta)
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+        Assert.Single (activatedUrls);
+        Assert.Equal ("https://b.com", activatedUrls [0]);
+
+        // Navigate backward — should go back to first link (alpha)
+        markdownView.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Equal ("https://a.com", activatedUrls [1]);
+
+        window.Dispose ();
+    }
+
+    // Copilot - Opus 4.6 - verify Issue 1: anchor links in tables should scroll to heading
+    [Fact]
+    public void Anchor_Link_In_Table_Scrolls_To_Heading ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        // Create markdown with a heading and a table containing an anchor link to it.
+        // The heading must be far enough below the table that scrolling is needed.
+        string markdown = """
+                          | Name | Link |
+                          |------|------|
+                          | jump | [go](#target) |
+
+                          Line 1
+
+                          Line 2
+
+                          Line 3
+
+                          Line 4
+
+                          Line 5
+
+                          Line 6
+
+                          Line 7
+
+                          Line 8
+
+                          Line 9
+
+                          ## Target
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 10 };
+        var clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Viewport should start at top
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // Find the table and activate the anchor link
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        tableView.SetFocus ();
+        tableView.InvokeCommand (Command.Accept);
+
+        // The anchor link should have been reported
+        Assert.Equal ("#target", clickedUrl);
+
+        // The viewport should have scrolled down to the heading
+        Assert.True (markdownView.Viewport.Y > 0, "Viewport should have scrolled to the anchor target");
+
+        window.Dispose ();
+    }
+
+    // Copilot - Opus 4.6 - verify Issue 2: duplicate URLs in different cells create separate navigable entries
+    [Fact]
+    public void Duplicate_Urls_In_Different_Cells_Are_Separately_Navigable ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        // Two cells in different rows with the same URL — should be independently navigable
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [link](https://same.com) | info |
+                          | [link](https://same.com) | info |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        List<string> activatedUrls = [];
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        activatedUrls.Add (e.Url);
+                                        e.Handled = true;
+                                    };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+        Assert.True (tableView.CanFocus);
+
+        // Focus the table — first link becomes active
+        tableView.SetFocus ();
+        tableView.InvokeCommand (Command.Accept);
+
+        // Advance to second link (same URL but different cell)
+        markdownView.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
+        tableView.InvokeCommand (Command.Accept);
+
+        // Both activations should have fired — proving they are independently navigable
+        Assert.Equal (2, activatedUrls.Count);
+        Assert.Equal ("https://same.com", activatedUrls [0]);
+        Assert.Equal ("https://same.com", activatedUrls [1]);
+
+        window.Dispose ();
+    }
+
     [Fact]
     public void Image_Fallback_Text_Renders ()
     {
@@ -382,11 +703,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Style_TaskDone_Renders_Strikethrough ()
+    public void Style_TaskDone_Renders_Checked_Glyph_With_Strikethrough ()
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- [x] D");
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• [x] " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + $"• {Glyphs.CheckStateChecked} " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
                                            output,
                                            app.Driver);
 
@@ -395,11 +716,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Style_TaskTodo_Renders_Bold ()
+    public void Style_TaskTodo_Renders_Unchecked_Glyph_With_Bold ()
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- [ ] T");
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• [ ] T" + @"\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + $"• {Glyphs.CheckStateUnChecked} T" + @"\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -1903,5 +2224,406 @@ public class MarkdownViewTests (ITestOutputHelper output)
         hostCode.Dispose ();
         hostNoCode.Dispose ();
     }
-}
 
+    // Copilot
+    [Fact]
+    public void CanFocus_False_Text_HotKeySpecifier_SetsFocus_Next ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = false,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+        View nextView = new () { CanFocus = true };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+        Assert.True (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_False_LeftButtonClicked_SetsFocus_Next ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            X = 0,
+            Y = 1,
+            Width = 20,
+            Height = 1,
+            CanFocus = false,
+            Text = "_Markdown"
+        };
+        View nextView = new ()
+        {
+            X = Pos.Right (markdown),
+            Y = Pos.Top (markdown),
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+        Assert.True (otherView.HasFocus);
+        Assert.False (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = markdown.Frame.Location, Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.False (markdown.HasFocus);
+        Assert.True (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_True_Text_HotKeySpecifier_SetsFocus_OnMarkdown ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        View otherView = new () { CanFocus = true };
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = true,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+        View nextView = new () { CanFocus = true };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (otherView, markdown, nextView);
+        otherView.SetFocus ();
+
+        Assert.Equal (Key.M, markdown.HotKey);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (otherView.HasFocus);
+        Assert.True (markdown.HasFocus);
+        Assert.False (nextView.HasFocus);
+    }
+
+    // Copilot
+    [Fact]
+    public void CanFocus_False_Text_HotKeySpecifier_NoNextPeer_DoesNotFocusMarkdown ()
+    {
+        using IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        Terminal.Gui.Views.Markdown markdown = new ()
+        {
+            CanFocus = false,
+            Width = 20,
+            Height = 1,
+            Text = "_Markdown"
+        };
+
+        markdown.HotKeySpecifier = (Rune)'_';
+
+        app.Begin (runnable);
+        runnable.Add (markdown);
+
+        Assert.Equal (Key.M, markdown.HotKey);
+
+        app.Keyboard.RaiseKeyDownEvent (markdown.HotKey);
+
+        Assert.False (markdown.HasFocus);
+    }
+
+    // Copilot - regression test for #5365
+    [Fact]
+    public void Initial_Render_With_Table_Links_Does_Not_Scroll_Viewport ()
+    {
+        // When a Markdown view contains tables with hyperlinks, the viewport must remain
+        // at Y=0 after initial layout. No table should have auto-focus.
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 10);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          # Title
+
+                          Some introductory text at the top.
+
+                          | Command | Description |
+                          |---------|-------------|
+                          | [help](app:help) | Shows help |
+                          | [quit](app:quit) | Quits the app |
+
+                          More text below.
+
+                          | Name | Link |
+                          |------|------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          | [gamma](https://c.com) | [delta](https://d.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = markdown
+        };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Viewport must remain at the top — no auto-scrolling to a focused table
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // No table SubView should have focus
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable table)
+            {
+                Assert.False (table.HasFocus, "No table should have auto-focus on initial render");
+            }
+        }
+
+        // Additional layout/draw cycles must not cause viewport drift or focus theft
+        app.LayoutAndDraw ();
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        app.LayoutAndDraw ();
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void Multiple_LayoutDraw_Cycles_Do_Not_Scroll_Or_Focus_Table ()
+    {
+        // Verifies that repeated layout/draw cycles don't cause viewport drift
+        // or auto-focus into a table (regression guard for issue #5365).
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 10);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          # Title
+
+                          Some text at the top.
+
+                          | Command | Description |
+                          |---------|-------------|
+                          | [help](app:help) | Shows help |
+                          | [quit](app:quit) | Quits the app |
+
+                          More text.
+
+                          | Name | Link |
+                          |------|------|
+                          | [alpha](https://a.com) | [beta](https://b.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = markdown
+        };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+
+        // Perform multiple layout/draw cycles
+        for (var i = 0; i < 5; i++)
+        {
+            app.LayoutAndDraw ();
+
+            Assert.Equal (0, markdownView.Viewport.Y);
+
+            foreach (View sub in markdownView.SubViews)
+            {
+                if (sub is MarkdownTable table)
+                {
+                    Assert.False (table.HasFocus, $"Table should not have focus after cycle {i}");
+                }
+            }
+        }
+
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void Content_Change_While_Focused_Does_Not_Focus_Table ()
+    {
+        // When the MarkdownView itself has focus and content changes (triggering re-layout),
+        // no table should steal focus. This tests the AddAt() auto-focus path.
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 15);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        Terminal.Gui.Views.Markdown markdownView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = "# No tables yet"
+        };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Give focus to the markdown view explicitly
+        markdownView.SetFocus ();
+        app.LayoutAndDraw ();
+        Assert.True (markdownView.HasFocus);
+
+        // Now change content to include tables with links — this triggers re-layout
+        markdownView.Text = """
+                            # Title
+
+                            | Command | Link |
+                            |---------|------|
+                            | [help](app:help) | Shows help |
+                            | [quit](app:quit) | Quits app |
+
+                            | Name | Link |
+                            |------|------|
+                            | [a](https://a.com) | [b](https://b.com) |
+                            """;
+
+        app.LayoutAndDraw ();
+
+        // Viewport must remain at top
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // The MarkdownView should still have focus, not any table
+        Assert.True (markdownView.HasFocus, "MarkdownView should retain focus after content change");
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable table)
+            {
+                Assert.False (table.HasFocus, "No table should steal focus when content changes");
+            }
+        }
+
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void Multiple_Tables_With_Links_No_Cascade_Focus ()
+    {
+        // When multiple tables have links, clearing auto-focus on one table must not
+        // cascade focus to another table (AdvanceFocus wrapping concern).
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 20);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          # Multi-table document
+
+                          | T1 Col | Link |
+                          |--------|------|
+                          | [a](https://a.com) | [b](https://b.com) |
+                          | [c](https://c.com) | [d](https://d.com) |
+
+                          | T2 Col | Link |
+                          |--------|------|
+                          | [e](https://e.com) | [f](https://f.com) |
+                          | [g](https://g.com) | [h](https://h.com) |
+
+                          | T3 Col | Link |
+                          |--------|------|
+                          | [i](https://i.com) | [j](https://j.com) |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = markdown
+        };
+
+        window.Add (markdownView);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // No table should have focus at all
+        int focusedTableCount = 0;
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable table && table.HasFocus)
+            {
+                focusedTableCount++;
+            }
+        }
+
+        Assert.Equal (0, focusedTableCount);
+
+        // Viewport should be at top
+        Assert.Equal (0, markdownView.Viewport.Y);
+
+        // Now give focus to markdownView and do another layout cycle
+        markdownView.SetFocus ();
+        app.LayoutAndDraw ();
+
+        focusedTableCount = 0;
+
+        foreach (View sub in markdownView.SubViews)
+        {
+            if (sub is MarkdownTable table && table.HasFocus)
+            {
+                focusedTableCount++;
+            }
+        }
+
+        Assert.Equal (0, focusedTableCount);
+
+        app.Dispose ();
+    }
+}

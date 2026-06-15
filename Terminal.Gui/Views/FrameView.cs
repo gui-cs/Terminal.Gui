@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     A non-overlapped container for other views with a border and optional title.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/FrameView.gif" alt="FrameView demo"/>
 ///     <para>
 ///         FrameView has <see cref="View.BorderStyle"/> set to <see cref="float"/> and
 ///         inherits it's scheme from the <see cref="View.SuperView"/>.

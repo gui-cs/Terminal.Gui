@@ -16,6 +16,7 @@ namespace Terminal.Gui.Views;
 ///     to printable Unicode glyphs).
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/HexView.gif" alt="HexView demo"/>
 ///     <para>Users can switch from one side to the other by using the tab key.</para>
 ///     <para>
 ///         To enable editing, set <see cref="ReadOnly"/> to true. When <see cref="ReadOnly"/> is true the user can
@@ -557,18 +558,18 @@ public class HexView : View, IDesignable
 
                         //    break;
                         case > 127:
-                        {
-                            byte [] utf8 = GetData (data, offset, 4, out bool _);
-
-                            OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-
-                            while (status == OperationStatus.NeedMoreData)
                             {
-                                status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-                            }
+                                byte [] utf8 = GetData (data, offset, 4, out bool _);
 
-                            break;
-                        }
+                                OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+
+                                while (status == OperationStatus.NeedMoreData)
+                                {
+                                    status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+                                }
+
+                                break;
+                            }
 
                         default:
                             Rune.DecodeFromUtf8 (new ReadOnlySpan<byte> (ref b), out c, out _);
@@ -939,6 +940,9 @@ public class HexView : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorRight,wait:300,CursorRight,wait:300,CursorDown,wait:300,CursorDown,wait:800";
 
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
