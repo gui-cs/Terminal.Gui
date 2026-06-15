@@ -1459,6 +1459,77 @@ public class ImageViewTests
 
     #endregion FitImageInViewportCells
 
+    #region Resolution Selection Consistency
+
+    // Copilot - Claude Sonnet 4.6
+    // When both Sixel and Kitty are available, ViewportToScreenInPixels must use the Sixel
+    // resolution (Sixel is the preferred protocol when both are supported). Using the Kitty
+    // resolution for sizing while Sixel does the actual rendering causes mis-sized images.
+    [Fact]
+    public void ViewportToScreenInPixels_WhenBothSixelAndKittyAvailable_UsesSixelResolution ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+
+        // Sixel: 10 px/cell. Kitty: 20 px/cell — deliberately different so we can tell which wins.
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (20, 20) });
+
+        ImageView imageView = new () { Width = 2, Height = 2, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // With Sixel resolution (10 px/cell) and a 2×2 cell viewport the pixel rect is 20×20.
+        // With Kitty resolution (20 px/cell) it would be 40×40 — wrong.
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        Assert.Equal (20, pixelRect.Width);
+        Assert.Equal (20, pixelRect.Height);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // FitImageInViewportCells must also use Sixel resolution when both protocols are available.
+    [Fact]
+    public void FitImageInViewportCells_WhenBothSixelAndKittyAvailable_UsesSixelResolution ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 20, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+
+        // Sixel: 8×16 px/cell (cell aspect ratio 2.0). Kitty: 16×8 px/cell (aspect ratio 0.5).
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (8, 16) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (16, 8) });
+
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Sixel cell aspect ratio = 16/8 = 2.0.  80×80 px image →
+        //   adjusted height = 80 / 2.0 = 40 cells → fits as (10, 5).
+        // Kitty cell aspect ratio = 8/16 = 0.5.  80×80 px image →
+        //   adjusted height = 80 / 0.5 = 160 cells → constrained by height → (1, 5).
+        Size result = imageView.FitImageInViewportCells (new Size (80, 80));
+
+        // Must match the Sixel result, not the Kitty result.
+        Assert.Equal (10, result.Width);
+        Assert.Equal (5, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    #endregion Resolution Selection Consistency
+
     #region Helper Methods
 
     /// <summary>Creates a solid-color image of the specified dimensions.</summary>

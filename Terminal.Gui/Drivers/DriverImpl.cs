@@ -335,9 +335,15 @@ internal class DriverImpl : IDriver
         KittyGraphicsSupportResult? old = KittyGraphicsSupport;
         KittyGraphicsSupport = result;
 
-        if (result.IsSupported)
+        // Sixel takes priority when both protocols are available.  Only enable Kitty output
+        // when Kitty is supported AND Sixel is not.
+        if (result.IsSupported && !(SixelSupport is { IsSupported: true }))
         {
             _output.UseKittyGraphics = true;
+        }
+        else
+        {
+            _output.UseKittyGraphics = false;
         }
 
         KittyGraphicsSupportChanged?.Invoke (this, new ValueChangedEventArgs<KittyGraphicsSupportResult?> (old, result));

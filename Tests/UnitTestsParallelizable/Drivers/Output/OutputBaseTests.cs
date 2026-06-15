@@ -1434,4 +1434,53 @@ public class OutputBaseTests
 
         return image;
     }
+
+    // Copilot - Claude Sonnet 4.6
+    // When Sixel is also available, UseKittyGraphics must NOT be enabled — Sixel takes precedence.
+    [Fact]
+    public void SetKittyGraphicsSupport_WhenSixelAlsoSupported_DoesNotEnableKittyOutput ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+
+        DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 output,
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Assert: Sixel has priority — Kitty output must NOT be enabled
+        Assert.False (output.UseKittyGraphics);
+
+        driver.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // When Sixel is NOT available, UseKittyGraphics should be enabled.
+    [Fact]
+    public void SetKittyGraphicsSupport_WhenSixelNotSupported_EnablesKittyOutput ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+
+        DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 output,
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Assert: no Sixel support → Kitty output must be enabled
+        Assert.True (output.UseKittyGraphics);
+
+        driver.Dispose ();
+    }
 }
