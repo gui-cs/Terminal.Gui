@@ -25,6 +25,15 @@ public class RasterImageCommand
     public string? EncodedSixel { get; set; }
 
     /// <summary>
+    ///     Gets or sets pre-encoded Kitty graphics protocol data for <see cref="Pixels"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This is used only when the full <see cref="DestinationCells"/> rectangle is visible. Clipped output still
+    ///     re-encodes the cropped pixels so the emitted dimensions match the clipped cell region.
+    /// </remarks>
+    public string? EncodedKitty { get; set; }
+
+    /// <summary>
     ///     Gets or sets the screen cells occupied by <see cref="Pixels"/>.
     /// </summary>
     public Rectangle DestinationCells { get; set; }

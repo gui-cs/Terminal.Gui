@@ -141,6 +141,19 @@ public interface IDriver : IDisposable
     /// </summary>
     event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
 
+    /// <summary>
+    ///     Gets the terminal's Kitty graphics protocol support capabilities, detected during driver initialization.
+    /// </summary>
+    /// <remarks>
+    ///     <see langword="null"/> if detection has not been performed.
+    /// </remarks>
+    KittyGraphicsSupportResult? KittyGraphicsSupport { get; }
+
+    /// <summary>
+    ///     Raised when <see cref="KittyGraphicsSupport"/> changes (e.g. after terminal detection completes).
+    /// </summary>
+    event EventHandler<ValueChangedEventArgs<KittyGraphicsSupportResult?>>? KittyGraphicsSupportChanged;
+
     /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
     bool SupportsTrueColor { get; }
 

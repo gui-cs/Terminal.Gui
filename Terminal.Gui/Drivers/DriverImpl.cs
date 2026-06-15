@@ -322,6 +322,28 @@ internal class DriverImpl : IDriver
     }
 
     /// <inheritdoc/>
+    public KittyGraphicsSupportResult? KittyGraphicsSupport { get; private set; }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<KittyGraphicsSupportResult?>>? KittyGraphicsSupportChanged;
+
+    /// <summary>
+    ///     Sets the terminal's Kitty graphics protocol support result (detected during initialization).
+    /// </summary>
+    internal void SetKittyGraphicsSupport (KittyGraphicsSupportResult result)
+    {
+        KittyGraphicsSupportResult? old = KittyGraphicsSupport;
+        KittyGraphicsSupport = result;
+
+        if (result.IsSupported)
+        {
+            _output.UseKittyGraphics = true;
+        }
+
+        KittyGraphicsSupportChanged?.Invoke (this, new ValueChangedEventArgs<KittyGraphicsSupportResult?> (old, result));
+    }
+
+    /// <inheritdoc/>
     public bool SupportsTrueColor => !IsLegacyConsole;
 
     /// <inheritdoc/>

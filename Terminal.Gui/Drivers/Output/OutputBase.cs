@@ -47,6 +47,9 @@ public abstract class OutputBase
         }
     }
 
+    /// <inheritdoc cref="IOutput.UseKittyGraphics"/>
+    public bool UseKittyGraphics { get; set; }
+
     private readonly ConcurrentQueue<SixelToRender> _sixels = [];
 
     /// <inheritdoc cref="IOutput.GetSixels"/>
@@ -532,14 +535,14 @@ public abstract class OutputBase
                 }
 
                 SetCursorPositionImpl (visibleCells.X, visibleCells.Y);
-                Write (new StringBuilder (GetRasterImageSixelData (command, visibleCells, pixels)));
+                Write (new StringBuilder (GetRasterImageData (command, visibleCells, pixels)));
             }
 
             command.IsDirty = false;
         }
     }
 
-    private static bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output)
+    private bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output)
     {
         bool wroteRasterImages = false;
 
@@ -549,17 +552,38 @@ public abstract class OutputBase
             {
                 if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
                 {
-
                     continue;
                 }
 
                 output.Append (EscSeqUtils.CSI_SetCursorPosition (visibleCells.Y + 1, visibleCells.X + 1));
-                output.Append (GetRasterImageSixelData (command, visibleCells, pixels));
+                output.Append (GetRasterImageData (command, visibleCells, pixels));
                 wroteRasterImages = true;
             }
         }
 
         return wroteRasterImages;
+    }
+
+    private string GetRasterImageData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)
+    {
+        if (UseKittyGraphics)
+        {
+            return GetRasterImageKittyData (command, visibleCells, pixels);
+        }
+
+        return GetRasterImageSixelData (command, visibleCells, pixels);
+    }
+
+    private static string GetRasterImageKittyData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)
+    {
+        if (command.EncodedKitty is { } encodedKitty && visibleCells == command.DestinationCells)
+        {
+            return encodedKitty;
+        }
+
+        KittyGraphicsEncoder encoder = new ();
+
+        return encoder.EncodeKitty (pixels, visibleCells.Width, visibleCells.Height);
     }
 
     private static string GetRasterImageSixelData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)

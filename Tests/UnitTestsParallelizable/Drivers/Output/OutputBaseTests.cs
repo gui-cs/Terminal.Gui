@@ -1332,6 +1332,94 @@ public class OutputBaseTests
         driver.Dispose ();
     }
 
+    // Copilot - Claude Sonnet 4.6
+    [Fact]
+    public void ToAnsi_RasterImage_EmitsKittyApcWhenKittyEnabled ()
+    {
+        // Arrange
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        string kittyPayload = new KittyGraphicsEncoder ().EncodeKitty (
+            CreateSolidImage (20, 40, new Color (255, 0, 0)),
+            2,
+            2);
+
+        RasterImageCommand command = new ()
+        {
+            Id = "kitty-test",
+            Pixels = CreateSolidImage (20, 40, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2),
+            EncodedKitty = kittyPayload
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: Kitty APC escape sequence emitted
+        Assert.Contains ("\x1b_G", ansi);
+        Assert.Contains ("a=T", ansi);
+        Assert.Contains ("f=32", ansi);
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    [Fact]
+    public void ToAnsi_RasterImage_EmitsSixelWhenKittyNotEnabled ()
+    {
+        // Arrange
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "sixel-test",
+            Pixels = CreateSolidImage (20, 40, new Color (0, 0, 255)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: Sixel DCS sequence emitted (no Kitty APC)
+        Assert.Contains ("\x1bP", ansi);
+        Assert.DoesNotContain ("\x1b_G", ansi);
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    [Fact]
+    public void ToAnsi_RasterImage_KittyUsesEncodedKittyWhenCellsMatch ()
+    {
+        // When EncodedKitty is pre-computed and cells match the clip, it is used verbatim.
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        string precomputed = "\x1b_Ga=T,f=32,s=2,v=2,c=2,r=2,q=2,m=0;AAAAAA==\x1b\\";
+
+        RasterImageCommand command = new ()
+        {
+            Id = "precomputed",
+            Pixels = CreateSolidImage (2, 2, new Color (0, 255, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2),
+            EncodedKitty = precomputed
+        };
+
+        buffer.AddRasterImage (command);
+
+        string ansi = output.ToAnsi (buffer);
+
+        Assert.Contains (precomputed, ansi);
+    }
+
     private static Color [,] CreateSolidImage (int width, int height, Color color)
     {
         Color [,] image = new Color [width, height];
