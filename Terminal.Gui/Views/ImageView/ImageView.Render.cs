@@ -143,7 +143,13 @@ public partial class ImageView
                              allowUpscale,
                              preserveAspectRatio);
 
-        return new RenderRequest (key, _image, visibleSource, targetSize, resolution, sixelEncoder is { } ? CreateBackgroundEncoder (sixelEncoder) : null);
+        return new RenderRequest (key,
+                                  _image,
+                                  visibleSource,
+                                  targetSize,
+                                  resolution,
+                                  sixelEncoder is { } ? CreateBackgroundEncoder (sixelEncoder) : null,
+                                  KittyGraphicsEncoder.GetImageId (RasterImageId));
     }
 
     private SixelEncoder PrepareSixelEncoder (SixelSupportResult support)
@@ -194,7 +200,7 @@ public partial class ImageView
         {
             if (request.Key.UseKitty)
             {
-                encodedKitty = new KittyGraphicsEncoder ().EncodeKitty (scaledImage, cellSize.Width, cellSize.Height);
+                encodedKitty = new KittyGraphicsEncoder ().EncodeKitty (scaledImage, cellSize.Width, cellSize.Height, request.KittyImageId);
             }
             else
             {
@@ -378,7 +384,14 @@ public partial class ImageView
                                               bool AllowUpscale,
                                               bool PreserveAspectRatio);
 
-    private sealed class RenderRequest (RenderKey key, Color [,] source, RectangleF visibleSource, Size targetSize, Size? resolution, SixelEncoder? encoder)
+    private sealed class RenderRequest (
+        RenderKey key,
+        Color [,] source,
+        RectangleF visibleSource,
+        Size targetSize,
+        Size? resolution,
+        SixelEncoder? encoder,
+        int kittyImageId)
     {
         public RenderKey Key { get; } = key;
         public Color [,] Source { get; } = source;
@@ -386,6 +399,7 @@ public partial class ImageView
         public Size TargetSize { get; } = targetSize;
         public Size? Resolution { get; } = resolution;
         public SixelEncoder? Encoder { get; } = encoder;
+        public int KittyImageId { get; } = kittyImageId;
     }
 
     private readonly record struct RenderResult (RenderKey Key, Color [,] ScaledImage, Size CellSize, string? EncodedSixel, string? EncodedKitty);

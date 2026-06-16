@@ -1470,6 +1470,105 @@ public class OutputBaseTests
         Assert.Contains ("z=-1", ansi);
     }
 
+    // Claude - Opus 4.8
+    // Kitty placements persist on screen until explicitly deleted. When a Kitty image is resized
+    // (re-added with a smaller destination), the previous, larger placement must be deleted before
+    // the new one is placed — otherwise it lingers outside the new frame.
+    [Fact]
+    public void Write_KittyRasterImage_Resized_EmitsDeleteBeforeReplacement ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        });
+        output.Write (buffer);
+
+        // Resize smaller — re-add with a smaller destination.
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (4, 4, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        });
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert: the delete-by-image-id sequence precedes the new placement.
+        string delete = KittyGraphicsEncoder.EncodeDeletePlacements (KittyGraphicsEncoder.GetImageId ("image"));
+        int deleteIdx = result.IndexOf (delete, StringComparison.Ordinal);
+        int placeIdx = result.IndexOf ("a=T", StringComparison.Ordinal);
+
+        Assert.True (deleteIdx >= 0, "Resize must emit a Kitty delete for the prior placement");
+        Assert.True (placeIdx > deleteIdx, "Delete must precede the replacement placement");
+    }
+
+    // Claude - Opus 4.8
+    // When a Kitty image is removed from the buffer, the next Write must delete its placement so it
+    // does not linger on screen (Sixel needs no such delete — redrawing the cells erases it).
+    [Fact]
+    public void Write_KittyRasterImage_Removed_EmitsDelete ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        });
+        output.Write (buffer);
+
+        // Act: remove the image and render the next frame.
+        buffer.RemoveRasterImage ("image");
+        buffer.AddStr ("x");
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert
+        string delete = KittyGraphicsEncoder.EncodeDeletePlacements (KittyGraphicsEncoder.GetImageId ("image"));
+        Assert.Contains (delete, result);
+    }
+
+    // Claude - Opus 4.8
+    // The removal delete is Kitty-specific: with Sixel output no APC delete must be emitted.
+    [Fact]
+    public void Write_SixelRasterImage_Removed_DoesNotEmitKittyDelete ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        });
+        output.Write (buffer);
+
+        // Act
+        buffer.RemoveRasterImage ("image");
+        buffer.AddStr ("x");
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert: no Kitty APC of any kind.
+        Assert.DoesNotContain ("\x1b_G", result);
+    }
+
     private static Color [,] CreateSolidImage (int width, int height, Color color)
     {
         Color [,] image = new Color [width, height];
