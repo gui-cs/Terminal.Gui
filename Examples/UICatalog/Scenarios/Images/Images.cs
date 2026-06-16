@@ -4,46 +4,37 @@ using SixLabors.ImageSharp.PixelFormats;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Images", "Demonstration of how to render an image with/without true color support.")]
+[ScenarioMetadata ("Images", "Demonstration of cell and raster image rendering with runtime capability detection.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Drawing")]
 public class Images : Scenario
 {
-    private ImageView _basicImageView;
-    private Image<Rgba32> _fullResImage;
-    private Window _win;
+    private const string FIRE_RASTER_IMAGE_ID = "UICatalog.Images.Fire";
 
-    /// <summary>
-    ///     Number of sixel pixels per row of characters in the console.
-    /// </summary>
-    private NumericUpDown _pxY;
-
-    /// <summary>
-    ///     Number of sixel pixels per column of characters in the console
-    /// </summary>
-    private NumericUpDown _pxX;
-
-    private View _sixelSettings;
-    private View _tabSixel;
-
-    /// <summary>
-    ///     The view into which the currently opened sixel image is bounded
-    /// </summary>
-    private ImageView _sixelImageView;
-
+    private IApplication _app;
+    private ImageView _cellImageView;
+    private CheckBox _cbUseRasterGraphics;
+    private Label _cellStatus;
+    private Label _driverStatus;
     private DoomFire _fire;
     private SixelEncoder _fireEncoder;
-    private SixelToRender _fireSixel;
     private int _fireFrameCounter;
+    private Image<Rgba32> _fullResImage;
     private bool _isDisposed;
-    private OptionSelector _osPaletteBuilder;
+    private Label _kittyStatus;
+    private KittyGraphicsSupportResult _kittyGraphicsSupportResult;
     private OptionSelector _osDistanceAlgorithm;
+    private OptionSelector _osPaletteBuilder;
     private NumericUpDown _popularityThreshold;
-
-    // Start by assuming no support — updated from driver-level detection.
-    private SixelSupportResult _sixelSupportResult = new ();
-    private CheckBox _cbSupportsSixel;
-    private IApplication _app;
+    private NumericUpDown _pxX;
+    private NumericUpDown _pxY;
+    private ImageView _rasterImageView;
+    private View _rasterSettings;
+    private Label _selectedStatus;
+    private Label _sixelStatus;
+    private SixelSupportResult _sixelSupportResult;
+    private View _tabRaster;
+    private Window _win;
     private Size _winSize;
 
     public override void Main ()
@@ -55,70 +46,65 @@ public class Images : Scenario
 
         _win = new Window { Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()}" };
 
+        View tabCell = new () { Title = "_Cell renderer", Width = Dim.Fill (), Height = Dim.Fill () };
+        _tabRaster = new View { Title = "_Raster graphics", Width = Dim.Fill (), Height = Dim.Fill () };
+
+        FrameView capabilityMatrix = BuildCapabilityMatrix ();
+        _win.Add (capabilityMatrix);
+
+        _cbUseRasterGraphics = new CheckBox { Y = Pos.Bottom (capabilityMatrix), Value = CheckState.Checked, Text = "Use raster ImageView" };
+        _cbUseRasterGraphics.ValueChanging += (_, evt) => SetUseRasterGraphics (evt.NewValue == CheckState.Checked);
+        _win.Add (_cbUseRasterGraphics);
+
         bool canTrueColor = app.Driver?.SupportsTrueColor ?? false;
 
-        View tabBasic = new () { Title = "_Cell-based", Width = Dim.Fill (), Height = Dim.Fill () };
-        _tabSixel = new View { Title = "_Sixel-based", Width = Dim.Fill (), Height = Dim.Fill () };
-
-        CheckBox cbSupportsTrueColor = new ()
+        CheckBox cbUseTrueColor = new ()
         {
-            Y = 0, Value = canTrueColor ? CheckState.Checked : CheckState.UnChecked, CanFocus = false, Text = "Driver supports true color"
+            X = Pos.Right (_cbUseRasterGraphics) + 2,
+            Y = Pos.Top (_cbUseRasterGraphics),
+            Value = !Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
+            Enabled = canTrueColor,
+            Text = "Use true color"
         };
-        _win.Add (cbSupportsTrueColor);
-
-        _cbSupportsSixel = new CheckBox { X = Pos.Right (cbSupportsTrueColor) + 2, Y = 1, Value = CheckState.UnChecked, Text = "Supports Sixel" };
-
-        _cbSupportsSixel.ValueChanging += (_, e) =>
-                                          {
-                                              _sixelSupportResult.IsSupported = e.NewValue == CheckState.Checked;
-                                              _tabSixel.Enabled = _sixelSupportResult.IsSupported;
-                                          };
-
-        _win.Add (_cbSupportsSixel);
+        cbUseTrueColor.ValueChanging += (_, evt) =>
+                                       {
+                                           Driver.Force16Colors = evt.NewValue == CheckState.UnChecked;
+                                           UpdateRasterCapabilityMatrix ();
+                                       };
+        _win.Add (cbUseTrueColor);
 
         CheckBox cbUseBackgroundRendering = new ()
         {
-            X = Pos.Right (_cbSupportsSixel) + 2,
-            Y = Pos.Top (_cbSupportsSixel),
+            X = Pos.Right (cbUseTrueColor) + 2,
+            Y = Pos.Top (cbUseTrueColor),
             Value = CheckState.Checked,
             Text = "Async rendering"
         };
         cbUseBackgroundRendering.ValueChanging += (_, evt) => SetBackgroundRendering (evt.NewValue == CheckState.Checked);
         _win.Add (cbUseBackgroundRendering);
 
-        CheckBox cbUseTrueColor = new ()
-        {
-            X = Pos.Right (cbSupportsTrueColor) + 2,
-            Y = 0,
-            Value = !Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked,
-            Enabled = canTrueColor,
-            Text = "Use true color"
-        };
-        cbUseTrueColor.ValueChanging += (_, evt) => Driver.Force16Colors = evt.NewValue == CheckState.UnChecked;
-        _win.Add (cbUseTrueColor);
-
-        Button btnOpenImage = new () { Y = Pos.Bottom (cbUseTrueColor), Text = "_Open Image" };
+        Button btnOpenImage = new () { Y = Pos.Bottom (_cbUseRasterGraphics), Text = "_Open Image" };
         _win.Add (btnOpenImage);
 
-        Button btnStartFire = new () { X = Pos.Right (btnOpenImage), Y = Pos.Bottom (cbUseTrueColor), Text = "Start _Fire" };
+        Button btnStartFire = new () { X = Pos.Right (btnOpenImage), Y = Pos.Top (btnOpenImage), Text = "Start _Fire" };
         btnStartFire.Accepting += BtnStartFireOnAccept;
         _win.Add (btnStartFire);
 
         Tabs tabs = new () { Y = Pos.Bottom (btnOpenImage), Width = Dim.Fill (), Height = Dim.Fill () };
-        BuildBasicTab (tabBasic);
-        BuildSixelTab (_tabSixel);
-        tabs.Add (tabBasic, _tabSixel);
+        BuildCellTab (tabCell);
+        BuildRasterTab (_tabRaster);
+        tabs.Add (tabCell, _tabRaster);
 
         LoadDefaultImage ();
 
         btnOpenImage.Accepting += OpenImage;
 
-        _win.Add (_cbSupportsSixel);
         _win.Add (tabs);
 
         _win.SubViewsLaidOut += Win_SubViewsLaidOut;
-        _win.Initialized += (_, _) => UpdateSixelSupportState (app.Driver?.SixelSupport);
+        _win.Initialized += (_, _) => UpdateRasterSupportState (app.Driver?.SixelSupport, app.Driver?.KittyGraphicsSupport);
         app.Driver!.SixelSupportChanged += Driver_SixelSupportChanged;
+        app.Driver.KittyGraphicsSupportChanged += Driver_KittyGraphicsSupportChanged;
 
         try
         {
@@ -127,6 +113,8 @@ public class Images : Scenario
         finally
         {
             app.Driver!.SixelSupportChanged -= Driver_SixelSupportChanged;
+            app.Driver.KittyGraphicsSupportChanged -= Driver_KittyGraphicsSupportChanged;
+            app.Driver.GetOutputBuffer ().RemoveRasterImage (FIRE_RASTER_IMAGE_ID);
             _win.Dispose ();
         }
     }
@@ -136,38 +124,64 @@ public class Images : Scenario
     {
         base.Dispose (disposing);
         _fullResImage?.Dispose ();
+        _app?.Driver?.GetOutputBuffer ().RemoveRasterImage (FIRE_RASTER_IMAGE_ID);
         _isDisposed = true;
     }
 
     private bool AdvanceFireTimerCallback ()
     {
+        if (_isDisposed)
+        {
+            return false;
+        }
+
         _fire.AdvanceFrame ();
         _fireFrameCounter++;
 
         // Control frame rate by adjusting this. Lower number means more FPS.
-        if (_fireFrameCounter % 2 != 0 || _isDisposed)
+        if (_fireFrameCounter % 2 != 0)
         {
-            return !_isDisposed;
+            return true;
         }
 
         Color [,] bmp = _fire.GetFirePixels ();
-        string sixelFireData = _fireEncoder.EncodeSixel (bmp);
 
-        if (_fireSixel == null)
+        RasterImageCommand command = new ()
         {
-            _fireSixel = new SixelToRender { SixelData = sixelFireData, ScreenPosition = GetFireScreenPosition (), Id = "fireSixel", AlwaysRender = true };
+            Id = FIRE_RASTER_IMAGE_ID,
+            Pixels = bmp,
+            DestinationCells = GetFireDestinationCells (),
+            Encoder = IsSixelRasterPath () ? _fireEncoder : null,
+            AlwaysRender = true
+        };
 
-            _app.Driver?.GetOutput ().GetSixels ().Enqueue (_fireSixel);
-        }
-        else
-        {
-            _fireSixel.SixelData = sixelFireData;
-            _fireSixel.ScreenPosition = GetFireScreenPosition ();
-        }
-
+        _app.Driver?.GetOutputBuffer ().AddRasterImage (command);
         _win.SetNeedsDraw ();
 
-        return !_isDisposed;
+        return true;
+    }
+
+    private FrameView BuildCapabilityMatrix ()
+    {
+        FrameView matrix = new ()
+        {
+            Title = "Raster Capability Matrix",
+            Width = Dim.Fill (),
+            Height = 7,
+            CanFocus = false
+        };
+
+        _driverStatus = new Label { Y = 0, Width = Dim.Fill () };
+        Label header = new () { Y = 1, Width = Dim.Fill (), Text = "Renderer       Available   Resolution       Notes" };
+        _cellStatus = new Label { Y = 2, Width = Dim.Fill () };
+        _kittyStatus = new Label { Y = 3, Width = Dim.Fill () };
+        _sixelStatus = new Label { Y = 4, Width = Dim.Fill () };
+        _selectedStatus = new Label { Y = 5, Width = Dim.Fill () };
+
+        matrix.Add (_driverStatus, header, _cellStatus, _kittyStatus, _sixelStatus, _selectedStatus);
+        UpdateRasterCapabilityMatrix ();
+
+        return matrix;
     }
 
     private void BtnStartFireOnAccept (object sender, CommandEventArgs e)
@@ -177,11 +191,18 @@ public class Images : Scenario
             return;
         }
 
-        if (!_sixelSupportResult.SupportsTransparency)
+        if (!IsRasterAvailable ())
+        {
+            MessageBox.ErrorQuery (_app!, "Raster Graphics Not Available", "This terminal did not report Kitty graphics or Sixel support.", "Ok");
+
+            return;
+        }
+
+        if (IsSixelRasterPath () && _sixelSupportResult is not { SupportsTransparency: true })
         {
             if (MessageBox.Query (_app!,
                                   "Transparency Not Supported",
-                                  "It looks like your terminal does not support transparent sixel backgrounds. Do you want to try anyway?",
+                                  "It looks like your terminal does not support transparent Sixel backgrounds. Do you want to try anyway?",
                                   "Yes",
                                   "No")
                 != 0)
@@ -192,88 +213,95 @@ public class Images : Scenario
 
         _winSize = _win.Viewport.Size;
 
-        GenerateSixelFire (true);
+        GenerateRasterFire (true);
     }
 
-    private void BuildBasicTab (View tabBasic)
+    private void BuildCellTab (View tabCell)
     {
-        _basicImageView = new ImageView
+        _cellImageView = new ImageView
         {
             BorderStyle = LineStyle.Dotted,
             Width = 30,
             Height = 10,
             CanFocus = true,
             Arrangement = ViewArrangement.Resizable,
-            UseSixel = false,
-            UseBackgroundRendering = true
-        };
-
-        tabBasic.Add (_basicImageView);
-    }
-
-    private void BuildSixelTab (View tabSixel)
-    {
-        _sixelSettings = new View { X = Pos.AnchorEnd (), Width = Dim.Auto (), Height = Dim.Auto (), CanFocus = true };
-
-        _sixelImageView = new ImageView
-        {
-            CanFocus = true,
-            Width = 30,
-            Height = 10,
-            BorderStyle = LineStyle.Dotted,
-            Arrangement = ViewArrangement.Resizable,
-            UseSixel = true,
+            UseRasterGraphics = false,
             UseBackgroundRendering = true,
-            Title = "ImageView"
+            Title = "Cell ImageView"
         };
 
-        Label lblPxX = new () { Y = 0, Text = "Pixels per Col:" };
+        tabCell.Add (_cellImageView);
+    }
+
+    private void BuildRasterTab (View tabRaster)
+    {
+        _rasterSettings = new View { X = Pos.AnchorEnd (), Width = Dim.Auto (), Height = Dim.Auto (), CanFocus = true };
+
+        _rasterImageView = new ImageView
+        {
+            CanFocus = true,
+            Width = 30,
+            Height = 10,
+            BorderStyle = LineStyle.Dotted,
+            Arrangement = ViewArrangement.Resizable,
+            UseRasterGraphics = true,
+            UseBackgroundRendering = true,
+            Title = "Raster ImageView"
+        };
+
+        Label lblPxX = new () { Y = 0, Text = "Fire pixels/Col:" };
         _pxX = new NumericUpDown { X = Pos.Right (lblPxX), Y = 0, Value = GetDefaultFirePixelsPerColumn () };
 
-        Label lblPxY = new () { X = lblPxX.X, Y = Pos.Bottom (_pxX), Text = "Pixels per Row:" };
+        Label lblPxY = new () { X = lblPxX.X, Y = Pos.Bottom (_pxX), Text = "Fire pixels/Row:" };
         _pxY = new NumericUpDown { X = Pos.Right (lblPxY), Y = Pos.Bottom (_pxX), Value = GetDefaultFirePixelsPerRow () };
 
-        Label paletteLabel = new () { Text = "Palette Building Algorithm", Width = Dim.Auto (), Y = Pos.Bottom (_pxY) + 1 };
+        Label paletteLabel = new () { Text = "Sixel Palette Builder", Width = Dim.Auto (), Y = Pos.Bottom (_pxY) + 1 };
         _osPaletteBuilder = new OptionSelector { Labels = ["Popularity", "Median Cut"], Y = Pos.Bottom (paletteLabel), Value = 1 };
 
         _popularityThreshold = new NumericUpDown { X = Pos.Right (_osPaletteBuilder) + 1, Y = Pos.Top (_osPaletteBuilder), Value = 8 };
 
         Label lblPopThreshold = new () { Text = "(threshold)", X = Pos.Right (_popularityThreshold), Y = Pos.Top (_popularityThreshold) };
 
-        Label distanceLabel = new () { Text = "Color Distance Algorithm", Width = Dim.Auto (), Y = Pos.Bottom (_osPaletteBuilder) + 1 };
+        Label distanceLabel = new () { Text = "Sixel Color Distance", Width = Dim.Auto (), Y = Pos.Bottom (_osPaletteBuilder) + 1 };
         _osDistanceAlgorithm = new OptionSelector { Labels = ["Euclidean", "CIE76"], Y = Pos.Bottom (distanceLabel) };
 
-        _sixelSettings.Add (lblPxX);
-        _sixelSettings.Add (_pxX);
-        _sixelSettings.Add (lblPxY);
-        _sixelSettings.Add (_pxY);
-        _sixelSettings.Add (paletteLabel);
-        _sixelSettings.Add (_osPaletteBuilder);
-        _sixelSettings.Add (distanceLabel);
-        _sixelSettings.Add (_osDistanceAlgorithm);
-        _sixelSettings.Add (_popularityThreshold);
-        _sixelSettings.Add (lblPopThreshold);
+        _rasterSettings.Add (lblPxX);
+        _rasterSettings.Add (_pxX);
+        _rasterSettings.Add (lblPxY);
+        _rasterSettings.Add (_pxY);
+        _rasterSettings.Add (paletteLabel);
+        _rasterSettings.Add (_osPaletteBuilder);
+        _rasterSettings.Add (distanceLabel);
+        _rasterSettings.Add (_osDistanceAlgorithm);
+        _rasterSettings.Add (_popularityThreshold);
+        _rasterSettings.Add (lblPopThreshold);
 
-        tabSixel.Add (_sixelImageView, _sixelSettings);
+        tabRaster.Add (_rasterImageView, _rasterSettings);
     }
 
-    private void SetBackgroundRendering (bool enabled)
+    private void Driver_KittyGraphicsSupportChanged (object sender, ValueChangedEventArgs<KittyGraphicsSupportResult> e)
     {
-        _basicImageView?.UseBackgroundRendering = enabled;
-
-        _sixelImageView?.UseBackgroundRendering = enabled;
+        UpdateRasterSupportState (_app.Driver?.SixelSupport, e.NewValue);
     }
 
-    private void Driver_SixelSupportChanged (object sender, ValueChangedEventArgs<SixelSupportResult> e) => UpdateSixelSupportState (e.NewValue);
+    private void Driver_SixelSupportChanged (object sender, ValueChangedEventArgs<SixelSupportResult> e)
+    {
+        UpdateRasterSupportState (e.NewValue, _app.Driver?.KittyGraphicsSupport);
+    }
 
-    private void GenerateSixelFire (bool addTimeout)
+    private void GenerateRasterFire (bool addTimeout)
     {
         int pixelsPerColumn = Math.Max (1, _pxX.Value);
         int pixelsPerRow = Math.Max (1, _pxY.Value);
         Size fireCellSize = GetFireTargetCellSize ();
         _fire = new DoomFire (fireCellSize.Width * pixelsPerColumn, fireCellSize.Height * pixelsPerRow);
-        _fireEncoder = new SixelEncoder { AvoidBottomScroll = true };
-        _fireEncoder.Quantizer.MaxColors = Math.Min (_fireEncoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
+        _fireEncoder = new SixelEncoder { AvoidBottomScroll = IsSixelRasterPath () };
+
+        if (_sixelSupportResult is { } sixel)
+        {
+            _fireEncoder.Quantizer.MaxColors = Math.Min (_fireEncoder.Quantizer.MaxColors, sixel.MaxPaletteColors);
+        }
+
         _fireEncoder.Quantizer.PaletteBuildingAlgorithm = new ConstPalette (_fire.Palette);
 
         _fireFrameCounter = 0;
@@ -296,26 +324,30 @@ public class Images : Scenario
         int pixelsPerColumn = Math.Max (1, _pxX.Value);
         int pixelsPerRow = Math.Max (1, _pxY.Value);
         Size fireCellSize = GetFireTargetCellSize ();
-        int resolutionWidth = Math.Max (1, _sixelSupportResult.Resolution.Width);
-        int resolutionHeight = Math.Max (1, _sixelSupportResult.Resolution.Height);
+        Size resolution = GetPreferredRasterResolution ();
         int pixelWidth = fireCellSize.Width * pixelsPerColumn;
-        int pixelHeight = Math.Max (1, fireCellSize.Height * pixelsPerRow - 6);
+        int pixelHeight = fireCellSize.Height * pixelsPerRow;
 
-        return new Size (Math.Max (1, (pixelWidth + resolutionWidth - 1) / resolutionWidth),
-                         Math.Max (1, (pixelHeight + resolutionHeight - 1) / resolutionHeight));
+        if (IsSixelRasterPath ())
+        {
+            pixelHeight = Math.Max (1, pixelHeight - 6);
+        }
+
+        return new Size (Math.Max (1, (pixelWidth + resolution.Width - 1) / resolution.Width),
+                         Math.Max (1, (pixelHeight + resolution.Height - 1) / resolution.Height));
     }
 
-    private Point GetFireScreenPosition ()
+    private Rectangle GetFireDestinationCells ()
     {
         Rectangle frameScreen = _win.FrameToScreen ();
         Size fireCellSize = GetFireRenderedCellSize ();
 
-        return new Point (frameScreen.X, Math.Max (frameScreen.Y, frameScreen.Bottom - fireCellSize.Height));
+        return new Rectangle (frameScreen.X, Math.Max (frameScreen.Y, frameScreen.Bottom - fireCellSize.Height), fireCellSize.Width, fireCellSize.Height);
     }
 
-    private int GetDefaultFirePixelsPerColumn () => Math.Max (1, _sixelSupportResult.Resolution.Width);
+    private int GetDefaultFirePixelsPerColumn () => Math.Max (1, GetPreferredRasterResolution ().Width);
 
-    private int GetDefaultFirePixelsPerRow () => Math.Max (1, _sixelSupportResult.Resolution.Height);
+    private int GetDefaultFirePixelsPerRow () => Math.Max (1, GetPreferredRasterResolution ().Height);
 
     private IColorDistance GetDistanceAlgorithm ()
     {
@@ -341,11 +373,45 @@ public class Images : Scenario
         }
     }
 
+    private Size GetPreferredRasterResolution ()
+    {
+        if (_kittyGraphicsSupportResult is { IsSupported: true } kitty)
+        {
+            return kitty.Resolution;
+        }
+
+        if (_sixelSupportResult is { IsSupported: true } sixel)
+        {
+            return sixel.Resolution;
+        }
+
+        if (_kittyGraphicsSupportResult is { } detectedKitty)
+        {
+            return detectedKitty.Resolution;
+        }
+
+        if (_sixelSupportResult is { } detectedSixel)
+        {
+            return detectedSixel.Resolution;
+        }
+
+        return new Size (10, 20);
+    }
+
+    private bool IsImageViewKittyActive (bool rasterEnabled) => rasterEnabled && _kittyGraphicsSupportResult is { IsSupported: true };
+
+    private bool IsRasterAvailable () => _kittyGraphicsSupportResult is { IsSupported: true } || _sixelSupportResult is { IsSupported: true };
+
+    private bool IsImageViewSixelActive (bool rasterEnabled) =>
+        rasterEnabled && !IsImageViewKittyActive (rasterEnabled) && _sixelSupportResult is { IsSupported: true };
+
+    private bool IsSixelRasterPath () => _kittyGraphicsSupportResult is not { IsSupported: true } && _sixelSupportResult is { IsSupported: true };
+
     private void LoadDefaultImage ()
     {
         Color [,] image = ImagesTestCard.Create (ImagesTestCard.DEFAULT_WIDTH, ImagesTestCard.DEFAULT_HEIGHT);
-        _basicImageView.Image = image;
-        UpdateSixelImage (image);
+        _cellImageView.Image = image;
+        UpdateRasterImage (image);
     }
 
     private void LoadImage (string path, bool showError)
@@ -369,8 +435,8 @@ public class Images : Scenario
         _fullResImage?.Dispose ();
         _fullResImage = img;
         Color [,] image = ConvertToColorArray (img);
-        _basicImageView.Image = image;
-        UpdateSixelImage (image);
+        _cellImageView.Image = image;
+        UpdateRasterImage (image);
     }
 
     public static Color [,] ConvertToColorArray (Image<Rgba32> image)
@@ -423,30 +489,128 @@ public class Images : Scenario
         _app?.LayoutAndDraw ();
     }
 
-    private void UpdateSixelImage (Color [,] image)
+    private static string ProtocolState (bool? isSupported) =>
+        isSupported switch
+        {
+            true => "yes",
+            false => "no",
+            _ => "detecting"
+        };
+
+    private static string Row (string renderer, string available, string resolution, string notes) =>
+        $"{renderer,-14} {available,-11} {resolution,-16} {notes}";
+
+    private void SetBackgroundRendering (bool enabled)
+    {
+        _cellImageView?.UseBackgroundRendering = enabled;
+        _rasterImageView?.UseBackgroundRendering = enabled;
+    }
+
+    private void SetUseRasterGraphics (bool enabled)
+    {
+        if (_rasterImageView is { })
+        {
+            _rasterImageView.UseRasterGraphics = enabled;
+            _rasterImageView.SetNeedsDraw ();
+        }
+
+        UpdateRasterCapabilityMatrix (enabled);
+    }
+
+    private static string SizeText (Size size) => $"{size.Width}x{size.Height} px/cell";
+
+    private void UpdateRasterCapabilityMatrix (bool? rasterEnabledOverride = null)
+    {
+        if (_cellStatus is null)
+        {
+            return;
+        }
+
+        bool rasterEnabled = rasterEnabledOverride ?? (_cbUseRasterGraphics?.Value != CheckState.UnChecked);
+        bool kittyActive = IsImageViewKittyActive (rasterEnabled);
+        bool sixelActive = IsImageViewSixelActive (rasterEnabled);
+        bool cellActive = !rasterEnabled || (!kittyActive && !sixelActive);
+        string driverName = _app?.Driver?.GetName () ?? "unknown";
+        bool trueColor = _app?.Driver?.SupportsTrueColor == true && Driver.Force16Colors == false;
+        bool legacy = _app?.Driver?.IsLegacyConsole == true;
+
+        _driverStatus.Text = $"Driver: {driverName}; true color: {YesNo (trueColor)}; legacy console: {YesNo (legacy)}";
+        _cellStatus.Text = Row ("Cell colors", "yes", "1 cell", cellActive ? "active" : "fallback");
+
+        bool? kittySupported = _kittyGraphicsSupportResult is null ? null : _kittyGraphicsSupportResult.IsSupported;
+        string kittyResolution = _kittyGraphicsSupportResult is { } kitty ? SizeText (kitty.Resolution) : "-";
+        _kittyStatus.Text = Row ("Kitty", ProtocolState (kittySupported), kittyResolution, kittyActive ? "active" : "preferred if available");
+
+        bool? sixelSupported = _sixelSupportResult is null ? null : _sixelSupportResult.IsSupported;
+        string sixelResolution = _sixelSupportResult is { } sixel ? SizeText (sixel.Resolution) : "-";
+        string sixelNotes = _sixelSupportResult is { IsSupported: true } supportedSixel
+                                ? $"{supportedSixel.MaxPaletteColors} colors; alpha {YesNo (supportedSixel.SupportsTransparency)}"
+                                : "fallback after Kitty";
+        _sixelStatus.Text = Row ("Sixel", ProtocolState (sixelSupported), sixelResolution, sixelActive ? $"active; {sixelNotes}" : sixelNotes);
+
+        _selectedStatus.Text = $"Selected raster path: {GetSelectedRendererName (rasterEnabled, kittyActive, sixelActive)}";
+        _win?.SetNeedsDraw ();
+    }
+
+    private void UpdateRasterImage (Color [,] image)
     {
         SixelEncoder encoder = new ();
-        encoder.Quantizer.MaxColors = Math.Min (encoder.Quantizer.MaxColors, _sixelSupportResult.MaxPaletteColors);
+
+        if (_sixelSupportResult is { } sixel)
+        {
+            encoder.Quantizer.MaxColors = Math.Min (encoder.Quantizer.MaxColors, sixel.MaxPaletteColors);
+        }
+
         encoder.Quantizer.PaletteBuildingAlgorithm = GetPaletteBuilder ();
         encoder.Quantizer.DistanceAlgorithm = GetDistanceAlgorithm ();
-        _sixelImageView.SixelEncoder = encoder;
-        _sixelImageView.Image = image;
+        _rasterImageView.SixelEncoder = encoder;
+        _rasterImageView.Image = image;
     }
 
-    private void UpdateSixelSupportState (SixelSupportResult newResult)
+    private void UpdateRasterSupportState (SixelSupportResult sixelResult, KittyGraphicsSupportResult kittyResult)
     {
-        newResult ??= new SixelSupportResult ();
-        _sixelSupportResult = newResult;
+        _sixelSupportResult = sixelResult;
+        _kittyGraphicsSupportResult = kittyResult;
 
-        _cbSupportsSixel.Value = newResult.IsSupported ? CheckState.Checked : CheckState.UnChecked;
-        _pxX.Value = GetDefaultFirePixelsPerColumn ();
-        _pxY.Value = GetDefaultFirePixelsPerRow ();
-
-        if (_sixelImageView?.Image is { } image)
+        if (_pxX is { })
         {
-            UpdateSixelImage (image);
+            _pxX.Value = GetDefaultFirePixelsPerColumn ();
         }
+
+        if (_pxY is { })
+        {
+            _pxY.Value = GetDefaultFirePixelsPerRow ();
+        }
+
+        if (_rasterImageView?.Image is { } image)
+        {
+            UpdateRasterImage (image);
+        }
+
+        UpdateRasterCapabilityMatrix ();
     }
+
+    private string GetSelectedRendererName (bool rasterEnabled, bool kittyActive, bool sixelActive)
+    {
+        if (!rasterEnabled)
+        {
+            return "Cell renderer";
+        }
+
+        if (kittyActive)
+        {
+            return "Kitty graphics";
+        }
+
+        if (sixelActive)
+        {
+            return "Sixel";
+        }
+
+        return "Cell renderer fallback";
+    }
+
+    private static string YesNo (bool value) => value ? "yes" : "no";
 
     private void Win_SubViewsLaidOut (object sender, LayoutEventArgs e)
     {
@@ -459,9 +623,9 @@ public class Images : Scenario
 
         _winSize = currentSize;
 
-        if (_fireSixel is { })
+        if (_fire is { })
         {
-            GenerateSixelFire (false);
+            GenerateRasterFire (false);
         }
     }
 }
