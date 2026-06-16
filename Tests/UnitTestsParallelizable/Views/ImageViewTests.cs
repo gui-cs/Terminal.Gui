@@ -36,8 +36,12 @@ public class ImageViewTests
         Assert.Equal ([Command.ScrollUp], imageView.KeyBindings.GetCommands (Key.CursorUp));
         Assert.Equal ([Command.ScrollDown], imageView.KeyBindings.GetCommands (Key.CursorDown));
         Assert.Equal ([Command.Home], imageView.KeyBindings.GetCommands (Key.Home));
-        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (Key.PageUp));
-        Assert.Equal ([Command.ZoomOut], imageView.KeyBindings.GetCommands (Key.PageDown));
+        Assert.Equal ([Command.Home], imageView.KeyBindings.GetCommands (Key.D0));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('+')));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('=')));
+        Assert.Equal ([Command.ZoomOut], imageView.KeyBindings.GetCommands (new Key ('-')));
+        Assert.Equal ([Command.PageUp], imageView.KeyBindings.GetCommands (Key.PageUp));
+        Assert.Equal ([Command.PageDown], imageView.KeyBindings.GetCommands (Key.PageDown));
         Assert.Equal ([Command.ZoomIn], imageView.MouseBindings.GetCommands (MouseFlags.WheeledUp));
         Assert.Equal ([Command.ZoomOut], imageView.MouseBindings.GetCommands (MouseFlags.WheeledDown));
         Assert.Equal ([Command.Center], imageView.MouseBindings.GetCommands (MouseFlags.LeftButtonDoubleClicked));
@@ -652,7 +656,7 @@ public class ImageViewTests
         runnable.Add (imageView);
         app.LayoutAndDraw ();
 
-        Assert.True (imageView.NewKeyDownEvent (Key.PageUp));
+        Assert.True (imageView.NewKeyDownEvent (new Key ('+')));
         Assert.True (imageView.ZoomLevel > 1d);
 
         imageView.ZoomLevel = 2d;
@@ -711,7 +715,7 @@ public class ImageViewTests
         app.LayoutAndDraw ();
         imageView.SetFocus ();
 
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.PageUp));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (new Key ('+')));
         Assert.True (imageView.ZoomLevel > 1d);
 
         imageView.ZoomLevel = 2d;
@@ -866,6 +870,111 @@ public class ImageViewTests
         Assert.Equal (image [1, 1], command.Pixels! [0, 0]);
 
         runnable.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_PlusKey_ZoomsIn ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewKeyDownEvent (new Key ('+')));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_EqualsKey_ZoomsIn ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewKeyDownEvent (new Key ('=')));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_MinusKey_ZoomsOut ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        imageView.ZoomLevel = 2d;
+        Assert.True (imageView.NewKeyDownEvent (new Key ('-')));
+        Assert.True (imageView.ZoomLevel < 2d);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_ZeroKey_ResetsZoom ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        imageView.ZoomLevel = 2d;
+        Assert.True (imageView.NewKeyDownEvent (Key.D0));
+        Assert.Equal (1d, imageView.ZoomLevel);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_PageUpStillZoomsIn ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewKeyDownEvent (Key.PageUp));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_PageDownStillZoomsOut ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        imageView.ZoomLevel = 2d;
+        Assert.True (imageView.NewKeyDownEvent (Key.PageDown));
+        Assert.True (imageView.ZoomLevel < 2d);
+
+        host.Dispose ();
     }
 
     #endregion Pan and Zoom

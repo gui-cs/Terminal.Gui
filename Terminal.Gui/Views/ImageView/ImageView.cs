@@ -49,9 +49,9 @@ public partial class ImageView : View, IDesignable
         [Command.ScrollRight] = Bind.All (Key.CursorRight),
         [Command.ScrollUp] = Bind.All (Key.CursorUp),
         [Command.ScrollDown] = Bind.All (Key.CursorDown),
-        [Command.Home] = Bind.All (Key.Home),
-        [Command.ZoomIn] = Bind.All (Key.PageUp),
-        [Command.ZoomOut] = Bind.All (Key.PageDown)
+        [Command.Home] = Bind.All (Key.Home, Key.D0),
+        [Command.ZoomIn] = Bind.All (new Key ('+'), new Key ('=')),
+        [Command.ZoomOut] = Bind.All (new Key ('-'))
     };
 
     /// <summary>
