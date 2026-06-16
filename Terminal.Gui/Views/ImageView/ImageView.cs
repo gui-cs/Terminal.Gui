@@ -144,8 +144,8 @@ public partial class ImageView : View, IDesignable
     /// </summary>
     /// <remarks>
     ///     When <see langword="true"/> the view selects the best available protocol:
-    ///     Sixel (if the driver reports <see cref="IDriver.SixelSupport"/>),
-    ///     then Kitty graphics (if the driver reports <see cref="IDriver.KittyGraphicsSupport"/>),
+    ///     Kitty graphics (if the driver reports <see cref="IDriver.KittyGraphicsSupport"/>),
+    ///     then Sixel (if the driver reports <see cref="IDriver.SixelSupport"/>),
     ///     then cell-based rendering as a fallback.
     ///     Set to <see langword="false"/> to always use cell-based rendering.
     /// </remarks>
@@ -331,18 +331,18 @@ public partial class ImageView : View, IDesignable
 
     /// <summary>
     ///     Returns the resolution (pixels per cell) for the active raster graphics protocol,
-    ///     preferring Sixel over Kitty.  Returns <see langword="null"/> when neither is available.
+    ///     preferring Kitty over Sixel.  Returns <see langword="null"/> when neither is available.
     /// </summary>
     private Size? GetActiveResolution ()
     {
-        if (App?.Driver?.SixelSupport is { IsSupported: true } sixel)
-        {
-            return sixel.Resolution;
-        }
-
         if (App?.Driver?.KittyGraphicsSupport is { IsSupported: true } kitty)
         {
             return kitty.Resolution;
+        }
+
+        if (App?.Driver?.SixelSupport is { IsSupported: true } sixel)
+        {
+            return sixel.Resolution;
         }
 
         return null;

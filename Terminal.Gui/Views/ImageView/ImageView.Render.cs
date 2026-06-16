@@ -101,8 +101,7 @@ public partial class ImageView
                 return null;
             }
 
-            useKitty = App?.Driver?.KittyGraphicsSupport is { IsSupported: true }
-                       && !(App?.Driver?.SixelSupport is { IsSupported: true });
+            useKitty = App?.Driver?.KittyGraphicsSupport is { IsSupported: true };
 
             if (!useKitty)
             {

@@ -1436,9 +1436,10 @@ public class OutputBaseTests
     }
 
     // Copilot - Claude Sonnet 4.6
-    // When Sixel is also available, UseKittyGraphics must NOT be enabled — Sixel takes precedence.
+    // When Kitty is supported, UseKittyGraphics must be enabled — even if Sixel is also available,
+    // because Kitty is the preferred protocol.
     [Fact]
-    public void SetKittyGraphicsSupport_WhenSixelAlsoSupported_DoesNotEnableKittyOutput ()
+    public void SetKittyGraphicsSupport_WhenSixelAlsoSupported_EnablesKittyOutput ()
     {
         // Arrange
         AnsiOutput output = new ();
@@ -1454,8 +1455,8 @@ public class OutputBaseTests
         driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
         driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
 
-        // Assert: Sixel has priority — Kitty output must NOT be enabled
-        Assert.False (output.UseKittyGraphics);
+        // Assert: Kitty has priority — Kitty output MUST be enabled even when Sixel is also available
+        Assert.True (output.UseKittyGraphics);
 
         driver.Dispose ();
     }

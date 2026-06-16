@@ -1462,11 +1462,11 @@ public class ImageViewTests
     #region Resolution Selection Consistency
 
     // Copilot - Claude Sonnet 4.6
-    // When both Sixel and Kitty are available, ViewportToScreenInPixels must use the Sixel
-    // resolution (Sixel is the preferred protocol when both are supported). Using the Kitty
-    // resolution for sizing while Sixel does the actual rendering causes mis-sized images.
+    // When both Sixel and Kitty are available, ViewportToScreenInPixels must use the Kitty
+    // resolution (Kitty is the preferred protocol). Using the Sixel resolution for sizing
+    // while Kitty does the actual rendering would cause mis-sized images.
     [Fact]
-    public void ViewportToScreenInPixels_WhenBothSixelAndKittyAvailable_UsesSixelResolution ()
+    public void ViewportToScreenInPixels_WhenBothSixelAndKittyAvailable_UsesKittyResolution ()
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -1484,20 +1484,21 @@ public class ImageViewTests
         runnable.Add (imageView);
         app.LayoutAndDraw ();
 
-        // With Sixel resolution (10 px/cell) and a 2×2 cell viewport the pixel rect is 20×20.
-        // With Kitty resolution (20 px/cell) it would be 40×40 — wrong.
+        // With Kitty resolution (20 px/cell) and a 2×2 cell viewport the pixel rect is 40×40.
+        // With Sixel resolution (10 px/cell) it would be 20×20 — wrong when Kitty is preferred.
         Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
 
-        Assert.Equal (20, pixelRect.Width);
-        Assert.Equal (20, pixelRect.Height);
+        Assert.Equal (40, pixelRect.Width);
+        Assert.Equal (40, pixelRect.Height);
 
         runnable.Dispose ();
     }
 
     // Copilot - Claude Sonnet 4.6
-    // FitImageInViewportCells must also use Sixel resolution when both protocols are available.
+    // FitImageInViewportCells must use Kitty resolution when both protocols are available,
+    // because Kitty is the preferred protocol.
     [Fact]
-    public void FitImageInViewportCells_WhenBothSixelAndKittyAvailable_UsesSixelResolution ()
+    public void FitImageInViewportCells_WhenBothSixelAndKittyAvailable_UsesKittyResolution ()
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -1515,14 +1516,14 @@ public class ImageViewTests
         runnable.Add (imageView);
         app.LayoutAndDraw ();
 
-        // Sixel cell aspect ratio = 16/8 = 2.0.  80×80 px image →
+        // Kitty cell aspect ratio = 8/16 = 0.5. 80×80 px image →
+        //   adjusted height = 80 / 0.5 = 160 cells → constrained by height → (2, 5).
+        // Sixel cell aspect ratio = 16/8 = 2.0. 80×80 px image →
         //   adjusted height = 80 / 2.0 = 40 cells → fits as (10, 5).
-        // Kitty cell aspect ratio = 8/16 = 0.5.  80×80 px image →
-        //   adjusted height = 80 / 0.5 = 160 cells → constrained by height → (1, 5).
         Size result = imageView.FitImageInViewportCells (new Size (80, 80));
 
-        // Must match the Sixel result, not the Kitty result.
-        Assert.Equal (10, result.Width);
+        // Must match the Kitty result, not the Sixel result.
+        Assert.Equal (2, result.Width);
         Assert.Equal (5, result.Height);
 
         runnable.Dispose ();
