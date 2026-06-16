@@ -40,9 +40,23 @@ public class Progress : Scenario
 
                                             _systemTimer = new Timer (_ =>
                                                                       {
-                                                                          // Note the check for Mainloop being valid. System.Timers can run after they are Disposed.
-                                                                          // This code must be defensive for that.
-                                                                          _app?.Invoke (_ => systemTimerDemo.Pulse ());
+                                                                          // System.Threading.Timer callbacks run on thread-pool threads and can race
+                                                                          // with shutdown. Invoke throws NotInitializedException once the
+                                                                          // application is no longer initialized, and that exception would be
+                                                                          // unhandled here and crash the process.
+                                                                          if (_app is not { Initialized: true })
+                                                                          {
+                                                                              return;
+                                                                          }
+
+                                                                          try
+                                                                          {
+                                                                              _app.Invoke (_ => systemTimerDemo.Pulse ());
+                                                                          }
+                                                                          catch (NotInitializedException)
+                                                                          {
+                                                                              // A callback can pass the Initialized check before shutdown completes.
+                                                                          }
                                                                       },
                                                                       null,
                                                                       0,
@@ -138,14 +152,38 @@ public class Progress : Scenario
                                };
         _win.Add (startBoth);
 
+        // Stop the background timers as soon as the window stops running (e.g. on Quit), while the
+        // application is still initialized. Waiting for Dispose is too late: by then the application
+        // has been torn down (so Invoke throws) and this window's SubViews have been disposed (so the
+        // Dispose-time cleanup below can no longer reach the demos). See issue #5474.
+        win.IsRunningChanged += (_, e) =>
+                                {
+                                    if (e.Value)
+                                    {
+                                        return;
+                                    }
+
+                                    _systemTimer?.Dispose ();
+                                    _systemTimer = null;
+
+                                    if (_mainLoopTimeout is { })
+                                    {
+                                        _app?.RemoveTimeout (_mainLoopTimeout);
+                                        _mainLoopTimeout = null;
+                                    }
+                                };
+
         app.Run (_win);
     }
 
     protected override void Dispose (bool disposing)
     {
-        foreach (ProgressDemo v in _win.SubViews.OfType<ProgressDemo> ())
+        // Backstop: the System.Timer is normally stopped in win.IsRunningChanged (see Main). This
+        // also covers the case where the scenario is disposed without ever having run.
+        if (disposing)
         {
-            v._stopBtnClick ();
+            _systemTimer?.Dispose ();
+            _systemTimer = null;
         }
 
         base.Dispose (disposing);
