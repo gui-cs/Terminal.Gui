@@ -319,12 +319,14 @@ public class OutputBufferImpl : IOutputBuffer
             {
                 MarkRasterImageCellsDirty (_rasterImages [index]);
                 MarkRasterImageCellsClean (command);
+                ClearGlyphsUnderRasterImage (command);
                 _rasterImages [index] = command;
 
                 return;
             }
 
             MarkRasterImageCellsClean (command);
+            ClearGlyphsUnderRasterImage (command);
             _rasterImages.Add (command);
         }
     }
@@ -356,6 +358,50 @@ public class OutputBufferImpl : IOutputBuffer
         lock (_contentsLock)
         {
             return _rasterImages.ToArray ();
+        }
+    }
+
+    // Clears any glyph sitting in a cell the raster image is placed over. Kitty images draw with
+    // z=-1 (below text), so a leftover glyph — e.g. an old border line exposed when an ImageView
+    // grows — renders on top of the image as a stale artifact. Replacing the glyph with a
+    // transparent blank (and marking the cell dirty) erases it without occluding the image. Already
+    // blank cells are left untouched so the common initial-render path keeps them clean.
+    private void ClearGlyphsUnderRasterImage (RasterImageCommand command)
+    {
+        if (Contents is null)
+        {
+            return;
+        }
+
+        Attribute transparent = new (Color.None, Color.None);
+        Region clip = command.Clip ?? new (Screen);
+
+        foreach (Rectangle clipRect in clip.GetRectangles ())
+        {
+            Rectangle visible = Rectangle.Intersect (Rectangle.Intersect (command.DestinationCells, clipRect), Screen);
+
+            if (visible.Width <= 0 || visible.Height <= 0)
+            {
+                continue;
+            }
+
+            for (int row = visible.Y; row < visible.Bottom; row++)
+            {
+                for (int col = visible.X; col < visible.Right; col++)
+                {
+                    string grapheme = Contents [row, col].Grapheme;
+
+                    if (string.IsNullOrEmpty (grapheme) || grapheme == " ")
+                    {
+                        continue;
+                    }
+
+                    Contents [row, col].Grapheme = " ";
+                    Contents [row, col].Attribute = transparent;
+                    Contents [row, col].IsDirty = true;
+                    DirtyLines [row] = true;
+                }
+            }
         }
     }
 

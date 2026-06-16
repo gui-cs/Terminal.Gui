@@ -343,4 +343,44 @@ public class ProgressBarTests : TestDriverBase
 
         Assert.DoesNotContain (EscSeqUtils.OSC_ClearProgress (), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
     }
+
+    // Claude - Opus 4.8
+    // The Fire progress style renders via a raster image, so it must work under Kitty graphics —
+    // not just Sixel. On Kitty/Ghostty (which report no Sixel support) the fire silently vanished
+    // because DrawFireProgress gated solely on SixelSupport.
+    [Fact]
+    public void Fire_WithKittyGraphicsActive_AddsRasterImage ()
+    {
+        IDriver driver = CreateTestDriver (8, 1);
+        driver.Clip = new (driver.Screen);
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        Assert.True (driver.GetOutput ().UseKittyGraphics);
+
+        ProgressBar pb = new () { Driver = driver, Width = 8, Height = 1, Fraction = 1F, ProgressBarStyle = ProgressBarStyle.Fire };
+        pb.BeginInit ();
+        pb.EndInit ();
+        pb.LayoutSubViews ();
+
+        pb.Draw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+    }
+
+    // Claude - Opus 4.8
+    [Fact]
+    public void Fire_WithNoRasterSupport_AddsNoRasterImage ()
+    {
+        IDriver driver = CreateTestDriver (8, 1);
+        driver.Clip = new (driver.Screen);
+
+        ProgressBar pb = new () { Driver = driver, Width = 8, Height = 1, Fraction = 1F, ProgressBarStyle = ProgressBarStyle.Fire };
+        pb.BeginInit ();
+        pb.EndInit ();
+        pb.LayoutSubViews ();
+
+        pb.Draw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+    }
 }

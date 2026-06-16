@@ -1788,6 +1788,43 @@ public class ImageViewTests
         Assert.Equal (expected, contents! [row, col].Attribute!.Value.Background);
     }
 
+    // Claude - Opus 4.8
+    // A Kitty image draws below text (z=-1). When an ImageView grows, the framework can leave a glyph
+    // in a now-interior viewport cell (e.g. the old border column) that resize invalidation never
+    // clears — it would render as a stale line over the image. The raster draw must blank every
+    // viewport cell so no stale glyph survives.
+    [Fact]
+    public void Draw_KittyRaster_ClearsStaleGlyphInViewport ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 20, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+
+        ImageView imageView = new () { X = 0, Y = 0, Width = 6, Height = 6, Image = CreateGradientImage (12, 12) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Plant a stale glyph in a cell inside the image's viewport (as resize leaves an old border).
+        Rectangle viewport = imageView.ViewportToScreen ();
+        int staleX = viewport.X + 1;
+        int staleY = viewport.Y + 1;
+        driver.GetOutputBuffer ().Contents! [staleY, staleX].Grapheme = "║";
+
+        // Act — redraw the image.
+        imageView.SetNeedsDraw ();
+        app.LayoutAndDraw ();
+
+        // Assert — the stale glyph was blanked so it cannot render over the z=-1 image.
+        Assert.Equal (" ", driver.GetOutputBuffer ().Contents! [staleY, staleX].Grapheme);
+
+        runnable.Dispose ();
+    }
+
     /// <summary>Creates a gradient image where pixel color varies by position.</summary>
     private static Color [,] CreateGradientImage (int width, int height)
     {
