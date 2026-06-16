@@ -40,14 +40,22 @@ public class Progress : Scenario
 
                                             _systemTimer = new Timer (_ =>
                                                                       {
-                                                                          // System.Threading.Timer callbacks run on thread-pool threads and can fire
-                                                                          // after the application has been shut down. Invoke throws
-                                                                          // NotInitializedException once the application is no longer initialized, and
-                                                                          // that exception would be unhandled here and crash the process. Only Invoke
-                                                                          // while the application is still initialized.
-                                                                          if (_app is { Initialized: true })
+                                                                          // System.Threading.Timer callbacks run on thread-pool threads and can race
+                                                                          // with shutdown. Invoke throws NotInitializedException once the
+                                                                          // application is no longer initialized, and that exception would be
+                                                                          // unhandled here and crash the process.
+                                                                          if (_app is not { Initialized: true })
+                                                                          {
+                                                                              return;
+                                                                          }
+
+                                                                          try
                                                                           {
                                                                               _app.Invoke (_ => systemTimerDemo.Pulse ());
+                                                                          }
+                                                                          catch (NotInitializedException)
+                                                                          {
+                                                                              // A callback can pass the Initialized check before shutdown completes.
                                                                           }
                                                                       },
                                                                       null,
