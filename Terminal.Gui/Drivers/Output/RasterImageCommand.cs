@@ -67,4 +67,9 @@ public class RasterImageCommand
     ///     avoid visible flicker.
     /// </remarks>
     public bool RenderAfterText { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether covered blank cells need to be emitted as transparent blanks before rendering.
+    /// </summary>
+    internal bool NeedsTransparentCellClear { get; set; }
 }

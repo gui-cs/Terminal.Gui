@@ -319,14 +319,14 @@ public class OutputBufferImpl : IOutputBuffer
             {
                 MarkRasterImageCellsDirty (_rasterImages [index]);
                 MarkRasterImageCellsClean (command);
-                ClearGlyphsUnderRasterImage (command);
+                command.NeedsTransparentCellClear = ClearCellsUnderRasterImage (command);
                 _rasterImages [index] = command;
 
                 return;
             }
 
             MarkRasterImageCellsClean (command);
-            ClearGlyphsUnderRasterImage (command);
+            command.NeedsTransparentCellClear = ClearCellsUnderRasterImage (command);
             _rasterImages.Add (command);
         }
     }
@@ -361,20 +361,19 @@ public class OutputBufferImpl : IOutputBuffer
         }
     }
 
-    // Clears any glyph sitting in a cell the raster image is placed over. Kitty images draw with
-    // z=-1 (below text), so a leftover glyph — e.g. an old border line exposed when an ImageView
-    // grows — renders on top of the image as a stale artifact. Replacing the glyph with a
-    // transparent blank (and marking the cell dirty) erases it without occluding the image. Already
-    // blank cells are left untouched so the common initial-render path keeps them clean.
-    private void ClearGlyphsUnderRasterImage (RasterImageCommand command)
+    // A raster image owns the blank cells in its visible destination. Keep those cells clean so
+    // Sixel output is not erased by normal cell rendering; OutputBase decides when protocol-specific
+    // transparent blanks must be emitted for Kitty's below-text placement model.
+    private bool ClearCellsUnderRasterImage (RasterImageCommand command)
     {
         if (Contents is null)
         {
-            return;
+            return false;
         }
 
         Attribute transparent = new (Color.None, Color.None);
         Region clip = command.Clip ?? new (Screen);
+        var needsTerminalClear = false;
 
         foreach (Rectangle clipRect in clip.GetRectangles ())
         {
@@ -391,18 +390,19 @@ public class OutputBufferImpl : IOutputBuffer
                 {
                     string grapheme = Contents [row, col].Grapheme;
 
-                    if (string.IsNullOrEmpty (grapheme) || grapheme == " ")
+                    if (!string.IsNullOrEmpty (grapheme) && grapheme != " ")
                     {
-                        continue;
+                        needsTerminalClear = true;
                     }
 
                     Contents [row, col].Grapheme = " ";
                     Contents [row, col].Attribute = transparent;
-                    Contents [row, col].IsDirty = true;
-                    DirtyLines [row] = true;
+                    Contents [row, col].IsDirty = false;
                 }
             }
         }
+
+        return needsTerminalClear;
     }
 
     private void MarkRasterImageCellsClean (RasterImageCommand command)
