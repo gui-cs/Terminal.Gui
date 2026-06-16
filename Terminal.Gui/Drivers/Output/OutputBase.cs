@@ -77,10 +77,13 @@ public abstract class OutputBase
     private readonly StringBuilder _lastOutputStringBuilder = new ();
     private bool _clearLastOutputPending;
 
-    // Kitty image ids placed on the previous Write, keyed by RasterImageCommand.Id. Kitty placements
-    // persist until explicitly deleted (unlike Sixel, which is erased by redrawing cells), so an id
-    // that was present last frame but is gone this frame must be deleted to erase its stale placement.
-    private readonly Dictionary<string, int> _lastKittyImageIds = [];
+    // Kitty image ids placed on the previous Write, keyed by RasterImageCommand.Id. A single image
+    // can occupy more than one placement when its visible region is fragmented by clipping (e.g. a
+    // SubView punches a hole), and each fragment needs its own image id — sharing one id makes each
+    // a=T overwrite the previous fragment's data. Kitty placements persist until explicitly deleted
+    // (unlike Sixel, which is erased by redrawing cells), so every id placed last frame must be
+    // deleted when the image is resized, re-fragmented, or removed.
+    private readonly Dictionary<string, List<int>> _placedKittyImageIds = [];
 
     /// <summary>
     ///     Writes dirty cells from the buffer to the console. Iterates rows/cols, skips clean cells,
@@ -534,10 +537,11 @@ public abstract class OutputBase
     }
 
     // Emits Kitty delete sequences for images that were placed on the previous Write but are no
-    // longer in the buffer, then records the current set of image ids for the next comparison.
+    // longer in the buffer, dropping their tracking entries. Entries for images still present are
+    // left untouched — their placements persist on screen and are managed by RenderRasterImages.
     private void EmitVanishedKittyDeletes (IOutputBuffer buffer)
     {
-        Dictionary<string, int> currentIds = [];
+        HashSet<string> currentIds = [];
 
         foreach (RasterImageCommand command in buffer.GetRasterImages ())
         {
@@ -546,26 +550,43 @@ public abstract class OutputBase
                 continue;
             }
 
-            currentIds [command.Id] = KittyGraphicsEncoder.GetImageId (command.Id);
+            currentIds.Add (command.Id);
         }
 
-        foreach ((string id, int imageId) in _lastKittyImageIds)
+        List<string> vanished = [];
+
+        foreach ((string id, List<int> placedImageIds) in _placedKittyImageIds)
         {
-            if (currentIds.ContainsKey (id))
+            if (currentIds.Contains (id))
             {
                 continue;
             }
 
-            Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (imageId)));
+            DeleteKittyPlacements (placedImageIds);
+            vanished.Add (id);
         }
 
-        _lastKittyImageIds.Clear ();
-
-        foreach ((string id, int imageId) in currentIds)
+        foreach (string id in vanished)
         {
-            _lastKittyImageIds [id] = imageId;
+            _placedKittyImageIds.Remove (id);
         }
     }
+
+    private void DeleteKittyPlacements (List<int> imageIds)
+    {
+        foreach (int imageId in imageIds)
+        {
+            Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (imageId)));
+        }
+    }
+
+    // Derives the Kitty image id for the rectIndex-th visible fragment of a command. Fragment 0 uses
+    // the command's base id (matching ImageView's pre-encoded payload); later fragments get distinct
+    // ids so their data does not overwrite earlier fragments under a shared id.
+    private static int GetKittyImageId (string commandId, int rectIndex) =>
+        rectIndex == 0
+            ? KittyGraphicsEncoder.GetImageId (commandId)
+            : KittyGraphicsEncoder.GetImageId ($"{commandId}#{rectIndex}");
 
     private void RenderRasterImages (IOutputBuffer buffer, bool renderAfterText)
     {
@@ -581,13 +602,18 @@ public abstract class OutputBase
                 continue;
             }
 
-            // Erase any prior placement of this image before re-placing it, so a resized or moved
-            // Kitty image does not leave its previous (larger or differently positioned) placement
-            // on screen. Sixel needs no such delete — redrawing the cells overwrites it.
-            if (UseKittyGraphics && !string.IsNullOrEmpty (command.Id))
+            bool trackKitty = UseKittyGraphics && !string.IsNullOrEmpty (command.Id);
+
+            // Erase every prior placement of this image before re-placing it, so a resized, moved, or
+            // re-fragmented Kitty image does not leave stale placements on screen. Sixel needs no such
+            // delete — redrawing the cells overwrites it.
+            if (trackKitty && _placedKittyImageIds.TryGetValue (command.Id!, out List<int>? previous))
             {
-                Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (KittyGraphicsEncoder.GetImageId (command.Id))));
+                DeleteKittyPlacements (previous);
             }
+
+            List<int> placedImageIds = [];
+            var rectIndex = 0;
 
             foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
             {
@@ -596,8 +622,21 @@ public abstract class OutputBase
                     continue;
                 }
 
+                int imageId = trackKitty ? GetKittyImageId (command.Id!, rectIndex) : 0;
                 SetCursorPositionImpl (visibleCells.X, visibleCells.Y);
-                Write (new StringBuilder (GetRasterImageData (command, visibleCells, pixels)));
+                Write (new StringBuilder (GetRasterImageData (command, visibleCells, pixels, imageId)));
+
+                if (trackKitty)
+                {
+                    placedImageIds.Add (imageId);
+                }
+
+                rectIndex++;
+            }
+
+            if (trackKitty)
+            {
+                _placedKittyImageIds [command.Id!] = placedImageIds;
             }
 
             command.IsDirty = false;
@@ -615,6 +654,9 @@ public abstract class OutputBase
                 continue;
             }
 
+            bool useKittyIds = UseKittyGraphics && !string.IsNullOrEmpty (command.Id);
+            var rectIndex = 0;
+
             foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
             {
                 if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
@@ -622,35 +664,41 @@ public abstract class OutputBase
                     continue;
                 }
 
+                int imageId = useKittyIds ? GetKittyImageId (command.Id!, rectIndex) : 0;
                 output.Append (EscSeqUtils.CSI_SetCursorPosition (visibleCells.Y + 1, visibleCells.X + 1));
-                output.Append (GetRasterImageData (command, visibleCells, pixels));
+                output.Append (GetRasterImageData (command, visibleCells, pixels, imageId));
                 wroteRasterImages = true;
+                rectIndex++;
             }
         }
 
         return wroteRasterImages;
     }
 
-    private string GetRasterImageData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)
+    private string GetRasterImageData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels, int imageId)
     {
         if (UseKittyGraphics)
         {
-            return GetRasterImageKittyData (command, visibleCells, pixels);
+            return GetRasterImageKittyData (command, visibleCells, pixels, imageId);
         }
 
         return GetRasterImageSixelData (command, visibleCells, pixels);
     }
 
-    private static string GetRasterImageKittyData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)
+    private static string GetRasterImageKittyData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels, int imageId)
     {
-        if (command.EncodedKitty is { } encodedKitty && visibleCells == command.DestinationCells)
+        // The pre-encoded payload carries the base image id and covers the whole destination, so it
+        // only applies to fragment 0 rendered un-clipped.
+        if (command.EncodedKitty is { } encodedKitty
+            && visibleCells == command.DestinationCells
+            && imageId == KittyGraphicsEncoder.GetImageId (command.Id!))
         {
             return encodedKitty;
         }
 
         KittyGraphicsEncoder encoder = new ();
 
-        return encoder.EncodeKitty (pixels, visibleCells.Width, visibleCells.Height, KittyGraphicsEncoder.GetImageId (command.Id!));
+        return encoder.EncodeKitty (pixels, visibleCells.Width, visibleCells.Height, imageId);
     }
 
     private static string GetRasterImageSixelData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)
