@@ -99,7 +99,7 @@ public abstract class OutputBase
         // Raster images must be written before dirty cells so later text draws above them.
         if (!IsLegacyConsole)
         {
-            RenderRasterImages (buffer);
+            RenderRasterImages (buffer, renderAfterText: false);
         }
 
         // Process each row
@@ -257,6 +257,8 @@ public abstract class OutputBase
         {
             return;
         }
+
+        RenderRasterImages (buffer, renderAfterText: true);
 
         // Render queued sixel images
         foreach (SixelToRender s in GetSixels ())
@@ -505,7 +507,7 @@ public abstract class OutputBase
         }
 
         StringBuilder ansiOutput = new ();
-        bool wroteRasterImages = AppendRasterImageAnsi (buffer, ansiOutput);
+        bool wroteRasterImages = AppendRasterImageAnsi (buffer, ansiOutput, renderAfterText: false);
 
         if (wroteRasterImages)
         {
@@ -514,14 +516,20 @@ public abstract class OutputBase
 
         Attribute? lastAttr = null;
         BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
+        AppendRasterImageAnsi (buffer, ansiOutput, renderAfterText: true);
 
         return ansiOutput.ToString ();
     }
 
-    private void RenderRasterImages (IOutputBuffer buffer)
+    private void RenderRasterImages (IOutputBuffer buffer, bool renderAfterText)
     {
         foreach (RasterImageCommand command in buffer.GetRasterImages ())
         {
+            if (command.RenderAfterText != renderAfterText)
+            {
+                continue;
+            }
+
             if (!command.IsDirty && !command.AlwaysRender)
             {
                 continue;
@@ -542,12 +550,17 @@ public abstract class OutputBase
         }
     }
 
-    private bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output)
+    private bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output, bool renderAfterText)
     {
         bool wroteRasterImages = false;
 
         foreach (RasterImageCommand command in buffer.GetRasterImages ())
         {
+            if (command.RenderAfterText != renderAfterText)
+            {
+                continue;
+            }
+
             foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
             {
                 if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))

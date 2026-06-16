@@ -10,6 +10,9 @@ namespace UICatalog.Scenarios;
 public class Images : Scenario
 {
     private const string FIRE_RASTER_IMAGE_ID = "UICatalog.Images.Fire";
+    private const int RASTER_PROTOCOL_AUTO = 0;
+    private const int RASTER_PROTOCOL_KITTY = 1;
+    private const int RASTER_PROTOCOL_SIXEL = 2;
 
     private IApplication _app;
     private ImageView _cellImageView;
@@ -25,6 +28,7 @@ public class Images : Scenario
     private KittyGraphicsSupportResult _kittyGraphicsSupportResult;
     private OptionSelector _osDistanceAlgorithm;
     private OptionSelector _osPaletteBuilder;
+    private OptionSelector _osRasterProtocol;
     private NumericUpDown _popularityThreshold;
     private NumericUpDown _pxX;
     private NumericUpDown _pxY;
@@ -83,7 +87,20 @@ public class Images : Scenario
         cbUseBackgroundRendering.ValueChanging += (_, evt) => SetBackgroundRendering (evt.NewValue == CheckState.Checked);
         _win.Add (cbUseBackgroundRendering);
 
-        Button btnOpenImage = new () { Y = Pos.Bottom (_cbUseRasterGraphics), Text = "_Open Image" };
+        Label protocolLabel = new () { Y = Pos.Bottom (_cbUseRasterGraphics), Text = "Raster protocol:" };
+        _osRasterProtocol = new OptionSelector
+        {
+            X = Pos.Right (protocolLabel) + 1,
+            Y = Pos.Top (protocolLabel),
+            Orientation = Orientation.Horizontal,
+            Labels = ["Auto", "Kitty", "Sixel"],
+            Values = [RASTER_PROTOCOL_AUTO, RASTER_PROTOCOL_KITTY, RASTER_PROTOCOL_SIXEL],
+            Value = RASTER_PROTOCOL_AUTO
+        };
+        _osRasterProtocol.ValueChanged += (_, _) => ApplyRasterProtocolSelection ();
+        _win.Add (protocolLabel, _osRasterProtocol);
+
+        Button btnOpenImage = new () { Y = Pos.Bottom (_osRasterProtocol), Text = "_Open Image" };
         _win.Add (btnOpenImage);
 
         Button btnStartFire = new () { X = Pos.Right (btnOpenImage), Y = Pos.Top (btnOpenImage), Text = "Start _Fire" };
@@ -152,13 +169,34 @@ public class Images : Scenario
             Pixels = bmp,
             DestinationCells = GetFireDestinationCells (),
             Encoder = IsSixelRasterPath () ? _fireEncoder : null,
-            AlwaysRender = true
+            AlwaysRender = true,
+            RenderAfterText = true
         };
 
-        _app.Driver?.GetOutputBuffer ().AddRasterImage (command);
         _win.SetNeedsDraw ();
+        _app.Driver?.GetOutputBuffer ().AddRasterImage (command);
 
         return true;
+    }
+
+    private void ApplyRasterProtocolSelection ()
+    {
+        if (_app?.Driver?.GetOutput () is { } output)
+        {
+            output.UseKittyGraphics = ShouldUseKittyGraphics ();
+        }
+
+        if (_rasterImageView?.Image is { } image)
+        {
+            UpdateRasterImage (image);
+        }
+
+        if (_fire is { })
+        {
+            GenerateRasterFire (false);
+        }
+
+        UpdateRasterCapabilityMatrix ();
     }
 
     private FrameView BuildCapabilityMatrix ()
@@ -375,7 +413,7 @@ public class Images : Scenario
 
     private Size GetPreferredRasterResolution ()
     {
-        if (_kittyGraphicsSupportResult is { IsSupported: true } kitty)
+        if (ShouldUseKittyGraphics () && _kittyGraphicsSupportResult is { IsSupported: true } kitty)
         {
             return kitty.Resolution;
         }
@@ -398,14 +436,14 @@ public class Images : Scenario
         return new Size (10, 20);
     }
 
-    private bool IsImageViewKittyActive (bool rasterEnabled) => rasterEnabled && _kittyGraphicsSupportResult is { IsSupported: true };
+    private bool IsImageViewKittyActive (bool rasterEnabled) => rasterEnabled && ShouldUseKittyGraphics ();
 
     private bool IsRasterAvailable () => _kittyGraphicsSupportResult is { IsSupported: true } || _sixelSupportResult is { IsSupported: true };
 
     private bool IsImageViewSixelActive (bool rasterEnabled) =>
-        rasterEnabled && !IsImageViewKittyActive (rasterEnabled) && _sixelSupportResult is { IsSupported: true };
+        rasterEnabled && !ShouldUseKittyGraphics () && _sixelSupportResult is { IsSupported: true };
 
-    private bool IsSixelRasterPath () => _kittyGraphicsSupportResult is not { IsSupported: true } && _sixelSupportResult is { IsSupported: true };
+    private bool IsSixelRasterPath () => !ShouldUseKittyGraphics () && _sixelSupportResult is { IsSupported: true };
 
     private void LoadDefaultImage ()
     {
@@ -539,7 +577,7 @@ public class Images : Scenario
 
         bool? kittySupported = _kittyGraphicsSupportResult is null ? null : _kittyGraphicsSupportResult.IsSupported;
         string kittyResolution = _kittyGraphicsSupportResult is { } kitty ? SizeText (kitty.Resolution) : "-";
-        _kittyStatus.Text = Row ("Kitty", ProtocolState (kittySupported), kittyResolution, kittyActive ? "active" : "preferred if available");
+        _kittyStatus.Text = Row ("Kitty", ProtocolState (kittySupported), kittyResolution, kittyActive ? "active" : "auto-preferred");
 
         bool? sixelSupported = _sixelSupportResult is null ? null : _sixelSupportResult.IsSupported;
         string sixelResolution = _sixelSupportResult is { } sixel ? SizeText (sixel.Resolution) : "-";
@@ -548,6 +586,7 @@ public class Images : Scenario
                                 : "fallback after Kitty";
         _sixelStatus.Text = Row ("Sixel", ProtocolState (sixelSupported), sixelResolution, sixelActive ? $"active; {sixelNotes}" : sixelNotes);
 
+        UpdateRasterProtocolSelector ();
         _selectedStatus.Text = $"Selected raster path: {GetSelectedRendererName (rasterEnabled, kittyActive, sixelActive)}";
         _win?.SetNeedsDraw ();
     }
@@ -571,6 +610,7 @@ public class Images : Scenario
     {
         _sixelSupportResult = sixelResult;
         _kittyGraphicsSupportResult = kittyResult;
+        ApplyRasterProtocolSelection ();
 
         if (_pxX is { })
         {
@@ -588,6 +628,22 @@ public class Images : Scenario
         }
 
         UpdateRasterCapabilityMatrix ();
+    }
+
+    private void UpdateRasterProtocolSelector ()
+    {
+        if (_osRasterProtocol is null)
+        {
+            return;
+        }
+
+        bool bothSupported = _kittyGraphicsSupportResult is { IsSupported: true } && _sixelSupportResult is { IsSupported: true };
+        _osRasterProtocol.Enabled = bothSupported;
+
+        if (!bothSupported && _osRasterProtocol.Value != RASTER_PROTOCOL_AUTO)
+        {
+            _osRasterProtocol.Value = RASTER_PROTOCOL_AUTO;
+        }
     }
 
     private string GetSelectedRendererName (bool rasterEnabled, bool kittyActive, bool sixelActive)
@@ -608,6 +664,21 @@ public class Images : Scenario
         }
 
         return "Cell renderer fallback";
+    }
+
+    private bool ShouldUseKittyGraphics ()
+    {
+        if (_kittyGraphicsSupportResult is not { IsSupported: true })
+        {
+            return false;
+        }
+
+        if (_osRasterProtocol?.Value == RASTER_PROTOCOL_SIXEL && _sixelSupportResult is { IsSupported: true })
+        {
+            return false;
+        }
+
+        return true;
     }
 
     private static string YesNo (bool value) => value ? "yes" : "no";

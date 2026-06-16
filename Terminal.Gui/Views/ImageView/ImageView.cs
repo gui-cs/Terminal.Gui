@@ -298,14 +298,14 @@ public partial class ImageView : View, IDesignable
     ///     Gets whether the current rendering mode is using a raster graphics protocol (Kitty or Sixel).
     /// </summary>
     public bool IsUsingRasterGraphics => UseRasterGraphics
-                                         && (App?.Driver?.KittyGraphicsSupport is { IsSupported: true }
+                                         && (IsKittyGraphicsActive ()
                                              || App?.Driver?.SixelSupport is { IsSupported: true });
 
     /// <summary>
     ///     Gets whether the current rendering mode is using sixel.
     /// </summary>
     [Obsolete ("Use IsUsingRasterGraphics instead. IsUsingSixel will be removed in a future version.")]
-    public bool IsUsingSixel => UseRasterGraphics && App?.Driver?.SixelSupport is { IsSupported: true };
+    public bool IsUsingSixel => UseRasterGraphics && !IsKittyGraphicsActive () && App?.Driver?.SixelSupport is { IsSupported: true };
 
     /// <summary>
     ///     Converts the Viewport to screen coordinates in pixels.
@@ -327,7 +327,7 @@ public partial class ImageView : View, IDesignable
         Rectangle boundsRect = ViewportToScreen ();
 
         int targetWidthInPixels = boundsRect.Width * pixelsPerCellX;
-        int targetHeightInPixels = App?.Driver?.KittyGraphicsSupport is { IsSupported: true }
+        int targetHeightInPixels = IsKittyGraphicsActive ()
                                        ? boundsRect.Height * pixelsPerCellY
                                        : SixelEncoder?.GetHeightInPixels (boundsRect.Height, pixelsPerCellY) ?? boundsRect.Height * pixelsPerCellY;
 
@@ -340,7 +340,7 @@ public partial class ImageView : View, IDesignable
     /// </summary>
     private Size? GetActiveResolution ()
     {
-        if (App?.Driver?.KittyGraphicsSupport is { IsSupported: true } kitty)
+        if (IsKittyGraphicsActive () && App?.Driver?.KittyGraphicsSupport is { IsSupported: true } kitty)
         {
             return kitty.Resolution;
         }
@@ -352,6 +352,9 @@ public partial class ImageView : View, IDesignable
 
         return null;
     }
+
+    private bool IsKittyGraphicsActive () =>
+        App?.Driver is { KittyGraphicsSupport: { IsSupported: true } } driver && driver.GetOutput ().UseKittyGraphics;
 
     /// <summary>
     ///     Returns the size in cell terms of the given image resized to fit in the viewport.

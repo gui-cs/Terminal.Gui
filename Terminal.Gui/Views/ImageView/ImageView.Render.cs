@@ -101,7 +101,7 @@ public partial class ImageView
                 return null;
             }
 
-            useKitty = App?.Driver?.KittyGraphicsSupport is { IsSupported: true };
+            useKitty = IsKittyGraphicsActive ();
 
             if (!useKitty)
             {
@@ -390,4 +390,3 @@ public partial class ImageView
 
     private readonly record struct RenderResult (RenderKey Key, Color [,] ScaledImage, Size CellSize, string? EncodedSixel, string? EncodedKitty);
 }
-

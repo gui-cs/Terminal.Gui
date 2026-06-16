@@ -57,4 +57,14 @@ public class RasterImageCommand
     ///     Gets or sets whether the image should be emitted on every driver write.
     /// </summary>
     public bool AlwaysRender { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether the image should be emitted after dirty text cells rather than before them.
+    /// </summary>
+    /// <remarks>
+    ///     The default is <see langword="false"/> so text drawn later can appear above a raster image. Set this to
+    ///     <see langword="true"/> for animated Sixel overlays that need to repaint after the normal cell pass to
+    ///     avoid visible flicker.
+    /// </remarks>
+    public bool RenderAfterText { get; set; }
 }
