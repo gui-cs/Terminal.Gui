@@ -1569,6 +1569,41 @@ public class OutputBaseTests
         Assert.DoesNotContain ("\x1b_G", result);
     }
 
+    // Claude - Opus 4.8
+    // When a Kitty image's visible region is fragmented into multiple rectangles by clipping (e.g.
+    // a SubView punches a hole in it), each fragment must use a DISTINCT Kitty image id. Sharing one
+    // id makes each a=T overwrite the previous fragment's transmitted data, corrupting the image.
+    [Fact]
+    public void Write_KittyRasterImage_FragmentedClip_UsesDistinctImageIdsPerFragment ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+
+        // Two disjoint horizontal strips → GetVisibleRasterCellRectangles yields two rectangles.
+        Region clip = new (new Rectangle (0, 0, 4, 1));
+        clip.Combine (new Rectangle (0, 3, 4, 1), RegionOp.Union);
+        buffer.Clip = clip;
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        });
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert: both fragment ids appear, and they differ.
+        int id0 = KittyGraphicsEncoder.GetImageId ("image");
+        int id1 = KittyGraphicsEncoder.GetImageId ("image#1");
+        Assert.NotEqual (id0, id1);
+        Assert.Contains ($"i={id0}", result);
+        Assert.Contains ($"i={id1}", result);
+    }
+
     private static Color [,] CreateSolidImage (int width, int height, Color color)
     {
         Color [,] image = new Color [width, height];
