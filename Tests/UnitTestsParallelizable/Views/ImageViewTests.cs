@@ -1652,6 +1652,39 @@ public class ImageViewTests
         runnable.Dispose ();
     }
 
+    [Fact]
+    public void ViewportToScreenInPixels_WhenKittyOutputDisabled_UsesSixelResolutionAndAvoidBottomScroll ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (20, 20) });
+        driver.GetOutput ().UseKittyGraphics = false;
+
+        ImageView imageView = new ()
+        {
+            Width = 2,
+            Height = 4,
+            SixelEncoder = new SixelEncoder { AvoidBottomScroll = true }
+        };
+
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        Assert.Equal (20, pixelRect.Width);
+        Assert.Equal (36, pixelRect.Height);
+        Assert.True (imageView.IsUsingSixel);
+
+        runnable.Dispose ();
+    }
+
     // Copilot - Claude Sonnet 4.6
     // FitImageInViewportCells must use Kitty resolution when both protocols are available,
     // because Kitty is the preferred protocol.
@@ -1682,6 +1715,32 @@ public class ImageViewTests
 
         // Must match the Kitty result, not the Sixel result.
         Assert.Equal (2, result.Width);
+        Assert.Equal (5, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_WhenKittyOutputDisabled_UsesSixelResolution ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 20, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (8, 16) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (16, 8) });
+        driver.GetOutput ().UseKittyGraphics = false;
+
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Size result = imageView.FitImageInViewportCells (new Size (80, 80));
+
+        Assert.Equal (10, result.Width);
         Assert.Equal (5, result.Height);
 
         runnable.Dispose ();

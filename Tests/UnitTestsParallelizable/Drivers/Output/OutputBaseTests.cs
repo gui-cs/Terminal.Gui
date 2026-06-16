@@ -1237,6 +1237,34 @@ public class OutputBaseTests
     }
 
     [Fact]
+    public void Write_RasterImage_RenderAfterText_RendersAfterDirtyCells ()
+    {
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "animated-overlay",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2),
+            RenderAfterText = true
+        };
+
+        buffer.AddRasterImage (command);
+        buffer.Move (0, 0);
+        buffer.AddStr ("\u03a9");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        int textIndex = rendered.IndexOf ("\u03a9", StringComparison.Ordinal);
+        int imageIndex = rendered.IndexOf ("\u001bP", StringComparison.Ordinal);
+        Assert.InRange (textIndex, 0, imageIndex - 1);
+    }
+
+    [Fact]
     public void DriverImpl_SixelSupport_DefaultsToNull ()
     {
         // Arrange & Act
