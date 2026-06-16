@@ -1265,6 +1265,115 @@ public class OutputBaseTests
     }
 
     [Fact]
+    public void Write_SixelRasterImage_SkipsDirtyBlankCellsCoveredByRaster ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        const string encodedSixel = "\u001bPIMG\u001b\\";
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        int imageIndex = rendered.IndexOf (encodedSixel, StringComparison.Ordinal);
+        Assert.True (imageIndex >= 0);
+        Assert.DoesNotContain (" ", rendered [(imageIndex + encodedSixel.Length)..]);
+    }
+
+    [Fact]
+    public void Write_SixelRasterImage_RenderAfterText_SkipsDirtyBlankCellsBeforeRaster ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        const string encodedSixel = "\u001bPIMG\u001b\\";
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 1, 1),
+            RenderAfterText = true
+        });
+
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        int imageIndex = rendered.IndexOf (encodedSixel, StringComparison.Ordinal);
+        Assert.True (imageIndex >= 0);
+        Assert.DoesNotContain (" ", rendered [..imageIndex]);
+    }
+
+    [Fact]
+    public void ToAnsi_SixelRasterImage_SkipsBlankCellsCoveredByRaster ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        const string encodedSixel = "\u001bPIMG\u001b\\";
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        string ansi = output.ToAnsi (buffer);
+
+        int imageIndex = ansi.IndexOf (encodedSixel, StringComparison.Ordinal);
+        Assert.True (imageIndex >= 0);
+        Assert.DoesNotContain (" ", ansi [(imageIndex + encodedSixel.Length)..]);
+    }
+
+    [Fact]
+    public void Write_KittyRasterImage_OverPreviousCleanGlyph_EmitsTransparentBlankClear ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        buffer.AddStr ("X");
+        output.Write (buffer);
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        Assert.Contains ("\x1b_G", rendered);
+        Assert.DoesNotContain ("X", rendered);
+        Assert.Contains (" ", rendered);
+    }
+
+    [Fact]
     public void DriverImpl_SixelSupport_DefaultsToNull ()
     {
         // Arrange & Act

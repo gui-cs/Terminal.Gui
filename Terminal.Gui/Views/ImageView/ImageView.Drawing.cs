@@ -135,27 +135,6 @@ public partial class ImageView
         };
 
         driver.GetOutputBuffer ().AddRasterImage (command);
-
-        // Force every viewport cell to a transparent blank. A Kitty image draws below text (z=-1), so
-        // any glyph the framework leaves in a viewport cell — e.g. an old border column exposed when
-        // the view grows, which resize invalidation does not reach — would render on top of the image.
-        // Transparent blanks erase such glyphs without occluding the image.
-        ClearRasterViewport ();
-    }
-
-    private void ClearRasterViewport ()
-    {
-        SetAttribute (new Attribute (Color.None, Color.None));
-
-        Rectangle viewport = Viewport;
-
-        for (var y = 0; y < viewport.Height; y++)
-        {
-            for (var x = 0; x < viewport.Width; x++)
-            {
-                AddRune (x, y, (Rune)' ');
-            }
-        }
     }
 
     private bool? CenterFromCommand (ICommandContext? context) =>

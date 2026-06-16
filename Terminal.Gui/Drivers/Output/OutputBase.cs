@@ -103,12 +103,14 @@ public abstract class OutputBase
         int lastCol = -1;
 
         InvalidateRowsWithUrlsIfStale (buffer, rows, cols);
+        IReadOnlyList<Rectangle> rasterCellRectangles = GetRasterCellRectangles (buffer);
 
         // Erase Kitty placements for images that were present last frame but are gone now. Kitty
         // placements persist until explicitly deleted, so removed images would otherwise linger.
         if (!IsLegacyConsole && UseKittyGraphics)
         {
             EmitVanishedKittyDeletes (buffer);
+            ClearKittyRasterBlankCells (buffer);
         }
 
         // Raster images must be written before dirty cells so later text draws above them.
@@ -158,9 +160,18 @@ public abstract class OutputBase
                 // Batch consecutive dirty cells
                 for (; col < cols; col++)
                 {
-                    // Skip clean cells - position cursor and continue
-                    if (!buffer.Contents! [row, col].IsDirty)
+                    // Skip clean cells, plus blank cells owned by raster images. Raster-owned
+                    // blanks must not be emitted because normal text output would erase Sixel
+                    // images and is unnecessary over Kitty's transparent-cleared placement.
+                    bool skipRasterBlank = IsRasterCoveredBlankCell (buffer, row, col, rasterCellRectangles);
+
+                    if (!buffer.Contents! [row, col].IsDirty || skipRasterBlank)
                     {
+                        if (skipRasterBlank)
+                        {
+                            buffer.Contents [row, col].IsDirty = false;
+                        }
+
                         if (outputStringBuilder.Length > 0)
                         {
                             // This clears outputStringBuilder
@@ -522,6 +533,7 @@ public abstract class OutputBase
         }
 
         StringBuilder ansiOutput = new ();
+        IReadOnlyList<Rectangle> rasterCellRectangles = GetRasterCellRectangles (buffer);
         bool wroteRasterImages = AppendRasterImageAnsi (buffer, ansiOutput, renderAfterText: false);
 
         if (wroteRasterImages)
@@ -530,11 +542,192 @@ public abstract class OutputBase
         }
 
         Attribute? lastAttr = null;
-        BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
+
+        if (rasterCellRectangles.Count > 0)
+        {
+            BuildAnsiForRegionSkippingRasterCoveredBlanks (buffer,
+                                                           0,
+                                                           buffer.Rows,
+                                                           0,
+                                                           buffer.Cols,
+                                                           ansiOutput,
+                                                           ref lastAttr,
+                                                           rasterCellRectangles);
+        }
+        else
+        {
+            BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
+        }
+
         AppendRasterImageAnsi (buffer, ansiOutput, renderAfterText: true);
 
         return ansiOutput.ToString ();
     }
+
+    private void BuildAnsiForRegionSkippingRasterCoveredBlanks (IOutputBuffer buffer,
+                                                                int startRow,
+                                                                int endRow,
+                                                                int startCol,
+                                                                int endCol,
+                                                                StringBuilder output,
+                                                                ref Attribute? lastAttr,
+                                                                IReadOnlyList<Rectangle> rasterCellRectangles)
+    {
+        var redrawTextStyle = TextStyle.None;
+        string? lastUrl = null;
+
+        for (int row = startRow; row < endRow; row++)
+        {
+            for (int col = startCol; col < endCol; col++)
+            {
+                if (IsRasterCoveredBlankCell (buffer, row, col, rasterCellRectangles))
+                {
+                    if (lastUrl is { })
+                    {
+                        output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                        lastUrl = null;
+                    }
+
+                    continue;
+                }
+
+                output.Append (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+                lastAttr = null;
+                redrawTextStyle = TextStyle.None;
+
+                for (; col < endCol; col++)
+                {
+                    if (IsRasterCoveredBlankCell (buffer, row, col, rasterCellRectangles))
+                    {
+                        col--;
+
+                        break;
+                    }
+
+                    string? cellUrl = buffer.GetCellUrl (col, row);
+
+                    if (cellUrl != lastUrl)
+                    {
+                        if (lastUrl is { })
+                        {
+                            output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                        }
+
+                        if (!string.IsNullOrEmpty (cellUrl))
+                        {
+                            output.Append (EscSeqUtils.OSC_StartHyperlink (cellUrl));
+                        }
+
+                        lastUrl = cellUrl;
+                    }
+
+                    Cell cell = buffer.Contents! [row, col];
+                    int outputWidth = -1;
+                    AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col, ref outputWidth);
+                }
+            }
+
+            if (lastUrl is { })
+            {
+                output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                lastUrl = null;
+            }
+        }
+    }
+
+    private void ClearKittyRasterBlankCells (IOutputBuffer buffer)
+    {
+        if (buffer.Contents is null)
+        {
+            return;
+        }
+
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            bool clearAllCoveredBlanks = command.IsDirty || command.AlwaysRender || command.NeedsTransparentCellClear;
+
+            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            {
+                Rectangle visible = Rectangle.Intersect (visibleCells, new Rectangle (0, 0, buffer.Cols, buffer.Rows));
+
+                for (int row = visible.Y; row < visible.Bottom; row++)
+                {
+                    for (int col = visible.X; col < visible.Right; col++)
+                    {
+                        Cell cell = buffer.Contents [row, col];
+
+                        if (!IsBlankCell (cell) || (!clearAllCoveredBlanks && !cell.IsDirty))
+                        {
+                            continue;
+                        }
+
+                        if (!SetCursorPositionImpl (col, row))
+                        {
+                            return;
+                        }
+
+                        WriteTransparentBlankCell ();
+                        buffer.Contents [row, col].IsDirty = false;
+                    }
+                }
+            }
+
+            command.NeedsTransparentCellClear = false;
+        }
+    }
+
+    private void WriteTransparentBlankCell ()
+    {
+        StringBuilder output = new ();
+        EscSeqUtils.CSI_AppendResetForegroundColor (output);
+        EscSeqUtils.CSI_AppendResetBackgroundColor (output);
+        output.Append (' ');
+        Write (output);
+    }
+
+    private static IReadOnlyList<Rectangle> GetRasterCellRectangles (IOutputBuffer buffer)
+    {
+        List<Rectangle> rectangles = [];
+        Rectangle screen = new (0, 0, buffer.Cols, buffer.Rows);
+
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            {
+                Rectangle visible = Rectangle.Intersect (visibleCells, screen);
+
+                if (visible.Width > 0 && visible.Height > 0)
+                {
+                    rectangles.Add (visible);
+                }
+            }
+        }
+
+        return rectangles;
+    }
+
+    private static bool IsRasterCoveredBlankCell (IOutputBuffer buffer,
+                                                 int row,
+                                                 int col,
+                                                 IReadOnlyList<Rectangle> rasterCellRectangles)
+    {
+        if (rasterCellRectangles.Count == 0 || buffer.Contents is null || !IsBlankCell (buffer.Contents [row, col]))
+        {
+            return false;
+        }
+
+        foreach (Rectangle rectangle in rasterCellRectangles)
+        {
+            if (rectangle.Contains (col, row))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsBlankCell (Cell cell) => string.IsNullOrEmpty (cell.Grapheme) || cell.Grapheme == " ";
 
     // Emits Kitty delete sequences for images that were placed on the previous Write but are no
     // longer in the buffer, dropping their tracking entries. Entries for images still present are
