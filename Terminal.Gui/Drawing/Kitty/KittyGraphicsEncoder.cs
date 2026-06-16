@@ -85,7 +85,7 @@ public class KittyGraphicsEncoder
         bool isLastChunk = offset + firstChunk.Length >= totalLength;
 
         sb.Append (APC_START);
-        sb.Append ($"a=T,f=32,s={pixelWidth},v={pixelHeight},c={destCols},r={destRows},q=2,m={( isLastChunk ? 0 : 1 )}");
+        sb.Append ($"a=T,f=32,s={pixelWidth},v={pixelHeight},c={destCols},r={destRows},z=-1,q=2,m={( isLastChunk ? 0 : 1 )}");
         sb.Append (';');
         sb.Append (firstChunk);
         sb.Append (APC_END);

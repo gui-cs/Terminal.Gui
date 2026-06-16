@@ -2,6 +2,7 @@
 
 namespace DrawingTests;
 
+[Collection ("Environment Variable Tests")]
 public class KittyGraphicsSupportDetectorTests
 {
     [Fact]
@@ -179,5 +180,47 @@ public class KittyGraphicsSupportDetectorTests
             Environment.SetEnvironmentVariable ("KITTY_WINDOW_ID", previousWindowId);
             Environment.SetEnvironmentVariable ("TERM_PROGRAM", previousTermProgram);
         }
+    }
+}
+
+[CollectionDefinition ("Environment Variable Tests", DisableParallelization = true)]
+public class EnvironmentVariableTestCollection { }
+
+public class KittyGraphicsSupportDetectorCollectionTests
+{
+    [Fact]
+    public void DetectorTests_RunInNonParallelEnvironmentCollection ()
+    {
+        object? collectionAttribute = typeof (KittyGraphicsSupportDetectorTests)
+                                      .GetCustomAttributes (inherit: false)
+                                      .SingleOrDefault (attribute => attribute.GetType ().Name == "CollectionAttribute");
+
+        Assert.NotNull (collectionAttribute);
+
+        string? collectionName = collectionAttribute!
+                                 .GetType ()
+                                 .GetProperty ("Name")
+                                 ?.GetValue (collectionAttribute) as string;
+
+        Assert.Equal ("Environment Variable Tests", collectionName);
+
+        Type? collectionDefinitionType = typeof (KittyGraphicsSupportDetectorTests)
+                                         .Assembly
+                                         .GetType ("DrawingTests.EnvironmentVariableTestCollection");
+
+        Assert.NotNull (collectionDefinitionType);
+
+        object? collectionDefinitionAttribute = collectionDefinitionType!
+                                                .GetCustomAttributes (inherit: false)
+                                                .SingleOrDefault (attribute => attribute.GetType ().Name == "CollectionDefinitionAttribute");
+
+        Assert.NotNull (collectionDefinitionAttribute);
+
+        bool disableParallelization = (bool)(collectionDefinitionAttribute!
+                                             .GetType ()
+                                             .GetProperty ("DisableParallelization")
+                                             ?.GetValue (collectionDefinitionAttribute) ?? false);
+
+        Assert.True (disableParallelization);
     }
 }
