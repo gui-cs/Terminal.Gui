@@ -311,10 +311,8 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
 
-    /// <summary>
-    ///     Sets the terminal's sixel support result (detected during initialization).
-    /// </summary>
-    internal void SetSixelSupport (SixelSupportResult result)
+    /// <inheritdoc/>
+    public void SetSixelSupport (SixelSupportResult result)
     {
         SixelSupportResult? old = SixelSupport;
         SixelSupport = result;
@@ -327,10 +325,8 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<KittyGraphicsSupportResult?>>? KittyGraphicsSupportChanged;
 
-    /// <summary>
-    ///     Sets the terminal's Kitty graphics protocol support result (detected during initialization).
-    /// </summary>
-    internal void SetKittyGraphicsSupport (KittyGraphicsSupportResult result)
+    /// <inheritdoc/>
+    public void SetKittyGraphicsSupport (KittyGraphicsSupportResult result)
     {
         KittyGraphicsSupportResult? old = KittyGraphicsSupport;
         KittyGraphicsSupport = result;

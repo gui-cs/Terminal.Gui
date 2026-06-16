@@ -142,6 +142,16 @@ public interface IDriver : IDisposable
     event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
 
     /// <summary>
+    ///     Sets the terminal's <see cref="SixelSupport"/> result and raises <see cref="SixelSupportChanged"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Normally populated automatically during driver initialization. Call this to override detection — for
+    ///     example, to force Sixel output on a headless or PTY driver that skips the terminal handshake.
+    /// </remarks>
+    /// <param name="result">The sixel support capabilities to apply.</param>
+    void SetSixelSupport (SixelSupportResult result);
+
+    /// <summary>
     ///     Gets the terminal's Kitty graphics protocol support capabilities, detected during driver initialization.
     /// </summary>
     /// <remarks>
@@ -153,6 +163,17 @@ public interface IDriver : IDisposable
     ///     Raised when <see cref="KittyGraphicsSupport"/> changes (e.g. after terminal detection completes).
     /// </summary>
     event EventHandler<ValueChangedEventArgs<KittyGraphicsSupportResult?>>? KittyGraphicsSupportChanged;
+
+    /// <summary>
+    ///     Sets the terminal's <see cref="KittyGraphicsSupport"/> result and raises
+    ///     <see cref="KittyGraphicsSupportChanged"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Normally populated automatically during driver initialization. Call this to override detection — for
+    ///     example, to force Kitty graphics output on a headless or PTY driver that skips the terminal handshake.
+    /// </remarks>
+    /// <param name="result">The Kitty graphics protocol support capabilities to apply.</param>
+    void SetKittyGraphicsSupport (KittyGraphicsSupportResult result);
 
     /// <summary>Gets whether the <see cref="IDriver"/> supports TrueColor output.</summary>
     bool SupportsTrueColor { get; }

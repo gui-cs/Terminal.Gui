@@ -77,6 +77,11 @@ public abstract class OutputBase
     private readonly StringBuilder _lastOutputStringBuilder = new ();
     private bool _clearLastOutputPending;
 
+    // Kitty image ids placed on the previous Write, keyed by RasterImageCommand.Id. Kitty placements
+    // persist until explicitly deleted (unlike Sixel, which is erased by redrawing cells), so an id
+    // that was present last frame but is gone this frame must be deleted to erase its stale placement.
+    private readonly Dictionary<string, int> _lastKittyImageIds = [];
+
     /// <summary>
     ///     Writes dirty cells from the buffer to the console. Iterates rows/cols, skips clean cells,
     ///     batches dirty cells into ANSI sequences, emits OSC 8 hyperlink start/close around URL cells,
@@ -95,6 +100,13 @@ public abstract class OutputBase
         int lastCol = -1;
 
         InvalidateRowsWithUrlsIfStale (buffer, rows, cols);
+
+        // Erase Kitty placements for images that were present last frame but are gone now. Kitty
+        // placements persist until explicitly deleted, so removed images would otherwise linger.
+        if (!IsLegacyConsole && UseKittyGraphics)
+        {
+            EmitVanishedKittyDeletes (buffer);
+        }
 
         // Raster images must be written before dirty cells so later text draws above them.
         if (!IsLegacyConsole)
@@ -521,6 +533,40 @@ public abstract class OutputBase
         return ansiOutput.ToString ();
     }
 
+    // Emits Kitty delete sequences for images that were placed on the previous Write but are no
+    // longer in the buffer, then records the current set of image ids for the next comparison.
+    private void EmitVanishedKittyDeletes (IOutputBuffer buffer)
+    {
+        Dictionary<string, int> currentIds = [];
+
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            if (string.IsNullOrEmpty (command.Id))
+            {
+                continue;
+            }
+
+            currentIds [command.Id] = KittyGraphicsEncoder.GetImageId (command.Id);
+        }
+
+        foreach ((string id, int imageId) in _lastKittyImageIds)
+        {
+            if (currentIds.ContainsKey (id))
+            {
+                continue;
+            }
+
+            Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (imageId)));
+        }
+
+        _lastKittyImageIds.Clear ();
+
+        foreach ((string id, int imageId) in currentIds)
+        {
+            _lastKittyImageIds [id] = imageId;
+        }
+    }
+
     private void RenderRasterImages (IOutputBuffer buffer, bool renderAfterText)
     {
         foreach (RasterImageCommand command in buffer.GetRasterImages ())
@@ -533,6 +579,14 @@ public abstract class OutputBase
             if (!command.IsDirty && !command.AlwaysRender)
             {
                 continue;
+            }
+
+            // Erase any prior placement of this image before re-placing it, so a resized or moved
+            // Kitty image does not leave its previous (larger or differently positioned) placement
+            // on screen. Sixel needs no such delete — redrawing the cells overwrites it.
+            if (UseKittyGraphics && !string.IsNullOrEmpty (command.Id))
+            {
+                Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (KittyGraphicsEncoder.GetImageId (command.Id))));
             }
 
             foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
@@ -596,7 +650,7 @@ public abstract class OutputBase
 
         KittyGraphicsEncoder encoder = new ();
 
-        return encoder.EncodeKitty (pixels, visibleCells.Width, visibleCells.Height);
+        return encoder.EncodeKitty (pixels, visibleCells.Width, visibleCells.Height, KittyGraphicsEncoder.GetImageId (command.Id!));
     }
 
     private static string GetRasterImageSixelData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)

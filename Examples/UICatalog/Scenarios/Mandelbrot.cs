@@ -21,6 +21,9 @@ public class Mandelbrot : Scenario
     private const int FIRE_PROGRESS_GROUP_ID = 8;
     private const double ZOOM_IN_FACTOR = 0.8;
     private const double ZOOM_OUT_FACTOR = 1.25;
+    private const int RASTER_PROTOCOL_AUTO = 0;
+    private const int RASTER_PROTOCOL_KITTY = 1;
+    private const int RASTER_PROTOCOL_SIXEL = 2;
 
     private IApplication _app = null!;
     private NumericUpDown<double> _centerX = null!;
@@ -33,18 +36,41 @@ public class Mandelbrot : Scenario
     private Label _status = null!;
     private Window _window = null!;
     private SixelSupportResult _sixelSupportResult = new ();
+    private KittyGraphicsSupportResult? _kittyGraphicsSupportResult;
+    private OptionSelector _osRasterProtocol = null!;
+    private Label _driverStatus = null!;
+    private Label _cellStatus = null!;
+    private Label _kittyStatus = null!;
+    private Label _sixelStatus = null!;
+    private Label _selectedStatus = null!;
 
     public override void Main ()
     {
         using IApplication app = Application.Create ().Init (DriverRegistry.Names.ANSI);
         _app = app;
         _app.Driver!.SixelSupportChanged += OnSixelSupportChanged;
+        _app.Driver.KittyGraphicsSupportChanged += OnKittyGraphicsSupportChanged;
 
         _window = new Window { Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()}" };
 
-        FrameView settings = new () { Title = "Settings", Width = 34, Height = Dim.Fill () };
+        FrameView capabilityMatrix = BuildCapabilityMatrix ();
 
-        View display = new () { X = Pos.Right (settings), Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
+        Label protocolLabel = new () { Y = Pos.Bottom (capabilityMatrix), Text = "Raster protocol:" };
+
+        _osRasterProtocol = new OptionSelector
+        {
+            X = Pos.Right (protocolLabel) + 1,
+            Y = Pos.Top (protocolLabel),
+            Orientation = Orientation.Horizontal,
+            Labels = ["Auto", "Kitty", "Sixel"],
+            Values = [RASTER_PROTOCOL_AUTO, RASTER_PROTOCOL_KITTY, RASTER_PROTOCOL_SIXEL],
+            Value = RASTER_PROTOCOL_AUTO
+        };
+        _osRasterProtocol.ValueChanged += (_, _) => ApplyRasterProtocolSelection ();
+
+        FrameView settings = new () { Title = "Settings", Y = Pos.Bottom (protocolLabel), Width = 34, Height = Dim.Fill () };
+
+        View display = new () { X = Pos.Right (settings), Y = Pos.Bottom (protocolLabel), Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
 
         _status = new Label { X = Pos.Align (Alignment.Start), Y = Pos.Align (Alignment.Start), Width = Dim.Fill (), Height = 1 };
 
@@ -67,11 +93,11 @@ public class Mandelbrot : Scenario
         _mandelbrotView.ViewportChanged += (_, _) => RenderMandelbrot ();
 
         display.Add (_status, _mandelbrotView);
-        _window.Add (settings, display);
+        _window.Add (capabilityMatrix, protocolLabel, _osRasterProtocol, settings, display);
 
         _window.Initialized += (_, _) =>
                                {
-                                   UpdateSixelSupport (_app.Driver?.SixelSupport);
+                                   UpdateRasterSupportState (_app.Driver?.SixelSupport, _app.Driver?.KittyGraphicsSupport);
                                    RenderMandelbrot ();
                                    StartFireProgress ();
 
@@ -92,6 +118,7 @@ public class Mandelbrot : Scenario
         {
             StopFireProgress ();
             _app.Driver!.SixelSupportChanged -= OnSixelSupportChanged;
+            _app.Driver.KittyGraphicsSupportChanged -= OnKittyGraphicsSupportChanged;
             _window.Dispose ();
         }
     }
@@ -295,11 +322,22 @@ public class Mandelbrot : Scenario
 
     private void OnSixelSupportChanged (object? sender, ValueChangedEventArgs<SixelSupportResult?> args)
     {
-        UpdateSixelSupport (args.NewValue);
+        UpdateRasterSupportState (args.NewValue, _app.Driver?.KittyGraphicsSupport);
         RenderMandelbrot ();
     }
 
-    private void UpdateSixelSupport (SixelSupportResult? support) => _sixelSupportResult = support ?? new SixelSupportResult ();
+    private void OnKittyGraphicsSupportChanged (object? sender, ValueChangedEventArgs<KittyGraphicsSupportResult?> args)
+    {
+        UpdateRasterSupportState (_app.Driver?.SixelSupport, args.NewValue);
+        RenderMandelbrot ();
+    }
+
+    private void UpdateRasterSupportState (SixelSupportResult? sixelResult, KittyGraphicsSupportResult? kittyResult)
+    {
+        _sixelSupportResult = sixelResult ?? new SixelSupportResult ();
+        _kittyGraphicsSupportResult = kittyResult;
+        ApplyRasterProtocolSelection ();
+    }
 
     private void RenderMandelbrot ()
     {
@@ -313,18 +351,175 @@ public class Mandelbrot : Scenario
             return;
         }
 
-        int pixelWidth = imageColumns * Math.Max (1, support.Resolution.Width);
-        int pixelHeight = imageRows * Math.Max (1, support.Resolution.Height);
+        Size resolution = GetPreferredRasterResolution ();
+        int pixelWidth = imageColumns * Math.Max (1, resolution.Width);
+        int pixelHeight = imageRows * Math.Max (1, resolution.Height);
         int iterations = _iterations.Value;
         double centerX = _centerX.Value;
         double centerY = _centerY.Value;
         double span = _span.Value;
 
         _mandelbrotView.Render (pixelWidth, pixelHeight, centerX, centerY, span, iterations, support);
-        string renderMode = _mandelbrotView.IsUsingSixel ? "Sixel raster" : "Cell fallback";
-        _status.Text = $"{renderMode}: {imageColumns} x {imageRows} cells, {pixelWidth} x {pixelHeight}px";
+        _status.Text = $"{GetActiveRenderMode ()}: {imageColumns} x {imageRows} cells, {pixelWidth} x {pixelHeight}px";
         _status.SetNeedsDraw ();
+        UpdateRasterCapabilityMatrix ();
     }
+
+    private string GetActiveRenderMode ()
+    {
+        if (!_mandelbrotView.IsUsingRasterGraphics)
+        {
+            return "Cell fallback";
+        }
+
+        return ShouldUseKittyGraphics () ? "Kitty raster" : "Sixel raster";
+    }
+
+    private void ApplyRasterProtocolSelection ()
+    {
+        if (_app?.Driver?.GetOutput () is { } output)
+        {
+            output.UseKittyGraphics = ShouldUseKittyGraphics ();
+        }
+
+        UpdateRasterCapabilityMatrix ();
+    }
+
+    private bool ShouldUseKittyGraphics ()
+    {
+        if (_kittyGraphicsSupportResult is not { IsSupported: true })
+        {
+            return false;
+        }
+
+        if (_osRasterProtocol?.Value == RASTER_PROTOCOL_SIXEL && _sixelSupportResult is { IsSupported: true })
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private Size GetPreferredRasterResolution ()
+    {
+        if (ShouldUseKittyGraphics () && _kittyGraphicsSupportResult is { IsSupported: true } kitty)
+        {
+            return kitty.Resolution;
+        }
+
+        if (_sixelSupportResult is { IsSupported: true } sixel)
+        {
+            return sixel.Resolution;
+        }
+
+        if (_kittyGraphicsSupportResult is { } detectedKitty)
+        {
+            return detectedKitty.Resolution;
+        }
+
+        return _sixelSupportResult.Resolution;
+    }
+
+    private FrameView BuildCapabilityMatrix ()
+    {
+        FrameView matrix = new ()
+        {
+            Title = "Raster Capability Matrix",
+            Width = Dim.Fill (),
+            Height = 7,
+            CanFocus = false
+        };
+
+        _driverStatus = new Label { Y = 0, Width = Dim.Fill () };
+        Label header = new () { Y = 1, Width = Dim.Fill (), Text = "Renderer       Available   Resolution       Notes" };
+        _cellStatus = new Label { Y = 2, Width = Dim.Fill () };
+        _kittyStatus = new Label { Y = 3, Width = Dim.Fill () };
+        _sixelStatus = new Label { Y = 4, Width = Dim.Fill () };
+        _selectedStatus = new Label { Y = 5, Width = Dim.Fill () };
+
+        matrix.Add (_driverStatus, header, _cellStatus, _kittyStatus, _sixelStatus, _selectedStatus);
+
+        return matrix;
+    }
+
+    private void UpdateRasterCapabilityMatrix ()
+    {
+        if (_cellStatus is null)
+        {
+            return;
+        }
+
+        bool kittyActive = _mandelbrotView is { IsUsingRasterGraphics: true } && ShouldUseKittyGraphics ();
+        bool sixelActive = _mandelbrotView is { IsUsingRasterGraphics: true } && !ShouldUseKittyGraphics () && _sixelSupportResult is { IsSupported: true };
+        bool cellActive = !kittyActive && !sixelActive;
+        string driverName = _app?.Driver?.GetName () ?? "unknown";
+        bool trueColor = _app?.Driver?.SupportsTrueColor == true;
+        bool legacy = _app?.Driver?.IsLegacyConsole == true;
+
+        _driverStatus.Text = $"Driver: {driverName}; true color: {YesNo (trueColor)}; legacy console: {YesNo (legacy)}";
+        _cellStatus.Text = Row ("Cell colors", "yes", "1 cell", cellActive ? "active" : "fallback");
+
+        bool? kittySupported = _kittyGraphicsSupportResult?.IsSupported;
+        string kittyResolution = _kittyGraphicsSupportResult is { } kitty ? SizeText (kitty.Resolution) : "-";
+        _kittyStatus.Text = Row ("Kitty", ProtocolState (kittySupported), kittyResolution, kittyActive ? "active" : "auto-preferred");
+
+        bool? sixelSupported = _sixelSupportResult is { IsSupported: true };
+        string sixelResolution = _sixelSupportResult is { IsSupported: true } ? SizeText (_sixelSupportResult.Resolution) : "-";
+        string sixelNotes = _sixelSupportResult is { IsSupported: true }
+                                ? $"{_sixelSupportResult.MaxPaletteColors} colors; alpha {YesNo (_sixelSupportResult.SupportsTransparency)}"
+                                : "fallback after Kitty";
+        _sixelStatus.Text = Row ("Sixel", ProtocolState (sixelSupported), sixelResolution, sixelActive ? $"active; {sixelNotes}" : sixelNotes);
+
+        UpdateRasterProtocolSelector ();
+        _selectedStatus.Text = $"Selected raster path: {GetSelectedRendererName (kittyActive, sixelActive)}";
+        _window?.SetNeedsDraw ();
+    }
+
+    private void UpdateRasterProtocolSelector ()
+    {
+        if (_osRasterProtocol is null)
+        {
+            return;
+        }
+
+        bool bothSupported = _kittyGraphicsSupportResult is { IsSupported: true } && _sixelSupportResult is { IsSupported: true };
+        _osRasterProtocol.Enabled = bothSupported;
+
+        if (!bothSupported && _osRasterProtocol.Value != RASTER_PROTOCOL_AUTO)
+        {
+            _osRasterProtocol.Value = RASTER_PROTOCOL_AUTO;
+        }
+    }
+
+    private static string GetSelectedRendererName (bool kittyActive, bool sixelActive)
+    {
+        if (kittyActive)
+        {
+            return "Kitty graphics";
+        }
+
+        if (sixelActive)
+        {
+            return "Sixel";
+        }
+
+        return "Cell renderer fallback";
+    }
+
+    private static string ProtocolState (bool? isSupported) =>
+        isSupported switch
+        {
+            true => "yes",
+            false => "no",
+            _ => "detecting"
+        };
+
+    private static string Row (string renderer, string available, string resolution, string notes) =>
+        $"{renderer,-14} {available,-11} {resolution,-16} {notes}";
+
+    private static string SizeText (Size size) => $"{size.Width}x{size.Height} px/cell";
+
+    private static string YesNo (bool value) => value ? "yes" : "no";
 
     private void ResetSettings ()
     {

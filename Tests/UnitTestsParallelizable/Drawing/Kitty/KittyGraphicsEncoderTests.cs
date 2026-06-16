@@ -49,6 +49,77 @@ public class KittyGraphicsEncoderTests
     }
 
     [Fact]
+    public void EncodeKitty_DoesNotMoveCursor ()
+    {
+        // Claude - Opus 4.8
+        // The Kitty protocol moves the cursor to just after the image by default (C=0).
+        // When an image is placed near the bottom of the screen, the resulting cursor move
+        // scrolls the terminal up one row on every frame. C=1 suppresses cursor movement so
+        // animated images repaint in place instead of marching up the screen.
+        KittyGraphicsEncoder encoder = new ();
+        Color [,] pixels = CreateSolidPixels (2, 2, new Color (255, 0, 0));
+
+        string result = encoder.EncodeKitty (pixels, 2, 1);
+
+        Assert.Contains ("C=1", result);
+    }
+
+    [Fact]
+    public void EncodeKitty_WithImageId_EmitsImageIdField ()
+    {
+        // Claude - Opus 4.8
+        // The i=<id> field tags the placement so a prior placement can be deleted/replaced by id.
+        // Without it, a resized or moved image leaves its old placement on screen.
+        KittyGraphicsEncoder encoder = new ();
+        Color [,] pixels = CreateSolidPixels (2, 2, new Color (255, 0, 0));
+
+        string result = encoder.EncodeKitty (pixels, 2, 1, 12345);
+
+        Assert.Contains ("i=12345", result);
+    }
+
+    [Fact]
+    public void EncodeKitty_WithoutImageId_OmitsImageIdField ()
+    {
+        // Claude - Opus 4.8
+        KittyGraphicsEncoder encoder = new ();
+        Color [,] pixels = CreateSolidPixels (2, 2, new Color (255, 0, 0));
+
+        string result = encoder.EncodeKitty (pixels, 2, 1);
+
+        Assert.DoesNotContain ("i=", result);
+    }
+
+    [Fact]
+    public void GetImageId_IsStableForSameString ()
+    {
+        // Claude - Opus 4.8
+        Assert.Equal (KittyGraphicsEncoder.GetImageId ("ImageView_42"), KittyGraphicsEncoder.GetImageId ("ImageView_42"));
+    }
+
+    [Fact]
+    public void GetImageId_IsPositiveAndNonZero ()
+    {
+        // Claude - Opus 4.8
+        Assert.True (KittyGraphicsEncoder.GetImageId ("ImageView_42") > 0);
+        Assert.True (KittyGraphicsEncoder.GetImageId ("anything") > 0);
+    }
+
+    [Fact]
+    public void EncodeDeletePlacements_TargetsImageIdAndKeepsData ()
+    {
+        // Claude - Opus 4.8
+        // a=d deletes; d=i targets placements of image id i, leaving the transmitted data intact.
+        string result = KittyGraphicsEncoder.EncodeDeletePlacements (777);
+
+        Assert.StartsWith ("\x1b_G", result);
+        Assert.EndsWith ("\x1b\\", result);
+        Assert.Contains ("a=d", result);
+        Assert.Contains ("d=i", result);
+        Assert.Contains ("i=777", result);
+    }
+
+    [Fact]
     public void EncodeKitty_SmallImage_HasSingleChunkWithMoreEqualZero ()
     {
         KittyGraphicsEncoder encoder = new ();

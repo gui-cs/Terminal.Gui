@@ -40,8 +40,15 @@ public class KittyGraphicsEncoder
     /// </param>
     /// <param name="destCols">The number of terminal columns the image should occupy.</param>
     /// <param name="destRows">The number of terminal rows the image should occupy.</param>
+    /// <param name="imageId">
+    ///     An optional stable image identifier (the Kitty <c>i</c> key). When supplied, placements can be
+    ///     deleted and replaced by id via <see cref="EncodeDeletePlacements"/>, which is required to erase
+    ///     a previous placement when the image is resized or moved. Use <see cref="GetImageId"/> to derive
+    ///     a stable id from a string. When <see langword="null"/> the terminal assigns its own id and the
+    ///     placement cannot be targeted for deletion.
+    /// </param>
     /// <returns>The complete Kitty APC escape sequence string.</returns>
-    public string EncodeKitty (Color [,] pixels, int destCols, int destRows)
+    public string EncodeKitty (Color [,] pixels, int destCols, int destRows, int? imageId = null)
     {
         int width = pixels.GetLength (0);
         int height = pixels.GetLength (1);
@@ -49,7 +56,47 @@ public class KittyGraphicsEncoder
         byte [] rgba = PixelsToRgba (pixels, width, height);
         string base64 = Convert.ToBase64String (rgba);
 
-        return BuildApcSequence (base64, width, height, destCols, destRows);
+        return BuildApcSequence (base64, width, height, destCols, destRows, imageId);
+    }
+
+    /// <summary>
+    ///     Builds a Kitty graphics protocol APC sequence that deletes all placements of the image with the
+    ///     specified <paramref name="imageId"/>, leaving the transmitted image data intact so it can be
+    ///     re-displayed.
+    /// </summary>
+    /// <remarks>
+    ///     Kitty image placements persist on screen until explicitly deleted — unlike Sixel, drawing text
+    ///     over their cells does not erase them. Emit this before re-placing a resized or moved image, and
+    ///     when an image is removed, so a stale placement is not left behind.
+    /// </remarks>
+    /// <param name="imageId">The image id (the Kitty <c>i</c> key) whose placements should be deleted.</param>
+    /// <returns>The complete Kitty APC delete escape sequence string.</returns>
+    public static string EncodeDeletePlacements (int imageId) => $"{APC_START}a=d,d=i,i={imageId}{APC_END}";
+
+    /// <summary>
+    ///     Derives a stable, positive, non-zero Kitty image id from the given string identifier.
+    /// </summary>
+    /// <remarks>
+    ///     The same <paramref name="id"/> always maps to the same image id, so a view's placement can be
+    ///     consistently replaced or deleted across renders.
+    /// </remarks>
+    /// <param name="id">The string identifier (e.g. a <see cref="Terminal.Gui.Drivers.RasterImageCommand.Id"/>).</param>
+    /// <returns>A positive, non-zero image id suitable for the Kitty <c>i</c> key.</returns>
+    public static int GetImageId (string id)
+    {
+        ArgumentException.ThrowIfNullOrEmpty (id);
+
+        // FNV-1a 32-bit hash, clamped to a positive, non-zero value.
+        var hash = 2166136261u;
+
+        foreach (char c in id)
+        {
+            hash = (hash ^ c) * 16777619u;
+        }
+
+        var result = (int)(hash & 0x7FFFFFFF);
+
+        return result == 0 ? 1 : result;
     }
 
     private static byte [] PixelsToRgba (Color [,] pixels, int width, int height)
@@ -72,7 +119,7 @@ public class KittyGraphicsEncoder
         return rgba;
     }
 
-    private static string BuildApcSequence (string base64, int pixelWidth, int pixelHeight, int destCols, int destRows)
+    private static string BuildApcSequence (string base64, int pixelWidth, int pixelHeight, int destCols, int destRows, int? imageId)
     {
         var sb = new StringBuilder ();
         int totalLength = base64.Length;
@@ -84,8 +131,16 @@ public class KittyGraphicsEncoder
                                 : base64.Substring (offset);
         bool isLastChunk = offset + firstChunk.Length >= totalLength;
 
+        // i=<id> tags the placement with a stable image id so a prior placement can be deleted by
+        // id (see EncodeDeletePlacements) when the image is resized or moved.
+        string idField = imageId.HasValue ? $"i={imageId.Value}," : string.Empty;
+
+        // C=1 suppresses cursor movement after the image is displayed. Without it the terminal
+        // advances the cursor past the bottom-right of the image, and an image near the bottom of
+        // the screen scrolls the whole display up one row on every repaint (animated images march
+        // up the screen instead of repainting in place).
         sb.Append (APC_START);
-        sb.Append ($"a=T,f=32,s={pixelWidth},v={pixelHeight},c={destCols},r={destRows},z=-1,q=2,m={( isLastChunk ? 0 : 1 )}");
+        sb.Append ($"a=T,f=32,{idField}s={pixelWidth},v={pixelHeight},c={destCols},r={destRows},z=-1,C=1,q=2,m={( isLastChunk ? 0 : 1 )}");
         sb.Append (';');
         sb.Append (firstChunk);
         sb.Append (APC_END);
