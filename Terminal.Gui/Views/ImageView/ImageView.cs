@@ -50,7 +50,10 @@ public partial class ImageView : View, IDesignable
         [Command.ScrollUp] = Bind.All (Key.CursorUp),
         [Command.ScrollDown] = Bind.All (Key.CursorDown),
         [Command.Home] = Bind.All (Key.Home, Key.D0),
-        [Command.ZoomIn] = Bind.All (new Key ('+'), new Key ('=')),
+        [Command.ZoomIn] = Bind.All (new Key ('+'),
+                                      new Key ('+').WithShift,
+                                      new Key ('='),
+                                      new Key ('=').WithShift),
         [Command.ZoomOut] = Bind.All (new Key ('-'))
     };
 
@@ -324,7 +327,9 @@ public partial class ImageView : View, IDesignable
         Rectangle boundsRect = ViewportToScreen ();
 
         int targetWidthInPixels = boundsRect.Width * pixelsPerCellX;
-        int targetHeightInPixels = SixelEncoder?.GetHeightInPixels (boundsRect.Height, pixelsPerCellY) ?? boundsRect.Height * pixelsPerCellY;
+        int targetHeightInPixels = App?.Driver?.KittyGraphicsSupport is { IsSupported: true }
+                                       ? boundsRect.Height * pixelsPerCellY
+                                       : SixelEncoder?.GetHeightInPixels (boundsRect.Height, pixelsPerCellY) ?? boundsRect.Height * pixelsPerCellY;
 
         return new Rectangle (boundsRect.X * pixelsPerCellX, boundsRect.Y * pixelsPerCellY, targetWidthInPixels, targetHeightInPixels);
     }

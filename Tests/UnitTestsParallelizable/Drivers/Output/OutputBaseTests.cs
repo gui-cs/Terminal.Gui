@@ -1420,6 +1420,28 @@ public class OutputBaseTests
         Assert.Contains (precomputed, ansi);
     }
 
+    [Fact]
+    public void ToAnsi_RasterImage_KittyOutput_UsesNegativeZIndex ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "kitty-z-index",
+            Pixels = CreateSolidImage (20, 40, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        string ansi = output.ToAnsi (buffer);
+
+        Assert.Contains ("z=-1", ansi);
+    }
+
     private static Color [,] CreateSolidImage (int width, int height, Color color)
     {
         Color [,] image = new Color [width, height];

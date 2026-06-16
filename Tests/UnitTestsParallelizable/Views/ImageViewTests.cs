@@ -38,7 +38,9 @@ public class ImageViewTests
         Assert.Equal ([Command.Home], imageView.KeyBindings.GetCommands (Key.Home));
         Assert.Equal ([Command.Home], imageView.KeyBindings.GetCommands (Key.D0));
         Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('+')));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('+').WithShift));
         Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('=')));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('=').WithShift));
         Assert.Equal ([Command.ZoomOut], imageView.KeyBindings.GetCommands (new Key ('-')));
         Assert.Equal ([Command.PageUp], imageView.KeyBindings.GetCommands (Key.PageUp));
         Assert.Equal ([Command.PageDown], imageView.KeyBindings.GetCommands (Key.PageDown));
@@ -889,6 +891,22 @@ public class ImageViewTests
         host.Dispose ();
     }
 
+    [Fact]
+    public void KeyBindings_ShiftedPlusKey_ZoomsIn ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewKeyDownEvent (new Key ('+').WithShift));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        host.Dispose ();
+    }
+
     // Copilot
     [Fact]
     public void KeyBindings_EqualsKey_ZoomsIn ()
@@ -1598,6 +1616,37 @@ public class ImageViewTests
         Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
 
         Assert.Equal (40, pixelRect.Width);
+        Assert.Equal (40, pixelRect.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void ViewportToScreenInPixels_WhenKittyActive_IgnoresSixelAvoidBottomScroll ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+
+        ImageView imageView = new ()
+        {
+            Width = 2,
+            Height = 4,
+            SixelEncoder = new SixelEncoder { AvoidBottomScroll = true }
+        };
+
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        Assert.Equal (20, pixelRect.Width);
         Assert.Equal (40, pixelRect.Height);
 
         runnable.Dispose ();
