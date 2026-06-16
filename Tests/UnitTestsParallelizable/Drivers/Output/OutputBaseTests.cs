@@ -1448,6 +1448,36 @@ public class OutputBaseTests
         Assert.Contains (precomputed, ansi);
     }
 
+    // Claude - Opus 4.8
+    // Kitty images draw with z=-1 (below text), so any glyph left in a covered cell renders ON TOP
+    // of the image. When an ImageView grows, cells that used to be its border become interior cells
+    // under the image; if their old glyph (e.g. ║) is not cleared, it shows as a stale line over the
+    // image. Adding a raster image over a cell that holds a glyph must clear that glyph.
+    [Fact]
+    public void ToAnsi_KittyRasterImage_OverCellWithGlyph_DoesNotRenderStaleGlyph ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 1);
+
+        // Stale border-like glyphs sitting where the image will be placed.
+        buffer.AddStr ("║║║║");
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 1)
+        });
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: the image is emitted, and no stale glyph is rendered over it.
+        Assert.Contains ("\x1b_G", ansi);
+        Assert.DoesNotContain ("║", ansi);
+    }
+
     [Fact]
     public void ToAnsi_RasterImage_KittyOutput_UsesNegativeZIndex ()
     {
