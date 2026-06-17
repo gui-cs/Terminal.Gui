@@ -28,7 +28,7 @@
     <PackageVersion Include="System.CommandLine" Version="2.0.7" />
     <PackageVersion Include="Wcwidth" Version="4.0.1" />
     <PackageVersion Include="Terminal.Gui.Editor" Version="2.4.1" />
-    <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4" />
+    <PackageVersion Include="JetBrains.Annotations" Version="2026.2.0" />
     <PackageVersion Include="AnsiConsoleToHtml" Version="0.2.0" />
     <PackageVersion Include="ColorHelper" Version="1.8.1" />
     <PackageVersion Include="TextMateSharp" Version="2.0.4" />
