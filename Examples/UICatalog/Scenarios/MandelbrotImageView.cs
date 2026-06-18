@@ -13,6 +13,11 @@ internal sealed class MandelbrotImageView : ImageView
     private const double DEFAULT_CENTER_Y = 0;
     private const double DEFAULT_SPAN = 3;
     private const int DEFAULT_ITERATIONS = 80;
+    private const double PAN_FACTOR = 0.1;
+    private const double ZOOM_IN_FACTOR = 0.8;
+    private const double ZOOM_OUT_FACTOR = 1.25;
+
+    private Point? _lastDragPosition;
 
     private double _centerX = DEFAULT_CENTER_X;
     public double CenterX => _centerX;
@@ -73,6 +78,7 @@ internal sealed class MandelbrotImageView : ImageView
         Arrangement = ViewArrangement.Resizable;
         UseRasterGraphics = true;
 
+        ReplacePanAndZoomCommands ();
         ViewportChanged += (_, _) => RenderMandelbrot ();
     }
 
@@ -115,6 +121,16 @@ internal sealed class MandelbrotImageView : ImageView
         SetMandelbrot (centerX, centerY, _span, _maxIterations, true);
 
         return true;
+    }
+
+    protected override bool OnMouseEvent (Mouse mouse)
+    {
+        if (HandleFractalDrag (mouse))
+        {
+            return true;
+        }
+
+        return base.OnMouseEvent (mouse);
     }
 
     private static int CountIterations (double cx, double cy, int maxIterations)
@@ -191,6 +207,80 @@ internal sealed class MandelbrotImageView : ImageView
         return _sixelSupportResult.Resolution;
     }
 
+    private bool HandleFractalDrag (Mouse mouse)
+    {
+        if (mouse.Position is not { } position)
+        {
+            return false;
+        }
+
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed) && !mouse.Flags.FastHasFlags (MouseFlags.PositionReport))
+        {
+            _lastDragPosition = position;
+            App?.Mouse.GrabMouse (this);
+
+            return true;
+        }
+
+        if (mouse.Flags == (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport) && _lastDragPosition is { } lastDragPosition)
+        {
+            bool panned = PanMandelbrot (lastDragPosition.X - position.X, lastDragPosition.Y - position.Y);
+            _lastDragPosition = position;
+
+            return panned;
+        }
+
+        if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
+        {
+            return false;
+        }
+
+        _lastDragPosition = null;
+
+        if (App is { } && App.Mouse.IsGrabbed (this))
+        {
+            App.Mouse.UngrabMouse ();
+        }
+
+        return true;
+    }
+
+    private bool PanMandelbrot (int deltaX, int deltaY)
+    {
+        Rectangle viewport = Viewport;
+
+        if (viewport.Width <= 0 || viewport.Height <= 0)
+        {
+            return false;
+        }
+
+        double spanY = _span * viewport.Height / viewport.Width;
+        double centerX = _centerX + deltaX * _span * PAN_FACTOR;
+        double centerY = _centerY + deltaY * spanY * PAN_FACTOR;
+        SetMandelbrot (centerX, centerY, _span, _maxIterations, true);
+
+        return true;
+    }
+
+    private void ReplacePanAndZoomCommands ()
+    {
+        AddCommand (Command.ScrollLeft, () => PanMandelbrot (-1, 0));
+        AddCommand (Command.ScrollRight, () => PanMandelbrot (1, 0));
+        AddCommand (Command.ScrollUp, () => PanMandelbrot (0, -1));
+        AddCommand (Command.ScrollDown, () => PanMandelbrot (0, 1));
+        AddCommand (Command.Home,
+                    () =>
+                    {
+                        ResetMandelbrot ();
+
+                        return true;
+                    });
+        AddCommand (Command.ZoomIn, context => ZoomMandelbrot (context, ZOOM_IN_FACTOR));
+        AddCommand (Command.ZoomOut, context => ZoomMandelbrot (context, ZOOM_OUT_FACTOR));
+        AddCommand (Command.PageUp, context => ZoomMandelbrot (context, ZOOM_IN_FACTOR));
+        AddCommand (Command.PageDown, context => ZoomMandelbrot (context, ZOOM_OUT_FACTOR));
+    }
+
     private void RenderMandelbrot ()
     {
         Rectangle viewport = Viewport;
@@ -243,4 +333,51 @@ internal sealed class MandelbrotImageView : ImageView
     private bool ShouldUseKittyGraphics () =>
         _kittyGraphicsSupportResult is { IsSupported: true }
         && App?.Driver?.GetOutput ().UseKittyGraphics == true;
+
+    private bool ZoomMandelbrot (ICommandContext? context, double spanMultiplier)
+    {
+        Point? anchor = context?.Binding is MouseBinding { MouseEvent.Position: { } mousePosition } ? mousePosition : null;
+        double nextSpan = Math.Max (MinimumSpan, _span * spanMultiplier);
+
+        if (Math.Abs (nextSpan - _span) < double.Epsilon)
+        {
+            return false;
+        }
+
+        if (anchor is { } anchorPosition && TryGetMandelbrotPoint (anchorPosition, _span, out double anchorX, out double anchorY))
+        {
+            double centerX = anchorX - (anchorX - _centerX) * spanMultiplier;
+            double centerY = anchorY - (anchorY - _centerY) * spanMultiplier;
+            SetMandelbrot (centerX, centerY, nextSpan, _maxIterations, true);
+
+            return true;
+        }
+
+        SetMandelbrot (_centerX, _centerY, nextSpan, _maxIterations, true);
+
+        return true;
+    }
+
+    private bool TryGetMandelbrotPoint (Point position, double span, out double x, out double y)
+    {
+        x = _centerX;
+        y = _centerY;
+        Rectangle viewport = Viewport;
+
+        if (viewport.Width <= 0 || viewport.Height <= 0)
+        {
+            return false;
+        }
+
+        if (position.X < 0 || position.Y < 0 || position.X >= viewport.Width || position.Y >= viewport.Height)
+        {
+            return false;
+        }
+
+        double spanY = span * viewport.Height / viewport.Width;
+        x = _centerX + ((position.X + 0.5d) / viewport.Width - 0.5d) * span;
+        y = _centerY + ((position.Y + 0.5d) / viewport.Height - 0.5d) * spanY;
+
+        return true;
+    }
 }
