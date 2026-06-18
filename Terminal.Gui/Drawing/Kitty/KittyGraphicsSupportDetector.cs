@@ -32,7 +32,7 @@ public class KittyGraphicsSupportDetector
     ///     bound to the specified driver (used for resolution queries).
     /// </summary>
     /// <param name="driver">The driver to send ANSI requests through.</param>
-    public KittyGraphicsSupportDetector (IDriver? driver)
+    public KittyGraphicsSupportDetector (IDriver driver)
     {
         ArgumentNullException.ThrowIfNull (driver);
         _driver = driver;
@@ -81,7 +81,7 @@ public class KittyGraphicsSupportDetector
 
     private void TryComputeResolution (KittyGraphicsSupportResult result, Action<KittyGraphicsSupportResult> resultCallback)
     {
-        string? consoleSize = null;
+        string? consoleSize;
 
         QueueRequest (EscSeqUtils.CSI_RequestWindowSizeInPixels,
                       r1 =>

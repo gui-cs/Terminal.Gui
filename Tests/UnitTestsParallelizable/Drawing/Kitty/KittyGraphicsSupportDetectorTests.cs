@@ -1,10 +1,26 @@
 // Copilot - Claude Sonnet 4.6
 
+using System.Reflection;
+
 namespace DrawingTests;
 
 [Collection ("Environment Variable Tests")]
 public class KittyGraphicsSupportDetectorTests
 {
+    [Fact]
+    public void Constructor_DriverParameter_IsNonNullableContract ()
+    {
+        NullabilityInfoContext context = new ();
+
+        ConstructorInfo constructor = typeof (KittyGraphicsSupportDetector).GetConstructor ([typeof (IDriver)])
+                                      ?? throw new InvalidOperationException ("Driver constructor was not found.");
+
+        ParameterInfo parameter = Assert.Single (constructor.GetParameters ());
+
+        Assert.Equal (NullabilityState.NotNull, context.Create (parameter).ReadState);
+        Assert.Throws<ArgumentNullException> (() => new KittyGraphicsSupportDetector (null!));
+    }
+
     [Fact]
     public void Detect_WhenKittyWindowIdSet_ReturnsSupported ()
     {
@@ -184,42 +200,39 @@ public class KittyGraphicsSupportDetectorTests
 }
 
 [CollectionDefinition ("Environment Variable Tests", DisableParallelization = true)]
-public class EnvironmentVariableTestCollection { }
+public class EnvironmentVariableTestCollection
+{ }
 
 public class KittyGraphicsSupportDetectorCollectionTests
 {
     [Fact]
     public void DetectorTests_RunInNonParallelEnvironmentCollection ()
     {
-        object? collectionAttribute = typeof (KittyGraphicsSupportDetectorTests)
-                                      .GetCustomAttributes (inherit: false)
-                                      .SingleOrDefault (attribute => attribute.GetType ().Name == "CollectionAttribute");
+        object? collectionAttribute = typeof (KittyGraphicsSupportDetectorTests).GetCustomAttributes (false)
+                                                                                .SingleOrDefault (attribute => attribute.GetType ().Name
+                                                                                                      == "CollectionAttribute");
 
         Assert.NotNull (collectionAttribute);
 
-        string? collectionName = collectionAttribute!
-                                 .GetType ()
-                                 .GetProperty ("Name")
-                                 ?.GetValue (collectionAttribute) as string;
+        var collectionName = collectionAttribute.GetType ().GetProperty ("Name")?.GetValue (collectionAttribute) as string;
 
         Assert.Equal ("Environment Variable Tests", collectionName);
 
-        Type? collectionDefinitionType = typeof (KittyGraphicsSupportDetectorTests)
-                                         .Assembly
-                                         .GetType ("DrawingTests.EnvironmentVariableTestCollection");
+        Type? collectionDefinitionType = typeof (KittyGraphicsSupportDetectorTests).Assembly.GetType ("DrawingTests.EnvironmentVariableTestCollection");
 
         Assert.NotNull (collectionDefinitionType);
 
-        object? collectionDefinitionAttribute = collectionDefinitionType!
-                                                .GetCustomAttributes (inherit: false)
-                                                .SingleOrDefault (attribute => attribute.GetType ().Name == "CollectionDefinitionAttribute");
+        object? collectionDefinitionAttribute = collectionDefinitionType.GetCustomAttributes (false)
+                                                                         .SingleOrDefault (attribute => attribute.GetType ().Name
+                                                                                                        == "CollectionDefinitionAttribute");
 
         Assert.NotNull (collectionDefinitionAttribute);
 
-        bool disableParallelization = (bool)(collectionDefinitionAttribute!
-                                             .GetType ()
-                                             .GetProperty ("DisableParallelization")
-                                             ?.GetValue (collectionDefinitionAttribute) ?? false);
+        var disableParallelization = (bool)(collectionDefinitionAttribute
+                                            .GetType ()
+                                            .GetProperty ("DisableParallelization")
+                                            ?.GetValue (collectionDefinitionAttribute)
+                                            ?? false);
 
         Assert.True (disableParallelization);
     }
