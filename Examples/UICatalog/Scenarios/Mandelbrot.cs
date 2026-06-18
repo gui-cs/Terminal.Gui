@@ -2,7 +2,7 @@
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Mandelbrot", "Displays a sixel-rendered Mandelbrot set with live settings and an overlay dialog.")]
+[ScenarioMetadata ("Mandelbrot", "Demonstrates Sixel/Kitty Graphics Support with live settings and an overlay dialog.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Drawing")]
 public class Mandelbrot : Scenario
@@ -70,7 +70,14 @@ public class Mandelbrot : Scenario
 
         FrameView settings = new () { Title = "Settings", Y = Pos.Bottom (protocolLabel), Width = 34, Height = Dim.Fill () };
 
-        View display = new () { X = Pos.Right (settings), Y = Pos.Bottom (protocolLabel), Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
+        View display = new ()
+        {
+            X = Pos.Right (settings),
+            Y = Pos.Bottom (protocolLabel),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            CanFocus = true
+        };
 
         _status = new Label { X = Pos.Align (Alignment.Start), Y = Pos.Align (Alignment.Start), Width = Dim.Fill (), Height = 1 };
 
@@ -84,7 +91,7 @@ public class Mandelbrot : Scenario
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
             Arrangement = ViewArrangement.Resizable,
-            UseSixel = true
+            UseRasterGraphics = true
         };
         _mandelbrotView.CenterRequested += CenterMandelbrot;
 
@@ -377,7 +384,7 @@ public class Mandelbrot : Scenario
 
     private void ApplyRasterProtocolSelection ()
     {
-        if (_app?.Driver?.GetOutput () is { } output)
+        if (_app.Driver?.GetOutput () is { } output)
         {
             output.UseKittyGraphics = ShouldUseKittyGraphics ();
         }
@@ -392,12 +399,7 @@ public class Mandelbrot : Scenario
             return false;
         }
 
-        if (_osRasterProtocol?.Value == RASTER_PROTOCOL_SIXEL && _sixelSupportResult is { IsSupported: true })
-        {
-            return false;
-        }
-
-        return true;
+        return _osRasterProtocol.Value != RASTER_PROTOCOL_SIXEL || _sixelSupportResult is not { IsSupported: true };
     }
 
     private Size GetPreferredRasterResolution ()
@@ -422,13 +424,7 @@ public class Mandelbrot : Scenario
 
     private FrameView BuildCapabilityMatrix ()
     {
-        FrameView matrix = new ()
-        {
-            Title = "Raster Capability Matrix",
-            Width = Dim.Fill (),
-            Height = 7,
-            CanFocus = false
-        };
+        FrameView matrix = new () { Title = "Raster Capability Matrix", Width = Dim.Fill (), Height = 7, CanFocus = false };
 
         _driverStatus = new Label { Y = 0, Width = Dim.Fill () };
         Label header = new () { Y = 1, Width = Dim.Fill (), Text = "Renderer       Available   Resolution       Notes" };
@@ -444,17 +440,12 @@ public class Mandelbrot : Scenario
 
     private void UpdateRasterCapabilityMatrix ()
     {
-        if (_cellStatus is null)
-        {
-            return;
-        }
-
         bool kittyActive = _mandelbrotView is { IsUsingRasterGraphics: true } && ShouldUseKittyGraphics ();
         bool sixelActive = _mandelbrotView is { IsUsingRasterGraphics: true } && !ShouldUseKittyGraphics () && _sixelSupportResult is { IsSupported: true };
         bool cellActive = !kittyActive && !sixelActive;
-        string driverName = _app?.Driver?.GetName () ?? "unknown";
-        bool trueColor = _app?.Driver?.SupportsTrueColor == true;
-        bool legacy = _app?.Driver?.IsLegacyConsole == true;
+        string driverName = _app.Driver?.GetName () ?? "unknown";
+        bool trueColor = _app.Driver?.SupportsTrueColor == true;
+        bool legacy = _app.Driver?.IsLegacyConsole == true;
 
         _driverStatus.Text = $"Driver: {driverName}; true color: {YesNo (trueColor)}; legacy console: {YesNo (legacy)}";
         _cellStatus.Text = Row ("Cell colors", "yes", "1 cell", cellActive ? "active" : "fallback");
@@ -465,6 +456,7 @@ public class Mandelbrot : Scenario
 
         bool? sixelSupported = _sixelSupportResult is { IsSupported: true };
         string sixelResolution = _sixelSupportResult is { IsSupported: true } ? SizeText (_sixelSupportResult.Resolution) : "-";
+
         string sixelNotes = _sixelSupportResult is { IsSupported: true }
                                 ? $"{_sixelSupportResult.MaxPaletteColors} colors; alpha {YesNo (_sixelSupportResult.SupportsTransparency)}"
                                 : "fallback after Kitty";
@@ -472,16 +464,11 @@ public class Mandelbrot : Scenario
 
         UpdateRasterProtocolSelector ();
         _selectedStatus.Text = $"Selected raster path: {GetSelectedRendererName (kittyActive, sixelActive)}";
-        _window?.SetNeedsDraw ();
+        _window.SetNeedsDraw ();
     }
 
     private void UpdateRasterProtocolSelector ()
     {
-        if (_osRasterProtocol is null)
-        {
-            return;
-        }
-
         bool bothSupported = _kittyGraphicsSupportResult is { IsSupported: true } && _sixelSupportResult is { IsSupported: true };
         _osRasterProtocol.Enabled = bothSupported;
 

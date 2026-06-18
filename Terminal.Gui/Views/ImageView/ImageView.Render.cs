@@ -196,16 +196,18 @@ public partial class ImageView
         string? encodedSixel = null;
         string? encodedKitty = null;
 
-        if (request.Key.UseRasterGraphics)
+        if (!request.Key.UseRasterGraphics)
         {
-            if (request.Key.UseKitty)
-            {
-                encodedKitty = new KittyGraphicsEncoder ().EncodeKitty (scaledImage, cellSize.Width, cellSize.Height, request.KittyImageId);
-            }
-            else
-            {
-                encodedSixel = request.Encoder?.EncodeSixel (scaledImage);
-            }
+            return new RenderResult (request.Key, scaledImage, cellSize, encodedSixel, encodedKitty);
+        }
+
+        if (request.Key.UseKitty)
+        {
+            encodedKitty = new KittyGraphicsEncoder ().EncodeKitty (scaledImage, cellSize.Width, cellSize.Height, request.KittyImageId);
+        }
+        else
+        {
+            encodedSixel = request.Encoder?.EncodeSixel (scaledImage);
         }
 
         return new RenderResult (request.Key, scaledImage, cellSize, encodedSixel, encodedKitty);
@@ -384,14 +386,13 @@ public partial class ImageView
                                               bool AllowUpscale,
                                               bool PreserveAspectRatio);
 
-    private sealed class RenderRequest (
-        RenderKey key,
-        Color [,] source,
-        RectangleF visibleSource,
-        Size targetSize,
-        Size? resolution,
-        SixelEncoder? encoder,
-        int kittyImageId)
+    private sealed class RenderRequest (RenderKey key,
+                                        Color [,] source,
+                                        RectangleF visibleSource,
+                                        Size targetSize,
+                                        Size? resolution,
+                                        SixelEncoder? encoder,
+                                        int kittyImageId)
     {
         public RenderKey Key { get; } = key;
         public Color [,] Source { get; } = source;
