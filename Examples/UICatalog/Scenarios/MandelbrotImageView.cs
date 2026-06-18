@@ -6,7 +6,7 @@ internal sealed class MandelbrotImageView : ImageView
 {
     internal const int DefaultColumns = 30;
     internal const int DefaultRows = 20;
-    internal const double MinimumSpan = 0.05;
+    internal const double MinimumSpan = double.Epsilon;
     internal const int MinimumIterations = 8;
 
     private const double DEFAULT_CENTER_X = -0.5;
