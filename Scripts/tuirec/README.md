@@ -221,6 +221,79 @@ tuirec record `
 - **Generous waits** — 1800ms between feature demonstrations so viewers
   can absorb each state change
 
+### Example: Mandelbrot Scenario (Sixel/Kitty raster)
+
+The `Mandelbrot` scenario renders a live fractal through the raster-graphics
+pipeline. It produces `docfx/images/Mandelbrot.gif`. Record it on **Linux/macOS
+only** — Windows ConPTY strips the sixel DCS (see Troubleshooting).
+
+```bash
+# Build ScenarioRunner first (Release).
+dll="./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
+zin=$(printf '+,%.0s' {1..16}); zout=$(printf -- '-,%.0s' {1..16})
+ks="wait:300,click:39:9,wait:1100,drag:63:19:37:19,wait:1200,\
+CursorLeft,CursorLeft,CursorLeft,wait:800,${zin}wait:1300,\
+CursorLeft,CursorLeft,CursorLeft,CursorLeft,wait:350,CursorUp,CursorUp,CursorUp,wait:350,\
+CursorRight,CursorRight,CursorRight,CursorRight,CursorRight,CursorRight,wait:350,\
+CursorDown,CursorDown,CursorDown,CursorDown,wait:350,CursorLeft,CursorLeft,CursorLeft,\
+wait:1100,${zout}wait:1200,Esc"
+
+tuirec record \
+    --binary dotnet \
+    --args "$dll,run,Mandelbrot" \
+    --name Mandelbrot --title "Mandelbrot" \
+    --keystrokes "$ks" \
+    --startup-delay 600 --drain 1200 \
+    --cols 120 --rows 30 --open --copy
+
+cp artifacts/Mandelbrot.gif docfx/images/Mandelbrot.gif
+```
+
+**Script breakdown:**
+
+| Step | Tokens | What happens |
+|------|--------|--------------|
+| 1 | `wait:300,click:39:9` | Select the **Sixel** raster radio (see "Force Sixel" below) |
+| 2 | `wait:1100` | Hold on the default centered fractal |
+| 3 | `drag:63:19:37:19` | Drag the image's **left border** out to the display edge — top-left corner as far up/left as possible (see "Resize is mouse-only" below) |
+| 4 | `CursorLeft`×3 | Pan to the left antenna, center `(-1.4, 0)` |
+| 5 | `+`×16 | Zoom way in (span 3 → 0.084) onto a mini-Mandelbrot satellite |
+| 6 | arrow keys | Pan around the antenna detail at depth |
+| 7 | `-`×16 | Zoom back out to the full set |
+| 8 | `Esc` | Quit |
+
+**Two non-obvious gotchas — both will silently ruin the recording:**
+
+- **Force Sixel — the default Auto mode picks Kitty graphics, which `agg`
+  cannot render** (the image box renders **blank**). Click the `Sixel` radio
+  (`click:39:9` at `--cols 120 --rows 30`) to switch the protocol. Click only
+  *after* the DA1/sixel handshake completes — clicking before **both** Kitty and
+  Sixel are detected resets the selector back to Auto. With `--startup-delay 600`
+  the click at `wait:300` lands at ~0.66s, just after detection, leaving only a
+  ~0.5s blank-Kitty flash in the intro. Verify the protocol actually switched by
+  grepping the cast for the render-mode status transitions:
+  `Cell fallback` → … → `Sixel raster` (not stuck on `Kitty raster`).
+- **Resize is mouse-only.** Moving the top-left corner up/left needs the Top and
+  Left resize handles, but keyboard arrange-mode handle-cycling is currently
+  **dead code** (`Arranger.HandleArrangeModeTab` is never bound to a key — Tab
+  just navigates focus away). Keyboard arrange (`Ctrl+F5` + arrows) only does
+  all-size = bottom-right resize, which keeps the top-left **fixed** and cannot
+  satisfy the goal. Use a mouse edge-drag instead: the box's left border sits at
+  screen col ~63, so `drag:63:19:37:19` grows the left edge out to the display's
+  left edge. The view is `ViewArrangement.Resizable`, so dragging any border edge
+  resizes directly — no `Ctrl+F5` needed.
+
+**Other notes:**
+- Keyboard zoom (`+`/`-`) is **centered on the current center**, so pan onto
+  interesting detail *first*. The left antenna `(-1.4, 0)` is symmetric about
+  `y = 0`, so it stays centered while zooming. Reset is `Home` or `0`.
+- Don't zoom past ~20 steps: at the default 80 iterations the detail flattens
+  into color bands. ~16 steps (span ≈ 0.084) is the sweet spot.
+- Keep `--trim` on (default): it rebases t=0 to the first cell-fallback draw and
+  drops the startup blank. `--trim=false` leaves a ~2.5s blank lead-in.
+- No `ffmpeg`/`gifsicle`/ImageMagick on the box? Extract frames for review with
+  Python + Pillow (`PIL.ImageSequence.Iterator`).
+
 ---
 
 ## Recording Individual View Sub-classes with EnableForDesign
