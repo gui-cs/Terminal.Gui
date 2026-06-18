@@ -52,6 +52,20 @@ public class StaleContentSizeCaptureTests
         }
     }
 
+    /// <summary>
+    ///     A View subclass that calls <see cref="View.SetContentSize"/> from the <c>SubViewLayout</c>
+    ///     event (raised before SubViews are laid out, after <see cref="View.OnSubViewLayout"/>).
+    /// </summary>
+    private class ContentSizeChangingOnSubViewLayoutEventView : View
+    {
+        public Size NewContentSize { get; set; }
+
+        public ContentSizeChangingOnSubViewLayoutEventView ()
+        {
+            SubViewLayout += (_, _) => { SetContentSize (NewContentSize); };
+        }
+    }
+
     #endregion
 
     #region Test 1: Core stale capture
@@ -284,6 +298,47 @@ public class StaleContentSizeCaptureTests
         // On current code, the child was already laid out before SubViewsLaidOut fired.
         Assert.Equal (80, child.Frame.Width);
         Assert.Equal (30, child.Frame.Height);
+    }
+
+    #endregion
+
+    #region Test 5b: SubViewLayout event SetContentSize is honored
+
+    // Claude - Opus 4.8
+    /// <summary>
+    ///     Regression test for the <c>SubViewLayout</c> <b>event</b> companion to the
+    ///     <c>OnSubViewLayout</c> virtual fixed by #4863. A handler on the <c>SubViewLayout</c> event
+    ///     that calls <see cref="View.SetContentSize"/> must be honored: <see cref="View.LayoutSubViews"/>
+    ///     re-reads the content size after raising the event, so SubViews are laid out against the
+    ///     updated value rather than the size captured before the event fired. See issue #4522.
+    /// </summary>
+    [Fact]
+    public void LayoutSubViews_Honors_SetContentSize_From_SubViewLayout_Event ()
+    {
+        ContentSizeChangingOnSubViewLayoutEventView superView = new ()
+        {
+            Width = 20,
+            Height = 10,
+            NewContentSize = new Size (50, 20)
+        };
+
+        View child = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        superView.Add (child);
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.Layout ();
+
+        // The child should fill the content size set from the SubViewLayout event handler,
+        // not the value captured before the event fired.
+        Assert.Equal (50, child.Frame.Width);
+        Assert.Equal (20, child.Frame.Height);
+
+        superView.Dispose ();
     }
 
     #endregion
