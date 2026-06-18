@@ -13,15 +13,14 @@ namespace Terminal.Gui.Views;
 ///         has no dependency on any image library.
 ///     </para>
 ///     <para>
-///         When sixel is available (detected via <see cref="IDriver.SixelSupport"/>) and
-///         <see cref="UseSixel"/> is <see langword="true"/>, the view will encode the image as
-///         sixel escape sequences and render it through the driver's output buffer. Sixel data
-///         is only re-sent to the terminal when <see cref="View.NeedsDraw"/> is true,
+///         When <see cref="UseRasterGraphics"/> is <see langword="true"/>, the view renders through
+///         the best raster protocol available to the driver: Kitty graphics first, then Sixel.
+///         Raster data is only re-sent to the terminal when <see cref="View.NeedsDraw"/> is true,
 ///         avoiding redundant rendering of unchanged images.
 ///     </para>
 ///     <para>
-///         When sixel is not available, the view falls back to cell-based rendering where each
-///         terminal cell is colored with the background color of the corresponding pixel.
+///         When no raster protocol is available, the view falls back to cell-based rendering where
+///         each terminal cell is colored with the background color of the corresponding pixel.
 ///     </para>
 /// </remarks>
 public partial class ImageView : View, IDesignable
@@ -155,14 +154,13 @@ public partial class ImageView : View, IDesignable
     public bool UseRasterGraphics { get; set; } = true;
 
     /// <summary>
-    ///     Gets whether to prefer sixel rendering when the terminal supports it.
+    ///     Gets whether to prefer raster rendering when the terminal supports it.
     ///     Default is <see langword="true"/>.
     /// </summary>
     /// <remarks>
-    ///     When <see langword="true"/> and the terminal supports sixel
-    ///     (per <see cref="IDriver.SixelSupport"/>), the image is rendered using sixel
-    ///     escape sequences for full-resolution display. When <see langword="false"/>,
-    ///     cell-based rendering is always used.
+    ///     This obsolete compatibility property delegates to <see cref="UseRasterGraphics"/>.
+    ///     When <see langword="true"/>, Kitty graphics is preferred and Sixel is used as the
+    ///     fallback. When <see langword="false"/>, cell-based rendering is always used.
     /// </remarks>
     [Obsolete ("Use UseRasterGraphics instead. UseSixel will be removed in a future version.")]
     public bool UseSixel

@@ -1,3 +1,5 @@
+#nullable enable
+
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 // ReSharper disable AccessToDisposedClosure
@@ -14,31 +16,31 @@ public class Images : Scenario
     private const int RASTER_PROTOCOL_KITTY = 1;
     private const int RASTER_PROTOCOL_SIXEL = 2;
 
-    private IApplication _app;
-    private ImageView _cellImageView;
-    private CheckBox _cbUseRasterGraphics;
-    private Label _cellStatus;
-    private Label _driverStatus;
-    private DoomFire _fire;
-    private SixelEncoder _fireEncoder;
+    private IApplication _app = null!;
+    private ImageView _cellImageView = null!;
+    private CheckBox _cbUseRasterGraphics = null!;
+    private Label _cellStatus = null!;
+    private Label _driverStatus = null!;
+    private DoomFire _fire = null!;
+    private SixelEncoder _fireEncoder = null!;
     private int _fireFrameCounter;
-    private Image<Rgba32> _fullResImage;
+    private Image<Rgba32> _fullResImage = null!;
     private bool _isDisposed;
-    private Label _kittyStatus;
-    private KittyGraphicsSupportResult _kittyGraphicsSupportResult;
-    private OptionSelector _osDistanceAlgorithm;
-    private OptionSelector _osPaletteBuilder;
-    private OptionSelector _osRasterProtocol;
-    private NumericUpDown _popularityThreshold;
-    private NumericUpDown _pxX;
-    private NumericUpDown _pxY;
-    private ImageView _rasterImageView;
-    private View _rasterSettings;
-    private Label _selectedStatus;
-    private Label _sixelStatus;
-    private SixelSupportResult _sixelSupportResult;
-    private View _tabRaster;
-    private Window _win;
+    private Label _kittyStatus = null!;
+    private KittyGraphicsSupportResult? _kittyGraphicsSupportResult;
+    private OptionSelector _osDistanceAlgorithm = null!;
+    private OptionSelector _osPaletteBuilder = null!;
+    private OptionSelector _osRasterProtocol = null!;
+    private NumericUpDown _popularityThreshold = null!;
+    private NumericUpDown _pxX = null!;
+    private NumericUpDown _pxY = null!;
+    private ImageView _rasterImageView = null!;
+    private View _rasterSettings = null!;
+    private Label _selectedStatus = null!;
+    private Label _sixelStatus = null!;
+    private SixelSupportResult? _sixelSupportResult;
+    private View _tabRaster = null!;
+    private Window _win = null!;
     private Size _winSize;
 
     public override void Main ()
@@ -222,7 +224,7 @@ public class Images : Scenario
         return matrix;
     }
 
-    private void BtnStartFireOnAccept (object sender, CommandEventArgs e)
+    private void BtnStartFireOnAccept (object? sender, CommandEventArgs e)
     {
         if (_fire != null)
         {
@@ -317,12 +319,12 @@ public class Images : Scenario
         tabRaster.Add (_rasterImageView, _rasterSettings);
     }
 
-    private void Driver_KittyGraphicsSupportChanged (object sender, ValueChangedEventArgs<KittyGraphicsSupportResult> e)
+    private void Driver_KittyGraphicsSupportChanged (object? sender, ValueChangedEventArgs<KittyGraphicsSupportResult?> e)
     {
         UpdateRasterSupportState (_app.Driver?.SixelSupport, e.NewValue);
     }
 
-    private void Driver_SixelSupportChanged (object sender, ValueChangedEventArgs<SixelSupportResult> e)
+    private void Driver_SixelSupportChanged (object? sender, ValueChangedEventArgs<SixelSupportResult?> e)
     {
         UpdateRasterSupportState (e.NewValue, _app.Driver?.KittyGraphicsSupport);
     }
@@ -495,7 +497,7 @@ public class Images : Scenario
         return colors;
     }
 
-    private void OpenImage (object sender, CommandEventArgs e)
+    private void OpenImage (object? sender, CommandEventArgs e)
     {
         OpenDialog ofd = new () { Title = "Open Image", AllowsMultipleSelection = false };
         _app?.Run (ofd);
@@ -606,7 +608,7 @@ public class Images : Scenario
         _rasterImageView.Image = image;
     }
 
-    private void UpdateRasterSupportState (SixelSupportResult sixelResult, KittyGraphicsSupportResult kittyResult)
+    private void UpdateRasterSupportState (SixelSupportResult? sixelResult, KittyGraphicsSupportResult? kittyResult)
     {
         _sixelSupportResult = sixelResult;
         _kittyGraphicsSupportResult = kittyResult;
@@ -683,7 +685,7 @@ public class Images : Scenario
 
     private static string YesNo (bool value) => value ? "yes" : "no";
 
-    private void Win_SubViewsLaidOut (object sender, LayoutEventArgs e)
+    private void Win_SubViewsLaidOut (object? sender, LayoutEventArgs e)
     {
         Size currentSize = _win.Viewport.Size;
 
