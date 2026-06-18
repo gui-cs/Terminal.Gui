@@ -3,7 +3,7 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     Displays an image represented as a 2D array of <see cref="Color"/> pixels.
 ///     Supports two rendering modes: cell-based (one colored space per pixel, works everywhere)
-///     and sixel-based (when the terminal supports it).
+///     and raster-based (for terminals that support either the Sixel or Kitty graphics protocols).
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -354,7 +354,7 @@ public partial class ImageView : View, IDesignable
     }
 
     private bool IsKittyGraphicsActive () =>
-        App?.Driver is { KittyGraphicsSupport: { IsSupported: true } } driver && driver.GetOutput ().UseKittyGraphics;
+        App?.Driver is { KittyGraphicsSupport.IsSupported: true } driver && driver.GetOutput ().UseKittyGraphics;
 
     /// <summary>
     ///     Returns the size in cell terms of the given image resized to fit in the viewport.
