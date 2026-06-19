@@ -91,9 +91,15 @@ Most draw steps can be overridden using the [Cancellable Work Pattern](cancellab
 Clipping enables better performance and features like shadows by ensuring regions of the terminal that need to be drawn actually get drawn by the driver. Terminal.Gui supports non-rectangular clip regions with <xref:Terminal.Gui.Drawing.Region>. The driver.Clip is the application managed clip region and is managed by <xref:Terminal.Gui.App.Application>. Developers cannot change this directly, but can use `SetClipToScreen()`, `SetClip()`(Terminal.Gui.Region), `SetClipToFrame()`, etc...
 
 
-## Sixel Raster Images
+## Raster Images (Kitty and Sixel)
 
-Terminal.Gui can render raster images through the same deferred drawing pipeline as text and line art. <xref:Terminal.Gui.Views.ImageView> accepts a `Color[,]` pixel buffer. When `ImageView.UseSixel` is `true` and <xref:Terminal.Gui.Drivers.IDriver.SixelSupport> reports support, the view encodes the pixels with <xref:Terminal.Gui.Drawing.SixelEncoder> and stores a raster image command in the driver's output buffer.
+Terminal.Gui can render raster images through the same deferred drawing pipeline as text and line art. <xref:Terminal.Gui.Views.ImageView> accepts a `Color[,]` pixel buffer. When `ImageView.UseRasterGraphics` is `true`, the driver uses the best available terminal raster protocol:
+
+1. Kitty graphics, when <xref:Terminal.Gui.Drivers.IDriver.KittyGraphicsSupport> reports support and the output path has Kitty enabled.
+2. Sixel, when Kitty is not active and <xref:Terminal.Gui.Drivers.IDriver.SixelSupport> reports support.
+3. Cell rendering, when no raster protocol is available.
+
+Kitty is preferred because it supports full RGBA pixels and works well in modern macOS terminals such as Kitty, Ghostty, and WezTerm. Sixel remains the fallback for terminals such as Windows Terminal and xterm. The obsolete `ImageView.UseSixel` and `ImageView.IsUsingSixel` members still work as compatibility shims; use `UseRasterGraphics` and `IsUsingRasterGraphics` in new code.
 
 Raster image commands participate in normal composition:
 
@@ -105,19 +111,21 @@ Raster image commands participate in normal composition:
 To render an image, assign the pixel buffer and mark the view for drawing:
 
 ```cs
+Color [,] pixels = new Color [1, 1];
+
 ImageView imageView = new ()
 {
     Width = 30,
     Height = 20,
-    UseSixel = true
+    UseRasterGraphics = true
 };
 
 imageView.Image = pixels;
 ```
 
-To customize sixel encoding, assign `ImageView.SixelEncoder` before setting `Image`. Terminals that do not report sixel support use ImageView's cell-based fallback.
+To customize Sixel encoding, assign `ImageView.SixelEncoder` before setting `Image`. Kitty output is encoded by the driver/output layer and does not use `SixelEncoder`.
 
-The UICatalog Mandelbrot scenario demonstrates a resizable `ImageView` with a double-line border and a runnable dialog drawn over the raster image.
+The UICatalog Images scenario demonstrates runtime protocol selection, and the Mandelbrot scenario demonstrates a custom `ImageView` that re-renders fractal pixels while zooming and panning.
 
 ![Mandelbrot sixel raster demo](../images/Mandelbrot.gif)
 

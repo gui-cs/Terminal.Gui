@@ -14,14 +14,15 @@ public partial class ImageView
             return true;
         }
 
-        if (IsUsingSixel)
+        if (IsUsingRasterGraphics)
         {
-            DrawSixel ();
+            DrawRasterImage ();
 
             if (_scaledImageCellSize is not { } cellSize)
             {
                 return true;
             }
+
             Rectangle viewport = ViewportToScreen ();
             Rectangle dirtyRect = viewport with { Width = Math.Min (viewport.Width, cellSize.Width), Height = Math.Min (viewport.Height, cellSize.Height) };
             context?.AddDrawnRectangle (dirtyRect);
@@ -34,6 +35,7 @@ public partial class ImageView
             {
                 return true;
             }
+
             Rectangle viewport = ViewportToScreen ();
             Rectangle dirtyRect = viewport with { Width = Math.Min (viewport.Width, cellSize.Width), Height = Math.Min (viewport.Height, cellSize.Height) };
             context?.AddDrawnRectangle (dirtyRect);
@@ -92,9 +94,9 @@ public partial class ImageView
     }
 
     /// <summary>
-    ///     Renders the image using sixel escape sequences.
+    ///     Renders the image using a raster graphics protocol (Kitty or Sixel).
     /// </summary>
-    private void DrawSixel ()
+    private void DrawRasterImage ()
     {
         RenderRequest? request = CreateRenderRequest (true);
 
@@ -105,7 +107,7 @@ public partial class ImageView
 
         EnsureScaledImage (request);
 
-        if (_scaledImage is null || _scaledImageCellSize is null || SixelEncoder is null || App?.Driver is not { } driver)
+        if (_scaledImage is null || _scaledImageCellSize is null || App?.Driver is not { } driver)
         {
             return;
         }
@@ -121,11 +123,25 @@ public partial class ImageView
             return;
         }
 
+        // Mark the image's covered cells transparent so the output layer treats them as raster-owned
+        // and lets the terminal-composited image show through. Opaque overlay cells drawn later (e.g.
+        // a View's shadow) keep their background and so still paint over the image. See issue #5502.
+        SetAttribute (new Attribute (Color.None, Color.None));
+
+        for (var row = 0; row < destinationSize.Height; row++)
+        {
+            for (var col = 0; col < destinationSize.Width; col++)
+            {
+                AddRune (offset.X + col, offset.Y + row, (Rune)' ');
+            }
+        }
+
         RasterImageCommand command = new ()
         {
             Id = RasterImageId,
             Pixels = _scaledImage,
             EncodedSixel = _encodedSixel,
+            EncodedKitty = _encodedKitty,
             DestinationCells = destinationCells,
             Encoder = SixelEncoder,
             IsDirty = true

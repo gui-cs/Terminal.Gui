@@ -1237,6 +1237,213 @@ public class OutputBaseTests
     }
 
     [Fact]
+    public void Write_RasterImage_RenderAfterText_RendersAfterDirtyCells ()
+    {
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "animated-overlay",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2),
+            RenderAfterText = true
+        };
+
+        buffer.AddRasterImage (command);
+        buffer.Move (0, 0);
+        buffer.AddStr ("\u03a9");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        int textIndex = rendered.IndexOf ("\u03a9", StringComparison.Ordinal);
+        int imageIndex = rendered.IndexOf ("\u001bP", StringComparison.Ordinal);
+        Assert.InRange (textIndex, 0, imageIndex - 1);
+    }
+
+    [Fact]
+    public void Write_SixelRasterImage_SkipsDirtyBlankCellsCoveredByRaster ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        const string encodedSixel = "\u001bPIMG\u001b\\";
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        int imageIndex = rendered.IndexOf (encodedSixel, StringComparison.Ordinal);
+        Assert.True (imageIndex >= 0);
+        Assert.DoesNotContain (" ", rendered [(imageIndex + encodedSixel.Length)..]);
+    }
+
+    [Fact]
+    public void Write_SixelRasterImage_RenderAfterText_SkipsDirtyBlankCellsBeforeRaster ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        const string encodedSixel = "\u001bPIMG\u001b\\";
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 1, 1),
+            RenderAfterText = true
+        });
+
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        int imageIndex = rendered.IndexOf (encodedSixel, StringComparison.Ordinal);
+        Assert.True (imageIndex >= 0);
+        Assert.DoesNotContain (" ", rendered [..imageIndex]);
+    }
+
+    [Fact]
+    public void ToAnsi_SixelRasterImage_SkipsBlankCellsCoveredByRaster ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        const string encodedSixel = "\u001bPIMG\u001b\\";
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        string ansi = output.ToAnsi (buffer);
+
+        int imageIndex = ansi.IndexOf (encodedSixel, StringComparison.Ordinal);
+        Assert.True (imageIndex >= 0);
+        Assert.DoesNotContain (" ", ansi [(imageIndex + encodedSixel.Length)..]);
+    }
+
+    // Claude - Opus 4.8
+    [Fact]
+    public void Write_SixelRasterImage_EmitsOpaqueBlankOverlayCell_SoShadowsOverlayImage ()
+    {
+        // A blank cell that carries a real (opaque) background — e.g. a View's shadow — drawn over a
+        // raster image's DestinationCells must still be emitted so it visually overlays the image.
+        // Only transparent (alpha-0) blanks are owned by the image and suppressed. See issue #5502.
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        const string encodedSixel = "PIMG\\";
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        // Opaque dimmed background simulating a shadow cell drawn over the image.
+        buffer.CurrentAttribute = new (Color.White, new Color (32, 32, 32));
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        int imageIndex = rendered.IndexOf (encodedSixel, StringComparison.Ordinal);
+        Assert.True (imageIndex >= 0);
+
+        // The opaque overlay blank is emitted after the image so it paints over the sixel pixels.
+        string afterImage = rendered [(imageIndex + encodedSixel.Length)..];
+        Assert.Contains ("[48;2;32;32;32m", afterImage);
+        Assert.Contains (" ", afterImage);
+    }
+
+    // Claude - Opus 4.8
+    [Fact]
+    public void Write_KittyRasterImage_EmitsOpaqueBlankOverlayCell_SoShadowsOverlayImage ()
+    {
+        // Kitty images are placed at z=-1 (below the text layer), so an opaque overlay blank — a
+        // shadow — must be emitted (not cleared to transparent) so it appears above the image. Only
+        // transparent (alpha-0) blanks owned by the image are cleared so the image shows through.
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        // Opaque dimmed background simulating a shadow cell drawn over the image.
+        buffer.CurrentAttribute = new (Color.White, new Color (32, 32, 32));
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        Assert.Contains ("\x1b_G", rendered);
+
+        // The opaque overlay blank's background is emitted rather than reset to transparent.
+        Assert.Contains ("[48;2;32;32;32m", rendered);
+    }
+
+    [Fact]
+    public void Write_KittyRasterImage_OverPreviousCleanGlyph_EmitsTransparentBlankClear ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        buffer.AddStr ("X");
+        output.Write (buffer);
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        Assert.Contains ("\x1b_G", rendered);
+        Assert.DoesNotContain ("X", rendered);
+        Assert.Contains (" ", rendered);
+    }
+
+    [Fact]
     public void DriverImpl_SixelSupport_DefaultsToNull ()
     {
         // Arrange & Act
@@ -1332,6 +1539,280 @@ public class OutputBaseTests
         driver.Dispose ();
     }
 
+    // Copilot - Claude Sonnet 4.6
+    [Fact]
+    public void ToAnsi_RasterImage_EmitsKittyApcWhenKittyEnabled ()
+    {
+        // Arrange
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        string kittyPayload = new KittyGraphicsEncoder ().EncodeKitty (
+            CreateSolidImage (20, 40, new Color (255, 0, 0)),
+            2,
+            2);
+
+        RasterImageCommand command = new ()
+        {
+            Id = "kitty-test",
+            Pixels = CreateSolidImage (20, 40, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2),
+            EncodedKitty = kittyPayload
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: Kitty APC escape sequence emitted
+        Assert.Contains ("\x1b_G", ansi);
+        Assert.Contains ("a=T", ansi);
+        Assert.Contains ("f=32", ansi);
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    [Fact]
+    public void ToAnsi_RasterImage_EmitsSixelWhenKittyNotEnabled ()
+    {
+        // Arrange
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "sixel-test",
+            Pixels = CreateSolidImage (20, 40, new Color (0, 0, 255)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: Sixel DCS sequence emitted (no Kitty APC)
+        Assert.Contains ("\x1bP", ansi);
+        Assert.DoesNotContain ("\x1b_G", ansi);
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    [Fact]
+    public void ToAnsi_RasterImage_KittyUsesEncodedKittyWhenCellsMatch ()
+    {
+        // When EncodedKitty is pre-computed and cells match the clip, it is used verbatim.
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        string precomputed = "\x1b_Ga=T,f=32,s=2,v=2,c=2,r=2,q=2,m=0;AAAAAA==\x1b\\";
+
+        RasterImageCommand command = new ()
+        {
+            Id = "precomputed",
+            Pixels = CreateSolidImage (2, 2, new Color (0, 255, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2),
+            EncodedKitty = precomputed
+        };
+
+        buffer.AddRasterImage (command);
+
+        string ansi = output.ToAnsi (buffer);
+
+        Assert.Contains (precomputed, ansi);
+    }
+
+    // Claude - Opus 4.8
+    // Kitty images draw with z=-1 (below text), so any glyph left in a covered cell renders ON TOP
+    // of the image. When an ImageView grows, cells that used to be its border become interior cells
+    // under the image; if their old glyph (e.g. ║) is not cleared, it shows as a stale line over the
+    // image. Adding a raster image over a cell that holds a glyph must clear that glyph.
+    [Fact]
+    public void ToAnsi_KittyRasterImage_OverCellWithGlyph_DoesNotRenderStaleGlyph ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 1);
+
+        // Stale border-like glyphs sitting where the image will be placed.
+        buffer.AddStr ("║║║║");
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 1)
+        });
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: the image is emitted, and no stale glyph is rendered over it.
+        Assert.Contains ("\x1b_G", ansi);
+        Assert.DoesNotContain ("║", ansi);
+    }
+
+    [Fact]
+    public void ToAnsi_RasterImage_KittyOutput_UsesNegativeZIndex ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        RasterImageCommand command = new ()
+        {
+            Id = "kitty-z-index",
+            Pixels = CreateSolidImage (20, 40, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        buffer.AddRasterImage (command);
+
+        string ansi = output.ToAnsi (buffer);
+
+        Assert.Contains ("z=-1", ansi);
+    }
+
+    // Claude - Opus 4.8
+    // Kitty placements persist on screen until explicitly deleted. When a Kitty image is resized
+    // (re-added with a smaller destination), the previous, larger placement must be deleted before
+    // the new one is placed — otherwise it lingers outside the new frame.
+    [Fact]
+    public void Write_KittyRasterImage_Resized_EmitsDeleteBeforeReplacement ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        });
+        output.Write (buffer);
+
+        // Resize smaller — re-add with a smaller destination.
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (4, 4, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        });
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert: the delete-by-image-id sequence precedes the new placement.
+        string delete = KittyGraphicsEncoder.EncodeDeletePlacements (KittyGraphicsEncoder.GetImageId ("image"));
+        int deleteIdx = result.IndexOf (delete, StringComparison.Ordinal);
+        int placeIdx = result.IndexOf ("a=T", StringComparison.Ordinal);
+
+        Assert.True (deleteIdx >= 0, "Resize must emit a Kitty delete for the prior placement");
+        Assert.True (placeIdx > deleteIdx, "Delete must precede the replacement placement");
+    }
+
+    // Claude - Opus 4.8
+    // When a Kitty image is removed from the buffer, the next Write must delete its placement so it
+    // does not linger on screen (Sixel needs no such delete — redrawing the cells erases it).
+    [Fact]
+    public void Write_KittyRasterImage_Removed_EmitsDelete ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        });
+        output.Write (buffer);
+
+        // Act: remove the image and render the next frame.
+        buffer.RemoveRasterImage ("image");
+        buffer.AddStr ("x");
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert
+        string delete = KittyGraphicsEncoder.EncodeDeletePlacements (KittyGraphicsEncoder.GetImageId ("image"));
+        Assert.Contains (delete, result);
+    }
+
+    // Claude - Opus 4.8
+    // The removal delete is Kitty-specific: with Sixel output no APC delete must be emitted.
+    [Fact]
+    public void Write_SixelRasterImage_Removed_DoesNotEmitKittyDelete ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        });
+        output.Write (buffer);
+
+        // Act
+        buffer.RemoveRasterImage ("image");
+        buffer.AddStr ("x");
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert: no Kitty APC of any kind.
+        Assert.DoesNotContain ("\x1b_G", result);
+    }
+
+    // Claude - Opus 4.8
+    // When a Kitty image's visible region is fragmented into multiple rectangles by clipping (e.g.
+    // a SubView punches a hole in it), each fragment must use a DISTINCT Kitty image id. Sharing one
+    // id makes each a=T overwrite the previous fragment's transmitted data, corrupting the image.
+    [Fact]
+    public void Write_KittyRasterImage_FragmentedClip_UsesDistinctImageIdsPerFragment ()
+    {
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+
+        // Two disjoint horizontal strips → GetVisibleRasterCellRectangles yields two rectangles.
+        Region clip = new (new Rectangle (0, 0, 4, 1));
+        clip.Combine (new Rectangle (0, 3, 4, 1), RegionOp.Union);
+        buffer.Clip = clip;
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (8, 8, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 4, 4)
+        });
+
+        // Act
+        output.Write (buffer);
+        string result = output.GetLastOutput ();
+
+        // Assert: both fragment ids appear, and they differ.
+        int id0 = KittyGraphicsEncoder.GetImageId ("image");
+        int id1 = KittyGraphicsEncoder.GetImageId ("image#1");
+        Assert.NotEqual (id0, id1);
+        Assert.Contains ($"i={id0}", result);
+        Assert.Contains ($"i={id1}", result);
+    }
+
     private static Color [,] CreateSolidImage (int width, int height, Color color)
     {
         Color [,] image = new Color [width, height];
@@ -1345,5 +1826,55 @@ public class OutputBaseTests
         }
 
         return image;
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // When Kitty is supported, UseKittyGraphics must be enabled — even if Sixel is also available,
+    // because Kitty is the preferred protocol.
+    [Fact]
+    public void SetKittyGraphicsSupport_WhenSixelAlsoSupported_EnablesKittyOutput ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+
+        DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 output,
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Assert: Kitty has priority — Kitty output MUST be enabled even when Sixel is also available
+        Assert.True (output.UseKittyGraphics);
+
+        driver.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // When Sixel is NOT available, UseKittyGraphics should be enabled.
+    [Fact]
+    public void SetKittyGraphicsSupport_WhenSixelNotSupported_EnablesKittyOutput ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+
+        DriverImpl driver = new (
+                                 new AnsiComponentFactory (),
+                                 new AnsiInputProcessor (null!),
+                                 new OutputBufferImpl (),
+                                 output,
+                                 new (new AnsiResponseParser (new SystemTimeProvider ())),
+                                 new SizeMonitorImpl (new AnsiOutput ()));
+
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+
+        // Assert: no Sixel support → Kitty output must be enabled
+        Assert.True (output.UseKittyGraphics);
+
+        driver.Dispose ();
     }
 }

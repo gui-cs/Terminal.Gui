@@ -108,6 +108,9 @@ Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templ
 dotnet new install Terminal.Gui.Templates
 ```
 
+### Powered by
+[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSource)
+
 # Contributing
 
 Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).

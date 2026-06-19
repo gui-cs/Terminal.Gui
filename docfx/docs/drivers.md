@@ -233,7 +233,7 @@ Renders the output buffer to the terminal. Platform-specific implementations:
 
 Responsibilities include:
 - Writing characters, strings, and ANSI escape sequences
-- Emitting raster image commands such as sixel images through the normal output pass
+- Emitting raster image commands through Kitty graphics or Sixel during the normal output pass
 - Cursor positioning and visibility control
 - Querying terminal window size
 - Managing the active screen buffer
@@ -348,7 +348,10 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 #### Color Support
 - `SupportsTrueColor` - 24-bit color capability
 - `Force16Colors` - Force 16-color mode
-- `SixelSupport` - The detected sixel capability, including cell pixel resolution, palette size, and transparency support. `ImageView` uses this to decide whether to render via sixel or its cell-based fallback.
+- `KittyGraphicsSupport` - The detected Kitty graphics capability, including cell pixel resolution. `ImageView` and `IOutput` prefer this path when it is supported.
+- `KittyGraphicsSupportChanged` - Raised when Kitty graphics detection completes or changes.
+- `SixelSupport` - The detected Sixel capability, including cell pixel resolution, palette size, and transparency support. `ImageView` uses this as the raster fallback when Kitty is not active.
+- `SixelSupportChanged` - Raised when Sixel detection completes or changes.
 - `DefaultAttribute` - The terminal's actual default foreground/background colors, detected at startup via OSC 10/11 queries. Used by <xref:Terminal.Gui.Drawing.Scheme> to resolve <xref:Terminal.Gui.Drawing.Color>'s `None` during role derivation. `null` if the terminal didn't respond (e.g., legacy console).
 - `ColorCapabilities` - The terminal's color capability level (`NoColor`, `Colors16`, `Colors256`, `TrueColor`), detected from `$TERM`, `$COLORTERM`, and other environment variables
 
@@ -401,6 +404,18 @@ When `AppModel == Inline`, the ANSI driver changes behavior in several ways:
 - `AddRasterImage()`, `RemoveRasterImage()`, `GetRasterImages()` - Integrated raster graphics commands
 - `WriteRaw()`, `GetSixels()` - Legacy raw output and graphics hooks
 - `Refresh()`, `ToString()`, `ToAnsi()` - Output rendering
+
+#### Raster Graphics Protocol Selection
+
+Raster images are protocol-neutral in the output buffer. Views add a `RasterImageCommand`; the output layer emits Kitty APC or Sixel DCS data when it flushes the buffer.
+
+Selection is Kitty-first:
+
+1. When `IOutput.UseKittyGraphics` is `true` and `IDriver.KittyGraphicsSupport.IsSupported` is `true`, output emits Kitty graphics.
+2. Otherwise, when `IDriver.SixelSupport.IsSupported` is `true`, output emits Sixel.
+3. Otherwise, views such as `ImageView` use their cell-based fallback.
+
+`DriverImpl.SetKittyGraphicsSupport()` enables `IOutput.UseKittyGraphics` when Kitty support is detected. Apps that need to force Sixel can set the output preference to `false` and keep Sixel support enabled.
 
 #### Cursor
 

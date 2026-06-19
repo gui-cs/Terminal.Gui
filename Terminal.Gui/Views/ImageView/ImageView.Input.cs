@@ -138,12 +138,7 @@ public partial class ImageView
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (HandleDrag (mouse))
-        {
-            return true;
-        }
-
-        return base.OnMouseEvent (mouse);
+        return HandleDrag (mouse) || base.OnMouseEvent (mouse);
     }
 
     private bool HandleDrag (Mouse mouse)
