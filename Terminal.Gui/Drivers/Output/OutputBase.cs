@@ -85,6 +85,23 @@ public abstract class OutputBase
     // deleted when the image is resized, re-fragmented, or removed.
     private readonly Dictionary<string, List<int>> _placedKittyImageIds = [];
 
+    // The visible destination fragments each Kitty image occupied on the previous Write, keyed by
+    // RasterImageCommand.Id. When the geometry is unchanged a repaint can replace the placements in
+    // place (no delete, no flash); only a changed layout needs the prior placements deleted first.
+    private readonly Dictionary<string, List<Rectangle>> _placedKittyGeometry = [];
+
+    // Source-crop mode (RasterImageCommand.SourceRect set): the full image is transmitted once and kept
+    // resident; pan/zoom then only moves the crop via placement updates. Maps RasterImageCommand.Id to the
+    // full-image pixel array currently resident in the terminal (re-transmitted only when it changes), and to
+    // the placement ids displayed last frame (so a shrunk fragment set can delete its now-unused placements).
+    private readonly Dictionary<string, Color [,]> _kittyTransmittedImage = [];
+    private readonly Dictionary<string, List<int>> _kittyPlacementIds = [];
+
+    // The image id currently resident+displayed for a source-crop command. New pixels are double-buffered:
+    // transmitted to the OTHER id and placed on top before the old id is deleted, so a sharpen-on-zoom
+    // re-raster never blanks the placement.
+    private readonly Dictionary<string, int> _kittyCurrentImageId = [];
+
     /// <summary>
     ///     Writes dirty cells from the buffer to the console. Iterates rows/cols, skips clean cells,
     ///     batches dirty cells into ANSI sequences, emits OSC 8 hyperlink start/close around URL cells,
@@ -769,6 +786,33 @@ public abstract class OutputBase
         foreach (string id in vanished)
         {
             _placedKittyImageIds.Remove (id);
+            _placedKittyGeometry.Remove (id);
+        }
+
+        // Source-crop images are resident in the terminal; when one is gone from the buffer, delete the
+        // image (which also drops its placements) and forget it so a future use re-transmits.
+        List<string> vanishedSourceCrop = [];
+
+        foreach ((string id, Color [,] _) in _kittyTransmittedImage)
+        {
+            if (currentIds.Contains (id))
+            {
+                continue;
+            }
+
+            if (_kittyCurrentImageId.TryGetValue (id, out int residentImageId))
+            {
+                Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (residentImageId)));
+            }
+
+            vanishedSourceCrop.Add (id);
+        }
+
+        foreach (string id in vanishedSourceCrop)
+        {
+            _kittyTransmittedImage.Remove (id);
+            _kittyPlacementIds.Remove (id);
+            _kittyCurrentImageId.Remove (id);
         }
     }
 
@@ -804,10 +848,29 @@ public abstract class OutputBase
 
             bool trackKitty = UseKittyGraphics && !string.IsNullOrEmpty (command.Id);
 
-            // Erase every prior placement of this image before re-placing it, so a resized, moved, or
-            // re-fragmented Kitty image does not leave stale placements on screen. Sixel needs no such
-            // delete — redrawing the cells overwrites it.
-            if (trackKitty && _placedKittyImageIds.TryGetValue (command.Id!, out List<int>? previous))
+            // Source-crop fast path: transmit the full image once and pan/zoom it with tiny placement
+            // updates (a=p) showing a different crop, instead of re-transmitting the whole image every
+            // frame. This is what keeps panning/zooming a static image flash-free for large images.
+            if (trackKitty && command.SourceRect is { } sourceRect && command.Pixels is { })
+            {
+                RenderKittySourceCrop (command, sourceRect);
+                command.IsDirty = false;
+
+                continue;
+            }
+
+            // The destination fragments this frame. Re-placing each one (a=T with a stable placement
+            // id) replaces it in place, so when the layout is unchanged from last frame the old pixels
+            // stay visible until the new ones arrive — no blank, no flash. Only a changed layout needs
+            // the prior placements deleted first, otherwise a resized/moved/re-fragmented image would
+            // leave stale placements behind. Sixel needs no delete — redrawing the cells overwrites it.
+            List<Rectangle> visibleRects = GetVisibleRasterCellRectangles (command).ToList ();
+
+            bool geometryUnchanged = trackKitty
+                                     && _placedKittyGeometry.TryGetValue (command.Id!, out List<Rectangle>? previousRects)
+                                     && previousRects.SequenceEqual (visibleRects);
+
+            if (trackKitty && !geometryUnchanged && _placedKittyImageIds.TryGetValue (command.Id!, out List<int>? previous))
             {
                 DeleteKittyPlacements (previous);
             }
@@ -815,7 +878,7 @@ public abstract class OutputBase
             List<int> placedImageIds = [];
             var rectIndex = 0;
 
-            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            foreach (Rectangle visibleCells in visibleRects)
             {
                 if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
                 {
@@ -837,10 +900,102 @@ public abstract class OutputBase
             if (trackKitty)
             {
                 _placedKittyImageIds [command.Id!] = placedImageIds;
+                _placedKittyGeometry [command.Id!] = visibleRects;
             }
 
             command.IsDirty = false;
         }
+    }
+
+    // Displays the command's image via Kitty placement crops. The full image is transmitted once (and only
+    // re-transmitted when the pixels themselves change); each visible fragment is then shown with an a=p
+    // placement that crops the corresponding source region. Reusing placement ids replaces them in place, so
+    // a pan/zoom of a static image is a handful of tiny bytes — no per-frame pixel re-transmit, no flash.
+    private void RenderKittySourceCrop (RasterImageCommand command, Rectangle sourceRect)
+    {
+        int idA = KittyGraphicsEncoder.GetImageId (command.Id!);
+        int idB = KittyGraphicsEncoder.GetImageId (command.Id! + " b");
+
+        bool pixelsChanged = !_kittyTransmittedImage.TryGetValue (command.Id!, out Color [,]? transmitted)
+                             || !ReferenceEquals (transmitted, command.Pixels);
+
+        _kittyCurrentImageId.TryGetValue (command.Id!, out int previousImageId);
+        int imageId = previousImageId == 0 ? idA : previousImageId;
+
+        if (pixelsChanged)
+        {
+            // Double-buffer: transmit the new pixels to the OTHER image id, so the image currently on
+            // screen stays intact while the new one loads; the new placement is then drawn on top below.
+            imageId = previousImageId == idA ? idB : idA;
+            Write (new StringBuilder (new KittyGraphicsEncoder ().EncodeTransmit (command.Pixels!, imageId)));
+            _kittyTransmittedImage [command.Id!] = command.Pixels!;
+            _kittyCurrentImageId [command.Id!] = imageId;
+        }
+
+        List<int> placementIds = [];
+        var index = 0;
+
+        foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+        {
+            Rectangle srcSub = MapFragmentToSource (sourceRect, command.DestinationCells, visibleCells);
+            int placementId = index + 1;
+            SetCursorPositionImpl (visibleCells.X, visibleCells.Y);
+
+            Write (new StringBuilder (KittyGraphicsEncoder.EncodePut (imageId,
+                                                                      placementId,
+                                                                      srcSub.X,
+                                                                      srcSub.Y,
+                                                                      srcSub.Width,
+                                                                      srcSub.Height,
+                                                                      visibleCells.Width,
+                                                                      visibleCells.Height)));
+            placementIds.Add (placementId);
+            index++;
+        }
+
+        // The new image is now placed on top; delete the previous buffer (image + its placements). The old
+        // pixels were visible right up to this point, so the swap never blanks.
+        if (pixelsChanged && previousImageId != 0 && previousImageId != imageId)
+        {
+            Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (previousImageId)));
+        }
+
+        // Fewer fragments than last frame (e.g. a clip hole closed): delete the now-unused placements so
+        // they do not linger.
+        if (_kittyPlacementIds.TryGetValue (command.Id!, out List<int>? previousPlacements))
+        {
+            foreach (int pid in previousPlacements)
+            {
+                if (!placementIds.Contains (pid))
+                {
+                    Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacement (imageId, pid)));
+                }
+            }
+        }
+
+        _kittyPlacementIds [command.Id!] = placementIds;
+    }
+
+    // Maps a visible destination fragment back to the source-image crop it should display, by proportion.
+    // For the common un-clipped case the fragment equals the whole destination, so this returns sourceRect.
+    private static Rectangle MapFragmentToSource (Rectangle sourceRect, Rectangle destinationCells, Rectangle fragment)
+    {
+        if (destinationCells.Width <= 0 || destinationCells.Height <= 0)
+        {
+            return sourceRect;
+        }
+
+        double relX = (fragment.X - destinationCells.X) / (double)destinationCells.Width;
+        double relY = (fragment.Y - destinationCells.Y) / (double)destinationCells.Height;
+        double relW = fragment.Width / (double)destinationCells.Width;
+        double relH = fragment.Height / (double)destinationCells.Height;
+
+        var x = (int)Math.Round (sourceRect.X + relX * sourceRect.Width);
+        var y = (int)Math.Round (sourceRect.Y + relY * sourceRect.Height);
+        int w = Math.Max (1, (int)Math.Round (relW * sourceRect.Width));
+        int h = Math.Max (1, (int)Math.Round (relH * sourceRect.Height));
+
+        return new Rectangle (x, y, w, h);
     }
 
     private bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output, bool renderAfterText)
