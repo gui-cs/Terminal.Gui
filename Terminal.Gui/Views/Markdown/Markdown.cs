@@ -528,6 +528,7 @@ public partial class Markdown : View, IDesignable
                                                           ## Links
 
                                                           * [Markdown API docs](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
+                                                          * [Relative local link](docs/getting-started.md) renders as a link without opening a URI handler by default.
 
                                                           ## Checklist
 
