@@ -1348,6 +1348,76 @@ public class OutputBaseTests
         Assert.DoesNotContain (" ", ansi [(imageIndex + encodedSixel.Length)..]);
     }
 
+    // Claude - Opus 4.8
+    [Fact]
+    public void Write_SixelRasterImage_EmitsOpaqueBlankOverlayCell_SoShadowsOverlayImage ()
+    {
+        // A blank cell that carries a real (opaque) background — e.g. a View's shadow — drawn over a
+        // raster image's DestinationCells must still be emitted so it visually overlays the image.
+        // Only transparent (alpha-0) blanks are owned by the image and suppressed. See issue #5502.
+        AnsiOutput output = new () { UseKittyGraphics = false };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        const string encodedSixel = "PIMG\\";
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            EncodedSixel = encodedSixel,
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        // Opaque dimmed background simulating a shadow cell drawn over the image.
+        buffer.CurrentAttribute = new (Color.White, new Color (32, 32, 32));
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        int imageIndex = rendered.IndexOf (encodedSixel, StringComparison.Ordinal);
+        Assert.True (imageIndex >= 0);
+
+        // The opaque overlay blank is emitted after the image so it paints over the sixel pixels.
+        string afterImage = rendered [(imageIndex + encodedSixel.Length)..];
+        Assert.Contains ("[48;2;32;32;32m", afterImage);
+        Assert.Contains (" ", afterImage);
+    }
+
+    // Claude - Opus 4.8
+    [Fact]
+    public void Write_KittyRasterImage_EmitsOpaqueBlankOverlayCell_SoShadowsOverlayImage ()
+    {
+        // Kitty images are placed at z=-1 (below the text layer), so an opaque overlay blank — a
+        // shadow — must be emitted (not cleared to transparent) so it appears above the image. Only
+        // transparent (alpha-0) blanks owned by the image are cleared so the image shows through.
+        AnsiOutput output = new () { UseKittyGraphics = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (1, 1);
+
+        buffer.AddRasterImage (new RasterImageCommand
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (1, 1, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 1, 1)
+        });
+
+        // Opaque dimmed background simulating a shadow cell drawn over the image.
+        buffer.CurrentAttribute = new (Color.White, new Color (32, 32, 32));
+        buffer.Move (0, 0);
+        buffer.AddStr (" ");
+
+        output.Write (buffer);
+        string rendered = output.GetLastOutput ();
+
+        Assert.Contains ("\x1b_G", rendered);
+
+        // The opaque overlay blank's background is emitted rather than reset to transparent.
+        Assert.Contains ("[48;2;32;32;32m", rendered);
+    }
+
     [Fact]
     public void Write_KittyRasterImage_OverPreviousCleanGlyph_EmitsTransparentBlankClear ()
     {
