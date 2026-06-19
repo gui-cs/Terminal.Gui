@@ -304,14 +304,35 @@ internal static class UnixIOHelper
                 return false;
             }
 
-            int written = write (fd, buffer, buffer.Length);
-
-            return written >= 0;
+            return TryWriteAll (fd, buffer, write);
         }
         catch
         {
             return false;
         }
+    }
+
+    internal static bool TryWriteAll (int fd, byte [] buffer, Func<int, byte [], int, int> writeFunc)
+    {
+        int offset = 0;
+        int remaining = buffer.Length;
+
+        while (remaining > 0)
+        {
+            // P/Invoke always writes from index 0, so slice when offset > 0.
+            byte [] slice = offset == 0 ? buffer : buffer [offset..];
+            int written = writeFunc (fd, slice, remaining);
+
+            if (written <= 0)
+            {
+                return false;
+            }
+
+            offset += written;
+            remaining -= written;
+        }
+
+        return true;
     }
 
     /// <summary>

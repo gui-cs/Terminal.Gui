@@ -3,6 +3,7 @@ namespace Terminal.Gui.Views;
 public partial class ImageView
 {
     private string? _encodedSixel;
+    private string? _encodedKitty;
     private Color [,]? _scaledImage;
     private Size? _scaledImageCellSize;
     private RenderKey? _scaledImageRenderKey;
@@ -21,6 +22,7 @@ public partial class ImageView
             _scaledImage = null;
             _scaledImageCellSize = null;
             _encodedSixel = null;
+            _encodedKitty = null;
             _attributeCache.Clear ();
         }
 
@@ -38,7 +40,7 @@ public partial class ImageView
             return true;
         }
 
-        RenderRequest? request = CreateRenderRequest (IsUsingSixel);
+        RenderRequest? request = CreateRenderRequest (IsUsingRasterGraphics);
 
         return request is null || IsRenderCacheCurrent (request.Key);
     }
@@ -63,7 +65,7 @@ public partial class ImageView
         SetRenderingOverlayVisible (false);
     }
 
-    private RenderRequest? CreateRenderRequest (bool useSixel)
+    private RenderRequest? CreateRenderRequest (bool useRasterGraphics)
     {
         if (_image is null)
         {
@@ -78,24 +80,42 @@ public partial class ImageView
         }
 
         Size? resolution = null;
-        SixelEncoder? encoder = null;
+        SixelEncoder? sixelEncoder = null;
         int? maxColors = null;
         Size targetSize;
         var allowUpscale = true;
         var preserveAspectRatio = false;
+        var useKitty = false;
 
-        if (useSixel)
+        if (useRasterGraphics)
         {
-            if (!IsUsingSixel || App?.Driver?.SixelSupport is not { } support)
+            if (!IsUsingRasterGraphics)
             {
                 return null;
             }
 
-            encoder = PrepareSixelEncoder (support);
+            resolution = GetActiveResolution ();
+
+            if (resolution is null)
+            {
+                return null;
+            }
+
+            useKitty = IsKittyGraphicsActive ();
+
+            if (!useKitty)
+            {
+                if (App?.Driver?.SixelSupport is not { } support)
+                {
+                    return null;
+                }
+
+                sixelEncoder = PrepareSixelEncoder (support);
+                maxColors = sixelEncoder.Quantizer.MaxColors;
+            }
+
             Rectangle targetRect = ViewportToScreenInPixels ();
             targetSize = targetRect.Size;
-            resolution = support.Resolution;
-            maxColors = encoder.Quantizer.MaxColors;
             allowUpscale = AllowSixelUpscaling || _zoomLevel > FIT_ZOOM_LEVEL;
             preserveAspectRatio = true;
         }
@@ -112,7 +132,8 @@ public partial class ImageView
         }
 
         RenderKey key = new (_imageVersion,
-                             useSixel,
+                             useRasterGraphics,
+                             useKitty,
                              targetSize,
                              resolution,
                              maxColors,
@@ -122,7 +143,13 @@ public partial class ImageView
                              allowUpscale,
                              preserveAspectRatio);
 
-        return new RenderRequest (key, _image, visibleSource, targetSize, resolution, encoder is { } ? CreateBackgroundEncoder (encoder) : null);
+        return new RenderRequest (key,
+                                  _image,
+                                  visibleSource,
+                                  targetSize,
+                                  resolution,
+                                  sixelEncoder is { } ? CreateBackgroundEncoder (sixelEncoder) : null,
+                                  KittyGraphicsEncoder.GetImageId (RasterImageId));
     }
 
     private SixelEncoder PrepareSixelEncoder (SixelSupportResult support)
@@ -149,6 +176,7 @@ public partial class ImageView
         _scaledImage = result.ScaledImage;
         _scaledImageCellSize = result.CellSize;
         _encodedSixel = result.EncodedSixel;
+        _encodedKitty = result.EncodedKitty;
         _scaledImageRenderKey = result.Key;
         _attributeCache.Clear ();
     }
@@ -161,12 +189,28 @@ public partial class ImageView
                                                    request.Key.AllowUpscale,
                                                    request.Key.PreserveAspectRatio);
 
-        Size cellSize = request.Key.UseSixel && request.Resolution is { } resolution
+        Size cellSize = request.Key.UseRasterGraphics && request.Resolution is { } resolution
                             ? GetSixelCellSize (new Size (scaledImage.GetLength (0), scaledImage.GetLength (1)), resolution)
                             : new Size (scaledImage.GetLength (0), scaledImage.GetLength (1));
-        string? encodedSixel = request.Key.UseSixel ? request.Encoder?.EncodeSixel (scaledImage) : null;
 
-        return new RenderResult (request.Key, scaledImage, cellSize, encodedSixel);
+        string? encodedSixel = null;
+        string? encodedKitty = null;
+
+        if (!request.Key.UseRasterGraphics)
+        {
+            return new RenderResult (request.Key, scaledImage, cellSize, encodedSixel, encodedKitty);
+        }
+
+        if (request.Key.UseKitty)
+        {
+            encodedKitty = new KittyGraphicsEncoder ().EncodeKitty (scaledImage, cellSize.Width, cellSize.Height, request.KittyImageId);
+        }
+        else
+        {
+            encodedSixel = request.Encoder?.EncodeSixel (scaledImage);
+        }
+
+        return new RenderResult (request.Key, scaledImage, cellSize, encodedSixel, encodedKitty);
     }
 
     private static SixelEncoder CreateBackgroundEncoder (SixelEncoder encoder) =>
@@ -272,7 +316,7 @@ public partial class ImageView
             return;
         }
 
-        RenderRequest? currentRequest = CreateRenderRequest (result.Key.UseSixel);
+        RenderRequest? currentRequest = CreateRenderRequest (result.Key.UseRasterGraphics);
 
         if (UseBackgroundRendering && currentRequest?.Key == result.Key)
         {
@@ -331,7 +375,8 @@ public partial class ImageView
     }
 
     private readonly record struct RenderKey (int ImageVersion,
-                                              bool UseSixel,
+                                              bool UseRasterGraphics,
+                                              bool UseKitty,
                                               Size TargetSize,
                                               Size? Resolution,
                                               int? MaxColors,
@@ -341,7 +386,13 @@ public partial class ImageView
                                               bool AllowUpscale,
                                               bool PreserveAspectRatio);
 
-    private sealed class RenderRequest (RenderKey key, Color [,] source, RectangleF visibleSource, Size targetSize, Size? resolution, SixelEncoder? encoder)
+    private sealed class RenderRequest (RenderKey key,
+                                        Color [,] source,
+                                        RectangleF visibleSource,
+                                        Size targetSize,
+                                        Size? resolution,
+                                        SixelEncoder? encoder,
+                                        int kittyImageId)
     {
         public RenderKey Key { get; } = key;
         public Color [,] Source { get; } = source;
@@ -349,7 +400,8 @@ public partial class ImageView
         public Size TargetSize { get; } = targetSize;
         public Size? Resolution { get; } = resolution;
         public SixelEncoder? Encoder { get; } = encoder;
+        public int KittyImageId { get; } = kittyImageId;
     }
 
-    private readonly record struct RenderResult (RenderKey Key, Color [,] ScaledImage, Size CellSize, string? EncodedSixel);
+    private readonly record struct RenderResult (RenderKey Key, Color [,] ScaledImage, Size CellSize, string? EncodedSixel, string? EncodedKitty);
 }
