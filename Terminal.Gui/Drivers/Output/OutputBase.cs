@@ -656,7 +656,7 @@ public abstract class OutputBase
                     {
                         Cell cell = buffer.Contents [row, col];
 
-                        if (!IsBlankCell (cell) || (!clearAllCoveredBlanks && !cell.IsDirty))
+                        if (!IsRasterOwnedBlankCell (cell) || (!clearAllCoveredBlanks && !cell.IsDirty))
                         {
                             continue;
                         }
@@ -711,7 +711,7 @@ public abstract class OutputBase
                                                  int col,
                                                  IReadOnlyList<Rectangle> rasterCellRectangles)
     {
-        if (rasterCellRectangles.Count == 0 || buffer.Contents is null || !IsBlankCell (buffer.Contents [row, col]))
+        if (rasterCellRectangles.Count == 0 || buffer.Contents is null || !IsRasterOwnedBlankCell (buffer.Contents [row, col]))
         {
             return false;
         }
@@ -728,6 +728,13 @@ public abstract class OutputBase
     }
 
     private static bool IsBlankCell (Cell cell) => string.IsNullOrEmpty (cell.Grapheme) || cell.Grapheme == " ";
+
+    // A raster image owns only its transparent (alpha-0) blank cells — those are what let the
+    // terminal-composited image show through. A blank cell carrying an opaque background (e.g. a
+    // View's shadow, or a colored fill) is intended overlay content and must be emitted so it paints
+    // over the image (Sixel) or appears above the z=-1 placement (Kitty). See issue #5502.
+    private static bool IsRasterOwnedBlankCell (Cell cell) =>
+        IsBlankCell (cell) && (cell.Attribute is not { } attribute || attribute.Background.A == 0);
 
     // Emits Kitty delete sequences for images that were placed on the previous Write but are no
     // longer in the buffer, dropping their tracking entries. Entries for images still present are

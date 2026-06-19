@@ -123,6 +123,19 @@ public partial class ImageView
             return;
         }
 
+        // Mark the image's covered cells transparent so the output layer treats them as raster-owned
+        // and lets the terminal-composited image show through. Opaque overlay cells drawn later (e.g.
+        // a View's shadow) keep their background and so still paint over the image. See issue #5502.
+        SetAttribute (new Attribute (Color.None, Color.None));
+
+        for (var row = 0; row < destinationSize.Height; row++)
+        {
+            for (var col = 0; col < destinationSize.Width; col++)
+            {
+                AddRune (offset.X + col, offset.Y + row, (Rune)' ');
+            }
+        }
+
         RasterImageCommand command = new ()
         {
             Id = RasterImageId,
