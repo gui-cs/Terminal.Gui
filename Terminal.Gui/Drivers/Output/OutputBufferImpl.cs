@@ -319,12 +319,14 @@ public class OutputBufferImpl : IOutputBuffer
             {
                 MarkRasterImageCellsDirty (_rasterImages [index]);
                 MarkRasterImageCellsClean (command);
+                command.NeedsTransparentCellClear = ClearCellsUnderRasterImage (command);
                 _rasterImages [index] = command;
 
                 return;
             }
 
             MarkRasterImageCellsClean (command);
+            command.NeedsTransparentCellClear = ClearCellsUnderRasterImage (command);
             _rasterImages.Add (command);
         }
     }
@@ -357,6 +359,50 @@ public class OutputBufferImpl : IOutputBuffer
         {
             return _rasterImages.ToArray ();
         }
+    }
+
+    // A raster image owns the blank cells in its visible destination. Keep those cells clean so
+    // Sixel output is not erased by normal cell rendering; OutputBase decides when protocol-specific
+    // transparent blanks must be emitted for Kitty's below-text placement model.
+    private bool ClearCellsUnderRasterImage (RasterImageCommand command)
+    {
+        if (Contents is null)
+        {
+            return false;
+        }
+
+        Attribute transparent = new (Color.None, Color.None);
+        Region clip = command.Clip ?? new (Screen);
+        var needsTerminalClear = false;
+
+        foreach (Rectangle clipRect in clip.GetRectangles ())
+        {
+            Rectangle visible = Rectangle.Intersect (Rectangle.Intersect (command.DestinationCells, clipRect), Screen);
+
+            if (visible.Width <= 0 || visible.Height <= 0)
+            {
+                continue;
+            }
+
+            for (int row = visible.Y; row < visible.Bottom; row++)
+            {
+                for (int col = visible.X; col < visible.Right; col++)
+                {
+                    string grapheme = Contents [row, col].Grapheme;
+
+                    if (!string.IsNullOrEmpty (grapheme) && grapheme != " ")
+                    {
+                        needsTerminalClear = true;
+                    }
+
+                    Contents [row, col].Grapheme = " ";
+                    Contents [row, col].Attribute = transparent;
+                    Contents [row, col].IsDirty = false;
+                }
+            }
+        }
+
+        return needsTerminalClear;
     }
 
     private void MarkRasterImageCellsClean (RasterImageCommand command)

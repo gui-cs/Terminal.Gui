@@ -311,14 +311,31 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
 
-    /// <summary>
-    ///     Sets the terminal's sixel support result (detected during initialization).
-    /// </summary>
-    internal void SetSixelSupport (SixelSupportResult result)
+    /// <inheritdoc/>
+    public void SetSixelSupport (SixelSupportResult result)
     {
         SixelSupportResult? old = SixelSupport;
         SixelSupport = result;
         SixelSupportChanged?.Invoke (this, new ValueChangedEventArgs<SixelSupportResult?> (old, result));
+    }
+
+    /// <inheritdoc/>
+    public KittyGraphicsSupportResult? KittyGraphicsSupport { get; private set; }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<KittyGraphicsSupportResult?>>? KittyGraphicsSupportChanged;
+
+    /// <inheritdoc/>
+    public void SetKittyGraphicsSupport (KittyGraphicsSupportResult result)
+    {
+        KittyGraphicsSupportResult? old = KittyGraphicsSupport;
+        KittyGraphicsSupport = result;
+
+        // Kitty takes priority when supported.  Sixel is the fallback for terminals that lack
+        // Kitty support (e.g. Windows Terminal).
+        _output.UseKittyGraphics = result.IsSupported;
+
+        KittyGraphicsSupportChanged?.Invoke (this, new ValueChangedEventArgs<KittyGraphicsSupportResult?> (old, result));
     }
 
     /// <inheritdoc/>

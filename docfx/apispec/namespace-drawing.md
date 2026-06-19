@@ -9,7 +9,12 @@ The `Drawing` namespace provides visual styling, color management, and drawing p
 
 - **Attribute** - Foreground/background color and text style combination
 - **Color** - Terminal colors including TrueColor (24-bit) support
+- **KittyGraphicsEncoder** - Encodes `Color[,]` pixels as Kitty graphics APC sequences
+- **KittyGraphicsSupportDetector** - Detects Kitty-compatible terminals and their cell pixel resolution
+- **KittyGraphicsSupportResult** - Reports Kitty graphics availability and resolution
 - **Scheme** - Maps semantic visual roles to attributes
+- **SixelEncoder** - Encodes `Color[,]` pixels as Sixel DCS sequences
+- **SixelSupportDetector** / **SixelSupportResult** - Detect Sixel availability, palette limits, transparency support, and resolution
 - **LineCanvas** - Line drawing with automatic glyph joining
 - **Thickness** - Border and spacing dimensions
 - **Glyphs** - Standard drawing characters for UI elements
@@ -26,6 +31,10 @@ Color custom = new (128, 64, 255);
 // Create an attribute
 Attribute attr = new (Color.White, Color.Blue);
 ```
+
+## Raster Graphics
+
+`ImageView` and the driver output layer use Drawing encoders and support detectors to render raster images. Kitty graphics is preferred when available; Sixel is the fallback for terminals that support Sixel but not Kitty. Terminals that support neither protocol render `ImageView` content with colored cells.
 
 ## Scheme System
 
