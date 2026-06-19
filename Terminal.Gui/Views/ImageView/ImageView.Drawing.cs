@@ -100,25 +100,68 @@ public partial class ImageView
     {
         RenderRequest? request = CreateRenderRequest (true);
 
-        if (request is null)
+        if (request is null || App?.Driver is not { } driver)
         {
+            return;
+        }
+
+        // Kitty source-crop path: transmit the full source image once and pan/zoom it with tiny placement
+        // updates that crop a different region — no per-frame pixel re-transmit (and so no flash) and no
+        // CPU scale/encode. The terminal does the scaling from the resident image.
+        if (request.Key.UseKitty && _image is { } image)
+        {
+            Size scaledPixels = ComputeScaledSize (request.VisibleSource, request.TargetSize, request.Key.AllowUpscale, request.Key.PreserveAspectRatio);
+            Size cellSize = request.Resolution is { } resolution ? GetSixelCellSize (scaledPixels, resolution) : scaledPixels;
+
+            Rectangle viewport = ViewportToScreen ();
+            Size destinationSize = new (Math.Min (viewport.Width, cellSize.Width), Math.Min (viewport.Height, cellSize.Height));
+            Point offset = _zoomLevel < FIT_ZOOM_LEVEL ? GetCenteredRenderOffset (destinationSize, viewport.Size) : Point.Empty;
+            Rectangle destinationCells = new (viewport.X + offset.X, viewport.Y + offset.Y, destinationSize.Width, destinationSize.Height);
+
+            if (destinationCells.Width <= 0 || destinationCells.Height <= 0)
+            {
+                return;
+            }
+
+            // Keep the cell size current so OnDrawingContent's drawn-region reporting still works without
+            // the scaled-image cache (which this path skips).
+            _scaledImageCellSize = cellSize;
+            SetRenderingOverlayVisible (false);
+
+            RectangleF visible = request.VisibleSource;
+            int srcX = Math.Clamp ((int)Math.Floor (visible.X), 0, Math.Max (0, image.GetLength (0) - 1));
+            int srcY = Math.Clamp ((int)Math.Floor (visible.Y), 0, Math.Max (0, image.GetLength (1) - 1));
+            int srcW = Math.Clamp ((int)Math.Round (visible.Width), 1, image.GetLength (0) - srcX);
+            int srcH = Math.Clamp ((int)Math.Round (visible.Height), 1, image.GetLength (1) - srcY);
+
+            RasterImageCommand kittyCommand = new ()
+            {
+                Id = RasterImageId,
+                Pixels = image,
+                SourceRect = new Rectangle (srcX, srcY, srcW, srcH),
+                DestinationCells = destinationCells,
+                IsDirty = true
+            };
+
+            driver.GetOutputBuffer ().AddRasterImage (kittyCommand);
+
             return;
         }
 
         EnsureScaledImage (request);
 
-        if (_scaledImage is null || _scaledImageCellSize is null || App?.Driver is not { } driver)
+        if (_scaledImage is null || _scaledImageCellSize is null)
         {
             return;
         }
 
-        Rectangle viewport = ViewportToScreen ();
-        Size cellSize = _scaledImageCellSize.Value;
-        Size destinationSize = new (Math.Min (viewport.Width, cellSize.Width), Math.Min (viewport.Height, cellSize.Height));
-        Point offset = _zoomLevel < FIT_ZOOM_LEVEL ? GetCenteredRenderOffset (destinationSize, viewport.Size) : Point.Empty;
-        Rectangle destinationCells = new (viewport.X + offset.X, viewport.Y + offset.Y, destinationSize.Width, destinationSize.Height);
+        Rectangle vp = ViewportToScreen ();
+        Size scaledCellSize = _scaledImageCellSize.Value;
+        Size sixelDestinationSize = new (Math.Min (vp.Width, scaledCellSize.Width), Math.Min (vp.Height, scaledCellSize.Height));
+        Point sixelOffset = _zoomLevel < FIT_ZOOM_LEVEL ? GetCenteredRenderOffset (sixelDestinationSize, vp.Size) : Point.Empty;
+        Rectangle sixelDestinationCells = new (vp.X + sixelOffset.X, vp.Y + sixelOffset.Y, sixelDestinationSize.Width, sixelDestinationSize.Height);
 
-        if (destinationCells.Width <= 0 || destinationCells.Height <= 0)
+        if (sixelDestinationCells.Width <= 0 || sixelDestinationCells.Height <= 0)
         {
             return;
         }
@@ -129,7 +172,7 @@ public partial class ImageView
             Pixels = _scaledImage,
             EncodedSixel = _encodedSixel,
             EncodedKitty = _encodedKitty,
-            DestinationCells = destinationCells,
+            DestinationCells = sixelDestinationCells,
             Encoder = SixelEncoder,
             IsDirty = true
         };

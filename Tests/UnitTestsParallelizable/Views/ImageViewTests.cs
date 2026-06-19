@@ -1825,6 +1825,88 @@ public class ImageViewTests
         runnable.Dispose ();
     }
 
+    // Claude - Opus 4.8
+    // Kitty source-crop: the full image is transmitted once (a=t), then panning a zoomed-in image only
+    // moves the crop with a placement update (a=p) — it must NOT re-transmit the pixels (no a=t). Re-sending
+    // the whole image every step is what made a large preview flash on each pan ("whole pane flashes").
+    [Fact]
+    public void Draw_KittyRaster_SourceCrop_PanUpdatesPlacementWithoutRetransmit ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 16, Height = 16 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.GetOutput ().UseKittyGraphics = true;
+
+        // Zoom in so the image fills the viewport and is pannable.
+        ImageView imageView = new () { X = 0, Y = 0, Width = 8, Height = 8, Image = CreateGradientImage (16, 16), ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        string first = driver.GetOutput ().GetLastOutput ();
+
+        Assert.Contains ("a=t,", first); // the full image is transmitted once...
+        Assert.Contains ("a=p,", first); // ...and displayed via a placement.
+
+        // Pan one cell — same image, different crop.
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        app.LayoutAndDraw ();
+        string panFrame = driver.GetOutput ().GetLastOutput ();
+
+        Assert.Contains ("a=p,", panFrame); // the crop moves with a tiny placement update...
+        Assert.DoesNotContain ("a=t,", panFrame); // ...with no pixel re-transmit (the flash fix).
+        Assert.DoesNotContain ("a=d", panFrame); // ...and no delete.
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.8
+    // A fresh Image must re-transmit (the placement would otherwise show stale pixels), and it must be
+    // double-buffered: the new pixels go to the OTHER image id and are placed before the old id is deleted,
+    // so a sharpen-on-zoom re-raster never blanks the on-screen image.
+    [Fact]
+    public void Draw_KittyRaster_SourceCrop_DoubleBuffersOnImageChange ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 16, Height = 16 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.GetOutput ().UseKittyGraphics = true;
+
+        ImageView imageView = new () { X = 0, Y = 0, Width = 8, Height = 8, Image = CreateGradientImage (16, 16), ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        driver.GetOutput ().GetLastOutput ();
+
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        app.LayoutAndDraw ();
+        Assert.DoesNotContain ("a=t,", driver.GetOutput ().GetLastOutput ()); // pan: no re-transmit
+
+        // A brand-new image re-transmits to the OTHER buffer and deletes the previous one.
+        imageView.Image = CreateGradientImage (16, 16);
+        app.LayoutAndDraw ();
+        string frame = driver.GetOutput ().GetLastOutput ();
+
+        System.Text.RegularExpressions.Match transmit = System.Text.RegularExpressions.Regex.Match (frame, @"a=t,f=32,i=(\d+)");
+        System.Text.RegularExpressions.Match delete = System.Text.RegularExpressions.Regex.Match (frame, @"a=d,d=i,i=(\d+)");
+
+        Assert.True (transmit.Success, "the new image must be transmitted");
+        Assert.True (delete.Success, "the previous image must be deleted");
+
+        // The deleted id is the OLD image id — different from the just-transmitted one — proving the new
+        // pixels did not overwrite the on-screen image in place (no blank during the swap).
+        Assert.NotEqual (transmit.Groups [1].Value, delete.Groups [1].Value);
+
+        runnable.Dispose ();
+    }
+
     /// <summary>Creates a gradient image where pixel color varies by position.</summary>
     private static Color [,] CreateGradientImage (int width, int height)
     {

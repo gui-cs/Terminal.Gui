@@ -39,6 +39,16 @@ public class RasterImageCommand
     public Rectangle DestinationCells { get; set; }
 
     /// <summary>
+    ///     When set (Kitty only), <see cref="Pixels"/> is the <em>full</em> source image and this is the crop of
+    ///     it (in image pixels) to display in <see cref="DestinationCells"/>. The image is transmitted to the
+    ///     terminal once; subsequent frames that only change the crop/destination (pan, zoom of a static image)
+    ///     emit a tiny placement update instead of re-sending the pixels, avoiding the per-frame flash. When
+    ///     <see langword="null"/> the legacy path is used: <see cref="Pixels"/> is the already-scaled region and
+    ///     is (re)transmitted each dirty frame.
+    /// </summary>
+    public Rectangle? SourceRect { get; set; }
+
+    /// <summary>
     ///     Gets or sets the clip region captured when the image is added to the output buffer.
     /// </summary>
     public Region? Clip { get; set; }
