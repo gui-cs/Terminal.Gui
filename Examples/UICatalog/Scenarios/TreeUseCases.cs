@@ -7,8 +7,10 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TreeView")]
 public partial class TreeUseCases : Scenario
 {
+    private CheckBox? _customArmyColorsCheckBox;
     private EventLog? _eventLog;
     private Runnable? _appWindow;
+    private TreeView<GameObject>? _armyTree;
     private TreeViewEditor? _treeViewEditor;
     private ViewportSettingsEditor? _viewportSettingsEditor;
 
@@ -33,6 +35,15 @@ public partial class TreeUseCases : Scenario
                                        new MenuItem { Title = "Armies With _Builder", Action = () => LoadArmies (false) },
                                        new MenuItem { Title = "Armies With _Delegate", Action = () => LoadArmies (true) }
                                    ]));
+
+        _customArmyColorsCheckBox = new CheckBox
+        {
+            Title = "_Army Type Colors",
+            Value = CheckState.Checked
+        };
+        _customArmyColorsCheckBox.ValueChanged += (_, _) => SetArmyTypeColors ();
+
+        menu.Add (new MenuBarItem ("_Style", [new MenuItem { CommandView = _customArmyColorsCheckBox }]));
 
         // EventLog on the right
         _eventLog = new EventLog
@@ -153,12 +164,16 @@ public partial class TreeUseCases : Scenario
         }
 
         tree.AddObject (army);
+        _armyTree = tree;
+        SetArmyTypeColors ();
 
         CurrentTree = tree;
     }
 
     private void LoadRooms ()
     {
+        _armyTree = null;
+
         House myHouse = new ()
         {
             Address = "23 Nowhere Street", Rooms = [new Room { Name = "Ballroom" }, new Room { Name = "Bedroom 1" }, new Room { Name = "Bedroom 2" }]
@@ -174,6 +189,8 @@ public partial class TreeUseCases : Scenario
 
     private void LoadEnableForDesign ()
     {
+        _armyTree = null;
+
         TreeView tree = new ();
         tree.EnableForDesign ();
         tree.Title = "_EnableForDesign";
@@ -182,6 +199,42 @@ public partial class TreeUseCases : Scenario
     }
 
     private void Quit () => _appWindow?.RequestStop ();
+
+    private void SetArmyTypeColors ()
+    {
+        if (_armyTree is null || _customArmyColorsCheckBox is null)
+        {
+            return;
+        }
+
+        if (_customArmyColorsCheckBox.Value != CheckState.Checked)
+        {
+            _armyTree.ColorGetter = null;
+            _armyTree.SetNeedsDraw ();
+
+            return;
+        }
+
+        _armyTree.ColorGetter = model => model switch
+                                  {
+                                      Army => CreateArmyTypeScheme (_armyTree, Color.BrightYellow),
+                                      CorpsObject => CreateArmyTypeScheme (_armyTree, Color.BrightCyan),
+                                      Division => CreateArmyTypeScheme (_armyTree, Color.BrightGreen),
+                                      Brigade => CreateArmyTypeScheme (_armyTree, Color.BrightMagenta),
+                                      Unit => CreateArmyTypeScheme (_armyTree, Color.Gray),
+                                      _ => null
+                                  };
+
+        _armyTree.SetNeedsDraw ();
+    }
+
+    private static Scheme CreateArmyTypeScheme (TreeView<GameObject> tree, Color foreground) =>
+        new ()
+        {
+            Normal = new Attribute (foreground, tree.GetAttributeForRole (VisualRole.Normal).Background),
+            Focus = new Attribute (foreground, tree.GetAttributeForRole (VisualRole.Focus).Background),
+            Active = new Attribute (foreground, tree.GetAttributeForRole (VisualRole.Active).Background)
+        };
 
     // ── House / Room model (unchanged) ─────────────────────────────────────
 
