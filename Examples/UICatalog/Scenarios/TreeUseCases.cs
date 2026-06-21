@@ -231,9 +231,9 @@ public partial class TreeUseCases : Scenario
     private static Scheme CreateArmyTypeScheme (TreeView<GameObject> tree, Color foreground) =>
         new ()
         {
-            Normal = new Attribute (foreground, tree.GetAttributeForRole (VisualRole.Normal).Background),
-            Focus = new Attribute (foreground, tree.GetAttributeForRole (VisualRole.Focus).Background),
-            Active = new Attribute (foreground, tree.GetAttributeForRole (VisualRole.Active).Background)
+            Normal = tree.GetAttributeForRole (VisualRole.Normal) with { Foreground = foreground },
+            Focus = tree.GetAttributeForRole (VisualRole.Focus) with { Foreground = foreground },
+            Active = tree.GetAttributeForRole (VisualRole.Active) with { Foreground = foreground }
         };
 
     // ── House / Room model (unchanged) ─────────────────────────────────────
