@@ -86,6 +86,63 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
                                               output,
                                               driver);
     }
+
+    // Codex - gpt 5.5 medium
+    // Regression for issue #5509.
+    [Fact]
+    public void Draw_ColorGetter_UsesActiveForSelectedRow_WhenTreeViewDoesNotHaveFocus ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 4);
+
+        const string selected = "selected";
+        Attribute normal = new (Color.BrightRed, Color.Black);
+        Attribute focus = new (Color.BrightYellow, Color.Blue);
+        Attribute active = new (Color.BrightYellow, Color.DarkGray);
+
+        Scheme treeScheme = new ()
+        {
+            Normal = new Attribute (Color.BrightGreen, Color.Black),
+            Focus = new Attribute (Color.Black, Color.BrightGreen),
+            Active = new Attribute (Color.BrightGreen, Color.DarkGray)
+        };
+
+        Scheme customScheme = new ()
+        {
+            Normal = normal,
+            Focus = focus,
+            Active = active
+        };
+
+        TreeView<string> tree = new (new DelegateTreeBuilder<string> (_ => [], _ => false))
+        {
+            Width = 20,
+            Height = 2,
+            ColorGetter = item => item == selected ? customScheme : null
+        };
+        tree.Style.ShowBranchLines = false;
+        tree.SetScheme (treeScheme);
+        tree.AddObject (selected);
+        tree.SelectedObject = selected;
+
+        View otherView = new () { Y = Pos.Bottom (tree), Width = 1, Height = 1, CanFocus = true };
+
+        using Runnable top = new ();
+        top.Add (tree, otherView);
+
+        app.Begin (top);
+        tree.SetFocus ();
+        app.LayoutAndDraw ();
+        Assert.Equal (focus, app.Driver.Contents! [0, 1].Attribute);
+
+        otherView.SetFocus ();
+        app.LayoutAndDraw ();
+
+        Assert.False (tree.HasFocus);
+        Assert.Equal (active, app.Driver.Contents! [0, 1].Attribute);
+    }
+
     [Fact]
     public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {

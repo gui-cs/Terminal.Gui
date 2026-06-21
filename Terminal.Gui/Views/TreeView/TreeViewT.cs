@@ -326,9 +326,32 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
     /// <summary>
-    ///     Delegate for multi-colored tree views. Return the <see cref="Scheme"/> to use for each passed object or
-    ///     null to use the default.
+    ///     Delegate for basic multi-colored tree view use cases. Return the <see cref="Scheme"/> to use for each passed
+    ///     object, or <see langword="null"/> to use the default tree view scheme.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         TreeView uses only <see cref="Scheme.Normal"/>, <see cref="Scheme.Focus"/>, and <see cref="Scheme.Active"/>
+    ///         from the returned scheme.
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <term>Normal</term>
+    ///                 <description>Used for unselected branches.</description>
+    ///             </item>
+    ///             <item>
+    ///                <term>Focus</term>
+    ///               <description>Used for selected branches when the tree view has focus.</description>
+    ///             </item>
+    ///             <item>
+    ///                 <term>Active</term>
+    ///                 <description>Used for selected branches when the tree view does not have focus.</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         For greater control over rendering, handle the <see cref="DrawLine"/> event instead.
+    ///     </para>
+    /// </remarks>
     public Func<T, Scheme?>? ColorGetter { get; set; }
 
     /// <summary>
