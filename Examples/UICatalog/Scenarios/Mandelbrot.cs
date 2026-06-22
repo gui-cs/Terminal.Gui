@@ -74,12 +74,14 @@ public class Mandelbrot : Scenario
             CanFocus = true
         };
 
-        _status = new Label { X = Pos.Align (Alignment.Start), Y = Pos.Align (Alignment.Start), Width = Dim.Fill (), Height = 1 };
+        _status = new Label { X = 0, Y = Pos.AnchorEnd (1), Width = Dim.Fill (), Height = 1 };
 
         _mandelbrotView = new MandelbrotImageView
         {
-            X = Pos.Center (),
-            Y = Pos.Center ()
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
         };
         _mandelbrotView.ImageRendered += (_, _) => UpdateMandelbrotStatus ();
         _mandelbrotView.MandelbrotSettingsChanged += (_, _) => UpdateSettingsFromMandelbrotView ();
