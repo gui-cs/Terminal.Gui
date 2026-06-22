@@ -127,7 +127,7 @@ To customize Sixel encoding, assign `ImageView.SixelEncoder` before setting `Ima
 
 The UICatalog Images scenario demonstrates runtime protocol selection, and the Mandelbrot scenario demonstrates a custom `ImageView` that re-renders fractal pixels while zooming and panning.
 
-![Mandelbrot sixel raster demo](../images/Mandelbrot.gif)
+![Mandelbrot Kitty graphics raster demo](../images/Mandelbrot.gif)
 
 ## Cell
 
