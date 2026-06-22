@@ -95,6 +95,11 @@ public abstract class OutputBase
     // full-image pixel array currently resident in the terminal (re-transmitted only when it changes), and to
     // the placement ids displayed last frame (so a shrunk fragment set can delete its now-unused placements).
     private readonly Dictionary<string, Color [,]> _kittyTransmittedImage = [];
+
+    // The RasterImageCommand.SourceVersion last transmitted per id. A reused buffer (same array instance,
+    // new contents) keeps the same reference but bumps the version, so this catches updates the reference
+    // comparison would miss.
+    private readonly Dictionary<string, int> _kittyTransmittedVersion = [];
     private readonly Dictionary<string, List<int>> _kittyPlacementIds = [];
 
     // The image id currently resident+displayed for a source-crop command. New pixels are double-buffered:
@@ -811,6 +816,7 @@ public abstract class OutputBase
         foreach (string id in vanishedSourceCrop)
         {
             _kittyTransmittedImage.Remove (id);
+            _kittyTransmittedVersion.Remove (id);
             _kittyPlacementIds.Remove (id);
             _kittyCurrentImageId.Remove (id);
         }
@@ -914,10 +920,17 @@ public abstract class OutputBase
     private void RenderKittySourceCrop (RasterImageCommand command, Rectangle sourceRect)
     {
         int idA = KittyGraphicsEncoder.GetImageId (command.Id!);
-        int idB = KittyGraphicsEncoder.GetImageId (command.Id! + " b");
+        int idB = KittyGraphicsEncoder.GetImageId (command.Id! + ":b");
 
-        bool pixelsChanged = !_kittyTransmittedImage.TryGetValue (command.Id!, out Color [,]? transmitted)
-                             || !ReferenceEquals (transmitted, command.Pixels);
+        // Re-transmit when the pixels change — by reference (a new array) OR by version (a reused buffer with
+        // new contents; the host bumps SourceVersion on every Image set, matching the legacy image-version
+        // cache key). Either signal alone would miss one of those cases.
+        bool hadTransmitted = _kittyTransmittedImage.TryGetValue (command.Id!, out Color [,]? transmitted);
+        _kittyTransmittedVersion.TryGetValue (command.Id!, out int transmittedVersion);
+
+        bool pixelsChanged = !hadTransmitted
+                             || !ReferenceEquals (transmitted, command.Pixels)
+                             || transmittedVersion != command.SourceVersion;
 
         _kittyCurrentImageId.TryGetValue (command.Id!, out int previousImageId);
         int imageId = previousImageId == 0 ? idA : previousImageId;
@@ -929,6 +942,7 @@ public abstract class OutputBase
             imageId = previousImageId == idA ? idB : idA;
             Write (new StringBuilder (new KittyGraphicsEncoder ().EncodeTransmit (command.Pixels!, imageId)));
             _kittyTransmittedImage [command.Id!] = command.Pixels!;
+            _kittyTransmittedVersion [command.Id!] = command.SourceVersion;
             _kittyCurrentImageId [command.Id!] = imageId;
         }
 
@@ -978,7 +992,8 @@ public abstract class OutputBase
 
     // Maps a visible destination fragment back to the source-image crop it should display, by proportion.
     // For the common un-clipped case the fragment equals the whole destination, so this returns sourceRect.
-    private static Rectangle MapFragmentToSource (Rectangle sourceRect, Rectangle destinationCells, Rectangle fragment)
+    // Internal for unit testing the rounding/clamp behavior.
+    internal static Rectangle MapFragmentToSource (Rectangle sourceRect, Rectangle destinationCells, Rectangle fragment)
     {
         if (destinationCells.Width <= 0 || destinationCells.Height <= 0)
         {
@@ -995,7 +1010,45 @@ public abstract class OutputBase
         int w = Math.Max (1, (int)Math.Round (relW * sourceRect.Width));
         int h = Math.Max (1, (int)Math.Round (relH * sourceRect.Height));
 
+        // Rounding can push the far edge past the source (e.g. the last fragment rounds x up while width also
+        // rounds up). Clamp so the emitted Kitty crop coordinates always stay within the resident image.
+        x = Math.Clamp (x, sourceRect.X, Math.Max (sourceRect.X, sourceRect.Right - 1));
+        y = Math.Clamp (y, sourceRect.Y, Math.Max (sourceRect.Y, sourceRect.Bottom - 1));
+        w = Math.Clamp (w, 1, sourceRect.Right - x);
+        h = Math.Clamp (h, 1, sourceRect.Bottom - y);
+
         return new Rectangle (x, y, w, h);
+    }
+
+    // Extracts the sub-rectangle of a full image (a Kitty source-crop command keeps the whole image in
+    // Pixels). The rect is clamped to the image bounds; a rect that already covers the whole image returns
+    // the source unchanged to avoid an allocation/copy.
+    private static Color [,] CropPixelsToRect (Color [,] source, Rectangle rect)
+    {
+        int sourceWidth = source.GetLength (0);
+        int sourceHeight = source.GetLength (1);
+
+        int x = Math.Clamp (rect.X, 0, Math.Max (0, sourceWidth - 1));
+        int y = Math.Clamp (rect.Y, 0, Math.Max (0, sourceHeight - 1));
+        int width = Math.Clamp (rect.Width, 1, sourceWidth - x);
+        int height = Math.Clamp (rect.Height, 1, sourceHeight - y);
+
+        if (x == 0 && y == 0 && width == sourceWidth && height == sourceHeight)
+        {
+            return source;
+        }
+
+        Color [,] cropped = new Color [width, height];
+
+        for (var cx = 0; cx < width; cx++)
+        {
+            for (var cy = 0; cy < height; cy++)
+            {
+                cropped [cx, cy] = source [x + cx, y + cy];
+            }
+        }
+
+        return cropped;
     }
 
     private bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output, bool renderAfterText)
@@ -1012,9 +1065,17 @@ public abstract class OutputBase
             bool useKittyIds = UseKittyGraphics && !string.IsNullOrEmpty (command.Id);
             var rectIndex = 0;
 
+            // ToAnsi() recreates the current screen as a self-contained string, so it cannot rely on the
+            // resident-image state the live source-crop path keeps. For a source-crop command (Pixels is the
+            // full image) extract the visible crop first, so the export reflects the panned/zoomed region
+            // rather than the whole source scaled into the destination.
+            Color [,] sourcePixels = command.SourceRect is { } sourceRect
+                                         ? CropPixelsToRect (command.Pixels!, sourceRect)
+                                         : command.Pixels!;
+
             foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
             {
-                if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
+                if (!TryCropRasterImagePixels (sourcePixels, command.DestinationCells, visibleCells, out Color [,] pixels))
                 {
                     continue;
                 }

@@ -143,6 +143,9 @@ public partial class ImageView
                 Id = RasterImageId,
                 Pixels = image,
                 SourceRect = new Rectangle (srcX, srcY, srcW, srcH),
+
+                // Bumped on every Image set (even to the same instance), so a reused buffer still re-transmits.
+                SourceVersion = _imageVersion,
                 DestinationCells = destinationCells,
                 IsDirty = true
             };

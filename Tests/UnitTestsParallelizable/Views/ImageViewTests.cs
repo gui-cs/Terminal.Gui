@@ -1825,7 +1825,7 @@ public class ImageViewTests
         runnable.Dispose ();
     }
 
-    // Claude - Opus 4.8
+    // Copilot - Claude Opus 4.8
     // Kitty source-crop: the full image is transmitted once (a=t), then panning a zoomed-in image only
     // moves the crop with a placement update (a=p) — it must NOT re-transmit the pixels (no a=t). Re-sending
     // the whole image every step is what made a large preview flash on each pan ("whole pane flashes").
@@ -1863,7 +1863,7 @@ public class ImageViewTests
         runnable.Dispose ();
     }
 
-    // Claude - Opus 4.8
+    // Copilot - Claude Opus 4.8
     // A fresh Image must re-transmit (the placement would otherwise show stale pixels), and it must be
     // double-buffered: the new pixels go to the OTHER image id and are placed before the old id is deleted,
     // so a sharpen-on-zoom re-raster never blanks the on-screen image.
@@ -1905,6 +1905,93 @@ public class ImageViewTests
         Assert.NotEqual (transmit.Groups [1].Value, delete.Groups [1].Value);
 
         runnable.Dispose ();
+    }
+
+    // Copilot - Claude Opus 4.8
+    // Re-assigning ImageView.Image — even the SAME Color[,] instance — bumps the image version and must
+    // re-transmit (a=t). Keying "did the pixels change" on the array reference alone misses a buffer a
+    // caller reused for a new render, leaving the terminal showing stale pixels. (Mirrors the legacy path,
+    // which re-encodes on every image-version bump.)
+    [Fact]
+    public void Draw_KittyRaster_SourceCrop_RetransmitsWhenImageReassignedSameInstance ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 16, Height = 16 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.GetOutput ().UseKittyGraphics = true;
+
+        Color [,] image = CreateGradientImage (16, 16);
+        ImageView imageView = new () { X = 0, Y = 0, Width = 8, Height = 8, Image = image, ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        Assert.Contains ("a=t,", driver.GetOutput ().GetLastOutput ()); // first transmit
+
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        app.LayoutAndDraw ();
+        Assert.DoesNotContain ("a=t,", driver.GetOutput ().GetLastOutput ()); // pan: no re-transmit
+
+        // Re-assign the SAME instance: the image version bumps, so the resident image must be refreshed.
+        imageView.Image = image;
+        app.LayoutAndDraw ();
+        Assert.Contains ("a=t,", driver.GetOutput ().GetLastOutput ());
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Opus 4.8
+    // ToAnsi() must recreate the *visible crop* of a panned/zoomed Kitty image, not the whole source. Two
+    // different pan positions of the same image therefore export different raster payloads; encoding
+    // command.Pixels (the full image) and ignoring SourceRect would make the two exports identical.
+    [Fact]
+    public void ToAnsi_KittyRaster_SourceCrop_ReflectsVisibleCrop ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 16, Height = 16 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.GetOutput ().UseKittyGraphics = true;
+
+        ImageView imageView = new () { X = 0, Y = 0, Width = 8, Height = 8, Image = CreateGradientImage (16, 16), ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        string ansiLeft = driver.ToAnsi ();
+
+        // Pan to a different crop of the same image.
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        app.LayoutAndDraw ();
+        string ansiPanned = driver.ToAnsi ();
+
+        Assert.NotEqual (ansiLeft, ansiPanned);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Opus 4.8
+    // MapFragmentToSource must never return a crop that extends past the source rectangle: rounding can push
+    // the last fragment's x/width (or y/height) beyond the source, which would emit out-of-bounds Kitty crop
+    // coordinates. Here dest 2x2 cells over a 3x3 source rounds the bottom-right 1x1 fragment past the edge.
+    [Fact]
+    public void MapFragmentToSource_ClampsToSourceRect ()
+    {
+        Rectangle mapped = OutputBase.MapFragmentToSource (
+                                                           new Rectangle (0, 0, 3, 3),
+                                                           new Rectangle (0, 0, 2, 2),
+                                                           new Rectangle (1, 1, 1, 1));
+
+        Assert.True (mapped.X >= 0 && mapped.Y >= 0, $"crop origin {mapped.Location} is negative");
+        Assert.True (mapped.Right <= 3, $"crop right {mapped.Right} exceeds source width 3");
+        Assert.True (mapped.Bottom <= 3, $"crop bottom {mapped.Bottom} exceeds source height 3");
+        Assert.True (mapped.Width >= 1 && mapped.Height >= 1, "crop must stay at least 1x1");
     }
 
     /// <summary>Creates a gradient image where pixel color varies by position.</summary>

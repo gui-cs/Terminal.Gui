@@ -49,6 +49,16 @@ public class RasterImageCommand
     public Rectangle? SourceRect { get; set; }
 
     /// <summary>
+    ///     A monotonic version of the <see cref="Pixels"/> contents, used only by the Kitty source-crop path
+    ///     to decide whether the resident image must be re-transmitted. The source-crop path keeps the full
+    ///     image resident in the terminal and pans/zooms it with placement updates; it re-transmits when this
+    ///     version changes. Hosts (e.g. <c>ImageView</c>) should bump it whenever the pixel contents change —
+    ///     including when the <em>same</em> array instance is reused for a new render, which a reference
+    ///     comparison alone would miss.
+    /// </summary>
+    public int SourceVersion { get; set; }
+
+    /// <summary>
     ///     Gets or sets the clip region captured when the image is added to the output buffer.
     /// </summary>
     public Region? Clip { get; set; }
