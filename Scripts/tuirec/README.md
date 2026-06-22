@@ -15,7 +15,33 @@ tuirec --version
 # agg is auto-downloaded on first use — no separate install needed.
 ```
 
-Verify: `tuirec --version`. If not on PATH, add `$(go env GOPATH)\bin` to PATH.
+Verify: `tuirec --version`. If not on PATH, add Go's bin dir
+(`$(go env GOPATH)\bin` on Windows, `$(go env GOPATH)/bin` on Linux/macOS) to PATH.
+
+> **PowerShell vs. bash.** The snippets below are PowerShell (the project's
+> default shell). The **raster recipes are Linux/macOS only** (Windows ConPTY
+> can't capture Kitty/sixel), so where it matters this guide gives a bash version
+> too. The mechanical translations: `Select-String -Pattern 'x'` →
+> `grep -o 'x' | wc -l`, `Copy-Item a b` → `cp a b`, `$ks = '...'` →
+> `ks='...'`, and the backtick line-continuation `` ` `` → `\`.
+
+### Fresh container / clean clone
+
+`tuirec` (Go) and `ScenarioRunner` (.NET) both need toolchains the Install
+section assumes are present. On a clean Linux box:
+
+```bash
+# .NET SDK — match global.json (read the version from it; currently 10.0.100)
+curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version 10.0.100 --install-dir ~/.dotnet
+export PATH="$HOME/.dotnet:$PATH"
+
+# Go 1.22+ (if missing: distro package manager, or https://go.dev/dl)
+# tuirec installs into GOPATH/bin, which is often off-PATH:
+go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+export PATH="$(go env GOPATH)/bin:$PATH"
+
+tuirec --version && dotnet --version
+```
 
 ## Quick Start — Recording a UICatalog Scenario
 
@@ -275,15 +301,25 @@ depends on what identity `tuirec` presents to the app.
 introducer shows up as ``):
 
 ```powershell
-# Kitty graphics payloads (expected by default on Linux/macOS):
-Select-String -Path artifacts/<name>.cast -Pattern 'u001b_G' | Measure-Object
-# Sixel image DCS (expected only when the app uses the sixel path):
-Select-String -Path artifacts/<name>.cast -Pattern 'u001bPq' | Measure-Object
+# PowerShell
+Select-String -Path artifacts/<name>.cast -Pattern 'u001b_G' | Measure-Object  # Kitty
+Select-String -Path artifacts/<name>.cast -Pattern 'u001bPq' | Measure-Object  # sixel
+```
+
+```bash
+# Linux/macOS — the raster recipes only run here
+grep -o 'u001b_G' artifacts/<name>.cast | wc -l   # Kitty (expected by default)
+grep -o 'u001bPq' artifacts/<name>.cast | wc -l   # sixel (only when forced)
 ```
 
 The sixel cell-size verification below applies to the **sixel** path; the
 [#84](https://github.com/gui-cs/tuirec/issues/84) cell-resolution mismatch is a
 sixel concern and does not apply when the app renders via Kitty graphics.
+
+> **The `adjusted agg font-size … to align the sixel cell grid (#84)` log line is
+> expected, not an error.** `tuirec` ≥ v0.9.0 auto-calibrates agg's font size to
+> close the #84 mismatch during recording. It's harmless for the Kitty path —
+> don't chase it.
 
 > **Smooth zoom/pan recordings.** Each keystroke pauses `--keystroke-delay` ms
 > (default 200). For continuous-looking motion (e.g. zooming/panning an image),
@@ -293,20 +329,31 @@ sixel concern and does not apply when the app renders via Kitty graphics.
 
 ### Exact recipe — `docfx/images/Mandelbrot.gif`
 
-This reproduces the committed Mandelbrot hero GIF in one shot. Build
-`ScenarioRunner` first (see Prerequisites), then run from the repo root on
-**Linux/macOS** (Windows ConPTY can't capture raster):
+This reproduces the committed Mandelbrot hero GIF in one shot. Because raster
+capture is **Linux/macOS only**, the recipe is shown in bash; build
+`ScenarioRunner` first (see Prerequisites), then run from the repo root. (In
+PowerShell on macOS, translate per the *PowerShell vs. bash* note above:
+`$ks = '...'`, backtick line-continuations, `Copy-Item`.)
 
-```powershell
-$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
-# Tour: show full set → zoom into the seahorse valley → pan across it → zoom out → reset
-$ks = 'wait:1600,PageUp,wait:150,CursorLeft,CursorDown,CursorDown,wait:300,PageUp,wait:120,PageUp,wait:120,PageUp,wait:120,PageUp,wait:850,CursorRight,wait:150,CursorRight,wait:150,CursorUp,wait:180,CursorLeft,wait:150,CursorLeft,wait:150,CursorLeft,wait:150,CursorDown,wait:180,CursorRight,wait:150,CursorRight,wait:600,PageDown,wait:120,PageDown,wait:120,PageDown,wait:120,PageDown,wait:120,PageDown,wait:300,Home,wait:1100,Esc'
+```bash
+dll="./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
+# Tour: full set → zoom into the seahorse valley → pan across it → zoom out → reset
+ks='wait:1600,PageUp,wait:150,CursorLeft,CursorDown,CursorDown,wait:300,PageUp,wait:120,PageUp,wait:120,PageUp,wait:120,PageUp,wait:850,CursorRight,wait:150,CursorRight,wait:150,CursorUp,wait:180,CursorLeft,wait:150,CursorLeft,wait:150,CursorLeft,wait:150,CursorDown,wait:180,CursorRight,wait:150,CursorRight,wait:600,PageDown,wait:120,PageDown,wait:120,PageDown,wait:120,PageDown,wait:120,PageDown,wait:300,Home,wait:1100,Esc'
 
-tuirec record --binary dotnet --args "$dll,run,Mandelbrot" --name Mandelbrot `
-    --title "Mandelbrot" --keystrokes $ks `
+tuirec record --binary dotnet --args "$dll,run,Mandelbrot" --name Mandelbrot \
+    --title "Mandelbrot" --keystrokes "$ks" \
     --startup-delay 2000 --drain 1200 --cols 120 --rows 30 --keystroke-delay 130
 
-Copy-Item artifacts/Mandelbrot.gif docfx/images/Mandelbrot.gif
+cp artifacts/Mandelbrot.gif docfx/images/Mandelbrot.gif
+```
+
+Validate (robust invariants — see the softened counts below):
+
+```bash
+grep -o 'u001b_G' artifacts/Mandelbrot.cast | wc -l   # Kitty: expect thousands
+grep -o 'u001bPq' artifacts/Mandelbrot.cast | wc -l   # sixel: expect 0
+# Extract a mid-zoom frame without ImageMagick/ffmpeg (needs python3 + Pillow):
+python3 -c "from PIL import Image; im=Image.open('artifacts/Mandelbrot.gif'); im.seek(im.n_frames//2); im.convert('RGB').save('/tmp/mid.png')"
 ```
 
 **Why each part matters (don't "improve" these blindly):**
@@ -325,9 +372,13 @@ Copy-Item artifacts/Mandelbrot.gif docfx/images/Mandelbrot.gif
   80 iterations the valley goes mostly black past ~span 0.5; span ≈ 1.0 keeps the
   colorful seahorse filaments. For a deeper dive you'd raise the iteration count
   first (the Iterations control, or `DEFAULT_ITERATIONS`).
-- **Validate**: the cast should hold thousands of `u001b_G` (Kitty) payloads and
-  no `u001bPq` (sixel); the GIF should be ~0.9 MB. Spot-check a mid-zoom frame to
-  confirm you landed in colorful structure, not black.
+- **Validate against invariants, not exact counts.** The cast holds **thousands**
+  of `u001b_G` (Kitty) payloads and **zero** `u001bPq` (sixel), and the GIF is
+  **~0.9 MB**. The precise payload count drifts (±a few hundred) with timing and
+  the auto font-size adjust — don't treat it as a target. Then open `/tmp/mid.png`
+  (extracted above) and confirm the in-app readout reads **Center X ≈ −0.74,
+  Center Y ≈ 0.105, Span ≈ 1.0** over colorful seahorse structure — measuring the
+  landmark, per this guide's "measure, don't eyeball" tenet, not eyeballing a vibe.
 
 ---
 
@@ -390,6 +441,9 @@ After every recording, verify:
   ```powershell
   Select-String -Path artifacts/<name>.cast -Pattern "error|unknown|not found|usage:" -CaseSensitive:$false
   ```
+  ```bash
+  grep -iE "error|unknown|not found|usage:" artifacts/<name>.cast
+  ```
 - [ ] **GIF is not blank** — file size > 100KB for a typical scenario recording.
       (A blank/static GIF is typically < 50KB.)
 - [ ] **Visual check** — open the GIF (`--open` flag) and confirm:
@@ -407,6 +461,10 @@ After every recording, verify:
   ```powershell
   Select-String -Path artifacts/<name>.cast -Pattern 'u001b_G' | Measure-Object  # Kitty
   Select-String -Path artifacts/<name>.cast -Pattern 'u001bPq' | Measure-Object  # sixel
+  ```
+  ```bash
+  grep -o 'u001b_G' artifacts/<name>.cast | wc -l   # Kitty
+  grep -o 'u001bPq' artifacts/<name>.cast | wc -l   # sixel
   ```
 - [ ] **Grid-anchored sixel measured, not eyeballed** — if the sixel is sized or
       aligned to the text grid, calibrate agg's real cell and confirm the rendered
