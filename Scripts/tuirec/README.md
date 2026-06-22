@@ -291,6 +291,44 @@ sixel concern and does not apply when the app renders via Kitty graphics.
 > a few large ones. Note that in-app *mouse-wheel* zoom may not work under
 > `tuirec` (some views bind the wheel to pan); prefer the keyboard zoom keys.
 
+### Exact recipe — `docfx/images/Mandelbrot.gif`
+
+This reproduces the committed Mandelbrot hero GIF in one shot. Build
+`ScenarioRunner` first (see Prerequisites), then run from the repo root on
+**Linux/macOS** (Windows ConPTY can't capture raster):
+
+```powershell
+$dll = "./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
+# Tour: show full set → zoom into the seahorse valley → pan across it → zoom out → reset
+$ks = 'wait:1600,PageUp,wait:150,CursorLeft,CursorDown,CursorDown,wait:300,PageUp,wait:120,PageUp,wait:120,PageUp,wait:120,PageUp,wait:850,CursorRight,wait:150,CursorRight,wait:150,CursorUp,wait:180,CursorLeft,wait:150,CursorLeft,wait:150,CursorLeft,wait:150,CursorDown,wait:180,CursorRight,wait:150,CursorRight,wait:600,PageDown,wait:120,PageDown,wait:120,PageDown,wait:120,PageDown,wait:120,PageDown,wait:300,Home,wait:1100,Esc'
+
+tuirec record --binary dotnet --args "$dll,run,Mandelbrot" --name Mandelbrot `
+    --title "Mandelbrot" --keystrokes $ks `
+    --startup-delay 2000 --drain 1200 --cols 120 --rows 30 --keystroke-delay 130
+
+Copy-Item artifacts/Mandelbrot.gif docfx/images/Mandelbrot.gif
+```
+
+**Why each part matters (don't "improve" these blindly):**
+
+- **The image view fills the display.** The scenario anchors `MandelbrotImageView`
+  at `(0,0)` with `Dim.Fill()` so the fractal is large enough for motion to read.
+  If you record a small centered image, the demo looks cramped.
+- **Zoom is keyboard-only and center-anchored.** `PageUp`/`PageDown` zoom about
+  the *center* (the in-app mouse wheel pans, it does not zoom). So you must pan
+  the target to the center first, then zoom.
+- **Target = the seahorse valley**, center ≈ `(-0.745, +0.11)` — the cusp where
+  the main cardioid meets the period-2 bulb. The opening `PageUp` shrinks the pan
+  step so `CursorLeft,CursorDown,CursorDown` lands at ≈ `(-0.74, +0.105)` instead
+  of overshooting onto the (mostly black) antenna filament at `-0.8`.
+- **Stop around span ≈ 1.0** (about 5 `PageUp`s total). At the scenario's default
+  80 iterations the valley goes mostly black past ~span 0.5; span ≈ 1.0 keeps the
+  colorful seahorse filaments. For a deeper dive you'd raise the iteration count
+  first (the Iterations control, or `DEFAULT_ITERATIONS`).
+- **Validate**: the cast should hold thousands of `u001b_G` (Kitty) payloads and
+  no `u001bPq` (sixel); the GIF should be ~0.9 MB. Spot-check a mid-zoom frame to
+  confirm you landed in colorful structure, not black.
+
 ---
 
 ## Verifying Placement and Size (measure — don't eyeball)
