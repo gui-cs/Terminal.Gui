@@ -260,6 +260,13 @@ public partial class ImageView : View, IDesignable
     /// </summary>
     public double ZoomLevel { get => _zoomLevel; set => SetZoomLevel (value, null); }
 
+    /// <summary>
+    ///     Raised when <see cref="ZoomLevel"/> changes (including a reset to fit). A host that renders its
+    ///     own source image (e.g. rasterizes a document) can subscribe to re-render it at the new zoom for
+    ///     crispness — the view itself only ever scales the pixels it was given.
+    /// </summary>
+    public event EventHandler? ZoomLevelChanged;
+
     private SixelEncoder? _sixelEncoder;
 
     private bool _usesDefaultSixelEncoder;

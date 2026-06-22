@@ -38,6 +38,7 @@ public partial class ImageView
         _centerX = 0.5d;
         _centerY = 0.5d;
         InvalidateScaledImage ();
+        ZoomLevelChanged?.Invoke (this, EventArgs.Empty);
 
         return true;
     }
@@ -87,6 +88,7 @@ public partial class ImageView
         }
 
         InvalidateScaledImage ();
+        ZoomLevelChanged?.Invoke (this, EventArgs.Empty);
 
         return true;
     }
