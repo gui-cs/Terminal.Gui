@@ -25,6 +25,10 @@ public class KittyGraphicsEncoder
     /// </summary>
     public const int MaxChunkSize = 4096;
 
+    // Each image id carries exactly one placement, so a single stable placement id is enough for an
+    // a=T to replace it in place across repaints (see BuildApcSequence).
+    private const int PlacementId = 1;
+
     // APC = ESC _ ... ESC \
     private const string APC_START = "\x1b_G";
     private const string APC_END = "\x1b\\";
@@ -72,6 +76,83 @@ public class KittyGraphicsEncoder
     /// <param name="imageId">The image id (the Kitty <c>i</c> key) whose placements should be deleted.</param>
     /// <returns>The complete Kitty APC delete escape sequence string.</returns>
     public static string EncodeDeletePlacements (int imageId) => $"{APC_START}a=d,d=i,i={imageId}{APC_END}";
+
+    /// <summary>
+    ///     Encodes a transmit-only (<c>a=t</c>) Kitty sequence: it sends the full image data under the given
+    ///     <paramref name="imageId"/> without creating a placement. The image stays resident in the terminal so
+    ///     it can be displayed — and re-displayed with a different crop — via <see cref="EncodePut"/> without
+    ///     re-sending the pixels. Used to pan/zoom a static image with tiny per-frame placement updates instead
+    ///     of re-transmitting the whole image every frame (which reads as a flash for large images).
+    /// </summary>
+    /// <param name="pixels">The full source image to transmit, indexed as <c>[x, y]</c>.</param>
+    /// <param name="imageId">The stable image id (the Kitty <c>i</c> key).</param>
+    /// <returns>The complete Kitty APC transmit-only escape sequence (chunked).</returns>
+    public string EncodeTransmit (Color [,] pixels, int imageId)
+    {
+        int width = pixels.GetLength (0);
+        int height = pixels.GetLength (1);
+        byte [] rgba = PixelsToRgba (pixels, width, height);
+        string base64 = Convert.ToBase64String (rgba);
+
+        var sb = new StringBuilder ();
+        int total = base64.Length;
+        var offset = 0;
+
+        string firstChunk = offset + MaxChunkSize < total ? base64.Substring (offset, MaxChunkSize) : base64.Substring (offset);
+        bool isLastChunk = offset + firstChunk.Length >= total;
+
+        sb.Append (APC_START);
+        sb.Append ($"a=t,f=32,i={imageId},s={width},v={height},q=2,m={( isLastChunk ? 0 : 1 )}");
+        sb.Append (';');
+        sb.Append (firstChunk);
+        sb.Append (APC_END);
+        offset += firstChunk.Length;
+
+        while (offset < total)
+        {
+            string chunk = offset + MaxChunkSize < total ? base64.Substring (offset, MaxChunkSize) : base64.Substring (offset);
+            bool last = offset + chunk.Length >= total;
+
+            sb.Append (APC_START);
+            sb.Append ($"m={( last ? 0 : 1 )}");
+            sb.Append (';');
+            sb.Append (chunk);
+            sb.Append (APC_END);
+            offset += chunk.Length;
+        }
+
+        return sb.ToString ();
+    }
+
+    /// <summary>
+    ///     Encodes a placement (<c>a=p</c>) that displays a crop of an already-transmitted image (see
+    ///     <see cref="EncodeTransmit"/>) at the current cursor position. The source rectangle
+    ///     (<paramref name="srcX"/>,<paramref name="srcY"/>,<paramref name="srcW"/>,<paramref name="srcH"/>) in
+    ///     image pixels is scaled to fill <paramref name="destCols"/>×<paramref name="destRows"/> cells. A later
+    ///     placement with the same (image id, placement id) replaces this one in place — so panning/zooming a
+    ///     static image is a tiny, flash-free update rather than a full re-transmit.
+    /// </summary>
+    /// <param name="imageId">The id of the already-transmitted image.</param>
+    /// <param name="placementId">The placement id; reusing it replaces the placement in place.</param>
+    /// <param name="srcX">Left edge of the source crop, in image pixels.</param>
+    /// <param name="srcY">Top edge of the source crop, in image pixels.</param>
+    /// <param name="srcW">Width of the source crop, in image pixels.</param>
+    /// <param name="srcH">Height of the source crop, in image pixels.</param>
+    /// <param name="destCols">Number of columns to display the crop in.</param>
+    /// <param name="destRows">Number of rows to display the crop in.</param>
+    /// <returns>The complete Kitty APC placement escape sequence.</returns>
+    public static string EncodePut (int imageId, int placementId, int srcX, int srcY, int srcW, int srcH, int destCols, int destRows) =>
+        $"{APC_START}a=p,i={imageId},p={placementId},x={srcX},y={srcY},w={srcW},h={srcH},c={destCols},r={destRows},z=-1,C=1,q=2{APC_END}";
+
+    /// <summary>
+    ///     Encodes a Kitty sequence that deletes a single placement (by image id + placement id), leaving the
+    ///     transmitted image data and other placements intact.
+    /// </summary>
+    /// <param name="imageId">The image id (the Kitty <c>i</c> key).</param>
+    /// <param name="placementId">The placement id (the Kitty <c>p</c> key) to delete.</param>
+    /// <returns>The complete Kitty APC delete-placement escape sequence.</returns>
+    public static string EncodeDeletePlacement (int imageId, int placementId) =>
+        $"{APC_START}a=d,d=i,i={imageId},p={placementId}{APC_END}";
 
     /// <summary>
     ///     Derives a stable, positive, non-zero Kitty image id from the given string identifier.
@@ -132,8 +213,12 @@ public class KittyGraphicsEncoder
         bool isLastChunk = offset + firstChunk.Length >= totalLength;
 
         // i=<id> tags the placement with a stable image id so a prior placement can be deleted by
-        // id (see EncodeDeletePlacements) when the image is resized or moved.
-        string idField = imageId.HasValue ? $"i={imageId.Value}," : string.Empty;
+        // id (see EncodeDeletePlacements) when the image is resized or moved. p=<PlacementId> gives the
+        // placement a stable id too: a later a=T with the same (image id, placement id) REPLACES the
+        // placement in place — the previous pixels stay on screen until the new ones arrive — so an
+        // unchanged-geometry repaint (pan, zoom-in) never blanks. Without it, re-placing would have to
+        // delete first (image vanishes, then the full image is slowly re-sent = a visible flash).
+        string idField = imageId.HasValue ? $"i={imageId.Value},p={PlacementId}," : string.Empty;
 
         // C=1 suppresses cursor movement after the image is displayed. Without it the terminal
         // advances the cursor past the bottom-right of the image, and an image near the bottom of

@@ -595,7 +595,7 @@ public sealed class MarkdownTable : View, IDesignable
                     }
 
                     bool hasUrl = !string.IsNullOrWhiteSpace (seg.Url);
-                    bool isAbsoluteUrl = hasUrl && Uri.IsWellFormedUriString (seg.Url, UriKind.Absolute);
+                    bool isAbsoluteUrl = hasUrl && MarkdownAttributeHelper.TryCreateSafeAbsoluteUri (seg.Url, out _);
                     bool isActive = hasUrl && HasFocus && IsActiveLinkAt (rowIndex, col, seg.Url!);
 
                     if (isActive)

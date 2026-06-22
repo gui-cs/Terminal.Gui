@@ -210,7 +210,9 @@ internal class Branch<T> where T : class
             if (modelScheme is { })
             {
                 // use it
-                modelColor = isSelected ? modelScheme.Focus : modelScheme.Normal;
+                modelColor = isSelected
+                                 ? _tree.HasFocus ? modelScheme.Focus : modelScheme.Active
+                                 : modelScheme.Normal;
             }
             else
             {

@@ -202,6 +202,37 @@ public class MarkdownViewTests (ITestOutputHelper output)
         window.Dispose ();
     }
 
+    // Codex - GPT-5
+    [Fact]
+    public void Mouse_Click_On_Relative_Link_Raises_LinkClicked ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = "[Local](docs/readme.md)", Width = 20, Height = 3 };
+
+        window.Add (markdownView);
+
+        string clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        markdownView.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.Equal ("docs/readme.md", clickedUrl);
+
+        window.Dispose ();
+    }
+
     // Copilot
     [Fact]
     public void Mouse_Click_On_Link_In_Table_Cell_Raises_LinkClicked ()
@@ -252,6 +283,45 @@ public class MarkdownViewTests (ITestOutputHelper output)
         tableView.NewMouseEvent (new Mouse { Position = new Point (2, 3), Flags = MouseFlags.LeftButtonClicked });
 
         Assert.Equal ("https://example.com", clickedUrl);
+
+        window.Dispose ();
+    }
+
+    // Codex - GPT-5
+    [Fact]
+    public void Mouse_Click_On_Relative_Link_In_Table_Cell_Raises_LinkClicked ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = 80, Height = 20, BorderStyle = LineStyle.None };
+
+        string markdown = """
+                          | Name | Description |
+                          |------|-------------|
+                          | [local](docs/readme.md) | Pick one item |
+                          """;
+
+        Terminal.Gui.Views.Markdown markdownView = new () { Text = markdown, Width = 60, Height = 15 };
+        window.Add (markdownView);
+
+        string clickedUrl = "";
+
+        markdownView.LinkClicked += (_, e) =>
+                                    {
+                                        clickedUrl = e.Url;
+                                        e.Handled = true;
+                                    };
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        MarkdownTable? tableView = markdownView.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
+        Assert.NotNull (tableView);
+
+        tableView.NewMouseEvent (new Mouse { Position = new Point (2, 3), Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.Equal ("docs/readme.md", clickedUrl);
 
         window.Dispose ();
     }
@@ -749,11 +819,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Style_Link_Relative_No_Underline_No_OSC8 ()
+    public void Style_Link_Relative_Underline_No_OSC8 ()
     {
         (IApplication app, Runnable window) = SetupStyleTest ("[Go](foo.md)");
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107mGo", output, app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[4mGo\x1b[30m\x1b[107m\x1b[24m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();

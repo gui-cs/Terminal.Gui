@@ -4,33 +4,33 @@ public partial class ImageView
 {
     private static Color [,] ScaleVisibleImage (Color [,] source, RectangleF visibleSource, Size targetSize, bool allowUpscale, bool preserveAspectRatio)
     {
-        int newWidth;
-        int newHeight;
-
-        if (preserveAspectRatio)
-        {
-            double widthScale = targetSize.Width / (double)visibleSource.Width;
-            double heightScale = targetSize.Height / (double)visibleSource.Height;
-            double scale = Math.Min (widthScale, heightScale);
-
-            if (!allowUpscale)
-            {
-                scale = Math.Min (scale, 1d);
-            }
-
-            newWidth = Math.Max (1, (int)(visibleSource.Width * scale));
-            newHeight = Math.Max (1, (int)(visibleSource.Height * scale));
-        }
-        else
-        {
-            newWidth = targetSize.Width;
-            newHeight = targetSize.Height;
-        }
-
-        Color [,] scaledImage = new Color [newWidth, newHeight];
+        Size size = ComputeScaledSize (visibleSource, targetSize, allowUpscale, preserveAspectRatio);
+        Color [,] scaledImage = new Color [size.Width, size.Height];
         ScaleVisibleNearestNeighbor (source, scaledImage, visibleSource);
 
         return scaledImage;
+    }
+
+    // The pixel size a visible source region scales to for the given target — the aspect-ratio-preserving fit
+    // used by ScaleVisibleImage. Exposed so the Kitty source-crop path can size the destination without
+    // actually scaling/encoding any pixels (it lets the terminal do the scaling from a once-transmitted image).
+    private static Size ComputeScaledSize (RectangleF visibleSource, Size targetSize, bool allowUpscale, bool preserveAspectRatio)
+    {
+        if (!preserveAspectRatio)
+        {
+            return targetSize;
+        }
+
+        double widthScale = targetSize.Width / (double)visibleSource.Width;
+        double heightScale = targetSize.Height / (double)visibleSource.Height;
+        double scale = Math.Min (widthScale, heightScale);
+
+        if (!allowUpscale)
+        {
+            scale = Math.Min (scale, 1d);
+        }
+
+        return new Size (Math.Max (1, (int)(visibleSource.Width * scale)), Math.Max (1, (int)(visibleSource.Height * scale)));
     }
 
     private static void ScaleVisibleNearestNeighbor (Color [,] source, Color [,] destination, RectangleF visibleSource)
