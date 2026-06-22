@@ -252,6 +252,47 @@ tuirec record `
 
 ---
 
+## Raster graphics: Kitty (default) and sixel
+
+Terminal.Gui's `ImageView` (with `UseRasterGraphics = true`) picks the best
+raster protocol the terminal advertises: **Kitty graphics** when available,
+otherwise **sixel**, otherwise cell rendering. Which one a recording captures
+depends on what identity `tuirec` presents to the app.
+
+- **`tuirec` ≥ v0.9.0 defaults to Kitty graphics.** It advertises a deterministic
+  Kitty identity (a `KITTY_WINDOW_ID` marker) to the recorded app, so apps that
+  prefer Kitty emit Kitty image escapes (`ESC _ G … ST`). The pinned
+  `agg` (`v1.11.0-sixel`, built on a Kitty-capable `avt`) renders them in the GIF.
+  This is the path the UICatalog **Mandelbrot** and **Images** scenarios take by
+  default. Terminal.Gui detects Kitty support purely from the environment, so the
+  app reports `Kitty … active` in its capability matrix with no extra flags.
+- **Sixel** is still used when the app does not support Kitty, or you force the
+  sixel path in-app (e.g. the Mandelbrot scenario's "Sixel" protocol option).
+- **Both are Linux/macOS only.** Windows ConPTY strips both Kitty graphics APC
+  strings and sixel DCS from the output stream, so neither is captured there.
+
+**Confirm which protocol the cast captured** (the `.cast` is JSON, so the escape
+introducer shows up as ``):
+
+```powershell
+# Kitty graphics payloads (expected by default on Linux/macOS):
+Select-String -Path artifacts/<name>.cast -Pattern 'u001b_G' | Measure-Object
+# Sixel image DCS (expected only when the app uses the sixel path):
+Select-String -Path artifacts/<name>.cast -Pattern 'u001bPq' | Measure-Object
+```
+
+The sixel cell-size verification below applies to the **sixel** path; the
+[#84](https://github.com/gui-cs/tuirec/issues/84) cell-resolution mismatch is a
+sixel concern and does not apply when the app renders via Kitty graphics.
+
+> **Smooth zoom/pan recordings.** Each keystroke pauses `--keystroke-delay` ms
+> (default 200). For continuous-looking motion (e.g. zooming/panning an image),
+> use a shorter delay (`--keystroke-delay 130`) and many small steps rather than
+> a few large ones. Note that in-app *mouse-wheel* zoom may not work under
+> `tuirec` (some views bind the wheel to pan); prefer the keyboard zoom keys.
+
+---
+
 ## Verifying Placement and Size (measure — don't eyeball)
 
 **The recurring trap.** Confirming a sixel *appears* in the GIF — or that agg
@@ -321,10 +362,13 @@ After every recording, verify:
   ```
   Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
   ```
-- [ ] **Sixel content recorded on Linux/macOS** — sixel DCS cannot be captured
-      through Windows ConPTY. Confirm sixel made it into the cast with:
+- [ ] **Raster content recorded on Linux/macOS** — Kitty graphics APC and sixel
+      DCS cannot be captured through Windows ConPTY. Confirm the expected protocol
+      made it into the cast (Kitty is the default for raster apps; see *Raster
+      graphics* above):
   ```powershell
-  Select-String -Path artifacts/<name>.cast -Pattern 'u001bP' | Measure-Object
+  Select-String -Path artifacts/<name>.cast -Pattern 'u001b_G' | Measure-Object  # Kitty
+  Select-String -Path artifacts/<name>.cast -Pattern 'u001bPq' | Measure-Object  # sixel
   ```
 - [ ] **Grid-anchored sixel measured, not eyeballed** — if the sixel is sized or
       aligned to the text grid, calibrate agg's real cell and confirm the rendered
@@ -338,7 +382,8 @@ After every recording, verify:
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
-| No sixel output on Windows | **Windows ConPTY strips sixel DCS** and does not pass through the DA1 sixel handshake — the app detects `Sixel support: False` | Record sixel content on Linux/macOS (see `tuirec agent-guide`). On Windows you can still verify the app's sixel code path runs (e.g., via an app-level force flag) by checking redraw activity in the `.cast`, but flame/image pixels will not appear |
+| No raster output on Windows | **Windows ConPTY strips Kitty graphics APC and sixel DCS** and does not pass the DA1 sixel handshake — the app detects no raster support | Record raster content (Kitty or sixel) on Linux/macOS (see `tuirec agent-guide`). On Windows you can still verify the app's raster code path runs (e.g., via an app-level force flag) by checking redraw activity in the `.cast`, but image pixels will not appear |
+| Image renders via sixel instead of Kitty (or vice versa) | The app picks its preferred protocol from what the terminal advertises; `tuirec` ≥ v0.9.0 advertises Kitty by default | Confirm the captured protocol in the cast (`u001b_G` for Kitty, `u001bPq` for sixel). To force sixel, use the app's own protocol control (e.g. the Mandelbrot scenario's "Sixel" option) |
 | Sixel renders ~4% too small / short of a border | tuirec advertises a cell resolution that doesn't match agg's rendered font cell ([#84](https://github.com/gui-cs/tuirec/issues/84)) | App is correct (fills on a real terminal). Verify by measurement (see *Verifying Placement and Size*); attribute to tuirec, not the app. Until fixed, only a tuirec-specific over-render hack would close the gap |
 | Wide glyphs misaligned in GIF | Emoji/CJK chars are 2-cell wide; agg renders per-cell | Avoid emoji/CJK categories; use single-width ranges (Arrows, Box Drawing, etc.) |
 | Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
