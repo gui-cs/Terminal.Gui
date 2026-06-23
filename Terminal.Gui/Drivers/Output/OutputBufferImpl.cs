@@ -545,7 +545,7 @@ public class OutputBufferImpl : IOutputBuffer
             }
 
             // Skip the second column of a wide character
-            // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
+            // See issue: https://github.com/tui-cs/Terminal.Gui/issues/4492
             // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
             // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
             if (Clip.Contains (Col, Row))
@@ -778,7 +778,7 @@ public class OutputBufferImpl : IOutputBuffer
             // The wide glyph will naturally render across both columns.
             // If we set column N+1 to replacement char, we would overwrite
             // any content that was intentionally drawn there (like borders at odd columns).
-            // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
+            // See: https://github.com/tui-cs/Terminal.Gui/issues/4258
         }
     }
 }

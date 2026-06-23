@@ -40,7 +40,7 @@ public class SpinnerViewTests : TestDriverBase
     [Fact]
     public void AutoSpin_SetBeforeEndInit_GetterReturnsTrueWithNoApp ()
     {
-        // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4879
+        // Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4879
         // Before the fix AutoSpin returned `_timeout != null`. When App is null the timeout
         // can never be registered, so the getter falsely returned false even though the
         // caller had set AutoSpin = true. The fix uses a dedicated _autoSpin backing field.

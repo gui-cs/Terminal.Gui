@@ -114,7 +114,7 @@ See `Tests/README.md` for the full list of test projects (including `Integration
 
 ## Seeing Your Changes (Visual Verification)
 
-Agents can observe a running Terminal.Gui app — don't ship UI changes blind. Use [`tuirec`](https://github.com/gui-cs/tuirec) to run the app in a PTY, inject keystrokes, and capture the result:
+Agents can observe a running Terminal.Gui app — don't ship UI changes blind. Use [`tuirec`](https://github.com/tui-cs/tuirec) to run the app in a PTY, inject keystrokes, and capture the result:
 
 - **Full guide:** [Scripts/tuirec/README.md](Scripts/tuirec/README.md) — install, keystroke syntax, UICatalog scenario recipes, validation checklist
 - The `.cast` output is asciinema v2 JSON (plain text) — **read it back** to verify what actually rendered, frame by frame

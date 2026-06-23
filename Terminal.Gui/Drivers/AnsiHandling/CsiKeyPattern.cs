@@ -60,7 +60,7 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
             return null;
         }
 
-        // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+        // See https://github.com/tui-cs/Terminal.Gui/issues/5067
         Debug.Assert (!key.Handled);
 
         // If there's no modifier, just return the key.

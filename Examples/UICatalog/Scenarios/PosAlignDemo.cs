@@ -291,7 +291,7 @@ public sealed class PosAlignDemo : Scenario
             }
 
             // BUGBUG: Create and assign a new Pos object because we currently have no way for X to be notified
-            // BUGBUG: of changes in the Pos object. See https://github.com/gui-cs/Terminal.Gui/issues/3485
+            // BUGBUG: of changes in the Pos object. See https://github.com/tui-cs/Terminal.Gui/issues/3485
             if (dimension == Dimension.Width)
             {
                 var posAlign = view.X as PosAlign;

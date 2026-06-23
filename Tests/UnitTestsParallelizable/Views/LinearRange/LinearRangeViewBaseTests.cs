@@ -266,7 +266,7 @@ public class LinearRangeViewBaseTests : TestDriverBase
         Assert.Equal (expectedSize, ms.Frame.Size);
     }
 
-    // https://github.com/gui-cs/Terminal.Gui/issues/3099
+    // https://github.com/tui-cs/Terminal.Gui/issues/3099
     [Fact]
     private void One_Option_Does_Not_Throw ()
     {

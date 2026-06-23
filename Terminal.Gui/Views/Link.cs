@@ -443,7 +443,7 @@ public class Link : View, IDesignable
     bool IDesignable.EnableForDesign ()
     {
         Title = "_Link";
-        Url = "https://github.com/gui-cs";
+        Url = "https://github.com/tui-cs";
 
         Initialized += (_, _) => { App?.ToolTips?.SetToolTip (this, "This is a Link. Click to open the URL in the default browser."); };
 

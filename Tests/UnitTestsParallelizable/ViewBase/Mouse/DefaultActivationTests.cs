@@ -5,7 +5,7 @@ namespace ViewBaseTests.MouseTests;
 ///     Tests for default View activation behavior (LeftButtonReleased → Command.Activate).
 ///     Verifies that the base View class follows industry-standard GUI conventions by activating
 ///     on button release rather than press, allowing cancellation by dragging away.
-///     Related to issue #4674: https://github.com/gui-cs/Terminal.Gui/issues/4674
+///     Related to issue #4674: https://github.com/tui-cs/Terminal.Gui/issues/4674
 /// </summary>
 [Trait ("Category", "Input")]
 [Trait ("Category", "Mouse")]

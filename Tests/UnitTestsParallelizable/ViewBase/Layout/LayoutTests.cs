@@ -218,7 +218,7 @@ public class LayoutTests
         v.Dispose ();
     }
 
-    /// <summary>This is an intentionally obtuse test. See https://github.com/gui-cs/Terminal.Gui/issues/2461</summary>
+    /// <summary>This is an intentionally obtuse test. See https://github.com/tui-cs/Terminal.Gui/issues/2461</summary>
     [Fact]
     public void Does_Not_Throw_If_Nested_SubViews_Ref_Topmost_SuperView ()
     {
@@ -539,7 +539,7 @@ public class LayoutTests
     }
 
     /// <summary>
-    ///     This tests the special case in LayoutSubViews. See https://github.com/gui-cs/Terminal.Gui/issues/2461
+    ///     This tests the special case in LayoutSubViews. See https://github.com/tui-cs/Terminal.Gui/issues/2461
     /// </summary>
     [Fact]
     public void Nested_SubViews_Ref_Topmost_SuperView ()

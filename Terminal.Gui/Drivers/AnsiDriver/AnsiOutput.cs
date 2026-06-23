@@ -79,7 +79,7 @@ public class AnsiOutput : OutputBase, IOutput
             // UTF-8 encoded bytes via WriteFile; without this, a fresh Windows terminal uses
             // its default OEM code page (e.g. 437), causing multi-byte UTF-8 characters
             // (box-drawing glyphs, etc.) to be misinterpreted as garbled single-byte characters.
-            // See https://github.com/gui-cs/Terminal.Gui/issues/4848
+            // See https://github.com/tui-cs/Terminal.Gui/issues/4848
             Console.OutputEncoding = Encoding.UTF8;
 
             // Check if we have a real console first

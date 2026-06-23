@@ -184,7 +184,7 @@ public class OutputBaseTests
         buffer.Move (0, 0);
         buffer.AddStr ("🦮A");
 
-        // After the fix for https://github.com/gui-cs/Terminal.Gui/issues/4258:
+        // After the fix for https://github.com/tui-cs/Terminal.Gui/issues/4258:
         // Writing a wide glyph at column 0 no longer sets column 1 to IsDirty = false.
         // Column 1 retains whatever state it had (in this case, it was initialized as dirty
         // by ClearContents, but may have been cleared by a previous Write call).
@@ -207,7 +207,7 @@ public class OutputBaseTests
         Assert.False (buffer.Contents! [0, 0].IsDirty);
 
         // Column 1 was marked as clean by OutputBase.Write when it processed the wide glyph at column 0
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/4466
+        // See: https://github.com/tui-cs/Terminal.Gui/issues/4466
         Assert.False (buffer.Contents! [0, 1].IsDirty);
 
         // Column 2 was written ('A')
@@ -657,7 +657,7 @@ public class OutputBaseTests
     }
 
     // Claude - Opus 4.7
-    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4892
     // When dirty cells with a URL are flushed mid-row because a clean cell follows,
     // the OSC 8 hyperlink remains open in the terminal. If no more dirty cells appear
     // on the row, the end-of-row code must still emit the OSC 8 close sequence so the
@@ -697,7 +697,7 @@ public class OutputBaseTests
     }
 
     // Claude - Opus 4.7
-    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4892
     // When a Link's display area shrinks (or a Link is replaced), the cells previously
     // associated with a URL may be overdrawn by content that has no URL. Those cells
     // must be removed from the URL map so OSC 8 sequences are not re-emitted for them.
@@ -735,7 +735,7 @@ public class OutputBaseTests
     }
 
     // Claude - Opus 4.7
-    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4892
+    // Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4892
     // When CurrentUrl changes from one URL to another for the same cell, the URL map
     // should reflect the new URL (verifying the URL clear path does not break re-assignment).
     [Fact]

@@ -77,7 +77,7 @@ public partial class View // Drawing APIs
     ///     </para>
     ///     <para>
     ///         See the View Drawing Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/>.
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/drawing.html"/>.
     ///     </para>
     /// </remarks>
     public void Draw (DrawContext? context = null)

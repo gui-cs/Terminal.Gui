@@ -307,7 +307,7 @@ internal partial class ApplicationImpl
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from
         // gui.cs does no longer process any callbacks. See #1084 for more details:
-        // (https://github.com/gui-cs/Terminal.Gui/issues/1084).
+        // (https://github.com/tui-cs/Terminal.Gui/issues/1084).
         SynchronizationContext.SetSynchronizationContext (null);
 
         // === 10. Unsubscribe from Application static property change events ===

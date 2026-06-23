@@ -403,5 +403,5 @@ public sealed class FormWindow : Runnable
 
 - Getting Started: `docfx/docs/getting-started.md`
 - Full v1→v2 Primer: [ai-v2-primer.md](ai-v2-primer.md)
-- Full API Docs: https://gui-cs.github.io/Terminal.Gui/
-- GitHub: https://github.com/gui-cs/Terminal.Gui
+- Full API Docs: https://tui-cs.github.io/Terminal.Gui/
+- GitHub: https://github.com/tui-cs/Terminal.Gui

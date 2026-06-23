@@ -142,7 +142,7 @@ public class WindowsConsole
         public uint Value;
     }
 
-    // See: https://github.com/gui-cs/Terminal.Gui/issues/357
+    // See: https://github.com/tui-cs/Terminal.Gui/issues/357
 
     [StructLayout (LayoutKind.Sequential)]
     public struct CONSOLE_SCREEN_BUFFER_INFOEX

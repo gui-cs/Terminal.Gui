@@ -79,7 +79,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void DimAuto_Uses_Text_Width_When_Text_Is_Set ()
     {
-        Link link = new () { Text = "Click", Url = "https://github.com/gui-cs/Terminal.Gui" };
+        Link link = new () { Text = "Click", Url = "https://github.com/tui-cs/Terminal.Gui" };
 
         link.BeginInit ();
         link.EndInit ();
@@ -244,7 +244,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
 
         using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        Link link = new () { App = app, Url = "https://github.com/gui-cs/Terminal.Gui", Text = "Terminal.Gui" };
+        Link link = new () { App = app, Url = "https://github.com/tui-cs/Terminal.Gui", Text = "Terminal.Gui" };
         window.Add (link);
 
         app.Begin (window);
@@ -256,7 +256,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         string? look = app.Driver.GetOutput ().GetLastOutput ();
 
         // Verify OSC 8 sequences are present
-        string expectedStart = EscSeqUtils.OSC_StartHyperlink ("https://github.com/gui-cs/Terminal.Gui");
+        string expectedStart = EscSeqUtils.OSC_StartHyperlink ("https://github.com/tui-cs/Terminal.Gui");
         string expectedEnd = EscSeqUtils.OSC_EndHyperlink ();
 
         Assert.Contains (expectedStart, look);
@@ -539,7 +539,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
 
         Assert.True (result);
         Assert.Equal ("_Link", link.Title);
-        Assert.Equal ("https://github.com/gui-cs", link.Url);
+        Assert.Equal ("https://github.com/tui-cs", link.Url);
 
         link.Dispose ();
     }

@@ -1243,7 +1243,7 @@ public class TableViewTests : TestDriverBase
     }
 
     // Claude - Opus 4.7
-    // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/5126
+    // Regression test for https://github.com/tui-cs/Terminal.Gui/issues/5126
     // Clicking outside the row area of a TableView (e.g. below the last row) must
     // not raise the Activating event.
     [Fact]

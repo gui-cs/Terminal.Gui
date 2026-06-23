@@ -6,7 +6,7 @@ namespace UnitTestsParallelizable.Input;
 
 /// <summary>
 ///     Tests for the multi-caret <see cref="Command"/> members added for #5318
-///     (consumed by gui-cs/Editor vertical multi-caret). The enum shape is part of
+///     (consumed by tui-cs/Editor vertical multi-caret). The enum shape is part of
 ///     the contract: the members must exist, be distinct, carry their readable
 ///     names, and be appended at the end so persisted configs never silently
 ///     rebind when the enum grows.

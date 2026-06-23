@@ -96,9 +96,9 @@ namespace Terminal.Gui.Views;
 ///         </item>
 ///     </list>
 /// </remarks>
-[Obsolete ("TextView is superseded by gui-cs/Editor's EditorView, which provides a rope-backed document model, "
+[Obsolete ("TextView is superseded by tui-cs/Editor's EditorView, which provides a rope-backed document model, "
            + "cell-aware rendering, multi-caret editing, undo, syntax highlighting, folding, find/replace, and soft wrap. "
-           + "See https://github.com/gui-cs/Editor for details.", error: false)]
+           + "See https://github.com/tui-cs/Editor for details.", error: false)]
 public partial class TextView : View, IDesignable
 {
     /// <summary>

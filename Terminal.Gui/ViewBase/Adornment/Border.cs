@@ -18,14 +18,14 @@ namespace Terminal.Gui.ViewBase;
 ///     <para>
 ///         The Border also provides keyboard and mouse support for moving and resizing the View via
 ///         <see cref="ViewArrangement"/>. See the
-///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
+///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
 ///     </para>
 ///     <para>
 ///         <see cref="View.BorderStyle"/> is a convenience helper that sets <see cref="LineStyle"/> and
 ///         <see cref="Thickness"/> atomically; use <see cref="View.Border"/> directly for advanced configuration.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/borders.html"/> for the full deep dive.
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/borders.html"/> for the full deep dive.
 ///     </para>
 ///     <example>
 ///         Standard border with title (<c>BorderStyle = LineStyle.Single</c>, <c>Thickness.Top == 1</c>):

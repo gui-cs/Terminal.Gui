@@ -99,7 +99,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
                                                // Check if this is an incomplete mouse sequence (timing issue when Run() blocks)
 
-                                               Logging.Warning ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'. See https://github.com/gui-cs/Terminal.Gui/issues/4587");
+                                               Logging.Warning ($"{nameof (InputProcessorImpl<TInputRecord>)} ignored unrecognized response '{cur}'. See https://github.com/tui-cs/Terminal.Gui/issues/4587");
 
                                                AnsiSequenceSwallowed?.Invoke (this, cur);
 

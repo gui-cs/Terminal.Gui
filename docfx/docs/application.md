@@ -1042,7 +1042,7 @@ Color? result = app.Run (wrapper).Result;
 
 ### Examples
 
-- See [gui-cs/Examples](https://github.com/gui-cs/Examples) for inline mode samples and additional application examples.
+- See [tui-cs/Examples](https://github.com/tui-cs/Examples) for inline mode samples and additional application examples.
 
 ## See Also
 

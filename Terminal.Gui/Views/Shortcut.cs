@@ -78,12 +78,12 @@ namespace Terminal.Gui.Views;
 ///         <see cref="Shortcut"/> to highlight when the mouse is over it.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
 ///         for detailed information on command routing, the BubbleDown pattern, dispatch flows, and
 ///         <see cref="CommandView"/> variant behaviors.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
 ///         how <see cref="Shortcut"/> fits into the menu system class hierarchy.
 ///     </para>
 /// </remarks>

@@ -27,7 +27,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         <see cref="Frame"/> is typically the output of Terminal.Gui's responsive layout system. To describe layout,
@@ -240,7 +240,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To express responsive relationships such as "center this view", "anchor it to the end", or "place it to
@@ -291,7 +291,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To express responsive relationships such as "center this view", "anchor it to the bottom", or "place it
@@ -341,7 +341,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To express responsive sizing such as filling remaining space, using a percentage of the available height,
@@ -434,7 +434,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To express responsive sizing such as filling remaining space, using a percentage of the available width,
@@ -562,7 +562,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         This method turns responsive <see cref="Pos"/> and <see cref="Dim"/> expressions into an absolute
@@ -615,7 +615,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To force a responsive layout pass after changing <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or
@@ -788,7 +788,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the

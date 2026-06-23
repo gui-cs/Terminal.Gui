@@ -262,7 +262,7 @@ public class ComputedLayout : Scenario
         #region Issue2358
 
         // Demonstrate odd-ball Combine scenarios
-        // Until https://github.com/gui-cs/Terminal.Gui/issues/2358 is fixed these won't work right
+        // Until https://github.com/tui-cs/Terminal.Gui/issues/2358 is fixed these won't work right
 
         oddballButton = new Button { Text = "Center + 0", X = Pos.Center () + 0, Y = Pos.Bottom (oddballButton) };
         window.Add (oddballButton);

@@ -182,7 +182,7 @@ public partial class View // Adornments
     ///     <para>
     ///         The Border also provides the UI for mouse and keyboard arrangement of the View.
     ///         See <see cref="Arrangement"/> and the
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
     ///     </para>
     ///     <para>
     ///         <see cref="BorderStyle"/> is a convenience helper that sets <see cref="Border.LineStyle"/> and

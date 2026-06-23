@@ -57,7 +57,7 @@ public class CsiCursorPattern : AnsiKeyboardParserPattern
             return null;
         }
 
-        // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+        // See https://github.com/tui-cs/Terminal.Gui/issues/5067
         Debug.Assert (!key.Handled);
 
         if (string.IsNullOrEmpty (modifierGroup))

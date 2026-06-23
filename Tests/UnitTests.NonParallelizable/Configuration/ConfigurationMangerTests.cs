@@ -651,7 +651,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
             // Arrange
             var json = @"
 {
-  ""$schema"": ""https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
+  ""$schema"": ""https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
   ""Application.DefaultKeyBindings"": { ""Quit"": { ""All"": [""Alt-Z""] } },
   ""Theme"": ""Default"",
   ""Themes"": [
@@ -1416,7 +1416,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
             // Arrange
             var json = @"
 {
-  ""$schema"": ""https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
+  ""$schema"": ""https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
   ""Application.DefaultKeyBindings"": { ""Quit"": { ""All"": [""Alt-Z""] } },
   ""Theme"": ""Default"",
   ""Themes"": [

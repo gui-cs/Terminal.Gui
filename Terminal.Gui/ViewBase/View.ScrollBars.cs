@@ -19,7 +19,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         See the Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     /// </remarks>
     [DebuggerBrowsable (DebuggerBrowsableState.Never)]
@@ -40,7 +40,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         See the Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     /// </remarks>
     [DebuggerBrowsable (DebuggerBrowsableState.Never)]

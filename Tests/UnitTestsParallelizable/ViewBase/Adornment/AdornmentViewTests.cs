@@ -4,7 +4,7 @@ namespace ViewBaseTests.Adornments;
 public class AdornmentViewTests
 {
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4883.
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4883.
     ///     AdornmentView.Contains must not throw NullReferenceException when Adornment is null
     ///     (i.e. the view was created via its parameter-less constructor, as happens when
     ///     AllViewsTester / Themes UICatalog scenario creates it via reflection).

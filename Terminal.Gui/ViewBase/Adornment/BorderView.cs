@@ -32,10 +32,10 @@ namespace Terminal.Gui.ViewBase;
 ///     <para>
 ///         Mouse and Keyboard-driven move/resize is handled by the <see cref="Arranger"/> (see
 ///         <see cref="View.Arrangement"/>
-///         and the <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>).
+///         and the <see href="https://tui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>).
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/borders.html"/> for the full deep dive.
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/borders.html"/> for the full deep dive.
 ///     </para>
 /// </remarks>
 /// <seealso cref="Border"/>

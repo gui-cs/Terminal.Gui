@@ -39,11 +39,11 @@ namespace Terminal.Gui.Views;
 ///         menu opening when switching between <see cref="MenuBarItem"/>s via HotKey.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
 ///         details on the underlying command routing and BubbleDown pattern.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
 ///         full menu system architecture, class hierarchy, command routing, and usage examples.
 ///     </para>
 /// </remarks>
