@@ -180,6 +180,10 @@ view.KeyBindings.Add (Key.F5, Command.Refresh);
    Do not use the static `Application.Init ()` / `Application.Run ()` / `Application.Shutdown ()` pattern.
 4. **Use `App!.RequestStop ()`** to close a window from inside a `Runnable`, not `Application.RequestStop ()`.
 5. **SubView/SuperView** — Never say "child", "parent", or "container". Use SubView/SuperView.
+6. **Dialog/MessageBox button order = the default** — The **last button added is the default** (Enter-activated) for both `Dialog` and `MessageBox`. Add buttons so the affirmative action is **last** (e.g. `Cancel` then `OK`); `Esc`/Cancel goes first. Do **not** hand-set `IsDefault` in a `Dialog` unless you intend to override the last-button default.
+7. **`AddCommand` is `protected`** — Register commands *inside* your `View` subclass (in the constructor), then bind keys with `KeyBindings.Add (Key.F5, Command.Refresh)`. You cannot call `view.AddCommand (...)` on an instance from outside.
+8. **`Terminal.Gui.Drawing.Attribute`** — The color/style `Attribute` is a `readonly record struct` in `Terminal.Gui.Drawing`; it collides with `System.Attribute`. Qualify or alias it when `System` is also imported.
+9. **Typed views expose `.Value`, not guessed names** — Value-bearing views implement `IValue<T>`: use `.Value` and `ValueChanged`/`ValueChanging` (e.g. `datePicker.Value` is a `DateTime`, not `.Date`). Don't guess property-specific names like `.Date`, `.Time`, or `.Color`.
 
 ### Code Style (Library Contributors Only)
 
