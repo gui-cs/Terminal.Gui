@@ -80,6 +80,12 @@ public class EscSeqUtilsTests
         cki = new ('R', 0, false, false, false);
         expectedCki = new ('R', ConsoleKey.R, true, false, false);
         Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
+
+        // BS (0x08) maps to Backspace WITHOUT a forced Control modifier (regression: it used to
+        // become Ctrl+Backspace, which editors treat as delete-word). Matches the DEL (0x7F) case.
+        cki = new ('\b', 0, false, false, false);
+        expectedCki = new ('\b', ConsoleKey.Backspace, false, false, false);
+        Assert.Equal (expectedCki.ToString(), EscSeqUtils.MapConsoleKeyInfo(cki).ToString());
     }
 
     [Theory]

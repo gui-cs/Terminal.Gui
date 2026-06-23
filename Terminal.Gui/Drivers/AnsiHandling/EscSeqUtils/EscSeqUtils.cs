@@ -403,11 +403,16 @@ public static class EscSeqUtils
                 {
                     key = ConsoleKey.Backspace;
 
+                    // BS (0x08) is the legacy Backspace code (some terminals/configs send it for the
+                    // Backspace key instead of DEL 0x7F). Honor the real Control state here — do NOT
+                    // force it on. Forcing Control turned a plain Backspace into Ctrl+Backspace, which
+                    // editors bind to "delete word", so one keypress wiped the whole word. Mirrors the
+                    // DEL (127) branch below. (gui-cs/Terminal.Gui)
                     newConsoleKeyInfo = new ConsoleKeyInfo (consoleKeyInfo.KeyChar,
                                                             key,
                                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Shift) != 0,
                                                             (consoleKeyInfo.Modifiers & ConsoleModifiers.Alt) != 0,
-                                                            true);
+                                                            (consoleKeyInfo.Modifiers & ConsoleModifiers.Control) != 0);
                 }
                 else if (consoleKeyInfo.Key == 0)
                 {
