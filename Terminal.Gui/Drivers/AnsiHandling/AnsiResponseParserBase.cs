@@ -410,7 +410,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
             if (HandleMouse && IsMouse (cur))
             {
-                // See https://github.com/gui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
+                // See https://github.com/tui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
                 // we call ResetState first
                 ResetState ();
                 RaiseMouseEvent (cur);
@@ -449,7 +449,7 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
 
                 if (pattern != null)
                 {
-                    // See https://github.com/gui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
+                    // See https://github.com/tui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
                     // we call ResetState first
                     ResetState ();
                     RaiseKeyboardEvent (pattern, cur);

@@ -16,8 +16,8 @@ public class Deepdives : Scenario
 {
     private static readonly HttpClient _httpClient = new ();
 
-    private const string DOCS_API_URL = "https://api.github.com/repos/gui-cs/Terminal.Gui/contents/docfx/docs?ref=develop";
-    private const string INCLUDES_API_URL = "https://api.github.com/repos/gui-cs/Terminal.Gui/contents/docfx/includes?ref=develop";
+    private const string DOCS_API_URL = "https://api.github.com/repos/tui-cs/Terminal.Gui/contents/docfx/docs?ref=develop";
+    private const string INCLUDES_API_URL = "https://api.github.com/repos/tui-cs/Terminal.Gui/contents/docfx/includes?ref=develop";
 
     private IApplication? _app;
     private ListView? _docList;

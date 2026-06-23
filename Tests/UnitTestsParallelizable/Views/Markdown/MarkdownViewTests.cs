@@ -155,7 +155,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Terminal.Gui.Views.Markdown markdownView = new ()
         {
-            Text = "Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)", Width = Dim.Fill (), Height = Dim.Fill ()
+            Text = "Visit [Terminal.Gui](https://github.com/tui-cs/Terminal.Gui)", Width = Dim.Fill (), Height = Dim.Fill ()
         };
 
         window.Add (markdownView);
@@ -166,7 +166,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         string lastOutput = app.Driver.GetOutput ().GetLastOutput ();
 
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://github.com/gui-cs/Terminal.Gui"), lastOutput);
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://github.com/tui-cs/Terminal.Gui"), lastOutput);
         Assert.Contains (EscSeqUtils.OSC_EndHyperlink (), lastOutput);
 
         window.Dispose ();

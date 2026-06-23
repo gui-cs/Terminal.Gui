@@ -33,12 +33,12 @@ namespace Terminal.Gui.Views;
 ///         <see cref="MenuItem"/> implements <see cref="IValue"/>, exposing <see cref="View.Title"/> as its value.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
 ///         details on command routing, the BubbleDown pattern, and how <see cref="Shortcut"/> coordinates commands
 ///         between itself and its <see cref="Shortcut.CommandView"/>.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
 ///         full menu system architecture, class hierarchy, command routing, and usage examples.
 ///     </para>
 /// </remarks>

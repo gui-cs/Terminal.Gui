@@ -15,14 +15,14 @@ namespace Terminal.Gui.Input;
 ///         <see cref="Application"/> supports a subset of these commands by default, which can be overriden via <see cref="Application.KeyBindings"/>.
 ///     </para>
 ///     <para>
-///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
+///         See the Commands Deep Dive for more information: <see href="https://tui-cs.github.io/Terminal.Gui/docs/command.html"/>.
 ///     </para>
 ///     <para>
 ///         <b>Every member has an explicit, frozen integer value.</b> These values are an ABI contract:
 ///         separately-compiled assemblies (e.g. the <c>Terminal.Gui.Editor</c> package) bake the integer
 ///         of each <see cref="Command"/> into their key bindings. Inserting or reordering members would
 ///         silently change those integers and re-map already-compiled bindings to the wrong commands —
-///         e.g. Backspace invoking <see cref="SelectAll"/> (gui-cs/Editor#241). <b>When adding a command,
+///         e.g. Backspace invoking <see cref="SelectAll"/> (tui-cs/Editor#241). <b>When adding a command,
 ///         append it with the next unused number; never insert, reorder, or renumber existing members.</b>
 ///     </para>
 /// </remarks>

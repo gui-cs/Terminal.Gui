@@ -1200,7 +1200,7 @@ public sealed class MarkdownTable : View, IDesignable
         Text = """
                | Feature | *Status (centered)* | **Owner** |
                |---------|:-----------------:|-------|
-               | [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! | @tig |
+               | [Markdown](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! | @tig |
                | *Tables*     | ✅ For **sure!** | [tig](https://github.com/tig) |
                | `Code`       | ✅ `printf ("Awesome!");` | ??? |
                """;

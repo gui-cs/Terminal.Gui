@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drawing;
 ///     <see cref="VisualRole.Disabled"/>, etc.)
 ///     to an <see cref="Attribute"/> describing its foreground color, background color, and text style.
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
 ///     </para>
 /// </summary>
 /// <remarks>

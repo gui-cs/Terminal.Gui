@@ -355,7 +355,7 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
     {
         if (_functionalKeyMap.TryGetValue (kittyCode, out Key? functionalKey))
         {
-            // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+            // See https://github.com/tui-cs/Terminal.Gui/issues/5067
             Debug.Assert (!functionalKey.Handled);
 
             return new Key (functionalKey);

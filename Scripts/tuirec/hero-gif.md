@@ -8,7 +8,7 @@ For recording Terminal.Gui app/scenario GIFs, use:
 
 ```powershell
 # Install tuirec (one-time)
-go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+go install github.com/tui-cs/tuirec/cmd/tuirec@latest
 
 # Build ScenarioRunner (before any recording)
 dotnet build Examples/ScenarioRunner/ScenarioRunner.csproj -c Release

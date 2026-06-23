@@ -78,7 +78,7 @@ jobs:
     - name: Install views docs tools
       if: steps.view-docs.outputs.should_generate == 'true'
       run: |
-        go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+        go install github.com/tui-cs/tuirec/cmd/tuirec@latest
         Add-Content $env:GITHUB_PATH "$(go env GOPATH)\bin"
         Install-Module powershell-yaml -Scope CurrentUser -Force
 

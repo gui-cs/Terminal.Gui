@@ -185,7 +185,7 @@ public sealed class MenuApp : Runnable
                                       ]));
 
         // Main content area below the menu bar. (For a real multi-line editor,
-        // use gui-cs/Editor's EditorView — the core TextView is deprecated.)
+        // use tui-cs/Editor's EditorView — the core TextView is deprecated.)
         View content = new ()
         {
             X = 0,
@@ -574,7 +574,7 @@ public sealed class StatusBarApp : Runnable
     {
         Title = "Status Bar Demo";
 
-        // Main content area. (For a real multi-line editor, use gui-cs/Editor's
+        // Main content area. (For a real multi-line editor, use tui-cs/Editor's
         // EditorView — the core TextView is deprecated.)
         View content = new ()
         {

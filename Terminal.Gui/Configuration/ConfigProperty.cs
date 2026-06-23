@@ -490,7 +490,7 @@ public class ConfigProperty
     ///         The set of <see cref="ConfigurationPropertyAttribute"/> host types that ship in Terminal.Gui is declared statically in
     ///         <see cref="ConfigPropertyHostTypes"/> and registered unconditionally. Declaring the set statically keeps initialization
     ///         trim- and AOT-safe without requiring consumer apps to carry <c>&lt;TrimmerRootAssembly Include="Terminal.Gui" /&gt;</c>.
-    ///         See <see href="https://github.com/gui-cs/Terminal.Gui/issues/5069"/>.
+    ///         See <see href="https://github.com/tui-cs/Terminal.Gui/issues/5069"/>.
     ///     </para>
     ///     <para>
     ///         Additional host types defined outside Terminal.Gui (test suites, plugins, embedding apps) are picked up via a

@@ -41,11 +41,11 @@ namespace Terminal.Gui.Views;
 ///         within the <see cref="Bar"/>. The default is <see cref="ViewBase.AlignmentModes.StartToEnd"/>.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
 ///         for details on the <see cref="Shortcut"/> items contained by <see cref="Bar"/>.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
 ///         how <see cref="Bar"/> fits into the menu system class hierarchy as the base of
 ///         <see cref="Menu"/> and <see cref="MenuBar"/>.
 ///     </para>

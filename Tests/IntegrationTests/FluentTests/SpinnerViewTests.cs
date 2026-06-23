@@ -16,7 +16,7 @@ public class SpinnerViewTests (ITestOutputHelper outputHelper) : TestsAllDrivers
     [MemberData (nameof (GetAllDriverNames))]
     public void AutoSpin_SetBeforeAppRun_TimeoutRegisteredAfterEndInit (string d)
     {
-        // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4879.
+        // Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4879.
         //
         // Before the fix: AutoSpin = true set before App.Run() left _timeout null because
         // AddAutoSpinTimeout() silently exited early (App was null). The spinner showed its

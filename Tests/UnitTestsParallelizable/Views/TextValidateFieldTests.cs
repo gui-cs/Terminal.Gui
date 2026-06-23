@@ -745,7 +745,7 @@ public class TextValidateField_Regex_Provider_Tests : TestDriverBase
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4963
     ///     Alt-modified keys must not be inserted as text input.
     /// </summary>
     [Fact]
@@ -767,7 +767,7 @@ public class TextValidateField_Regex_Provider_Tests : TestDriverBase
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4963
     ///     Ctrl-modified keys must not be inserted as text input.
     /// </summary>
     [Fact]

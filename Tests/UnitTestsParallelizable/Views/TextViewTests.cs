@@ -1873,17 +1873,17 @@ public class TextViewTests (ITestOutputHelper output)
     [InlineData ("1ºªA", true, "")]
     [InlineData ("ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", false, "\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", "")]
     [InlineData ("ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", true, "\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", "|$=+´`~^<>£€¨", "")]
-    [InlineData ("{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+    [InlineData ("{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  false,
-                 "\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "\"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "\"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  "-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  "cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  ".github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
@@ -1908,18 +1908,18 @@ public class TextViewTests (ITestOutputHelper output)
                  "\r\n}",
                  "}",
                  "")]
-    [InlineData ("{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+    [InlineData ("{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  true,
-                 "\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "\"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "\"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
-                 "gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "\"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+                 "tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  "-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  "cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  ".github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
@@ -1997,29 +1997,29 @@ public class TextViewTests (ITestOutputHelper output)
     [InlineData ("1ºªA", true, "")]
     [InlineData ("ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", false, "ºª", "")]
     [InlineData ("ºª\\!\"#%&/()?'«»*;,:._-@{[]}]|$=+´`~^<>£€¨", true, "ºª\\!\"#%&/()?'«»*;,:._-@{[]}]", "ºª", "")]
-    [InlineData ("{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+    [InlineData ("{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  false,
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github",
-                 "{\r\n  \"$schema\": \"https://gui-cs.",
-                 "{\r\n  \"$schema\": \"https://gui-cs",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github",
+                 "{\r\n  \"$schema\": \"https://tui-cs.",
+                 "{\r\n  \"$schema\": \"https://tui-cs",
                  "{\r\n  \"$schema\": \"https://gui-",
                  "{\r\n  \"$schema\": \"https://gui",
                  "{\r\n  \"$schema\": \"https://",
@@ -2032,29 +2032,29 @@ public class TextViewTests (ITestOutputHelper output)
                  "{\r\n",
                  "{",
                  "")]
-    [InlineData ("{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
+    [InlineData ("{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n}",
                  true,
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-config",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui-",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/tui",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas/",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/schemas",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui/",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.Gui",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal.",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/Terminal",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io/",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.io",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github.",
-                 "{\r\n  \"$schema\": \"https://gui-cs.github",
-                 "{\r\n  \"$schema\": \"https://gui-cs.",
-                 "{\r\n  \"$schema\": \"https://gui-cs",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"\r\n",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json\"",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-config",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui-",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/tui",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas/",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/schemas",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui/",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.Gui",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal.",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/Terminal",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io/",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.io",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github.",
+                 "{\r\n  \"$schema\": \"https://tui-cs.github",
+                 "{\r\n  \"$schema\": \"https://tui-cs.",
+                 "{\r\n  \"$schema\": \"https://tui-cs",
                  "{\r\n  \"$schema\": \"https://gui-",
                  "{\r\n  \"$schema\": \"https://gui",
                  "{\r\n  \"$schema\": \"https://",
@@ -2182,7 +2182,7 @@ public class TextViewTests (ITestOutputHelper output)
     // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
     /// <summary>
     ///     Tests that ContentSize is updated when text is edited, allowing scrollbars to appear.
-    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    ///     See https://github.com/tui-cs/Terminal.Gui/issues/4660
     /// </summary>
     [Fact]
     public void ContentSize_Updates_When_Text_Is_Edited ()
@@ -2243,7 +2243,7 @@ public class TextViewTests (ITestOutputHelper output)
     // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
     /// <summary>
     ///     Tests that horizontal scrollbar appears when text width exceeds viewport width.
-    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    ///     See https://github.com/tui-cs/Terminal.Gui/issues/4660
     /// </summary>
     [Fact]
     public void HorizontalScrollBar_Appears_When_Text_Width_Exceeds_Viewport ()
@@ -2274,7 +2274,7 @@ public class TextViewTests (ITestOutputHelper output)
     // GitHub Copilot - Issue #4660: TextView scrollbars do not appear when text is edited
     /// <summary>
     ///     Tests that ContentSize is updated when Text property is set programmatically.
-    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    ///     See https://github.com/tui-cs/Terminal.Gui/issues/4660
     /// </summary>
     [Fact]
     public void ContentSize_Updates_When_Text_Property_Is_Set ()
@@ -2303,7 +2303,7 @@ public class TextViewTests (ITestOutputHelper output)
     /// <summary>
     ///     Tests that ContentsChanged event is fired and content size is updated appropriately.
     ///     This test verifies the behavior described in issue #4660.
-    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    ///     See https://github.com/tui-cs/Terminal.Gui/issues/4660
     /// </summary>
     [Fact]
     public void ContentsChanged_Fires_And_ContentSize_Is_Correct_After_Typing ()
@@ -2366,7 +2366,7 @@ public class TextViewTests (ITestOutputHelper output)
     ///     Tests that ContentSize is updated *during* the ContentsChanged event, not just after.
     ///     This test specifically verifies the bug where UpdateContentSize() needs to be called
     ///     in OnContentsChanged() so that the content size is correct at the time the event fires.
-    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    ///     See https://github.com/tui-cs/Terminal.Gui/issues/4660
     /// </summary>
     [Fact]
     public void ContentSize_Is_Updated_During_ContentsChanged_Event ()
@@ -2410,7 +2410,7 @@ public class TextViewTests (ITestOutputHelper output)
     ///     Tests that scrollbar visibility is correct *during* the ContentsChanged event.
     ///     The bug in issue #4660 is that scrollbar visibility isn't updated until after
     ///     OnContentsChanged returns, which can cause issues for event handlers.
-    ///     See https://github.com/gui-cs/Terminal.Gui/issues/4660
+    ///     See https://github.com/tui-cs/Terminal.Gui/issues/4660
     /// </summary>
     [Fact]
     public void ScrollBar_Visibility_Is_Correct_During_ContentsChanged_Event ()
@@ -3949,7 +3949,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4963
     ///     When Kitty keyboard protocol sets AssociatedText on Alt+letter keys,
     ///     TextView must not insert the text. Alt-modified keys are never text input.
     /// </summary>
@@ -3969,7 +3969,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4963
     ///     Ctrl-modified keys with AssociatedText must not be inserted as text.
     /// </summary>
     [Fact]
