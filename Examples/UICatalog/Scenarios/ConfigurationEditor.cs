@@ -1,8 +1,8 @@
 #nullable enable
 using System.Reflection;
-using Terminal.Gui.Document;
+using Terminal.Gui.Editor.Document;
 using Terminal.Gui.Editor;
-using Terminal.Gui.Highlighting;
+using Terminal.Gui.Editor.Highlighting;
 
 namespace UICatalog.Scenarios;
 
