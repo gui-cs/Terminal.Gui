@@ -1,7 +1,7 @@
 // ReSharper disable AccessToDisposedClosure
 
 using Terminal.Gui.Editor;
-using Terminal.Gui.Highlighting;
+using Terminal.Gui.Editor.Highlighting;
 using TextMateSharp.Grammars;
 
 namespace UICatalog.Scenarios;
