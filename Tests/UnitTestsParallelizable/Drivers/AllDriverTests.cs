@@ -94,7 +94,7 @@ public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
         app.Dispose ();
     }
 
-    // Tests fix for https://github.com/gui-cs/Terminal.Gui/issues/4258
+    // Tests fix for https://github.com/tui-cs/Terminal.Gui/issues/4258
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void All_Drivers_When_Clipped_AddStr_Glyph_On_Second_Cell_Of_Wide_Glyph_Outputs_Correctly (string driverName)

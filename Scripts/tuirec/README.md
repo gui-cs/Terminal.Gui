@@ -1,7 +1,7 @@
 # Recording Terminal.Gui Apps with `tuirec`
 
 Use this guide when an issue or PR asks for a GIF/video capture of a Terminal.Gui
-app or scenario. The recording tool is [`gui-cs/tuirec`](https://github.com/gui-cs/tuirec) —
+app or scenario. The recording tool is [`tui-cs/tuirec`](https://github.com/tui-cs/tuirec) —
 a Go CLI that spawns the target app in a PTY, injects keystrokes, records terminal
 output as an asciinema v2 cast, and renders an animated GIF via `agg`.
 
@@ -9,7 +9,7 @@ output as an asciinema v2 cast, and renders an animated GIF via `agg`.
 
 ```powershell
 # Requires Go 1.22+
-go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+go install github.com/tui-cs/tuirec/cmd/tuirec@latest
 tuirec --version
 
 # agg is auto-downloaded on first use — no separate install needed.
@@ -37,7 +37,7 @@ export PATH="$HOME/.dotnet:$PATH"
 
 # Go 1.22+ (if missing: distro package manager, or https://go.dev/dl)
 # tuirec installs into GOPATH/bin, which is often off-PATH:
-go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+go install github.com/tui-cs/tuirec/cmd/tuirec@latest
 export PATH="$(go env GOPATH)/bin:$PATH"
 
 tuirec --version && dotnet --version
@@ -164,7 +164,7 @@ file is named correctly. The `--name` value determines the artifact filenames.
 
 ### Critical: `--kitty-keyboard` Decision
 
-**Known bug ([gui-cs/tuirec#54](https://github.com/gui-cs/tuirec/issues/54)):**
+**Known bug ([tui-cs/tuirec#54](https://github.com/tui-cs/tuirec/issues/54)):**
 tuirec currently encodes navigation keys (`CursorUp`, `CursorDown`, `CursorLeft`,
 `CursorRight`, `PageUp`, `PageDown`, `Home`, `End`) incorrectly under
 `--kitty-keyboard` — it sends fabricated CSI u codepoints that the Kitty spec
@@ -313,7 +313,7 @@ grep -o 'u001bPq' artifacts/<name>.cast | wc -l   # sixel (only when forced)
 ```
 
 The sixel cell-size verification below applies to the **sixel** path; the
-[#84](https://github.com/gui-cs/tuirec/issues/84) cell-resolution mismatch is a
+[#84](https://github.com/tui-cs/tuirec/issues/84) cell-resolution mismatch is a
 sixel concern and does not apply when the app renders via Kitty graphics.
 
 > **The `adjusted agg font-size … to align the sixel cell grid (#84)` log line is
@@ -399,7 +399,7 @@ sight and obvious by arithmetic.
 **Why this bites with tuirec specifically.** tuirec advertises a sixel cell
 resolution (e.g. `8×17` px) that does **not** match agg's actual rendered font
 cell (~`8.3×18.8` px at the default `--font-size 14`) — see
-[#84](https://github.com/gui-cs/tuirec/issues/84). An app that *correctly* sizes
+[#84](https://github.com/tui-cs/tuirec/issues/84). An app that *correctly* sizes
 its raster as `cells × reportedResolution` (and fills exactly on a real sixel
 terminal) therefore renders ~4% **undersized** under tuirec. Do not "fix" the app
 for this; verify it and attribute it correctly.
@@ -416,7 +416,7 @@ for this; verify it and attribute it correctly.
    `P…q"asp;asp;WIDTH;HEIGHT` gives raster pixel size; divide by the raster's
    cell count to get the app's px-per-cell.
 4. **If agg's measured cell ≠ the app's px-per-cell, the sixel is mis-sized —
-   and that is the tuirec mismatch ([#84](https://github.com/gui-cs/tuirec/issues/84)),
+   and that is the tuirec mismatch ([#84](https://github.com/tui-cs/tuirec/issues/84)),
    not an app bug.** Then confirm the sixel's rendered bounding box actually spans
    the target region (the columns/rows it was meant to cover), not merely that it
    exists.
@@ -469,7 +469,7 @@ After every recording, verify:
 - [ ] **Grid-anchored sixel measured, not eyeballed** — if the sixel is sized or
       aligned to the text grid, calibrate agg's real cell and confirm the rendered
       bbox covers the target columns/rows (see *Verifying Placement and Size*
-      above). A ~4% undersize from [#84](https://github.com/gui-cs/tuirec/issues/84)
+      above). A ~4% undersize from [#84](https://github.com/tui-cs/tuirec/issues/84)
       is invisible by sight.
 
 ---
@@ -480,9 +480,9 @@ After every recording, verify:
 |---------|-------|-----|
 | No raster output on Windows | **Windows ConPTY strips Kitty graphics APC and sixel DCS** and does not pass the DA1 sixel handshake — the app detects no raster support | Record raster content (Kitty or sixel) on Linux/macOS (see `tuirec agent-guide`). On Windows you can still verify the app's raster code path runs (e.g., via an app-level force flag) by checking redraw activity in the `.cast`, but image pixels will not appear |
 | Image renders via sixel instead of Kitty (or vice versa) | The app picks its preferred protocol from what the terminal advertises; `tuirec` ≥ v0.9.0 advertises Kitty by default | Confirm the captured protocol in the cast (`u001b_G` for Kitty, `u001bPq` for sixel). To force sixel, use the app's own protocol control (e.g. the Mandelbrot scenario's "Sixel" option) |
-| Sixel renders ~4% too small / short of a border | tuirec advertises a cell resolution that doesn't match agg's rendered font cell ([#84](https://github.com/gui-cs/tuirec/issues/84)) | App is correct (fills on a real terminal). Verify by measurement (see *Verifying Placement and Size*); attribute to tuirec, not the app. Until fixed, only a tuirec-specific over-render hack would close the gap |
+| Sixel renders ~4% too small / short of a border | tuirec advertises a cell resolution that doesn't match agg's rendered font cell ([#84](https://github.com/tui-cs/tuirec/issues/84)) | App is correct (fills on a real terminal). Verify by measurement (see *Verifying Placement and Size*); attribute to tuirec, not the app. Until fixed, only a tuirec-specific over-render hack would close the gap |
 | Wide glyphs misaligned in GIF | Emoji/CJK chars are 2-cell wide; agg renders per-cell | Avoid emoji/CJK categories; use single-width ranges (Arrows, Box Drawing, etc.) |
-| Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
+| Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/tui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
 | App doesn't quit | Wrong quit key or key not delivered | Use `Escape` (the default quit key); check `--kitty-keyboard` interaction |
 | Blank frames at start/end | Pre/postroll not trimmed | `--trim` is on by default in v0.4.2+; ensure tuirec is up-to-date |
 | GIF validation: 1 frame | `--trim` removes all frames for static views | Use `--trim=false` for views with no visual change during demo |
@@ -512,7 +512,7 @@ When asked to record a scenario GIF:
 
 ## Reference
 
-- **tuirec repo:** https://github.com/gui-cs/tuirec
+- **tuirec repo:** https://github.com/tui-cs/tuirec
 - **Full keystroke syntax:** `tuirec agent-guide` (embeds the complete reference)
 - **CLI flags:** `tuirec record --help`
 - **ScenarioRunner:** `Examples/ScenarioRunner/` — CLI that runs individual UICatalog scenarios

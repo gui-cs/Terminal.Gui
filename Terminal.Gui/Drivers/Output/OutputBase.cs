@@ -250,7 +250,7 @@ public abstract class OutputBase
                     if (col != lastCol)
                     {
                         // Was a wide grapheme so mark clean next cell
-                        // See https://github.com/gui-cs/Terminal.Gui/issues/4466
+                        // See https://github.com/tui-cs/Terminal.Gui/issues/4466
                         buffer.Contents [row, col].IsDirty = false;
                     }
                 }

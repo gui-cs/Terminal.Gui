@@ -4,7 +4,7 @@ namespace ViewBaseTests.MouseTests;
 /// <summary>
 ///     Tests for MouseBinding with xxxReleased flags.
 ///     Verifies that custom bindings for Released events are properly invoked.
-///     Related to issue #4674: https://github.com/gui-cs/Terminal.Gui/issues/4674
+///     Related to issue #4674: https://github.com/tui-cs/Terminal.Gui/issues/4674
 /// </summary>
 [Trait ("Category", "Input")]
 [Trait ("Category", "Mouse")]

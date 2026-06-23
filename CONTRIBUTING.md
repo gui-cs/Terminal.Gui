@@ -312,7 +312,7 @@ foreach (Rune rune in text.EnumerateRunes ())
 **`/Examples/`**:
 - `UICatalog/` - Comprehensive demo app for manual testing
 - `ScenarioRunner/` - Scenario automation tool
-- Additional examples live in [gui-cs/Examples](https://github.com/gui-cs/Examples)
+- Additional examples live in [tui-cs/Examples](https://github.com/tui-cs/Examples)
 
 **`/docfx/`** - Documentation source:
 - `docs/` - Conceptual documentation (deep dives)

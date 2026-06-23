@@ -88,7 +88,7 @@ jobs:
       run: dotnet nuget push Terminal.Gui.Interop.Spectre/bin/Release/Terminal.Gui.Interop.Spectre.${{ steps.gitversion.outputs.SemVer }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}
 
     # Deterministic version handoff to notify-clet.yml. Avoids the NuGet
-    # search-API indexing lag that caused gui-cs/clet to skip TG develop.37
+    # search-API indexing lag that caused tui-cs/clet to skip TG develop.37
     # (see clet workflow run 25406348354). notify-clet.yml downloads this
     # artifact via workflow_run + actions/download-artifact and then polls
     # NuGet flat-container until the version is restorable.
@@ -121,22 +121,22 @@ jobs:
       uses: peter-evans/repository-dispatch@v4
       with:
         token: ${{ secrets.TEMPLATE_REPO_TOKEN }}
-        repository: gui-cs/Terminal.Gui.templates
+        repository: tui-cs/Terminal.Gui.templates
         event-type: terminal-gui-v2-released
         client-payload: ${{ steps.payload.outputs.json }}
 
-    # Notify gui-cs/Editor so its bump-terminal-gui.yml workflow can pin the
+    # Notify tui-cs/Editor so its bump-terminal-gui.yml workflow can pin the
     # just-published version, validate, and republish Editor against it
     # (Editor is the continuous canary for TG API churn — see Editor's
     # specs/decisions.md DEC-010). Editor also polls NuGet on a schedule, so a
     # missing token degrades gracefully.
-    # Requires EDITOR_DISPATCH_TOKEN: a PAT with `repo` scope on gui-cs/Editor.
-    - name: Notify gui-cs/Editor of publish
+    # Requires EDITOR_DISPATCH_TOKEN: a PAT with `repo` scope on tui-cs/Editor.
+    - name: Notify tui-cs/Editor of publish
       if: env.EDITOR_DISPATCH_TOKEN != ''
       continue-on-error: true
       uses: peter-evans/repository-dispatch@v4
       with:
         token: ${{ secrets.EDITOR_DISPATCH_TOKEN }}
-        repository: gui-cs/Editor
+        repository: tui-cs/Editor
         event-type: terminal-gui-published
         client-payload: '{"version":"${{ steps.gitversion.outputs.SemVer }}"}'

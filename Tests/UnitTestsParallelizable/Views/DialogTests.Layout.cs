@@ -241,7 +241,7 @@ public partial class DialogTests
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4615
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4615
     ///     Dialog's size logic should not allow it to be taller or wider than the screen.
     /// </summary>
     [Fact]
@@ -293,7 +293,7 @@ public partial class DialogTests
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4615
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4615
     ///     Dialog's size should be constrained by maximumContentDim.
     /// </summary>
     [Theory]

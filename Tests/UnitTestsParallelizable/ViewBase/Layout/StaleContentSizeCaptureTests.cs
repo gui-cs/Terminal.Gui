@@ -4,7 +4,7 @@ namespace ViewBaseTests.Layout;
 
 /// <summary>
 ///     Tests for the stale content size capture bug in <see cref="View.LayoutSubViews"/>.
-///     See: https://github.com/gui-cs/Terminal.Gui/issues/4522
+///     See: https://github.com/tui-cs/Terminal.Gui/issues/4522
 ///
 ///     The core bug: <c>LayoutSubViews</c> captures <c>contentSize</c> once at the top, then fires
 ///     <c>OnSubViewLayout</c>. If a subclass (e.g. Dialog) calls <c>SetContentSize</c> from that callback,

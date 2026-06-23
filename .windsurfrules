@@ -122,4 +122,4 @@ Input flows: Driver → `IInputProcessor` → `KeyBindings`/`MouseBindings` → 
 | Common UI patterns | `.claude/cookbook/common-patterns.md` |
 | App building guide | `.claude/tasks/build-app.md` |
 | Deep-dive docs | `docfx/docs/` |
-| Working examples | `Examples/UICatalog/`, `Examples/ScenarioRunner/`, `gui-cs/Examples` |
+| Working examples | `Examples/UICatalog/`, `Examples/ScenarioRunner/`, `tui-cs/Examples` |

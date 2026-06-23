@@ -62,7 +62,7 @@ dotnet run
 ### Key Resources
 - **App Building Guide**: [.claude/tasks/build-app.md](.claude/tasks/build-app.md)
 - **Common Patterns**: [.claude/cookbook/common-patterns.md](.claude/cookbook/common-patterns.md)
-- **Examples**: `Examples/UICatalog/`, `Examples/ScenarioRunner/`, and [gui-cs/Examples](https://github.com/gui-cs/Examples)
+- **Examples**: `Examples/UICatalog/`, `Examples/ScenarioRunner/`, and [tui-cs/Examples](https://github.com/tui-cs/Examples)
 
 ### API Reference (Compressed)
 | Namespace | Contents |
@@ -146,7 +146,7 @@ Process guides in `.claude/workflows/`:
 
 ## Visual Verification (Agent Eyes)
 
-Don't ship UI changes blind. Use [`tuirec`](https://github.com/gui-cs/tuirec) to run any Terminal.Gui app in a PTY, inject keystrokes, and capture the result — see [Scripts/tuirec/README.md](Scripts/tuirec/README.md). The `.cast` output is asciinema v2 JSON (plain text): read it back to verify what actually rendered. The `.gif` is for humans — attach it to PRs that change visuals. For deterministic in-process assertions, use `InputInjector`/`VirtualTimeProvider` (`docfx/docs/input-injection.md`).
+Don't ship UI changes blind. Use [`tuirec`](https://github.com/tui-cs/tuirec) to run any Terminal.Gui app in a PTY, inject keystrokes, and capture the result — see [Scripts/tuirec/README.md](Scripts/tuirec/README.md). The `.cast` output is asciinema v2 JSON (plain text): read it back to verify what actually rendered. The `.gif` is for humans — attach it to PRs that change visuals. For deterministic in-process assertions, use `InputInjector`/`VirtualTimeProvider` (`docfx/docs/input-injection.md`).
 
 ## Planning Mode
 

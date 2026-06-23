@@ -511,7 +511,7 @@ public partial class TreeView<T>
         }
 
         // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
+        // See: https://github.com/tui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
         if (KeyBindings.TryGet (key, out _))
         {
             return false;

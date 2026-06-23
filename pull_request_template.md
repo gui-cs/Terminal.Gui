@@ -9,8 +9,8 @@
 ## Pull Request checklist:
 
 - [ ] I've named my PR in the form of "Fixes #issue. Terse description."
-- [ ] My code follows the [style guidelines of Terminal.Gui](https://github.com/gui-cs/Terminal.Gui/blob/develop/.editorconfig) - if you use Visual Studio, hit `CTRL-K-D` to automatically reformat your files before committing.
-- [ ] My code follows the [Terminal.Gui library design guidelines](https://github.com/gui-cs/Terminal.Gui/blob/develop/CONTRIBUTING.md)
+- [ ] My code follows the [style guidelines of Terminal.Gui](https://github.com/tui-cs/Terminal.Gui/blob/develop/.editorconfig) - if you use Visual Studio, hit `CTRL-K-D` to automatically reformat your files before committing.
+- [ ] My code follows the [Terminal.Gui library design guidelines](https://github.com/tui-cs/Terminal.Gui/blob/develop/CONTRIBUTING.md)
 - [ ] I ran `dotnet test` before commit
 - [ ] I have made corresponding changes to the API documentation (using `///` style comments)
 - [ ] My changes generate no new warnings

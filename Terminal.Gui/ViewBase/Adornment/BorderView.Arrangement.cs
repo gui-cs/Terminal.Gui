@@ -22,7 +22,7 @@ public partial class BorderView
     ///     keyboard-based arrangement via <c>Ctrl+F5</c>.
     /// </summary>
     /// <remarks>
-    ///     See the <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
+    ///     See the <see href="https://tui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
     /// </remarks>
     internal Arranger Arranger => _arranger ??= new Arranger (this);
 

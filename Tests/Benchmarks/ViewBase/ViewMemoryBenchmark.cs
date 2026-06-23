@@ -7,7 +7,7 @@ namespace Terminal.Gui.Benchmarks.ViewBase;
 ///     Measures memory allocated when instantiating each concrete <see cref="View"/> subclass.
 ///     Discovers all View types via reflection (same technique as TestsAllViews).
 ///     Tracks the per-view footprint reduction described in
-///     <see href="https://github.com/gui-cs/Terminal.Gui/issues/4696"/>.
+///     <see href="https://github.com/tui-cs/Terminal.Gui/issues/4696"/>.
 /// </summary>
 /// <remarks>
 ///     <para>

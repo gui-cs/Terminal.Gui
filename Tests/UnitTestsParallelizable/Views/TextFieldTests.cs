@@ -1786,7 +1786,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4963
     ///     When Kitty keyboard protocol sets AssociatedText on Alt+letter keys,
     ///     TextField must not insert the text. Alt-modified keys are never text input.
     /// </summary>
@@ -1806,7 +1806,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4963
     ///     Ctrl-modified keys with AssociatedText must not be inserted as text.
     /// </summary>
     [Fact]

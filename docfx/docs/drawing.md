@@ -193,7 +193,7 @@ While <xref:Terminal.Gui.Drawing.Color> supports an alpha channel for transparen
 
 - Indicate whether a color should be rendered at all (alpha = 0 means fully transparent/don't render)
 - Support future transparency features
-- Enable terminal background pass-through (see [#2381](https://github.com/gui-cs/Terminal.Gui/issues/2381) and [#4229](https://github.com/gui-cs/Terminal.Gui/issues/4229))
+- Enable terminal background pass-through (see [#2381](https://github.com/tui-cs/Terminal.Gui/issues/2381) and [#4229](https://github.com/tui-cs/Terminal.Gui/issues/4229))
 
 **Important**: When matching colors to standard color names, the alpha channel is **ignored**. This means `Color(255, 0, 0, 255)` (opaque red) and `Color(255, 0, 0, 128)` (semi-transparent red) will both be recognized as "Red". This design decision supports the vision of enabling transparent backgrounds while still being able to identify colors semantically.
 

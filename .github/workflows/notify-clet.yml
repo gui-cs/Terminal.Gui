@@ -1,8 +1,8 @@
 name: Notify clet
 
-# Fires repository_dispatch to gui-cs/clet so that every TG develop NuGet
+# Fires repository_dispatch to tui-cs/clet so that every TG develop NuGet
 # publish and every TG release tag drives a matching clet build/publish.
-# See gui-cs/clet#30 and gui-cs/clet D-020 for context.
+# See tui-cs/clet#30 and tui-cs/clet D-020 for context.
 #
 # Design notes:
 #   - The version comes from the `published-version` artifact uploaded by
@@ -11,7 +11,7 @@ name: Notify clet
 #     `dotnet restore` actually hits) until the package is downloadable.
 #     The flat-container is updated soon after publish; the search API
 #     (queried by `dotnet package search`) lags by minutes, which broke
-#     this workflow once before — see gui-cs/clet workflow run 25406348354.
+#     this workflow once before — see tui-cs/clet workflow run 25406348354.
 #   - Channel is derived from the triggering workflow's branch:
 #     develop ⇒ tg-develop-published, anything else (main, release
 #     branches like v2.1.0-rc.4, tags) ⇒ tg-main-published.
@@ -70,11 +70,11 @@ jobs:
           echo "::error::Timed out after 10min waiting for $VER on flat-container"
           exit 1
 
-      - name: Dispatch to gui-cs/clet
+      - name: Dispatch to tui-cs/clet
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.CLET_DISPATCH_PAT }}
-          repository: gui-cs/clet
+          repository: tui-cs/clet
           event-type: ${{ steps.version.outputs.event_type }}
           client-payload: |
             {"tg_version": "${{ steps.version.outputs.tg_version }}"}

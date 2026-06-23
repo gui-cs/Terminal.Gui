@@ -6,7 +6,7 @@ namespace InputTests;
 ///     Locks the explicit integer value of every <see cref="Command"/> member. These values are an ABI
 ///     contract: separately-compiled assemblies (notably the <c>Terminal.Gui.Editor</c> package) bake the
 ///     integer of each command into their key bindings, so inserting/reordering/renumbering a member
-///     silently re-maps already-compiled bindings to the wrong command — the gui-cs/Editor#241 regression
+///     silently re-maps already-compiled bindings to the wrong command — the tui-cs/Editor#241 regression
 ///     where Backspace invoked <see cref="Command.SelectAll"/>.
 ///     <para>
 ///         When you ADD a command, append it with the next unused number and add a line here. If this test
@@ -69,7 +69,7 @@ public class CommandFrozenValueTests
     [Fact]
     public void BindingCriticalCommands_DoNotCollide ()
     {
-        // The exact trio behind gui-cs/Editor#241: a one-off shift made Backspace's bound command
+        // The exact trio behind tui-cs/Editor#241: a one-off shift made Backspace's bound command
         // (DeleteCharLeft) resolve to SelectAll. They must stay distinct and in this fixed order.
         Assert.Equal (40, (int)Command.DeleteCharRight);
         Assert.Equal (41, (int)Command.DeleteCharLeft);

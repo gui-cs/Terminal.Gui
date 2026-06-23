@@ -147,7 +147,7 @@ See `.claude/cookbook/common-patterns.md` for recipes including:
 |---------|----------|-------------|
 | All Controls | `Examples/UICatalog/` | Comprehensive demo app |
 | Scenario automation | `Examples/ScenarioRunner/` | Run UICatalog scenarios from the CLI |
-| Additional samples | `gui-cs/Examples` | Standalone example applications |
+| Additional samples | `tui-cs/Examples` | Standalone example applications |
 
 ## Event Handling Patterns
 
@@ -256,7 +256,7 @@ Available themes: `Default`, `Dark`, `Light`, `Amber Phosphor`, `Green Phosphor`
 
 ## Verify Your App Actually Works (Give Yourself Eyes)
 
-You cannot see a TUI from a build log. Before declaring an app done, **run it and observe it** with [`tuirec`](https://github.com/gui-cs/tuirec) — it spawns the app in a PTY, injects keystrokes, and records the terminal output:
+You cannot see a TUI from a build log. Before declaring an app done, **run it and observe it** with [`tuirec`](https://github.com/tui-cs/tuirec) — it spawns the app in a PTY, injects keystrokes, and records the terminal output:
 
 ```powershell
 dotnet build -c Release

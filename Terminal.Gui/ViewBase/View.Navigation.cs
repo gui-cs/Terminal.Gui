@@ -17,7 +17,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///     </para>
     ///     <para>
     ///         See the View Navigation Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
     ///     </para>
     /// </remarks>
     /// <param name="direction"></param>
@@ -252,7 +252,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <remarks>
     ///     <para>
     ///         See the View Navigation Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
     ///     </para>
     ///     <para>
     ///         <see cref="SuperView"/> must also have <see cref="CanFocus"/> set to <see langword="true"/>.
@@ -478,7 +478,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <remarks>
     ///     <para>
     ///         See the View Navigation Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
     ///     </para>
     ///     <para>
     ///         Only Views that are visible, enabled, and have <see cref="CanFocus"/> set to <see langword="true"/> are
@@ -548,7 +548,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <remarks>
     ///     <para>
     ///         See the View Navigation Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
     ///     </para>
     /// </remarks>
     /// <returns><see langword="true"/> if the focus changed; <see langword="true"/> false otherwise.</returns>
@@ -589,7 +589,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Pre-conditions
         if (_hasFocus)
         {
-            //// See https://github.com/gui-cs/Terminal.Gui/pull/4013#issuecomment-2823934197
+            //// See https://github.com/tui-cs/Terminal.Gui/pull/4013#issuecomment-2823934197
             //if (Application.Navigation is { } && (Application.Navigation.GetFocused () == this || Application.Navigation.GetFocused () == MostFocused))
             //{
             //    throw new InvalidOperationException (@"Do not SetFocus on a view that is already MostFocused.");
@@ -1039,7 +1039,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// <remarks>
     ///     <para>
     ///         See the View Navigation Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/navigation.html"/>
     ///     </para>
     ///     <para>
     ///         If <see langword="null"/> the tab stop has not been set and setting <see cref="CanFocus"/> to true will set it

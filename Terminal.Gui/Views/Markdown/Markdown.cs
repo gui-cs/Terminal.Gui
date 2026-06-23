@@ -527,14 +527,14 @@ public partial class Markdown : View, IDesignable
 
                                                           ## Links
 
-                                                          * [Markdown API docs](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
+                                                          * [Markdown API docs](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
                                                           * [Relative local link](docs/getting-started.md) renders as a link without opening a URI handler by default.
 
                                                           ## Checklist
 
                                                           - [x] Text with **bold**, *italic*, `inline code`, and ~~strikethrough~~ ✅
                                                           - [x] Inline `Code` 🔧
-                                                          - [x] [Links](https://github.com/gui-cs) 🎉
+                                                          - [x] [Links](https://github.com/tui-cs) 🎉
                                                           - [ ] Images 😒
 
                                                           ## Code Blocks
@@ -553,7 +553,7 @@ public partial class Markdown : View, IDesignable
 
                                                           Plain text. *Formatted text* with **bold** and `inline code`.
 
-                                                          Link:  [SyntaxHighlighting](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
+                                                          Link:  [SyntaxHighlighting](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
 
                                                           - [x] Checked
 
@@ -569,7 +569,7 @@ public partial class Markdown : View, IDesignable
 
                                                           | Feature        | Status        |
                                                           |----------------|---------------|
-                                                          | [Links](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! |
+                                                          | [Links](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! |
                                                           | Inline `code`  | ✅ *Awesome!*   |
                                                           | Emojis 🎉      | ✅ **Whoa!**      |
 

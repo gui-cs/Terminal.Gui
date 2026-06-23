@@ -1,6 +1,6 @@
 # Getting Started
 
-Paste these commands into your favorite terminal on Windows, Mac, or Linux. This will install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new "Hello World" TUI app, and run it.
+Paste these commands into your favorite terminal on Windows, Mac, or Linux. This will install the [Terminal.Gui.Templates](https://github.com/tui-cs/Terminal.Gui.templates), create a new "Hello World" TUI app, and run it.
 
 (Press `Esc` to exit the app)
 
@@ -21,7 +21,7 @@ dotnet add package Terminal.Gui
 
 ## Using the Templates
 
-Use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
+Use the [Terminal.Gui.Templates](https://github.com/tui-cs/Terminal.Gui.templates):
 
 ```ps1
 dotnet new install Terminal.Gui.Templates@2.0.*
@@ -67,5 +67,5 @@ When run the application looks as follows:
 ## Building the Library and Running the Examples
 
 * Windows, Mac, and Linux - Build and run using the .NET SDK command line tools (`dotnet build` in the root directory). Run `UICatalog` with `dotnet run --project UICatalog`.
-* Additional examples are available in [gui-cs/Examples](https://github.com/gui-cs/Examples).
+* Additional examples are available in [tui-cs/Examples](https://github.com/tui-cs/Examples).
 * Windows - Open `Terminal.slnx` with Visual Studio 2022 (17.10+).
