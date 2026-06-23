@@ -57,8 +57,8 @@ app.Run (window);
 - The application initializes automatically when you call `Run<T>()`
 - Use `app.Run<ExampleWindow>()` to run a window that implements <xref:Terminal.Gui.App.IRunnable>
 - Call `app.Dispose()` to clean up resources and restore the terminal
-- Event handling uses <xref:Terminal.Gui.ViewBase.View.Accepting> event instead of legacy `Accept` event
-- Set `e.Handled = true` in event handlers to prevent further processing
+- Use the <xref:Terminal.Gui.ViewBase.View.Accepted> event for side effects (e.g. handling a button press); the legacy `Accept` event is gone
+- Use the <xref:Terminal.Gui.ViewBase.View.Accepting> event only to inspect or cancel an action, setting `e.Handled = true` to cancel it
 
 When run the application looks as follows:
 
