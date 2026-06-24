@@ -9,10 +9,7 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 
 ![Terminal.Gui — cross-platform TUI toolkit for .NET. Build full-featured terminal UIs with menus, forms, tables, charts, wizards and file dialogs. +11k stars, +50 built-in views, +1.7M downloads, TrueColor with Unicode and mouse — Windows / macOS / Linux, MIT-licensed.](docfx/images/hero.gif)
 
-
-# Version 2.0 Has Been Released
-
-Terminal.Gui enables building sophisticated console applications with modern UIs:
+## Terminal.Gui enables building sophisticated console applications with modern UIs
 
 - **Responsive TUI** - Easy to use, innovative, layout system enables console apps as responsive as any responsive web page.
 - **Performant and Scalable** - Built for modern TUIs - fast, double-buffering-based rendering; Tables and Tree Views scale to infinite elements with sorting and filtering.
