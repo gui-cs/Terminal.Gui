@@ -218,6 +218,12 @@ public partial class View
             }
             else if (Padding.Thickness != Thickness.Empty)
             {
+                // Thickness.Draw fills via the driver's CurrentAttribute and does not set one itself, so
+                // set the view's Normal here. Otherwise the padding inherits whatever attribute was last
+                // used — which is stale (e.g. a sibling raster view's Color.None) when the parent skipped
+                // its ClearViewport on a child-only redraw, bleeding foreign content into the padding
+                // column. (gui-cs/Terminal.Gui#5518.)
+                SetAttributeForRole (VisualRole.Normal);
                 Padding.Thickness.Draw (Driver, Padding.FrameToScreen (), Padding.Diagnostics);
                 Padding.LastDrawnRegion = null;
             }
