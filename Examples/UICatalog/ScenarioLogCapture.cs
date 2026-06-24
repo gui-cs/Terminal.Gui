@@ -10,6 +10,9 @@ namespace UICatalog;
 /// </summary>
 public class ScenarioLogCapture : ILoggerProvider
 {
+    private const int MaxBufferChars = 256_000;
+    private const int TrimTargetChars = 192_000;
+
     private readonly object _lock = new ();
     private readonly StringBuilder _buffer = new ();
 
@@ -113,12 +116,47 @@ public class ScenarioLogCapture : ILoggerProvider
         lock (_lock)
         {
             _buffer.AppendLine ($"[{logLevel}] {message}");
+            TrimIfNeeded ();
 
             if (logLevel >= LogLevel.Error)
             {
                 _hasErrors = true;
             }
         }
+    }
+
+    private void TrimIfNeeded ()
+    {
+        if (_buffer.Length <= MaxBufferChars)
+        {
+            return;
+        }
+
+        var removeCount = _buffer.Length - TrimTargetChars;
+
+        if (removeCount <= 0)
+        {
+            return;
+        }
+
+        int nextLineBreak = -1;
+
+        for (int i = removeCount; i < _buffer.Length; i++)
+        {
+            if (_buffer [i] == '\n')
+            {
+                nextLineBreak = i;
+                break;
+            }
+        }
+
+        if (nextLineBreak >= 0)
+        {
+            removeCount = nextLineBreak + 1;
+        }
+
+        _buffer.Remove (0, removeCount);
+        _scenarioStartPosition = Math.Max (0, _scenarioStartPosition - removeCount);
     }
 
     /// <inheritdoc />
