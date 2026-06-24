@@ -565,7 +565,7 @@ public sealed class TreeWindow : Runnable
 leave room.
 
 For shortcuts that need to work app-wide (not just when focused), set `BindKeyToApplication = true`
-and handle the `Accepted` event for side effects (not `Action`).
+and handle the `Activated` event or set `Action` for side effects.
 
 ```csharp
 public sealed class StatusBarApp : Runnable
@@ -592,10 +592,10 @@ public sealed class StatusBarApp : Runnable
             BindKeyToApplication = true
         };
 
-        saveShortcut.Accepted += (_, _) =>
-                                 {
-                                     MessageBox.Query (App!, "Save", "Saving...", "OK");
-                                 };
+        saveShortcut.Activated += (_, _) =>
+                                  {
+                                      MessageBox.Query (App!, "Save", "Saving...", "OK");
+                                  };
 
         Shortcut quitShortcut = new ()
         {
@@ -604,10 +604,10 @@ public sealed class StatusBarApp : Runnable
             BindKeyToApplication = true
         };
 
-        quitShortcut.Accepted += (_, _) =>
-                                  {
-                                      App?.RequestStop ();
-                                  };
+        quitShortcut.Activated += (_, _) =>
+                                   {
+                                       App?.RequestStop ();
+                                   };
 
         statusBar.Add (saveShortcut, quitShortcut);
         Add (content, statusBar);

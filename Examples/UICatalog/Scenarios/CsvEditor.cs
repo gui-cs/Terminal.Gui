@@ -246,19 +246,10 @@ public class CsvEditor : Scenario
 
     private bool GetText (string title, string label, string initialText, out string enteredText)
     {
-        var okPressed = false;
-
         Button cancel = new () { Text = "Cancel" };
         Button ok = new () { Text = "Ok" };
 
         Dialog d = new () { Title = title };
-
-        ok.Accepted += (_, _) =>
-                        {
-                            okPressed = true;
-                            d.App?.RequestStop ();
-                        };
-        cancel.Accepted += (_, _) => { d.App?.RequestStop (); };
         d.Buttons = [cancel, ok];
 
         Label lbl = new () { X = 0, Y = 1, Text = label };
@@ -269,11 +260,12 @@ public class CsvEditor : Scenario
         tf.SetFocus ();
 
         _app?.Run (d);
+        bool accepted = !d.Canceled;
         d.Dispose ();
 
-        enteredText = okPressed ? tf.Text : string.Empty;
+        enteredText = accepted ? tf.Text : string.Empty;
 
-        return okPressed;
+        return accepted;
     }
 
     private void MoveColumn ()
