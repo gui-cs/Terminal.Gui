@@ -53,8 +53,7 @@ public sealed class FormWindow : Runnable<FormData?>
         {
             Text = "Submit",
             X = Pos.Center (),
-            Y = 9,
-            IsDefault = true
+            Y = 9
         };
 
         submitButton.Accepting += (_, e) =>
@@ -76,10 +75,12 @@ public sealed class FormWindow : Runnable<FormData?>
                 return;
             }
 
-            // Success - return data
+        };
+
+        submitButton.Accepted += (_, _) =>
+        {
             Result = new FormData (nameField.Text, emailField.Text, ageField.Value);
             App!.RequestStop ();
-            e.Handled = true;
         };
 
         Add (nameLabel, nameField, emailLabel, emailField, ageLabel, ageField, errorLabel, submitButton);
@@ -133,7 +134,7 @@ public sealed class ListWindow : Runnable
             Y = Pos.AnchorEnd (1)
         };
 
-        // ListView is IValue<int?> — the selected index. SelectedItem is int?.
+        // ListView is IValue<int?> — the selected index.
         _listView.ValueChanged += (_, e) =>
         {
             if (e.NewValue is int index && index < _items.Count)
@@ -144,7 +145,7 @@ public sealed class ListWindow : Runnable
 
         selectButton.Accepted += (_, _) =>
         {
-            if (_listView.SelectedItem is int selected)
+            if (_listView.Value is int selected)
             {
                 MessageBox.Query (App!, "Selection", $"You selected: {_items [selected]}", "OK");
             }
@@ -319,10 +320,9 @@ public sealed class ProgressWindow : Runnable
             Y = 5
         };
 
-        cancelButton.Accepting += (_, e) =>
+        cancelButton.Accepted += (_, _) =>
         {
             App!.RequestStop ();
-            e.Handled = true;
         };
 
         Add (_statusLabel, _progressBar, cancelButton);
@@ -565,7 +565,7 @@ public sealed class TreeWindow : Runnable
 leave room.
 
 For shortcuts that need to work app-wide (not just when focused), set `BindKeyToApplication = true`
-and handle the `Accepting` event (not `Action`).
+and handle the `Accepted` event for side effects (not `Action`).
 
 ```csharp
 public sealed class StatusBarApp : Runnable
@@ -592,11 +592,10 @@ public sealed class StatusBarApp : Runnable
             BindKeyToApplication = true
         };
 
-        saveShortcut.Accepting += (_, e) =>
-                                  {
-                                      MessageBox.Query (App!, "Save", "Saving...", "OK");
-                                      e.Handled = true;
-                                  };
+        saveShortcut.Accepted += (_, _) =>
+                                 {
+                                     MessageBox.Query (App!, "Save", "Saving...", "OK");
+                                 };
 
         Shortcut quitShortcut = new ()
         {
@@ -605,10 +604,9 @@ public sealed class StatusBarApp : Runnable
             BindKeyToApplication = true
         };
 
-        quitShortcut.Accepting += (_, e) =>
+        quitShortcut.Accepted += (_, _) =>
                                   {
                                       App?.RequestStop ();
-                                      e.Handled = true;
                                   };
 
         statusBar.Add (saveShortcut, quitShortcut);

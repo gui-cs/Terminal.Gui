@@ -248,18 +248,18 @@ public class CsvEditor : Scenario
     {
         var okPressed = false;
 
-        Button ok = new () { Text = "Ok", IsDefault = true };
+        Button cancel = new () { Text = "Cancel" };
+        Button ok = new () { Text = "Ok" };
 
         Dialog d = new () { Title = title };
 
-        ok.Accepting += (_, _) =>
+        ok.Accepted += (_, _) =>
                         {
                             okPressed = true;
                             d.App?.RequestStop ();
                         };
-        Button cancel = new () { Text = "Cancel" };
-        cancel.Accepting += (_, _) => { d.App?.RequestStop (); };
-        d.Buttons = [ok, cancel];
+        cancel.Accepted += (_, _) => { d.App?.RequestStop (); };
+        d.Buttons = [cancel, ok];
 
         Label lbl = new () { X = 0, Y = 1, Text = label };
 
