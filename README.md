@@ -2,7 +2,6 @@
 ![Bugs](https://img.shields.io/github/issues/tui-cs/Terminal.Gui)
 [![codecov](https://codecov.io/gh/tui-cs/Terminal.Gui/graph/badge.svg?token=1Ac9gyGtrj)](https://codecov.io/gh/tui-cs/Terminal.Gui)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
-[![License](https://img.shields.io/github/license/tui-cs/gui.cs.svg)](LICENSE)
 
 # Terminal.Gui
 
