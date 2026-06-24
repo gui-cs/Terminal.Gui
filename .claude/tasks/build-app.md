@@ -15,7 +15,7 @@ When a user says "I want to build a terminal.gui app that does XYZ":
 
 ### New Project (Recommended)
 ```bash
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
+dotnet new install Terminal.Gui.Templates@2.*
 dotnet new tui-simple -n ProjectName
 cd ProjectName
 dotnet run
@@ -83,7 +83,7 @@ public sealed class LoginWindow : Runnable<string?>
     public LoginWindow ()
     {
         TextField usernameField = new () { X = 1, Y = 1, Width = 20 };
-        Button loginButton = new () { Text = "Login", X = 1, Y = 3, IsDefault = true };
+        Button loginButton = new () { Text = "Login", X = 1, Y = 3 };
 
         loginButton.Accepted += (_, _) =>
         {
@@ -203,8 +203,9 @@ KeyBindings.Add (Key.F5, Command.Refresh);
 
 ### Message Box
 ```csharp
-int? result = MessageBox.Query (App!, "Title", "Message", "Yes", "No");
-// result: 0 = Yes, 1 = No, null = dismissed without choosing
+// MessageBox makes the last button the default (Enter-activated), so put affirmative last.
+int? result = MessageBox.Query (App!, "Title", "Message", "No", "Yes");
+// result: 0 = No, 1 = Yes, null = dismissed without choosing
 ```
 
 ### Error Dialog
@@ -213,13 +214,17 @@ MessageBox.ErrorQuery (App!, "Error", "Something went wrong", "OK");
 ```
 
 ### Custom Dialog
+
+The last `Dialog` button added is the default (Enter-activated), just like `MessageBox`. Add `Cancel` before `OK` and avoid setting `IsDefault` manually unless you intentionally override that default.
+
 ```csharp
 Dialog dialog = new ()
 {
     Title = "Custom Dialog",
     Width = 40,
     Height = 10,
-    Buttons = [new Button { Text = "OK" }, new Button { Text = "Cancel" }]
+    // Dialog makes the last button the default; order cancel/destructive choices first.
+    Buttons = [new Button { Text = "Cancel" }, new Button { Text = "OK" }]
 };
 // Add controls to dialog...
 app.Run (dialog);

@@ -28,7 +28,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 - **Language**: C# 14 (net10.0)
 - **Platform**: Cross-platform (Windows, macOS, Linux)
 - **Architecture**: Console UI toolkit with driver-based architecture
-- **Version**: v2 (Beta), v1 (maintenance mode)
+- **Version**: v2 (stable), v1 (maintenance mode)
 - **Branching**: GitFlow model (develop is default/active development)
 
 ## Key Architecture Concepts
