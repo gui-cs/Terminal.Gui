@@ -67,6 +67,31 @@ public partial class View // Drawing APIs
     }
 
     /// <summary>
+    ///     Collects the ids of raster graphics (Sixel/Kitty) this view and its rendered SubViews currently keep
+    ///     resident in the terminal. The framework calls this after drawing and passes the result to
+    ///     <see cref="IOutputBuffer.RetainRasterImages"/> so raster graphics whose owning view is no longer
+    ///     rendered (hidden, removed, or on a runnable that has ended) are released instead of lingering on screen.
+    /// </summary>
+    /// <remarks>
+    ///     A view that transmits a raster image (e.g. <see cref="Views.ImageView"/>) overrides this to add its
+    ///     id when it is currently rendering. Invisible views and their SubViews are skipped, so a view that was
+    ///     hidden releases its raster graphics.
+    /// </remarks>
+    /// <param name="ids">The set to add active raster image ids to.</param>
+    internal virtual void CollectActiveRasterImageIds (HashSet<string> ids)
+    {
+        if (!Visible)
+        {
+            return;
+        }
+
+        foreach (View subView in InternalSubViews)
+        {
+            subView.CollectActiveRasterImageIds (ids);
+        }
+    }
+
+    /// <summary>
     ///     Draws the view if it needs to be drawn.
     /// </summary>
     /// <remarks>

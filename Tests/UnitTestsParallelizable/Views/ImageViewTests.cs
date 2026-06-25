@@ -1748,6 +1748,139 @@ public class ImageViewTests
 
     #endregion Resolution Selection Consistency
 
+    #region Raster Cleanup (issue #5543)
+
+    // Claude - Opus 4.8
+    // A raster ImageView removed from its SuperView (without being disposed) must not leave its
+    // out-of-band Sixel/Kitty graphic resident in the output buffer. See issue #5543.
+    [Fact]
+    public void RasterImage_Released_WhenRemovedFromSuperView ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 4, Height = 4, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+
+        runnable.Remove (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        imageView.Dispose ();
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.8
+    // A raster ImageView that becomes invisible must release its resident Sixel/Kitty graphic. See issue #5543.
+    [Fact]
+    public void RasterImage_Released_WhenHidden ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 4, Height = 4, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+
+        imageView.Visible = false;
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.8
+    // A raster ImageView nested in a container that is removed (e.g. the container revealing the view
+    // beneath it) must release its resident Sixel/Kitty graphic. This generalizes the issue #5543 case
+    // beyond modal Dialogs to any overlapping container.
+    [Fact]
+    public void RasterImage_Released_WhenContainerRemoved ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        View container = new () { Width = 6, Height = 6 };
+        ImageView imageView = new () { Width = 4, Height = 4, Image = CreateCoordinateImage (4, 4) };
+        container.Add (imageView);
+        runnable.Add (container);
+        app.LayoutAndDraw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+
+        runnable.Remove (container);
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        container.Dispose ();
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.8
+    // The issue #5543 scenario: a modal runnable hosting a raster ImageView leaves its Sixel/Kitty graphic
+    // on screen after it closes. When the modal session ends, its raster graphic must be released.
+    [Fact]
+    public void RasterImage_Released_WhenModalRunnableEnds ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+        app.Driver!.SetScreenSize (10, 10);
+
+        Runnable main = new () { Width = 10, Height = 10 };
+        app.Begin (main);
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        // Run a modal runnable hosting a raster ImageView on top of the main view.
+        Runnable dialog = new () { Width = 6, Height = 6 };
+        ImageView imageView = new () { Width = 4, Height = 4, Image = CreateCoordinateImage (4, 4) };
+        dialog.Add (imageView);
+        SessionToken? dialogToken = app.Begin (dialog);
+        app.LayoutAndDraw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+
+        // Close the modal — the main view is revealed and the dialog's graphic must not linger.
+        app.End (dialogToken!);
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        dialog.Dispose ();
+        main.Dispose ();
+    }
+
+    #endregion Raster Cleanup (issue #5543)
+
     #region Helper Methods
 
     /// <summary>Creates a solid-color image of the specified dimensions.</summary>

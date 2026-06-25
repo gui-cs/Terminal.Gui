@@ -93,6 +93,7 @@ public class ProgressBar : View, IDesignable
     private int _fireEncoderMaxColors;
     private int _fireFrame;
     private readonly string _fireRasterImageId = $"{nameof (ProgressBar)}.{Guid.NewGuid ():N}.Fire";
+    private bool _fireRasterImageActive;
     private float _fraction;
     private bool _isActivity;
     private bool _syncWithTerminal;
@@ -450,6 +451,7 @@ public class ProgressBar : View, IDesignable
         };
 
         driver.GetOutputBuffer ().AddRasterImage (command);
+        _fireRasterImageActive = true;
 
         return true;
     }
@@ -507,7 +509,27 @@ public class ProgressBar : View, IDesignable
         public List<Color> BuildPalette (int maxColors) => [.. _firePalette.Take (maxColors)];
     }
 
-    private void RemoveFireRasterImage () => Driver?.GetOutputBuffer ().RemoveRasterImage (_fireRasterImageId);
+    private void RemoveFireRasterImage ()
+    {
+        _fireRasterImageActive = false;
+        Driver?.GetOutputBuffer ().RemoveRasterImage (_fireRasterImageId);
+    }
+
+    /// <inheritdoc/>
+    internal override void CollectActiveRasterImageIds (HashSet<string> ids)
+    {
+        if (!Visible)
+        {
+            return;
+        }
+
+        base.CollectActiveRasterImageIds (ids);
+
+        if (_fireRasterImageActive)
+        {
+            ids.Add (_fireRasterImageId);
+        }
+    }
 
     private void UpdateTerminalProgress ()
     {
