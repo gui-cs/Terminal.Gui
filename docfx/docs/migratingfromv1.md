@@ -404,7 +404,7 @@ myView.AddRune(col, row, new Rune('▄'));
 var width = rune.GetColumns();
 ```
 
-See [Unicode](https://tui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#unicode) for details.
+See [Unicode](https://tui-cs.github.io/Terminal.Gui/docs/overview#unicode) for details.
 
 ---
 

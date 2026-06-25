@@ -37,7 +37,7 @@
 ## Quick Start
 
 ```bash
-dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
+dotnet new install Terminal.Gui.Templates@2.*
 dotnet new tui-simple -n myproj
 cd myproj
 dotnet run
@@ -153,10 +153,10 @@ button.Accepted += (_, _) =>
     // Handle button press — no e.Handled needed for post-events
 };
 
-// List selection changed
-listView.SelectedItemChanged += (_, e) =>
+// List selection changed — ListView is IValue<int?> (the selected index)
+listView.ValueChanged += (_, e) =>
 {
-    int selectedIndex = e.Value;
+    int? selectedIndex = e.NewValue;
 };
 
 // Key bindings
@@ -183,8 +183,7 @@ public sealed class LoginDialog : Runnable<string?>
         {
             Text = "OK",
             X = Pos.Center (),
-            Y = 5,
-            IsDefault = true
+            Y = 5
         };
 
         okButton.Accepted += (_, _) =>
@@ -213,35 +212,30 @@ public sealed class MenuApp : Runnable
     {
         Title = "My App";
 
-        MenuBar menuBar = new ()
-        {
-            Menus =
-            [
-                new MenuBarItem (
-                    "File",
-                    [
-                        new MenuItem ("New", "", () => NewFile (), null, null, KeyCode.N | KeyCode.CtrlMask),
-                        new MenuItem ("Open...", "", () => OpenFile (), null, null, KeyCode.O | KeyCode.CtrlMask),
-                        null, // Separator
-                        new MenuItem ("Exit", "", () => App!.RequestStop (), null, null, KeyCode.Q | KeyCode.CtrlMask)
-                    ]),
-                new MenuBarItem (
-                    "Help",
-                    [
-                        new MenuItem ("About...", "", () => ShowAbout ())
-                    ])
-            ]
-        };
+        MenuBar menuBar = new ();
 
-        TextView editor = new ()
+        menuBar.Add (new MenuBarItem ("_File",
+                                      [
+                                          new MenuItem { Title = "_New", Key = Key.N.WithCtrl, Action = NewFile },
+                                          new MenuItem { Title = "_Open...", Key = Key.O.WithCtrl, Action = OpenFile },
+                                          new Line (),
+                                          new MenuItem { Title = "E_xit", Key = Key.Q.WithCtrl, Action = () => App!.RequestStop () }
+                                      ]));
+
+        menuBar.Add (new MenuBarItem ("_Help",
+                                      [
+                                          new MenuItem { Title = "_About...", Action = ShowAbout }
+                                      ]));
+
+        View content = new ()
         {
             X = 0,
-            Y = 1,
+            Y = Pos.Bottom (menuBar),
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
 
-        Add (menuBar, editor);
+        Add (menuBar, content);
     }
 
     private void NewFile () => MessageBox.Query (App!, "New", "Created!", "OK");
@@ -261,26 +255,27 @@ public sealed class TabbedWindow : Runnable
     {
         Title = "Tabs Demo";
 
-        TabView tabView = new ()
+        Tabs tabs = new ()
         {
-            X = 0, Y = 0,
+            X = 0,
+            Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
 
-        View settingsTab = new ();
+        View settingsTab = new () { Title = "Settings" };
         settingsTab.Add (
             new Label { Text = "Enable Feature:", X = 1, Y = 1 },
             new CheckBox { X = 20, Y = 1, Text = "Enabled" }
         );
 
-        View aboutTab = new ();
+        View aboutTab = new () { Title = "About" };
         aboutTab.Add (new Label { Text = "Version 1.0.0", X = 1, Y = 1 });
 
-        tabView.AddTab (new Tab { DisplayText = "Settings", View = settingsTab }, false);
-        tabView.AddTab (new Tab { DisplayText = "About", View = aboutTab }, false);
+        tabs.Add (settingsTab, aboutTab);
+        tabs.Value = settingsTab;
 
-        Add (tabView);
+        Add (tabs);
     }
 }
 ```
@@ -310,8 +305,7 @@ public sealed class FormWindow : Runnable
         {
             Text = "Submit",
             X = Pos.Center (),
-            Y = 7,
-            IsDefault = true
+            Y = 7
         };
 
         submitButton.Accepted += (_, _) =>
@@ -344,7 +338,11 @@ public sealed class FormWindow : Runnable
 3. **Instance-based app** — `Application.Create ().Init ()` returns `IApplication`
 4. **`App!.RequestStop ()`** — Not `Application.RequestStop ()`
 5. **SubView/SuperView** — Never "child"/"parent"/"container" in docs/discussion
-6. **Docs instruction style** — In reference/how-to/API docs, write `To [goal], [imperative action].` Avoid `When/If you want/need to ...` unless describing a real condition.
+6. **Dialog/MessageBox button order = the default** — The last button added is Enter-activated. Add cancel/destructive choices first and affirmative actions last; don't set `IsDefault` manually unless overriding.
+7. **`AddCommand` is `protected`** — Register command handlers inside a `View` subclass constructor, then bind keys with `KeyBindings.Add (Key.F5, Command.Refresh)`.
+8. **`Terminal.Gui.Drawing.Attribute`** — Alias or qualify it when `System.Attribute` is also in scope.
+9. **Typed views expose `.Value`** — Use `IValue<T>.Value` plus `ValueChanged`/`ValueChanging`; don't guess `.Date`, `.Time`, or `.Color`.
+10. **Docs instruction style** — In reference/how-to/API docs, write `To [goal], [imperative action].` Avoid `When/If you want/need to ...` unless describing a real condition.
 
 ### Code Style (Library Contributors Only)
 

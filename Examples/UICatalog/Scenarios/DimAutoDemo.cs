@@ -120,12 +120,12 @@ public class DimAutoDemo : Scenario
                                       };
 
         Button movingButton = new () { Text = "_Move", X = Pos.Right (vlabel), Y = Pos.Bottom (vlabel) };
-        movingButton.Accepting += (s, e) => { movingButton.Y = movingButton.Frame.Y + 1; };
+        movingButton.Accepted += (_, _) => { movingButton.Y = movingButton.Frame.Y + 1; };
         dimAutoFrameView.Add (movingButton);
 
         Button resetButton = new () { Text = "_Reset Button (AnchorEnd)", X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
 
-        resetButton.Accepting += (s, e) =>
+        resetButton.Accepted += (_, _) =>
                                  {
                                      movingButton.Y = Pos.Bottom (hlabel);
                                      movingButton.X = 0;

@@ -23,7 +23,7 @@ Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data is **wrong**.
 
 ### App Builder Quick Start
 ```bash
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
+dotnet new install Terminal.Gui.Templates@2.*
 dotnet new tui-simple -n myapp
 cd myapp
 dotnet run
@@ -86,7 +86,7 @@ When in planning mode:
 
 - **Language**: C# 14 (net10.0)
 - **Branch**: `develop`
-- **Version**: v2 (Alpha)
+- **Version**: v2 (stable)
 
 ## Build & Test
 

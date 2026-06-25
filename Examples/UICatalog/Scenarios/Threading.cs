@@ -128,24 +128,24 @@ public class Threading : Scenario
 
 
         Button btnAction = new () { X = 80, Y = 10, Text = "Load Data Action" };
-        btnAction.Accepting += (_, _) => _action.Invoke ();
+        btnAction.Accepted += (_, _) => _action.Invoke ();
         Button btnLambda = new () { X = 80, Y = 12, Text = "Load Data Lambda" };
-        btnLambda.Accepting += (_, _) => _lambda.Invoke ();
+        btnLambda.Accepted += (_, _) => _lambda.Invoke ();
         Button btnHandler = new () { X = 80, Y = 14, Text = "Load Data Handler" };
-        btnHandler.Accepting += (_, _) => _handler.Invoke (null, EventArgs.Empty);
+        btnHandler.Accepted += (_, _) => _handler.Invoke (null, EventArgs.Empty);
         Button btnSync = new () { X = 80, Y = 16, Text = "Load Data Synchronous" };
-        btnSync.Accepting += (_, _) => _sync.Invoke ();
+        btnSync.Accepted += (_, _) => _sync.Invoke ();
         Button btnMethod = new () { X = 80, Y = 18, Text = "Load Data Method" };
-        btnMethod.Accepting += async (_, _) => await MethodAsync ();
+        btnMethod.Accepted += async (_, _) => await MethodAsync ();
         Button btnClearData = new () { X = 80, Y = 20, Text = "Clear Data" };
 
-        btnClearData.Accepting += (_, _) =>
+        btnClearData.Accepted += (_, _) =>
                                 {
                                     _itemsList.Source = null;
                                     LogJob ("Cleaning Data");
                                 };
         Button btnQuit = new () { X = 80, Y = 22, Text = "Quit" };
-        btnQuit.Accepting += (_, _) => win.RequestStop ();
+        btnQuit.Accepted += (_, _) => win.RequestStop ();
 
         win.Add (
                  _itemsList,
