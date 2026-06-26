@@ -29,25 +29,29 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
 
         StringBuilder combined = new ();
         List<string> threw = [];
-        var rendered = 0;
+        var successful = 0;
 
         foreach (Type type in types)
         {
             string line = FingerprintOne (type);
             output.WriteLine (line);
             combined.AppendLine (line);
-            rendered++;
 
             if (line.Contains ("|EX:"))
             {
                 threw.Add (line);
             }
+            else if (!line.Contains ("|GENERIC") && !line.Contains ("|ENV:"))
+            {
+                successful++;
+            }
         }
 
-        output.WriteLine ($"--- {rendered} view types fingerprinted ---");
+        output.WriteLine ($"--- {successful} view types successfully rendered ---");
         output.WriteLine ($"COMBINED={Hash (combined.ToString ())}");
 
-        Assert.True (rendered > 30, $"Expected to fingerprint many view types, got {rendered}.");
+        // Guarantee we're actually exercising a meaningful number of concrete view types.
+        Assert.True (successful > 30, $"Expected to render many view types, got {successful}.");
 
         // No concrete view may throw while being laid out and drawn in design mode.
         Assert.True (threw.Count == 0, $"View(s) threw during layout/draw:\n{string.Join ("\n", threw)}");
@@ -108,6 +112,9 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
         }
         catch (Exception ex)
         {
+            view.Dispose ();
+            driver.Dispose ();
+
             return $"{type.FullName}|EX:{ex.GetType ().Name}";
         }
     }

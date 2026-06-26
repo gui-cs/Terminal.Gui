@@ -76,11 +76,12 @@ public class StaleContentSizeCaptureTests
     #region Test 1: Core stale capture
 
     /// <summary>
-    ///     Proves the core bug: <c>LayoutSubViews</c> captures <c>contentSize</c> before
-    ///     <c>OnSubViewLayout</c> fires, so SubViews are laid out with the wrong size.
+    ///     Regression guard: <c>LayoutSubViews</c> re-reads <c>contentSize</c> after
+    ///     <c>OnSubViewLayout</c> fires, so SubViews are laid out with the updated size.
+    ///     Fixed by #4863.
     /// </summary>
     [Fact]
-    public void LayoutSubViews_Uses_Stale_ContentSize_When_OnSubViewLayout_Changes_It ()
+    public void LayoutSubViews_Honors_SetContentSize_From_OnSubViewLayout ()
     {
         // Arrange: SuperView that changes content size in OnSubViewLayout
         ContentSizeChangingOnSubViewLayoutView superView = new ()
@@ -162,14 +163,16 @@ public class StaleContentSizeCaptureTests
 
     #endregion
 
-    #region Test 3: Dialog OnSubViewLayout divergence
+    #region Test 3: Dialog OnSubViewLayout non-divergence
 
     /// <summary>
-    ///     Proves that <c>Dialog.OnSubViewLayout</c> → <c>UpdateSizes</c> → <c>SetContentSize</c>
-    ///     produces a content size that differs from what <c>LayoutSubViews</c> used to lay out SubViews.
+    ///     Regression guard: after the fix, <c>Dialog.OnSubViewLayout</c> → <c>UpdateSizes</c> →
+    ///     <c>SetContentSize</c> does NOT produce a content size that differs from what
+    ///     <c>LayoutSubViews</c> uses to lay out SubViews. The pre-event and post-event sizes
+    ///     must be equal (no divergence). Fixed by #4863.
     /// </summary>
     [Fact]
-    public void Dialog_OnSubViewLayout_SetContentSize_Diverges_From_Captured_Value ()
+    public void Dialog_OnSubViewLayout_SetContentSize_Does_Not_Diverge_From_Layout_Value ()
     {
         // Arrange: Dialog with explicit (non-Auto) Width/Height
         Dialog dialog = new ()

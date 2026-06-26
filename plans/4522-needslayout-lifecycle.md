@@ -12,18 +12,22 @@ This issue now scopes to the deterministic-`NeedsLayout`-lifecycle cleanup. Two 
 
 - **Bug #2 (O(N²) propagation): FIXED.** `SetNeedsLayout` now splits into `MarkSubtreeNeedsLayout` (down) and `MarkAncestorsNeedLayout` (up); ancestors no longer re-descend into sibling subtrees.
 - **duskfold stale `ContentSize`: primary fix landed (#4863).** `LayoutSubViews` re-reads `GetContentSize()` after the `OnSubViewLayout` virtual (`View.Layout.cs:812-813`). The re-read does **not** also happen after the `SubViewLayout` *event* (line 815).
-- **Bug #5 (clear-before-events): current order is actually the safe one.** `LayoutSubViews` clears `NeedsLayout` (`:862`) *before* firing `SubViewsLaidOut` (`:864-865`). A handler that calls `SetNeedsLayout` re-marks *after* the clear, so the next iteration honors it. The issue's proposed "clear after events" would **regress** this (it would overwrite a handler's re-mark). Do NOT apply the issue's suggested fix.
+- **Bug #5 (clear-before-events): current order is actually the safe one.** `LayoutSubViews` clears `NeedsLayout` (`:866`) *before* firing `SubViewsLaidOut` (`:868-869`). A handler that calls `SetNeedsLayout` re-marks *after* the clear, so the next iteration honors it. The issue's proposed "clear after events" would **regress** this (it would overwrite a handler's re-mark). Do NOT apply the issue's suggested fix.
 - **`NeedsLayout` setter:** still `{ get; internal set; }`. The `internal set` has a **legitimate test-infra use**: `SetNeedsLayoutPropagationTests.ClearAllNeedsLayout` sets `root.NeedsLayout = false` to establish a clean baseline. Fully removing the setter requires a replacement testing seam.
 
-## Why Bug #1 / #6 (SetFrame self-dirtying) cannot be safely fixed piecemeal
+## Why Bug #1 / #6 (SetFrame self-dirtying) is not worth fixing piecemeal
 
-`SetFrame` (`:113`) calls `SetNeedsLayout()` unconditionally. During a layout pass this re-marks the view's **SuperView** via `MarkAncestorsNeedLayout`. For a non-`Dim.Auto` SuperView this is a false positive (the issue's complaint). **But** the engine relies on exactly this mark for `Dim.Auto` convergence:
+`SetFrame` (`:113`) calls `SetNeedsLayout()` unconditionally. `SetNeedsLayout` only propagates upward via `MarkAncestorsNeedLayout` when `SuperView.NeedsLayout` is **already false**; if the SuperView is already marked, the call is a no-op for the ancestor chain. During an active layout pass the SuperView's `NeedsLayout` is true (otherwise `LayoutSubViews` would have returned early), so `SetFrame`'s upward mark is effectively a no-op during the pass itself.
 
-- Layout is driven top-down: `SuperView.Layout()` resolves the SuperView's own `Frame` in `SetRelativeLayout` **before** `LayoutSubViews` lays out children.
-- For a `Dim.Auto` SuperView, the final children sizes are only known *during* `LayoutSubViews` — after the SuperView's frame was computed.
-- The "mark SuperView + re-layout next iteration" behavior is the convergence mechanism that lets `Dim.Auto` settle.
+`DimAuto` resolves in-place: `DimAuto.Calculate()` calls `SetRelativeLayout()` directly on its subviews, so the SuperView's frame is already correct after that single call — no "mark + re-layout next iteration" mechanism is involved. The measurements (above) confirm everything is single-pass.
 
-Naively guarding `SetFrame` against the upward mark (the issue's proposed `_isLayouting` flag) breaks `Dim.Auto` convergence. A correct fix is a **redesign of `Dim.Auto` multi-pass convergence**, not a one-line guard. This is why @tig called it "too gnarly" and deferred it post-2.0. It should be its own design-led PR with full visual verification, not bundled here.
+The concern with the ad-hoc `_isLayouting` guard is not that it would break `Dim.Auto` convergence (it is likely safe for that specific path), but that:
+
+- `SetFrame` is called from many non-layout contexts (user code, direct frame assignment). The guard would need to be robust across all call sites.
+- The propagation to a **false** SuperView (the only case where it fires) might matter in scenarios not covered by synthetic tests.
+- The O(depth) traversal it produces is already single-pass and dominates no measured profile.
+
+**Recommendation: do not attempt the ad-hoc `SetFrame` guard.** The risk/reward is poor: high complexity for a change that saves O(depth) work that is already single-pass and not measurably expensive. Any attempt must be a design-led PR with full visual verification — not bundled into a lifecycle cleanup.
 
 The same reasoning applies to removing the ~9 direct `Layout()` "workaround" calls (Bar, Dialog, ToolTipHost, Markdown, Popover, ScrollBars, Arranger, View init): each exists because the iteration-driven layout doesn't converge for that case. They can only be removed *after* convergence is deterministic, and each needs individual visual verification.
 
