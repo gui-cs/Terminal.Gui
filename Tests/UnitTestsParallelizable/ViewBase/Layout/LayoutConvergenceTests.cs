@@ -53,13 +53,13 @@ public class LayoutConvergenceTests (ITestOutputHelper output)
 
             for (var b = 0; b < breadth; b++)
             {
-                View child = new () { Id = $"d{d}b{b}", X = b * 10, Y = d, Width = 8, Height = 1 };
-                current.Add (child);
-                all.Add (child);
+                View subView = new () { Id = $"d{d}b{b}", X = b * 10, Y = d, Width = 8, Height = 1 };
+                current.Add (subView);
+                all.Add (subView);
 
                 if (b == 0)
                 {
-                    next = child;
+                    next = subView;
                 }
             }
 
@@ -129,16 +129,15 @@ public class LayoutConvergenceTests (ITestOutputHelper output)
     {
         View root = new () { Id = "root", Width = 200, Height = 200 };
         View autoParent = new () { Id = "autoParent", Width = Dim.Auto (), Height = Dim.Auto () };
-        View child = new () { Id = "child", Width = 10, Height = 3 };
-        autoParent.Add (child);
+        View subView = new () { Id = "subView", Width = 10, Height = 3 };
+        autoParent.Add (subView);
         root.Add (autoParent);
 
         root.BeginInit ();
         root.EndInit ();
         root.Layout ();
 
-        child.Width = 40;
-
+        subView.Width = 40;
         var passes = 0;
 
         while (root.NeedsLayout && passes < 20)
