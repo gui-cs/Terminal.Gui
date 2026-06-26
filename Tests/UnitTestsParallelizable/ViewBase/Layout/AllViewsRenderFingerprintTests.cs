@@ -29,7 +29,7 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
 
         StringBuilder combined = new ();
         List<string> threw = [];
-        var successful = 0;
+        int successful = 0;
 
         foreach (Type type in types)
         {
@@ -73,8 +73,8 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
         view.Driver = driver;
 
         // EnableForDesign for filesystem-interactive views (FileDialog family) attempts to list
-        // directories and may throw on sandboxed/restricted environments. That is an environment
-        // constraint, not a layout bug — separate it from layout/draw exceptions.
+        // directories during design setup or the later initialization/layout pass. That is an
+        // environment constraint, not a layout bug — separate it from layout/draw exceptions.
         try
         {
             if (view is IDesignable designable)
@@ -82,7 +82,7 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
                 designable.EnableForDesign ();
             }
         }
-        catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+        catch (Exception ex) when (IsFileDialogEnvironmentException (view, ex))
         {
             view.Dispose ();
             driver.Dispose ();
@@ -96,7 +96,7 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
             view.EndInit ();
             view.Layout ();
 
-            var fingerprint = $"frame={view.Frame};needsLayout={view.NeedsLayout}";
+            string fingerprint = $"frame={view.Frame};needsLayout={view.NeedsLayout}";
 
             if (view.Visible)
             {
@@ -110,6 +110,13 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
 
             return $"{type.FullName}|{fingerprint}";
         }
+        catch (Exception ex) when (IsFileDialogEnvironmentException (view, ex))
+        {
+            view.Dispose ();
+            driver.Dispose ();
+
+            return $"{type.FullName}|ENV:{ex.GetType ().Name}";
+        }
         catch (Exception ex)
         {
             view.Dispose ();
@@ -118,4 +125,7 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
             return $"{type.FullName}|EX:{ex.GetType ().Name}";
         }
     }
+
+    private static bool IsFileDialogEnvironmentException (View view, Exception ex) =>
+        view is FileDialog && ex is UnauthorizedAccessException or IOException;
 }

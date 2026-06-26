@@ -11,7 +11,7 @@ This issue now scopes to the deterministic-`NeedsLayout`-lifecycle cleanup. Two 
 ## What I verified in the current code (post #4863, #5357/#5373, #5358, #5359)
 
 - **Bug #2 (O(N²) propagation): FIXED.** `SetNeedsLayout` now splits into `MarkSubtreeNeedsLayout` (down) and `MarkAncestorsNeedLayout` (up); ancestors no longer re-descend into sibling subtrees.
-- **duskfold stale `ContentSize`: primary fix landed (#4863).** `LayoutSubViews` re-reads `GetContentSize()` after the `OnSubViewLayout` virtual (`View.Layout.cs:812-813`). The re-read does **not** also happen after the `SubViewLayout` *event* (line 815).
+- **duskfold stale `ContentSize`: primary fix landed (#4863).** `LayoutSubViews` re-reads `GetContentSize()` after the `OnSubViewLayout` virtual (`View.Layout.cs:812-813`). This branch adds the matching re-read after the `SubViewLayout` *event* (`View.Layout.cs:817-819`), so event handlers that call `SetContentSize` are honored before SubViews are laid out.
 - **Bug #5 (clear-before-events): current order is actually the safe one.** `LayoutSubViews` clears `NeedsLayout` (`:866`) *before* firing `SubViewsLaidOut` (`:868-869`). A handler that calls `SetNeedsLayout` re-marks *after* the clear, so the next iteration honors it. The issue's proposed "clear after events" would **regress** this (it would overwrite a handler's re-mark). Do NOT apply the issue's suggested fix.
 - **`NeedsLayout` setter:** still `{ get; internal set; }`. The `internal set` has a **legitimate test-infra use**: `SetNeedsLayoutPropagationTests.ClearAllNeedsLayout` sets `root.NeedsLayout = false` to establish a clean baseline. Fully removing the setter requires a replacement testing seam.
 
@@ -38,9 +38,10 @@ The same reasoning applies to removing the ~9 direct `Layout()` "workaround" cal
 3. **Regression test** (parallelizable): `LayoutSubViews_Honors_SetContentSize_From_SubViewLayout_Event` in `StaleContentSizeCaptureTests`. Note: #4863's `OnSubViewLayout`-virtual, `SubViewsLaidOut`, Dialog, ListView and TableView scenarios are **already** covered by that file (7 tests) — this adds the missing event-companion case.
 
 ### Verification
-- Core library + both test projects build clean (the only warning is the pre-existing CS0419 in `View.Drawing.cs`, a file not touched here).
-- `UnitTestsParallelizable`: **17,376 passed, 0 failed** (run twice; one transient failure on the first run was the known-flaky `ProcessQueue_DoesNotReleaseEscape_BeforeTimeout`, green on re-run).
-- `UnitTests.NonParallelizable`: **74 passed, 0 failed** (after a clean rebuild; an initial mass failure was a stale local `Markdig.dll` 1.3.0 vs. central 1.3.1, unrelated to this change).
+- Focused layout/content-size regression tests pass: `StaleContentSizeCaptureTests` (8 tests) and `LayoutConvergenceTests` (5 tests).
+- The new event-companion test was mutation-checked: removing the post-`SubViewLayout` re-read makes `LayoutSubViews_Honors_SetContentSize_From_SubViewLayout_Event` fail with `Expected: 50, Actual: 20`; restoring the re-read makes it pass.
+- `AllViewsRenderFingerprintTests` passes locally after classifying FileDialog-family filesystem permission failures as environment limitations (`|ENV:`) rather than layout/draw exceptions (`|EX:`).
+- Builds during the focused test runs still show the pre-existing CS0419 warning in `View.Drawing.cs`, a file not touched here.
 
 ## Measurement: is the Bug #1/#6 convergence redesign actually warranted?
 
@@ -77,12 +78,12 @@ should only be pursued as a dedicated dependency-analysis project if profiling s
 
 ## Visual / rendering verification
 
-- **All-views render diff:** captured a SHA fingerprint of `Driver.ToString()` for every concrete
-  view type (61 views) with the `LayoutSubViews` change applied vs. reverted. **Byte-identical**
-  (combined hash `CCF30A9EA3C45AB5` both ways) — the change is provably render- and layout-neutral
-  across all views.
-- **`AllViewsDrawTests`** (existing) passes — every view draws with exactly one layout pass, no extra.
-- Full `UnitTestsParallelizable` (**17,382**) and `UnitTests.NonParallelizable` (**74**) green.
+- **All-views render smoke:** the harness lays out and draws every concrete, non-environment-dependent
+  view type and fails on `|EX:` layout/draw exceptions. FileDialog-family views may touch restricted
+  filesystem paths during design-mode initialization/layout; those permission failures are reported as
+  `|ENV:` so the smoke test remains portable without hiding real layout/draw exceptions from other views.
+- The focused verification above passes. Re-run the full parallelizable and non-parallelizable suites
+  before merge to refresh branch-wide pass counts.
 - tuirec PTY capture was not available in this environment (needs a Go install + non-allowlisted
   network); deterministic in-process `Driver.ToString()` snapshots were used instead.
 
