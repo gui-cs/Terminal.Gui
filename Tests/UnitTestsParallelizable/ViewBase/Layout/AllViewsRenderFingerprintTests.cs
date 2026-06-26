@@ -55,24 +55,39 @@ public class AllViewsRenderFingerprintTests (ITestOutputHelper output) : TestsAl
 
     private static string FingerprintOne (Type type)
     {
+        IDriver driver = CreateTestDriver (60, 20);
+
+        View? view = CreateInstanceIfNotGeneric (type);
+
+        if (view is null)
+        {
+            driver.Dispose ();
+
+            return $"{type.FullName}|GENERIC";
+        }
+
+        view.Driver = driver;
+
+        // EnableForDesign for filesystem-interactive views (FileDialog family) attempts to list
+        // directories and may throw on sandboxed/restricted environments. That is an environment
+        // constraint, not a layout bug — separate it from layout/draw exceptions.
         try
         {
-            IDriver driver = CreateTestDriver (60, 20);
-
-            View? view = CreateInstanceIfNotGeneric (type);
-
-            if (view is null)
-            {
-                return $"{type.FullName}|GENERIC";
-            }
-
-            view.Driver = driver;
-
             if (view is IDesignable designable)
             {
                 designable.EnableForDesign ();
             }
+        }
+        catch (Exception ex) when (ex is UnauthorizedAccessException or IOException)
+        {
+            view.Dispose ();
+            driver.Dispose ();
 
+            return $"{type.FullName}|ENV:{ex.GetType ().Name}";
+        }
+
+        try
+        {
             view.BeginInit ();
             view.EndInit ();
             view.Layout ();

@@ -149,8 +149,9 @@ public class LayoutConvergenceTests (ITestOutputHelper output)
 
         output.WriteLine ($"Dim.Auto parent grew to {autoParent.Frame.Size} in {passes} pass(es)");
 
-        // Convergence: the upward NeedsLayout propagation is load-bearing for Dim.Auto. The parent
-        // must grow to contain the enlarged child, and it must settle in a single pass.
+        // The parent must track the child's new width and converge in a single pass.
+        // (In this test the upward mark from child.Width = 40 is sufficient; the SetFrame
+        // upward mark is not additionally exercised by this synthetic case.)
         Assert.Equal (40, autoParent.Frame.Width);
         Assert.Equal (1, passes);
 

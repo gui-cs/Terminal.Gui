@@ -54,7 +54,7 @@ Conclusions:
 - **Convergence is already single-pass** — no multi-iteration thrashing (Bug #6 symptom gone).
 - **Only the changed view's frame changes** (`FrameChanged == 1`) — Bug #1's spurious-frame-churn symptom is gone.
 - **No sibling/subtree fan-out** — work stays on the affected ancestor chain (`SubViewsLaidOut ≈ depth+2`), far below the total view count. (#5357.)
-- **`Dim.Auto` parents still converge correctly in one pass**, and the upward `NeedsLayout` mark from `SetFrame` is **load-bearing** for that.
+- **`Dim.Auto` parents still converge correctly in one pass.** Note: in the synthetic tests here, the user-initiated `child.Width = N` setter already propagates upward via `SetNeedsLayout → MarkAncestorsNeedLayout`, so the additional mark that `SetFrame` emits during the layout pass is redundant for those cases. Whether the `SetFrame` upward mark is **load-bearing** for some production scenario (e.g. a multi-pass cascade where no user setter triggered the initial propagation) is not disproved by these tests, but not proven either. The ad-hoc guard is still **not recommended** (see below).
 
 The only residual is **O(depth)** ancestor re-layout that produces no frame change. Removing it
 requires **dependency-aware invalidation** (marking only ancestors/siblings that actually reference
