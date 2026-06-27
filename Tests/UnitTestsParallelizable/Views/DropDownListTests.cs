@@ -1179,7 +1179,6 @@ public class DropDownListTests (ITestOutputHelper output)
         dropdown.Dispose ();
     }
 
-    // Helper to find the DropDownList popover (excludes the context menu popover)
     // Claude - Opus 4.8 - Regression test for https://github.com/gui-cs/Terminal.Gui/issues/5517
     [Fact]
     public void DroppedList_UsesBackgroundDistinctFromSuperView ()
@@ -1224,6 +1223,7 @@ public class DropDownListTests (ITestOutputHelper output)
         app.End (token!);
     }
 
+    // Helper to find the DropDownList popover (excludes the context menu popover)
     private static IPopoverView? FindDropDownPopover (IApplication app) => app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
 }
 
