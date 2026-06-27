@@ -353,6 +353,26 @@ public class OutputBufferImpl : IOutputBuffer
     }
 
     /// <inheritdoc/>
+    public void RetainRasterImages (IReadOnlyCollection<string> activeIds)
+    {
+        ArgumentNullException.ThrowIfNull (activeIds);
+
+        lock (_contentsLock)
+        {
+            for (int i = _rasterImages.Count - 1; i >= 0; i--)
+            {
+                if (_rasterImages [i].Id is { } id && activeIds.Contains (id))
+                {
+                    continue;
+                }
+
+                MarkRasterImageCellsDirty (_rasterImages [i]);
+                _rasterImages.RemoveAt (i);
+            }
+        }
+    }
+
+    /// <inheritdoc/>
     public IReadOnlyList<RasterImageCommand> GetRasterImages ()
     {
         lock (_contentsLock)
