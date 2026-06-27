@@ -65,9 +65,72 @@ public partial class View // Text Property APIs
             _text = value;
 
             UpdateTextFormatterText ();
+
+            if (IsTextOnlyAutoSizeUnchanged ())
+            {
+                // The view is sized solely by its Text and the new Text produces the same Frame size as before.
+                // The content changed, so it must be reformatted and redrawn, but nothing outside this view can be
+                // affected, so the layout pass (and the ancestor propagation SetNeedsLayout would trigger) is skipped.
+                // See issue #5499.
+                TextFormatter.NeedsFormat = true;
+                SetNeedsDraw ();
+                OnTextChanged ();
+
+                return;
+            }
+
             SetNeedsLayout ();
             OnTextChanged ();
         }
+    }
+
+    /// <summary>
+    ///     Determines whether this view is sized solely by its <see cref="Text"/> and the current
+    ///     <see cref="TextFormatter"/> state produces the same <see cref="Frame"/> size it has now.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Used by the <see cref="Text"/> setter to skip <see cref="SetNeedsLayout"/> — and the ancestor layout
+    ///         propagation it triggers — when a text change does not change the view's size. See issue #5499.
+    ///     </para>
+    ///     <para>
+    ///         The optimization applies only when both <see cref="Width"/> and <see cref="Height"/> are exactly
+    ///         <see cref="DimAutoStyle.Text"/> (so <see cref="DimAutoStyle.Auto"/> — which also depends on content and
+    ///         subviews — is excluded) and the view has already been laid out.
+    ///     </para>
+    ///     <para>
+    ///         The prediction reuses <see cref="Dim.Calculate"/> — the exact code the layout engine runs in
+    ///         <see cref="SetRelativeLayout"/> — so it can never disagree with the size a real layout pass would
+    ///         produce. For a Text-only <see cref="DimAuto"/> view <see cref="DimAuto.Calculate"/> only reads view state
+    ///         and updates <see cref="TextFormatter"/> sizing; it does not lay out subviews.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     <see langword="true"/> if the optimization applies and the resulting size is unchanged; otherwise
+    ///     <see langword="false"/>.
+    /// </returns>
+    private bool IsTextOnlyAutoSizeUnchanged ()
+    {
+        if (_frame is null)
+        {
+            // Not yet laid out; let the normal layout pass establish the Frame.
+            return false;
+        }
+
+        if (!IsExactlyTextAuto (_width) || !IsExactlyTextAuto (_height))
+        {
+            return false;
+        }
+
+        Size container = GetContainerSize ();
+
+        // Mirror SetRelativeLayout's order: Width first (it caches TextFormatter.ConstrainToWidth/Height), then Height.
+        int newWidth = _width.Calculate (0, container.Width, this, Dimension.Width);
+        int newHeight = _height.Calculate (0, container.Height, this, Dimension.Height);
+
+        return newWidth == Frame.Width && newHeight == Frame.Height;
+
+        static bool IsExactlyTextAuto (Dim dim) => dim.Has (out DimAuto auto) && auto.Style == DimAutoStyle.Text;
     }
 
     /// <summary>
