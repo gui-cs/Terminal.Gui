@@ -109,11 +109,76 @@ public partial class DimAutoTests
     }
 
     [Fact]
-    public void Text_FixedDimensions_BypassOptimization ()
+    public void Text_FixedDimensions_DoesNotSetNeedsLayout_ButStillRedraws ()
     {
-        // The optimization is conservatively scoped to views sized solely by Text. A fixed-size view still routes
-        // through SetNeedsLayout on a text change.
+        // A fixed-size view's Frame never changes on a text change, so layout is skipped and only a redraw happens -
+        // even when the new text is a different length (it still fits the fixed Frame). See issue #5499 (Finding 3:
+        // fixed-size text redraws should not force layout).
         View view = new () { Width = 20, Height = 3, Text = "12:00:00" };
+        view.Layout ();
+
+        view.NeedsLayout = false;
+        view.ClearNeedsDraw ();
+
+        view.Text = "a much longer string that still fits the fixed width";
+
+        Assert.False (view.NeedsLayout);
+        Assert.True (view.NeedsDraw);
+    }
+
+    [Fact]
+    public void Text_OneAxisAuto_SameSize_DoesNotSetNeedsLayout ()
+    {
+        // One axis Text-auto, the other fixed - a common label shape. Same-size text change skips layout. See issue
+        // #5499 (Finding 3: one-axis auto scenarios).
+        View view = new () { Width = Auto (DimAutoStyle.Text), Height = 1, Text = "12:00:00" };
+        view.Layout ();
+        Assert.Equal (new Rectangle (0, 0, 8, 1), view.Frame);
+
+        view.NeedsLayout = false;
+
+        view.Text = "12:00:01";
+
+        Assert.False (view.NeedsLayout);
+    }
+
+    [Fact]
+    public void Text_OneAxisAuto_DifferentSize_SetsNeedsLayout ()
+    {
+        View view = new () { Width = Auto (DimAutoStyle.Text), Height = 1, Text = "12:00:00" };
+        view.Layout ();
+
+        view.NeedsLayout = false;
+
+        view.Text = "12:00:00 in the morning";
+
+        Assert.True (view.NeedsLayout);
+    }
+
+    [Fact]
+    public void Text_PositionDependsOnText_SameSize_SetsNeedsLayout ()
+    {
+        // Finding 1: comparing only size is wrong. A Pos can depend on Text, so a same-size text change can still move
+        // the view. The full-Frame prediction must detect the position change and run layout.
+        View view = new () { Width = Auto (DimAutoStyle.Text), Height = Auto (DimAutoStyle.Text), Text = "aa" };
+        view.X = Pos.Func (v => v!.Text.StartsWith ("b") ? 5 : 0, view);
+        view.Layout ();
+        Assert.Equal (new Rectangle (0, 0, 2, 1), view.Frame);
+
+        view.NeedsLayout = false;
+
+        // Same size (2x1) but X must move from 0 to 5
+        view.Text = "bb";
+
+        Assert.True (view.NeedsLayout);
+    }
+
+    [Fact]
+    public void Text_CompositeDim_BypassesOptimization ()
+    {
+        // Finding 2: the guard must be exact. Dim.Auto(Text) + 2 is a composite (DimCombine), not a bare Text-auto, so
+        // it must not enter the size-only fast path.
+        View view = new () { Width = Auto (DimAutoStyle.Text) + 2, Height = Auto (DimAutoStyle.Text), Text = "12:00:00" };
         view.Layout ();
 
         view.NeedsLayout = false;

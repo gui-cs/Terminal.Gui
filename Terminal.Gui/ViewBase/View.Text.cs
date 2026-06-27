@@ -66,12 +66,11 @@ public partial class View // Text Property APIs
 
             UpdateTextFormatterText ();
 
-            if (IsTextOnlyAutoSizeUnchanged ())
+            if (IsTextDrivenFrameUnchanged ())
             {
-                // The view is sized solely by its Text and the new Text produces the same Frame size as before.
-                // The content changed, so it must be reformatted and redrawn, but nothing outside this view can be
-                // affected, so the layout pass (and the ancestor propagation SetNeedsLayout would trigger) is skipped.
-                // See issue #5499.
+                // The new Text produces the same Frame (position and size) as before. The content changed, so it must
+                // be reformatted and redrawn, but nothing outside this view can be affected, so the layout pass (and
+                // the ancestor propagation SetNeedsLayout would trigger) is skipped. See issue #5499.
                 TextFormatter.NeedsFormat = true;
                 SetNeedsDraw ();
                 OnTextChanged ();
@@ -85,31 +84,29 @@ public partial class View // Text Property APIs
     }
 
     /// <summary>
-    ///     Determines whether this view is sized solely by its <see cref="Text"/> and the current
-    ///     <see cref="TextFormatter"/> state produces the same <see cref="Frame"/> size it has now.
+    ///     Determines whether the new <see cref="Text"/> resolves to the same <see cref="Frame"/> (position and size)
+    ///     the view has now, so a text change can skip <see cref="SetNeedsLayout"/> and only redraw. See issue #5499.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Used by the <see cref="Text"/> setter to skip <see cref="SetNeedsLayout"/> — and the ancestor layout
-    ///         propagation it triggers — when a text change does not change the view's size. See issue #5499.
+    ///         The prediction reuses <see cref="TryComputeRelativeFrame"/> — the exact computation
+    ///         <see cref="SetRelativeLayout"/> runs — so it can never disagree with the Frame a real layout pass would
+    ///         produce, and it compares the whole <see cref="Frame"/> (a <see cref="Pos"/> can depend on
+    ///         <see cref="Text"/>, so a same-size change can still move the view).
     ///     </para>
     ///     <para>
-    ///         The optimization applies only when both <see cref="Width"/> and <see cref="Height"/> are exactly
-    ///         <see cref="DimAutoStyle.Text"/> (so <see cref="DimAutoStyle.Auto"/> — which also depends on content and
-    ///         subviews — is excluded) and the view has already been laid out.
-    ///     </para>
-    ///     <para>
-    ///         The prediction reuses <see cref="Dim.Calculate"/> — the exact code the layout engine runs in
-    ///         <see cref="SetRelativeLayout"/> — so it can never disagree with the size a real layout pass would
-    ///         produce. For a Text-only <see cref="DimAuto"/> view <see cref="DimAuto.Calculate"/> only reads view state
-    ///         and updates <see cref="TextFormatter"/> sizing; it does not lay out subviews.
+    ///         The optimization applies only when the view has already been laid out and both <see cref="Width"/> and
+    ///         <see cref="Height"/> are either a fixed dimension or exactly <see cref="DimAutoStyle.Text"/>. A
+    ///         <see cref="DimAuto"/> with <see cref="DimAutoStyle.Content"/> (including <see cref="DimAutoStyle.Auto"/>)
+    ///         lays out subviews while calculating, so resolving it here would have side effects; those views fall back
+    ///         to <see cref="SetNeedsLayout"/>.
     ///     </para>
     /// </remarks>
     /// <returns>
-    ///     <see langword="true"/> if the optimization applies and the resulting size is unchanged; otherwise
-    ///     <see langword="false"/>.
+    ///     <see langword="true"/> if the optimization applies and the resolved <see cref="Frame"/> is unchanged;
+    ///     otherwise <see langword="false"/>.
     /// </returns>
-    private bool IsTextOnlyAutoSizeUnchanged ()
+    private bool IsTextDrivenFrameUnchanged ()
     {
         if (_frame is null)
         {
@@ -117,20 +114,19 @@ public partial class View // Text Property APIs
             return false;
         }
 
-        if (!IsExactlyTextAuto (_width) || !IsExactlyTextAuto (_height))
+        if (!IsEagerlyResolvable (_width) || !IsEagerlyResolvable (_height))
         {
             return false;
         }
 
-        Size container = GetContainerSize ();
+        // Mirror SetRelativeLayout's preamble so the prediction sees the same TextFormatter state.
+        SetTextFormatterSize ();
 
-        // Mirror SetRelativeLayout's order: Width first (it caches TextFormatter.ConstrainToWidth/Height), then Height.
-        int newWidth = _width.Calculate (0, container.Width, this, Dimension.Width);
-        int newHeight = _height.Calculate (0, container.Height, this, Dimension.Height);
+        return TryComputeRelativeFrame (GetContainerSize (), out Rectangle predicted) && predicted == Frame;
 
-        return newWidth == Frame.Width && newHeight == Frame.Height;
-
-        static bool IsExactlyTextAuto (Dim dim) => dim.Has (out DimAuto auto) && auto.Style == DimAutoStyle.Text;
+        // A dimension is safe to resolve here only when doing so has no side effects beyond this view's own
+        // TextFormatter. DimAbsolute is constant; a Text-only DimAuto depends solely on the TextFormatter.
+        static bool IsEagerlyResolvable (Dim dim) => dim is DimAbsolute or DimAuto { Style: DimAutoStyle.Text };
     }
 
     /// <summary>
