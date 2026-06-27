@@ -35,44 +35,80 @@ internal class FileDialogState
 
     protected IEnumerable<FileSystemInfoStats> GetChildren (IDirectoryInfo dir)
     {
+        List<FileSystemInfoStats> children = [];
+
+        AddReadableChildren (children, dir);
+
+        // if only allowing specific file types
+        if (Parent.AllowedTypes.Count > 0 && Parent.OpenMode == OpenMode.File)
+        {
+            children = children.Where (c => c.IsDir || (c.FileSystemInfo is IFileInfo f && Parent.IsCompatibleWithAllowedExtensions (f))).ToList ();
+        }
+
+        // if there's a UI filter in place too
+        if (Parent.CurrentFilter is { })
+        {
+            children = children.Where (MatchesApiFilter).ToList ();
+        }
+
+        AddParentNavigation (children, dir);
+
+        return children;
+    }
+
+    private void AddReadableChildren (List<FileSystemInfoStats> children, IDirectoryInfo dir)
+    {
         try
         {
-            List<FileSystemInfoStats> children;
+            IEnumerable<IFileSystemInfo> entries;
 
             // if directories only
             if (Parent.OpenMode == OpenMode.Directory)
             {
-                children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e, Parent.Style.Culture)).ToList ();
+                entries = dir.GetDirectories ();
             }
             else
             {
-                children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e, Parent.Style.Culture)).ToList ();
+                entries = dir.GetFileSystemInfos ();
             }
 
-            // if only allowing specific file types
-            if (Parent.AllowedTypes.Count > 0 && Parent.OpenMode == OpenMode.File)
+            foreach (IFileSystemInfo entry in entries)
             {
-                children = children.Where (c => c.IsDir || (c.FileSystemInfo is IFileInfo f && Parent.IsCompatibleWithAllowedExtensions (f))).ToList ();
+                AddReadableChild (children, entry);
             }
-
-            // if there's a UI filter in place too
-            if (Parent.CurrentFilter is { })
-            {
-                children = children.Where (MatchesApiFilter).ToList ();
-            }
-
-            // allow navigating up as '..'
-            if (dir.Parent is { })
-            {
-                children.Add (new FileSystemInfoStats (dir.Parent, Parent.Style.Culture) { IsParent = true });
-            }
-
-            return children;
         }
         catch (Exception)
         {
             // Access permissions Exceptions, Dir not exists etc
-            return [];
+        }
+    }
+
+    private void AddReadableChild (List<FileSystemInfoStats> children, IFileSystemInfo entry)
+    {
+        try
+        {
+            children.Add (new FileSystemInfoStats (entry, Parent.Style.Culture));
+        }
+        catch (Exception)
+        {
+            // A single unreadable entry should not hide the rest of the directory.
+        }
+    }
+
+    private void AddParentNavigation (List<FileSystemInfoStats> children, IDirectoryInfo dir)
+    {
+        if (dir.Parent is not { } parent)
+        {
+            return;
+        }
+
+        try
+        {
+            children.Add (new FileSystemInfoStats (parent, Parent.Style.Culture) { IsParent = true });
+        }
+        catch (Exception)
+        {
+            // If even the parent cannot be statted, keep the readable children.
         }
     }
 
