@@ -1180,6 +1180,50 @@ public class DropDownListTests (ITestOutputHelper output)
     }
 
     // Helper to find the DropDownList popover (excludes the context menu popover)
+    // Claude - Opus 4.8 - Regression test for https://github.com/gui-cs/Terminal.Gui/issues/5517
+    [Fact]
+    public void DroppedList_UsesBackgroundDistinctFromSuperView ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 15);
+
+        using Runnable top = new ();
+        SessionToken? token = app.Begin (top);
+
+        ObservableCollection<string> items = ["Alpha", "Beta", "Gamma"];
+
+        DropDownList dropdown = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 12,
+            Source = new ListWrapper<string> (items),
+            ReadOnly = true
+        };
+
+        top.Add (dropdown);
+        app.LayoutAndDraw ();
+
+        dropdown.SetFocus ();
+        app.InjectKey (Key.F4);
+        app.LayoutAndDraw ();
+
+        // Act
+        Popover<ListView, string?>? popover = FindDropDownPopover (app) as Popover<ListView, string?>;
+        Assert.NotNull (popover);
+        Assert.True (popover.Visible);
+
+        // Assert - the dropped list must "float" with its own background, distinct from the SuperView's.
+        Attribute superViewNormal = dropdown.SuperView!.GetAttributeForRole (VisualRole.Normal);
+        Attribute droppedListNormal = popover.ContentView!.GetAttributeForRole (VisualRole.Normal);
+
+        Assert.NotEqual (superViewNormal.Background, droppedListNormal.Background);
+
+        app.End (token!);
+    }
+
     private static IPopoverView? FindDropDownPopover (IApplication app) => app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
 }
 
