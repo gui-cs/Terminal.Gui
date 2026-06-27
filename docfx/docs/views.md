@@ -170,7 +170,7 @@ Provides a hex editor with the left side showing the hex values of the bytes in 
 
 ## [ImageView](xref:Terminal.Gui.Views.ImageView)
 
-Displays an image represented as a 2D array of <xref:Terminal.Gui.Drawing.Color> pixels. Supports two rendering modes: cell-based (one colored space per pixel, works everywhere) and sixel-based (when the terminal supports it).
+Displays an image represented as a 2D array of <xref:Terminal.Gui.Drawing.Color> pixels. Supports two rendering modes: cell-based (one colored space per pixel, works everywhere) and raster-based (for terminals that support either the Sixel or Kitty graphics protocols).
 
 
 ![ImageView](../images/views/ImageView.gif)
