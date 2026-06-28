@@ -79,7 +79,7 @@ internal class FileDialogState
         }
         catch (Exception)
         {
-            // Access permissions Exceptions, Dir not exists etc
+            // Access permission exceptions, missing directories, etc.
         }
     }
 
