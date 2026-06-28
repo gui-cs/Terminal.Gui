@@ -665,53 +665,11 @@ public partial class View // Layout APIs
         // TODO: Should move to View.LayoutSubViews?
         SetTextFormatterSize ();
 
-        int newX, newW, newY, newH;
-
-        try
+        if (!TryComputeRelativeFrame (superviewContentSize, out Rectangle newFrame))
         {
-            // Calculate the new X, Y, Width, and Height
-            // If the Width or Height is Dim.Auto, calculate the Width or Height first. Otherwise, calculate the X or Y first.
-            if (_width.Has<DimAuto> (out _))
-            {
-                newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
-                newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
-
-                if (newW != Frame.Width)
-                {
-                    // Pos.Calculate got us a new position. We need to redo dimension
-                    newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
-                }
-            }
-            else
-            {
-                newX = _x.Calculate (superviewContentSize.Width, _width, this, Dimension.Width);
-                newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
-            }
-
-            if (_height.Has<DimAuto> (out _))
-            {
-                newH = _height.Calculate (0, superviewContentSize.Height, this, Dimension.Height);
-                newY = _y.Calculate (superviewContentSize.Height, newH, this, Dimension.Height);
-
-                if (newH != Frame.Height)
-                {
-                    // Pos.Calculate got us a new position. We need to redo dimension
-                    newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
-                }
-            }
-            else
-            {
-                newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
-                newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
-            }
-        }
-        catch (LayoutException)
-        {
-            //Debug.WriteLine ($"A Dim/PosFunc function threw (typically this is because a dependent View was not laid out)\n{le}.");
+            //Debug.WriteLine ($"A Dim/PosFunc function threw (typically this is because a dependent View was not laid out)");
             return false;
         }
-
-        Rectangle newFrame = new (newX, newY, newW, newH);
 
         if (Frame != newFrame)
         {
@@ -768,6 +726,23 @@ public partial class View // Layout APIs
             }
         }
 
+        FinalizeTextFormatterConstraints ();
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Finalizes <see cref="TextFormatter"/>'s size constraints after the <see cref="Frame"/> has been resolved.
+    ///     Any constraint left unset by <see cref="SetTextFormatterSize"/> (e.g. for fixed dimensions whose content
+    ///     size was not explicitly set) is filled from the view's content size so wrapped/clipped text formats
+    ///     correctly.
+    /// </summary>
+    /// <remarks>
+    ///     Called by <see cref="SetRelativeLayout"/> and by the <see cref="Text"/> setter's same-frame fast path, which
+    ///     skips <see cref="SetRelativeLayout"/> but must leave <see cref="TextFormatter"/> in the same state.
+    /// </remarks>
+    private void FinalizeTextFormatterConstraints ()
+    {
         if (TextFormatter.ConstrainToWidth is null)
         {
             TextFormatter.ConstrainToWidth = GetContentWidth ();
@@ -777,6 +752,70 @@ public partial class View // Layout APIs
         {
             TextFormatter.ConstrainToHeight = GetContentHeight ();
         }
+    }
+
+    /// <summary>
+    ///     Resolves this view's <see cref="Pos"/>/<see cref="Dim"/> expressions into the absolute <see cref="Frame"/>
+    ///     they would produce, without applying it. This is the size/position computation
+    ///     <see cref="SetRelativeLayout"/> performs and is the single source of truth for both that method and any
+    ///     speculative "would the Frame change?" check.
+    /// </summary>
+    /// <param name="superviewContentSize">The size of the SuperView's content.</param>
+    /// <param name="frame">The resolved Frame. Valid only when the method returns <see langword="true"/>.</param>
+    /// <returns>
+    ///     <see langword="true"/> if the Frame could be resolved; <see langword="false"/> if a dependency was not ready
+    ///     (a <see cref="LayoutException"/> was thrown during calculation).
+    /// </returns>
+    private bool TryComputeRelativeFrame (Size superviewContentSize, out Rectangle frame)
+    {
+        frame = Rectangle.Empty;
+
+        int newX, newW, newY, newH;
+
+        try
+        {
+            // Calculate the new X, Y, Width, and Height
+            // If the Width or Height is Dim.Auto, calculate the Width or Height first. Otherwise, calculate the X or Y first.
+            if (_width.Has<DimAuto> (out _))
+            {
+                newW = _width.Calculate (0, superviewContentSize.Width, this, Dimension.Width);
+                newX = _x.Calculate (superviewContentSize.Width, newW, this, Dimension.Width);
+
+                if (newW != Frame.Width)
+                {
+                    // Pos.Calculate got us a new position. We need to redo dimension
+                    newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
+                }
+            }
+            else
+            {
+                newX = _x.Calculate (superviewContentSize.Width, _width, this, Dimension.Width);
+                newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
+            }
+
+            if (_height.Has<DimAuto> (out _))
+            {
+                newH = _height.Calculate (0, superviewContentSize.Height, this, Dimension.Height);
+                newY = _y.Calculate (superviewContentSize.Height, newH, this, Dimension.Height);
+
+                if (newH != Frame.Height)
+                {
+                    // Pos.Calculate got us a new position. We need to redo dimension
+                    newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
+                }
+            }
+            else
+            {
+                newY = _y.Calculate (superviewContentSize.Height, _height, this, Dimension.Height);
+                newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
+            }
+        }
+        catch (LayoutException)
+        {
+            return false;
+        }
+
+        frame = new (newX, newY, newW, newH);
 
         return true;
     }
