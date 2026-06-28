@@ -7,6 +7,8 @@ using System.Text.Json.Serialization;
 using ColorHelper;
 using ColorConverter = ColorHelper.ColorConverter;
 
+#pragma warning disable CS0618 // Obsolete - Color still uses ConfigurationPropertyAttribute during transition
+
 namespace Terminal.Gui.Drawing;
 
 /// <summary>

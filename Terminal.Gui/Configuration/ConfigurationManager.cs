@@ -8,6 +8,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Trace = Terminal.Gui.Tracing.Trace;
 
+#pragma warning disable CS0618 // Obsolete - ConfigurationManager uses ConfigProperty/SettingsScope/ThemeScope internally
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
@@ -46,6 +48,7 @@ namespace Terminal.Gui.Configuration;
 ///         See the UICatalog example for a complete example of how to use ConfigurationManager.
 ///     </para>
 /// </summary>
+[Obsolete ("ConfigurationManager is being replaced by Microsoft.Extensions.Configuration. Use TuiConfigurationBuilder instead. Will be removed in a future version.")]
 public static class ConfigurationManager
 {
     private static readonly Lock _appNameLock = new ();
@@ -714,28 +717,7 @@ public static class ConfigurationManager
     // `Sources` - A source is a location where a configuration can be stored. Sources are defined in the `ConfigLocations` enum.
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static readonly SourceGenerationContext SerializerContext = new (new JsonSerializerOptions
-    {
-        // Be relaxed
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        PropertyNameCaseInsensitive = true,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        WriteIndented = true,
-        AllowTrailingCommas = true,
-        Converters =
-        {
-            // We override the standard Rune converter to support specifying Glyphs in
-            // a flexible way
-            new RuneJsonConverter (),
-
-            // Override Key to support "Ctrl+Q" format.
-            new KeyJsonConverter ()
-        },
-
-        // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        TypeInfoResolver = SourceGenerationContext.Default
-    });
+    internal static readonly SourceGenerationContext SerializerContext = TuiSerializerContext.Instance;
 
     private static SourcesManager? _sourcesManager = new ();
     private static readonly object _sourcesManagerLock = new ();

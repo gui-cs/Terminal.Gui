@@ -171,7 +171,7 @@ public static class DeepCloner
             // In AOT, try using the JsonSerializer if available
             if (IsAotEnvironment ())
             {
-                JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (type);
+                JsonTypeInfo? jsonTypeInfo = TuiSerializerContext.Instance.GetTypeInfo (type);
 
                 if (jsonTypeInfo is not null)
                 {
@@ -390,30 +390,43 @@ public static class DeepCloner
             return new Dictionary<string, Scheme?> ();
         }
 
+        if (dictType == typeof (Dictionary<Command, PlatformKeyBinding>))
+        {
+            return new Dictionary<Command, PlatformKeyBinding> ();
+        }
+
+        if (dictType == typeof (Dictionary<string, Dictionary<Command, PlatformKeyBinding>>))
+        {
+            if (comparer is IEqualityComparer<string> stringComparer)
+            {
+                return new Dictionary<string, Dictionary<Command, PlatformKeyBinding>> (stringComparer);
+            }
+
+            return new Dictionary<string, Dictionary<Command, PlatformKeyBinding>> ();
+        }
+
         // AOT-safe: use the source-generated JSON serializer to create empty dictionary instances.
         // This avoids Activator.CreateInstance, whose target constructors are trimmed by the AOT linker
         // for closed generic dictionary types not otherwise statically reachable.
-        // Only used when no comparer is needed — Deserialize("{}") always creates a default-comparer instance.
-        if (comparer is null)
+        // Always attempted regardless of comparer — in AOT, a default-comparer dictionary is preferable
+        // to a crash from a trimmed constructor.
+        try
         {
-            try
+            JsonTypeInfo? jsonTypeInfo = TuiSerializerContext.Instance.GetTypeInfo (dictType);
+
+            if (jsonTypeInfo is not null)
             {
-                JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (dictType);
+                IDictionary? result = JsonSerializer.Deserialize ("{}", jsonTypeInfo) as IDictionary;
 
-                if (jsonTypeInfo is not null)
+                if (result is not null)
                 {
-                    IDictionary? result = JsonSerializer.Deserialize ("{}", jsonTypeInfo) as IDictionary;
-
-                    if (result is not null)
-                    {
-                        return result;
-                    }
+                    return result;
                 }
             }
-            catch (InvalidOperationException)
-            {
-                // JSON serializer context may not be initialized — fall through to reflective construction.
-            }
+        }
+        catch (InvalidOperationException)
+        {
+            // JSON serializer context may not be initialized — fall through to reflective construction.
         }
 
         try

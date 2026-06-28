@@ -80,7 +80,11 @@ public partial class TextField : View, IDesignable, IValue<string>
     ///     Gets or sets the default cursor style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBar;
+    public static CursorStyle DefaultCursorStyle
+    {
+        get => TextFieldSettings.Defaults.DefaultCursorStyle;
+        set => TextFieldSettings.Defaults.DefaultCursorStyle = value;
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextField"/> class.

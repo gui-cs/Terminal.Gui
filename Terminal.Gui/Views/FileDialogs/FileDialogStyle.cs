@@ -45,14 +45,22 @@ public class FileDialogStyle
     ///     files via <see cref="ConfigurationManager"/>
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool DefaultUseColors { get; set; } = true;
+    public static bool DefaultUseColors
+    {
+        get => FileDialogStyleSettings.Defaults.DefaultUseColors;
+        set => FileDialogStyleSettings.Defaults.DefaultUseColors = value;
+    }
 
     /// <summary>
     ///     Gets or sets the default value to use for <see cref="UseUnicodeCharacters"/>. This can be populated from .tui
     ///     config files via <see cref="ConfigurationManager"/>
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool DefaultUseUnicodeCharacters { get; set; }
+    public static bool DefaultUseUnicodeCharacters
+    {
+        get => FileDialogStyleSettings.Defaults.DefaultUseUnicodeCharacters;
+        set => FileDialogStyleSettings.Defaults.DefaultUseUnicodeCharacters = value;
+    }
 
     /// <summary>
     ///     Gets or sets error message when user <see cref="OpenMode"/> is <see cref="OpenMode.File"/> and user enters the

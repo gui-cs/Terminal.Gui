@@ -26,7 +26,11 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     ///     Gets or sets the default Highlight Style.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static MouseState DefaultMouseHighlightStates { get; set; } = MouseState.In;
+    public static MouseState DefaultMouseHighlightStates
+    {
+        get => SelectorBaseSettings.Defaults.DefaultMouseHighlightStates;
+        set => SelectorBaseSettings.Defaults.DefaultMouseHighlightStates = value;
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="SelectorBase"/> class.

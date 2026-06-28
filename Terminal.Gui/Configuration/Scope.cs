@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
+#pragma warning disable CS0618 // Obsolete - Scope uses ConfigProperty/ConfigurationPropertyAttribute internally
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>

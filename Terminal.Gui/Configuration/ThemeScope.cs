@@ -1,5 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 
+#pragma warning disable CS0618 // Obsolete - ThemeScope references Scope internally
+
 namespace Terminal.Gui.Configuration;
 
 // TODO: Change to internal to prevent app usage
@@ -43,6 +45,7 @@ namespace Terminal.Gui.Configuration;
 /// </code>
 /// </example>
 [JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
+[Obsolete ("Being replaced by Microsoft.Extensions.Configuration. Will be removed in a future version.")]
 public class ThemeScope : Scope<ThemeScope>
 {
 }
