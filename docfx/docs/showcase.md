@@ -2,16 +2,16 @@
 
 ## Applications Built with Terminal.Gui
 
-- **[clet](https://github.com/gui-cs/clet)** - CLI-lets: simple CLI commands that prompt the user with rich TUI inputs (select, confirm, file picker, date, color, etc.) and return typed JSON. One binary, every prompt, JSON out. Works for humans and AI agents alike.
-  ![clet](https://raw.githubusercontent.com/gui-cs/clet/develop/docs/images/hero.png)
+- **[clet](https://github.com/tui-cs/clet)** - CLI-lets: simple CLI commands that prompt the user with rich TUI inputs (select, confirm, file picker, date, color, etc.) and return typed JSON. One binary, every prompt, JSON out. Works for humans and AI agents alike.
+  ![clet](https://raw.githubusercontent.com/tui-cs/clet/develop/docs/images/hero.png)
   ⠀
-- **[UI Catalog](https://github.com/gui-cs/Terminal.Gui/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
+- **[UI Catalog](https://github.com/tui-cs/Terminal.Gui/tree/master/UICatalog)** - The UI Catalog project provides an easy to use and extend sample illustrating the capabilities of **Terminal.Gui**. Run `dotnet run --project UICatalog` to run the UI Catalog.
   ![Sample app](../images/sample.gif)  
   ⠀
 - **[PowerShell's `Out-ConsoleGridView`](https://github.com/PowerShell/GraphicalTools)** - `OCGV` sends the output from a command to an interactive table.
   ![OutConsoleGridView](../images/OutConsoleGridView.png)  
   ⠀
-- **[F7History](https://github.com/gui-cs/F7History)** - Graphical Command History for PowerShell (built on PowerShell's `Out-ConsoleGridView`).
+- **[F7History](https://github.com/tui-cs/F7History)** - Graphical Command History for PowerShell (built on PowerShell's `Out-ConsoleGridView`).
   ![F7History](../images/F7History.gif)  
   ⠀
 - **[PoshRedisViewer](https://github.com/En3Tho/PoshRedisViewer)** - A compact Redis viewer module for PowerShell written in F#.
@@ -27,7 +27,7 @@
   ![hui](https://github.com/user-attachments/assets/8b4a493d-ac74-4876-88e4-fa56a6ff40f7)
 
 - **[Capital and Cargo](https://github.com/dhorions/Capital-and-Cargo)** - A retro console game where you buy, sell, produce and transport goods built with Terminal.Gui
-  ![image](https://github.com/gui-cs/Terminal.Gui/assets/1682004/ed89f3d6-020f-4a8a-ae18-e057514f4c43)
+  ![image](https://github.com/tui-cs/Terminal.Gui/assets/1682004/ed89f3d6-020f-4a8a-ae18-e057514f4c43)
  
 - **[Falcon](https://github.com/MaciekWin3/Falcon)** - Terminal chat application that uses SignalR and Terminal.Gui.
   ![Falcon](https://github.com/user-attachments/assets/d505cba3-75d3-43ea-b270-924dfd257a65)
@@ -41,8 +41,8 @@
 - **[TermKeyVault](https://github.com/MaciekWin3/TermKeyVault)** - Terminal based password manager built with F# and Terminal.Gui.
   ![TermKeyVault](https://github.com/user-attachments/assets/c40e17ed-2614-4ad4-8547-e93c1b1d8937)
 
-- **[mdv](https://github.com/gui-cs/mdv)** - A Terminal.Gui-based Markdown viewer for the terminal. Supports full-screen interactive mode and print-to-terminal mode.
+- **[mdv](https://github.com/tui-cs/mdv)** - A Terminal.Gui-based Markdown viewer for the terminal. Supports full-screen interactive mode and print-to-terminal mode.
 
 ## Examples
 
-- **[See all Examples here](https://github.com/gui-cs/Terminal.Gui/tree/master/Examples)**
+- **[See all Examples here](https://github.com/tui-cs/Terminal.Gui/tree/master/Examples)**

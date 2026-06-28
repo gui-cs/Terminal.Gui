@@ -16,8 +16,8 @@ public class Deepdives : Scenario
 {
     private static readonly HttpClient _httpClient = new ();
 
-    private const string DOCS_API_URL = "https://api.github.com/repos/gui-cs/Terminal.Gui/contents/docfx/docs?ref=develop";
-    private const string INCLUDES_API_URL = "https://api.github.com/repos/gui-cs/Terminal.Gui/contents/docfx/includes?ref=develop";
+    private const string DOCS_API_URL = "https://api.github.com/repos/tui-cs/Terminal.Gui/contents/docfx/docs?ref=develop";
+    private const string INCLUDES_API_URL = "https://api.github.com/repos/tui-cs/Terminal.Gui/contents/docfx/includes?ref=develop";
 
     private IApplication? _app;
     private ListView? _docList;
@@ -44,7 +44,8 @@ public class Deepdives : Scenario
             X = 0,
             Y = 0,
             Width = 30,
-            Height = Dim.Fill (1)
+            Height = Dim.Fill (1),
+            TabStop = TabBehavior.TabStop
         };
 
         _docList = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
@@ -58,7 +59,8 @@ public class Deepdives : Scenario
             X = Pos.Right (listFrame),
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill (1)
+            Height = Dim.Fill (1),
+            TabStop = TabBehavior.TabStop
         };
 
         _markdownView = new Markdown { Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter () };

@@ -1,6 +1,6 @@
 # Terminal.Gui Library — Maintainer Guide
 
-This directory contains the core **Terminal.Gui** library source code. This README documents how to maintain and release the library. For contribution guidelines, see [CONTRIBUTING.md](../CONTRIBUTING.md). For building apps with Terminal.Gui, see [the documentation](https://gui-cs.github.io/Terminal.Gui).
+This directory contains the core **Terminal.Gui** library source code. This README documents how to maintain and release the library. For contribution guidelines, see [CONTRIBUTING.md](../CONTRIBUTING.md). For building apps with Terminal.Gui, see [the documentation](https://tui-cs.github.io/Terminal.Gui).
 
 ## Versioning
 
@@ -90,9 +90,9 @@ If you need to release manually:
    git push --atomic upstream main vX.Y.Z
    ```
 
-6. **Monitor CI**: the [Publish workflow](https://github.com/gui-cs/Terminal.Gui/actions) builds and pushes to [NuGet](https://www.nuget.org/packages/Terminal.Gui). It also triggers an update to [Terminal.Gui.templates](https://github.com/gui-cs/Terminal.Gui.templates) for stable releases.
+6. **Monitor CI**: the [Publish workflow](https://github.com/tui-cs/Terminal.Gui/actions) builds and pushes to [NuGet](https://www.nuget.org/packages/Terminal.Gui). It also triggers an update to [Terminal.Gui.templates](https://github.com/tui-cs/Terminal.Gui.templates) for stable releases.
 
-7. **Create a GitHub Release** at [Releases](https://github.com/gui-cs/Terminal.Gui/releases) with auto-generated release notes.
+7. **Create a GitHub Release** at [Releases](https://github.com/tui-cs/Terminal.Gui/releases) with auto-generated release notes.
 
 8. **Merge `main` back into `develop`**:
    ```powershell
@@ -152,7 +152,7 @@ dotnet build Terminal.Gui/Terminal.Gui.csproj -c Release
 
 ## Documentation
 
-- **Live docs**: [gui-cs.github.io/Terminal.Gui](https://gui-cs.github.io/Terminal.Gui)
+- **Live docs**: [tui-cs.github.io/Terminal.Gui](https://tui-cs.github.io/Terminal.Gui)
 - **DocFX source**: [`docfx/`](../docfx/) — see [`docfx/README.md`](../docfx/README.md) for local generation
 - **API docs** are auto-deployed to GitHub Pages on every push to `main`
 

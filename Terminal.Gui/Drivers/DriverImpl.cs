@@ -79,7 +79,7 @@ internal class DriverImpl : IDriver
         _terminalSize = new Size (outputBuffer.Cols, outputBuffer.Rows);
         AnsiStartupGate = ansiStartupGate;
 
-        CreateClipboard ();
+        Clipboard = CreateClipboard ();
 
         Driver.Force16ColorsChanged += OnDriverOnForce16ColorsChanged;
     }
@@ -158,27 +158,61 @@ internal class DriverImpl : IDriver
     public IAnsiStartupGate? AnsiStartupGate { get; }
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard { get; set; } = new FakeClipboard ();
+    public IClipboard? Clipboard { get; set; }
 
     /// <inheritdoc/>
     public ProgressIndicator? ProgressIndicator { get; internal set; }
 
-    private void CreateClipboard ()
+    internal static IClipboard CreateClipboard (
+        Func<bool> isWindows,
+        Func<bool> isMac,
+        Func<bool> isWsl,
+        Func<bool> isLinux,
+        Func<IClipboard> createWindowsClipboard,
+        Func<IClipboard> createMacClipboard,
+        Func<IClipboard> createWslClipboard,
+        Func<IClipboard> createUnixClipboard,
+        IClipboard fallbackClipboard
+    )
+    {
+        if (isWindows ())
+        {
+            return createWindowsClipboard ();
+        }
+
+        if (isMac ())
+        {
+            return createMacClipboard ();
+        }
+
+        if (isWsl ())
+        {
+            return createWslClipboard ();
+        }
+
+        if (!isLinux ())
+        {
+            return fallbackClipboard;
+        }
+
+        IClipboard unixClipboard = createUnixClipboard ();
+
+        return !unixClipboard.IsSupported ? fallbackClipboard : unixClipboard;
+    }
+
+    private static IClipboard CreateClipboard ()
     {
         PlatformID p = Environment.OSVersion.Platform;
 
-        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
-        {
-            Clipboard = new WindowsClipboard ();
-        }
-        else if (RuntimeInformation.IsOSPlatform (OSPlatform.OSX))
-        {
-            Clipboard = new MacOSXClipboard ();
-        }
-        else if (PlatformDetection.IsWSL ())
-        {
-            Clipboard = new WSLClipboard ();
-        }
+        return CreateClipboard (() => p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows,
+                                () => RuntimeInformation.IsOSPlatform (OSPlatform.OSX),
+                                PlatformDetection.IsWSL,
+                                PlatformDetection.IsLinux,
+                                () => new WindowsClipboard (),
+                                () => new MacOSXClipboard (),
+                                () => new WSLClipboard (),
+                                () => new UnixClipboard (),
+                                new FakeClipboard ());
     }
 
     internal void InitializeProgressIndicator ()
@@ -277,14 +311,31 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<SixelSupportResult?>>? SixelSupportChanged;
 
-    /// <summary>
-    ///     Sets the terminal's sixel support result (detected during initialization).
-    /// </summary>
-    internal void SetSixelSupport (SixelSupportResult result)
+    /// <inheritdoc/>
+    public void SetSixelSupport (SixelSupportResult result)
     {
         SixelSupportResult? old = SixelSupport;
         SixelSupport = result;
         SixelSupportChanged?.Invoke (this, new ValueChangedEventArgs<SixelSupportResult?> (old, result));
+    }
+
+    /// <inheritdoc/>
+    public KittyGraphicsSupportResult? KittyGraphicsSupport { get; private set; }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<KittyGraphicsSupportResult?>>? KittyGraphicsSupportChanged;
+
+    /// <inheritdoc/>
+    public void SetKittyGraphicsSupport (KittyGraphicsSupportResult result)
+    {
+        KittyGraphicsSupportResult? old = KittyGraphicsSupport;
+        KittyGraphicsSupport = result;
+
+        // Kitty takes priority when supported.  Sixel is the fallback for terminals that lack
+        // Kitty support (e.g. Windows Terminal).
+        _output.UseKittyGraphics = result.IsSupported;
+
+        KittyGraphicsSupportChanged?.Invoke (this, new ValueChangedEventArgs<KittyGraphicsSupportResult?> (old, result));
     }
 
     /// <inheritdoc/>

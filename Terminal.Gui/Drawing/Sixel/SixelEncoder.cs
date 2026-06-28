@@ -113,8 +113,8 @@ public class SixelEncoder
         Array.Fill (accu, (ushort)1);
         Array.Fill (slots, (short)-1);
 
-        List<int> usedColorIdx = new List<int> ();
-        List<List<string>> targets = new List<List<string>> ();
+        List<int> usedColorIdx = new();
+        List<List<string>> targets = new();
 
         // Process columns within the band
         for (var x = 0; x < width; ++x)
@@ -126,12 +126,12 @@ public class SixelEncoder
             {
                 Color color = pixels [x, startY + row];
 
-                int colorIndex = Quantizer.GetNearestColor (color);
-
                 if (color.A == 0) // Skip fully transparent pixels
                 {
                     continue;
                 }
+
+                int colorIndex = Quantizer.GetNearestColor (color);
 
                 if (slots [colorIndex] == -1)
                 {
@@ -184,7 +184,17 @@ public class SixelEncoder
 
         for (var j = 0; j < usedColorIdx.Count; ++j)
         {
-            result.Append ($"#{usedColorIdx [j]}{string.Join ("", targets [j])}$");
+            result.Append ($"#{usedColorIdx [j]}{string.Join ("", targets [j])}");
+
+            // Emit '$' (Graphics Carriage Return) between color layers so
+            // the next layer redraws the same band. Do NOT emit after the
+            // last layer — a trailing '$' before '-' or before the sequence
+            // terminator is redundant and causes rendering corruption in
+            // iTerm2 (see #5490).
+            if (j < usedColorIdx.Count - 1)
+            {
+                result.Append ('$');
+            }
         }
 
         return result.ToString ();

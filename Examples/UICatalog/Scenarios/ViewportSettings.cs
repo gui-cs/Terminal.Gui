@@ -67,10 +67,10 @@ public class ViewportSettings : Scenario
             Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20))
         };
 
-        charMap.Accepting += (s, _) => MessageBox.Query ((s as View)?.App!, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
+        charMap.Accepted += (s, _) => MessageBox.Query ((s as View)?.App!, 20, 7, "Hi", $"Am I a {view.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
 
         Button buttonAnchored = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Bottom Rig_ht" };
-        buttonAnchored.Accepting += (sender, _) => MessageBox.Query ((sender as View)?.App!, "Hi", $"You pressed {((Button)sender!).Text}", Strings.btnOk);
+        buttonAnchored.Accepted += (sender, _) => MessageBox.Query ((sender as View)?.App!, "Hi", $"You pressed {((Button)sender!).Text}", Strings.btnOk);
 
         view.Margin.Thickness = new Thickness (0);
         view.Border.Thickness = new Thickness (3);

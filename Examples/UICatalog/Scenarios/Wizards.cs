@@ -1,8 +1,6 @@
 ﻿#nullable enable
 
 // ReSharper disable AccessToDisposedClosure
-using Terminal.Gui.Views;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Wizards", "Demonstrates the Wizard class")]
@@ -35,15 +33,10 @@ public class Wizards : Scenario
         };
         win.Add (settingsFrame);
 
-        Label label = new ()
-        {
-            X = 0,
-            TextAlignment = Alignment.End,
-            Text = "_Title:"
-        };
+        Label label = new () { X = 0, TextAlignment = Alignment.End, Text = "_Title:" };
         settingsFrame.Add (label);
 
-        _titleEdit = new ()
+        _titleEdit = new TextField
         {
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
@@ -53,32 +46,17 @@ public class Wizards : Scenario
         };
         settingsFrame.Add (_titleEdit);
 
-        CheckBox cbRun = new ()
-        {
-            Title = "_Run Wizard as a modal",
-            X = 0,
-            Y = Pos.Bottom (label),
-            Value = CheckState.Checked
-        };
+        CheckBox cbRun = new () { Title = "_Run Wizard as a modal", X = 0, Y = Pos.Bottom (label), Value = CheckState.Checked };
         settingsFrame.Add (cbRun);
 
-        Button showWizardButton = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Bottom (cbRun),
-            IsDefault = true,
-            Text = "_Show Wizard"
-        };
+        Button showWizardButton = new () { X = Pos.Center (), Y = Pos.Bottom (cbRun), IsDefault = true, Text = "_Show Wizard" };
 
         settingsFrame.Add (showWizardButton);
 
-        label = new ()
-        {
-            X = Pos.Center (), Y = Pos.AnchorEnd (1), TextAlignment = Alignment.End, Text = "Action:"
-        };
+        label = new Label { X = Pos.Center (), Y = Pos.AnchorEnd (1), TextAlignment = Alignment.End, Text = "Action:" };
         win.Add (label);
 
-        _actionLabel = new ()
+        _actionLabel = new View
         {
             X = Pos.Right (label),
             Y = Pos.AnchorEnd (1),
@@ -96,32 +74,32 @@ public class Wizards : Scenario
         }
 
         cbRun.ValueChanged += (_, a) =>
-        {
-            if (a.NewValue == CheckState.Checked)
-            {
-                showWizardButton.Enabled = true;
-                _wizard!.X = Pos.Center ();
-                _wizard.Y = Pos.Center ();
+                              {
+                                  if (a.NewValue == CheckState.Checked)
+                                  {
+                                      showWizardButton.Enabled = true;
+                                      _wizard!.X = Pos.Center ();
+                                      _wizard.Y = Pos.Center ();
 
-                win.Remove (_wizard);
-                _wizard.Dispose ();
-                _wizard = null;
-            }
-            else
-            {
-                showWizardButton.Enabled = false;
-                _wizard = CreateWizard ();
-                _wizard.Y = Pos.Bottom (settingsFrame) + 1;
-                win.Add (_wizard);
-            }
-        };
+                                      win.Remove (_wizard);
+                                      _wizard.Dispose ();
+                                      _wizard = null;
+                                  }
+                                  else
+                                  {
+                                      showWizardButton.Enabled = false;
+                                      _wizard = CreateWizard ();
+                                      _wizard.Y = Pos.Bottom (settingsFrame) + 1;
+                                      win.Add (_wizard);
+                                  }
+                              };
 
         showWizardButton.Accepting += (_, _) =>
-        {
-            _wizard = CreateWizard ();
-            app.Run (_wizard);
-            _wizard.Dispose ();
-        };
+                                      {
+                                          _wizard = CreateWizard ();
+                                          app.Run (_wizard);
+                                          _wizard.Dispose ();
+                                      };
 
         app.Run (win);
     }
@@ -130,7 +108,7 @@ public class Wizards : Scenario
     {
         Wizard wizard = new ();
 
-        if (_titleEdit is not null)
+        if (_titleEdit is { })
         {
             wizard.Title = _titleEdit.Text;
         }
@@ -161,7 +139,7 @@ public class Wizards : Scenario
                                 }
                                 else
                                 {
-                                    wizard.App!.RequestStop();
+                                    wizard.App!.RequestStop ();
                                     args.Handled = true;
                                 }
                             };

@@ -9,6 +9,7 @@ namespace UICatalog.Scenarios;
 public sealed class TreeViewEditor : EditorBase
 {
     private CheckBox? _cbMultiSelect;
+    private CheckBox? _cbCheckboxMode;
     private CheckBox? _cbShowBranchLines;
     private CheckBox? _cbColorExpandSymbol;
     private CheckBox? _cbInvertExpandSymbolColors;
@@ -66,6 +67,7 @@ public sealed class TreeViewEditor : EditorBase
         }
 
         _cbMultiSelect!.Value = treeView.MultiSelect ? CheckState.Checked : CheckState.UnChecked;
+        _cbCheckboxMode!.Value = treeView.CheckboxMode ? CheckState.Checked : CheckState.UnChecked;
         _cbShowBranchLines!.Value = treeView.Style.ShowBranchLines ? CheckState.Checked : CheckState.UnChecked;
         _cbColorExpandSymbol!.Value = treeView.Style.ColorExpandSymbol ? CheckState.Checked : CheckState.UnChecked;
         _cbInvertExpandSymbolColors!.Value = treeView.Style.InvertExpandSymbolColors ? CheckState.Checked : CheckState.UnChecked;
@@ -81,10 +83,13 @@ public sealed class TreeViewEditor : EditorBase
         _cbMultiSelect = new CheckBox { Title = "MultiSelect", CanFocus = true };
         _cbMultiSelect.ValueChanging += (_, args) => SetBool (args, (tv, v) => tv.MultiSelect = v);
 
+        _cbCheckboxMode = new CheckBox { X = Pos.Right (_cbMultiSelect) + 1, Title = "CheckboxMode", CanFocus = true };
+        _cbCheckboxMode.ValueChanging += (_, args) => SetBool (args, (tv, v) => tv.CheckboxMode = v);
+
         _cbShowBranchLines = new CheckBox { Y = Pos.Bottom (_cbMultiSelect), Title = "ShowBranchLines", CanFocus = true };
         _cbShowBranchLines.ValueChanging += (_, args) => SetStyleBool (args, (style, v) => style.ShowBranchLines = v);
 
-        _cbColorExpandSymbol = new CheckBox { X = Pos.Right (_cbMultiSelect) + 1, Title = "ColorExpandSymbol", CanFocus = true };
+        _cbColorExpandSymbol = new CheckBox { X = Pos.Right (_cbCheckboxMode) + 1, Title = "ColorExpandSymbol", CanFocus = true };
         _cbColorExpandSymbol.ValueChanging += (_, args) => SetStyleBool (args, (style, v) => style.ColorExpandSymbol = v);
 
         _cbInvertExpandSymbolColors = new CheckBox
@@ -189,6 +194,7 @@ public sealed class TreeViewEditor : EditorBase
                                 };
 
         Add (_cbMultiSelect,
+             _cbCheckboxMode,
              _cbColorExpandSymbol,
              _cbShowBranchLines,
              _cbInvertExpandSymbolColors,

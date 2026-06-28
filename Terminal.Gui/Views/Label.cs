@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Displays text that describes the View next in the <see cref="View.SubViews"/>. When
@@ -6,6 +6,7 @@
 ///     <see cref="View.SubViews"/> will be activated.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Label.gif" alt="Label demo"/>
 ///     <para>
 ///         Title and Text are the same property. When Title is set Text s also set. When Text is set Title is also set.
 ///     </para>
@@ -75,4 +76,7 @@ public class Label : View, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:2000";
 }

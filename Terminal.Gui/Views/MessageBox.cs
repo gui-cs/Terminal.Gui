@@ -10,16 +10,16 @@ namespace Terminal.Gui.Views;
 ///         All methods return <see langword="int?"/> where the value is the 0-based index of the button pressed,
 ///         or <see langword="null"/> if the user pressed <see cref="Application.GetDefaultKey"/> (typically Esc).
 ///     </para>
-    ///     <para>
-    ///         <see cref="Query(IApplication, string, string, string[])"/> uses the default Dialog color scheme.
-    ///         <see cref="ErrorQuery(IApplication, string, string, string[])"/> uses the Error color scheme.
-    ///     </para>
-    ///     <para>
-    ///         The last button provided is always the default button.
-    ///     </para>
-    ///     <para>
-    ///         <b>Important:</b> All MessageBox methods require an <see cref="IApplication"/> instance to be passed.
-    ///         This enables proper modal dialog management and respects the application's lifecycle. Pass your
+///     <para>
+///         <see cref="Query(IApplication, string, string, string[])"/> uses the default Dialog color scheme.
+///         <see cref="ErrorQuery(IApplication, string, string, string[])"/> uses the Error color scheme.
+///     </para>
+///     <para>
+///         The last button provided is always the default button.
+///     </para>
+///     <para>
+///         <b>Important:</b> All MessageBox methods require an <see cref="IApplication"/> instance to be passed.
+///         This enables proper modal dialog management and respects the application's lifecycle. Pass your
 ///         application instance (from <see cref="Application.Create"/>) or use the legacy
 ///         <see cref="Application.Instance"/> if using the static Application pattern.
 ///     </para>

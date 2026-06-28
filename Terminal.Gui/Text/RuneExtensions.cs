@@ -7,7 +7,7 @@ namespace Terminal.Gui.Text;
 /// <summary>Extends <see cref="System.Text.Rune"/> to support TUI text manipulation.</summary>
 public static class RuneExtensions
 {
-    private static readonly Lock _wcwidthLock = new Lock ();
+    private static readonly Lock _wcwidthLock = new();
 
     /// <summary>Maximum Unicode code point.</summary>
     public static readonly int MaxUnicodeCodePoint = 0x10FFFF;

@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Raises the <see cref="View.Accepting"/> and <see cref="View.Accepted"/> events when the user presses
@@ -6,6 +6,7 @@
 ///     <c>Enter</c>, or <c>Space</c> or clicks with the mouse.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Button.gif" alt="Button demo"/>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
 ///     <para>
 ///         Button can act as the default <see cref="Command.Accept"/> handler for all peer-Views. See
@@ -99,7 +100,7 @@ public class Button : View, IDesignable, IAcceptTarget
 
     /// <summary>
     ///     Called before the Button's initial <see cref="View.ShadowStyle"/> is applied during construction.
-    ///     Override to change or suppress the default shadow — set <see cref="ValueChangingEventArgs{T}.NewValue"/>
+    ///     Override to change or suppress the default shadow � set <see cref="ValueChangingEventArgs{T}.NewValue"/>
     ///     to the desired style, or set <see cref="ValueChangingEventArgs{T}.Handled"/> to
     ///     <see langword="true"/> to skip applying any shadow.
     /// </summary>
@@ -122,10 +123,10 @@ public class Button : View, IDesignable, IAcceptTarget
     {
         ValueChangingEventArgs<ShadowStyles?> args = new (null, DefaultShadow);
 
-        // 1. Virtual method — subclasses override to change/suppress the default shadow.
+        // 1. Virtual method � subclasses override to change/suppress the default shadow.
         OnInitializingShadowStyle (args);
 
-        // 2. Event — external subscribers get a chance to customize.
+        // 2. Event � external subscribers get a chance to customize.
         InitializingShadowStyle?.Invoke (this, args);
 
         // 3. Apply the (potentially modified) shadow style unless already handled.
@@ -142,23 +143,23 @@ public class Button : View, IDesignable, IAcceptTarget
     {
         if (mouseHoldRepeat.HasValue)
         {
-            // MouseHoldRepeat enabled: Remove ALL Click/Release/Press bindings, add only configured event→HotKey
+            // MouseHoldRepeat enabled: Remove ALL Click/Release/Press bindings, add only configured event?HotKey
             MouseBindings.Remove (MouseFlags.LeftButtonPressed);
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonDoubleClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonTripleClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
 
-            // Add configured mouse event→HotKey binding
+            // Add configured mouse event?HotKey binding
             MouseBindings.Add (mouseHoldRepeat.Value, Command.Accept);
         }
         else
         {
-            // MouseHoldRepeat disabled: Remove ALL Click/Release/Press bindings, add only Clicked→HotKey
+            // MouseHoldRepeat disabled: Remove ALL Click/Release/Press bindings, add only Clicked?HotKey
             MouseBindings.Remove (MouseFlags.LeftButtonClicked);
             MouseBindings.Remove (MouseFlags.LeftButtonReleased);
 
-            // Add Clicked→HotKey bindings (default behavior)
+            // Add Clicked?HotKey bindings (default behavior)
             MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
             MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
             MouseBindings.Add (MouseFlags.LeftButtonTripleClicked, Command.Accept);
@@ -339,6 +340,9 @@ public class Button : View, IDesignable, IAcceptTarget
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
 
     // GetDecoratedText (called by UpdateTextFormatterText for Dim.Auto sizing) and GetInteriorText
     // (called by OnDrawingText for rendering) must remain in sync when modifying button text formatting.

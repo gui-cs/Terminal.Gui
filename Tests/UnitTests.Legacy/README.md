@@ -10,4 +10,4 @@ Each test class in this project is a candidate for one of:
 1. **Rewrite** in the appropriate project if the case is not already covered.
 2. **Deletion** if the case is already covered in `UnitTestsParallelizable`.
 
-See the [Testing wiki](https://github.com/gui-cs/Terminal.Gui/wiki/Testing) for details.
+See the [Testing wiki](https://github.com/tui-cs/Terminal.Gui/wiki/Testing) for details.

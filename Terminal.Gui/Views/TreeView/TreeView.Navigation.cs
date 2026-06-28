@@ -350,6 +350,48 @@ public partial class TreeView<T>
         }
     }
 
+    /// <summary>Returns all objects whose effective check state is <see cref="CheckState.Checked"/>.</summary>
+    /// <returns>Checked objects in tree order, followed by any checked objects that are not currently in the tree.</returns>
+    public IEnumerable<T> GetCheckedObjects ()
+    {
+        HashSet<T> yielded = [];
+
+        foreach (T model in EnumerateKnownObjects ())
+        {
+            if (GetCheckState (model) == CheckState.Checked && yielded.Add (model))
+            {
+                yield return model;
+            }
+        }
+
+        foreach (T model in _checkedStates.Keys)
+        {
+            if (GetCheckState (model) == CheckState.Checked && yielded.Add (model))
+            {
+                yield return model;
+            }
+        }
+    }
+
+    /// <summary>Gets the effective check state of <paramref name="o"/>, derived from children if applicable.</summary>
+    /// <param name="o">The node object.</param>
+    /// <returns>The effective check state.</returns>
+    public CheckState GetCheckState (T? o) => o is null ? CheckState.UnChecked : GetEffectiveCheckState (o, []);
+
+    /// <summary>Sets the explicit check state of <paramref name="o"/> and propagates to all descendants.</summary>
+    /// <param name="o">The node object.</param>
+    /// <param name="state">The new check state.</param>
+    public void SetChecked (T? o, CheckState state)
+    {
+        if (o is null)
+        {
+            return;
+        }
+
+        SetCheckedRecursive (o, state);
+        SetNeedsDraw ();
+    }
+
     /// <summary>
     ///     Returns the currently expanded children of the passed object. Returns an empty collection if the branch is not
     ///     exposed or not expanded.
@@ -469,7 +511,7 @@ public partial class TreeView<T>
         }
 
         // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
+        // See: https://github.com/tui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
         if (KeyBindings.TryGet (key, out _))
         {
             return false;
@@ -640,6 +682,14 @@ public partial class TreeView<T>
         {
             return;
         }
+
+        if (CheckboxMode)
+        {
+            ToggleChecked (SelectedObject);
+
+            return;
+        }
+
         Toggle (SelectedObject);
     }
 
@@ -648,4 +698,197 @@ public partial class TreeView<T>
 
     // TODO: Refactor to use CWP
     protected virtual void OnSelectionChanged (SelectionChangedEventArgs<T> e) => SelectionChanged?.Invoke (this, e);
+
+    private IEnumerable<T> EnumerateKnownObjects ()
+    {
+        if (Roots is null)
+        {
+            yield break;
+        }
+
+        HashSet<T> seen = [];
+
+        foreach (T root in Roots.Keys)
+        {
+            foreach (T model in EnumerateKnownObjects (root, seen, 0))
+            {
+                yield return model;
+            }
+        }
+    }
+
+    private IEnumerable<T> EnumerateKnownObjects (T model, HashSet<T> seen, int depth)
+    {
+        if (!seen.Add (model))
+        {
+            yield break;
+        }
+
+        yield return model;
+
+        if (depth >= MaxDepth || TreeBuilder is null)
+        {
+            yield break;
+        }
+
+        foreach (T child in TreeBuilder.GetChildren (model))
+        {
+            foreach (T descendant in EnumerateKnownObjects (child, seen, depth + 1))
+            {
+                yield return descendant;
+            }
+        }
+    }
+
+    internal Rune GetCheckGlyph (T model) =>
+        GetCheckState (model) switch
+        {
+            CheckState.Checked => Glyphs.CheckStateChecked,
+            CheckState.UnChecked => Glyphs.CheckStateUnChecked,
+            CheckState.None => Glyphs.CheckStateNone,
+            _ => throw new ArgumentOutOfRangeException ()
+        };
+
+    private CheckState GetEffectiveCheckState (T model, HashSet<T> visited)
+    {
+        if (!visited.Add (model))
+        {
+            return _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
+        }
+
+        CheckState explicitState = _checkedStates.GetValueOrDefault (model, CheckState.UnChecked);
+
+        if (TreeBuilder is null)
+        {
+            return explicitState;
+        }
+
+        // Derive state from known children (ChildBranches). These are preserved even after
+        // collapse, so we can derive correct tri-state without calling TreeBuilder.GetChildren.
+        Branch<T>? branch = ObjectToBranch (model);
+
+        if (branch is not { ChildBranches: { Count: > 0 } childBranches })
+        {
+            return explicitState;
+        }
+
+        CheckState [] childStates = childBranches
+                                    .Select (child => GetEffectiveCheckState (child.Model, visited))
+                                    .ToArray ();
+
+        if (childStates.All (state => state is CheckState.Checked))
+        {
+            return CheckState.Checked;
+        }
+
+        if (childStates.All (state => state is CheckState.UnChecked))
+        {
+            return CheckState.UnChecked;
+        }
+
+        // Mixed states among children - indeterminate
+        return CheckState.None;
+    }
+
+    private void SetCheckedRecursive (T model, CheckState state)
+    {
+        SetCheckedRecursive (model, state, []);
+    }
+
+    private void SetCheckedRecursive (T model, CheckState state, HashSet<T> visited)
+    {
+        if (!visited.Add (model))
+        {
+            return;
+        }
+
+        SetCheckedCore (model, state);
+
+        if (TreeBuilder is null)
+        {
+            return;
+        }
+
+        foreach (T child in TreeBuilder.GetChildren (model))
+        {
+            SetCheckedRecursive (child, state, visited);
+        }
+    }
+
+    private void SetCheckedCore (T model, CheckState state)
+    {
+        CheckState oldEffective = GetCheckState (model);
+
+        if (oldEffective == state)
+        {
+            return;
+        }
+
+        _checkedStates [model] = state;
+        CheckedChanged?.Invoke (this, new CheckedChangedEventArgs<T> (this, model, oldEffective, state));
+    }
+
+    private void ToggleChecked (T model)
+    {
+        CheckState current = GetCheckState (model);
+
+        // If effective state is not UnChecked, toggle to UnChecked
+        if (current != CheckState.UnChecked)
+        {
+            SetChecked (model, CheckState.UnChecked);
+
+            return;
+        }
+
+        // Effective state is UnChecked - but for collapsed nodes, descendants might
+        // still be explicitly checked in the dictionary. Check for that case.
+        if (HasCheckedDescendantsInState (model))
+        {
+            SetChecked (model, CheckState.UnChecked);
+
+            return;
+        }
+
+        SetChecked (model, CheckState.Checked);
+    }
+
+    private bool HasCheckedDescendantsInState (T model)
+    {
+        if (TreeBuilder is null)
+        {
+            return false;
+        }
+
+        HashSet<T> visited = [];
+
+        return HasCheckedDescendantsRecursive (model, visited);
+    }
+
+    private bool HasCheckedDescendantsRecursive (T model, HashSet<T> visited)
+    {
+        if (!visited.Add (model))
+        {
+            return false;
+        }
+
+        if (TreeBuilder is null)
+        {
+            return false;
+        }
+
+        foreach (T child in TreeBuilder.GetChildren (model))
+        {
+            if (_checkedStates.TryGetValue (child, out CheckState state) && state == CheckState.Checked)
+            {
+                return true;
+            }
+
+            if (HasCheckedDescendantsRecursive (child, visited))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -36,7 +36,7 @@ jobs:
 
     steps:
       - name: Checkout develop
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: develop
           fetch-depth: 0

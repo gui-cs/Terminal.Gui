@@ -56,25 +56,25 @@ internal static class MarkdownAttributeHelper
         Attribute baseAttr = viewNormal with { Background = bg };
 
         return segment.StyleRole switch
-               {
-                   MarkdownStyleRole.Heading => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
-                   MarkdownStyleRole.HeadingMarker => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
-                   MarkdownStyleRole.Emphasis => baseAttr with { Style = baseAttr.Style | TextStyle.Italic },
-                   MarkdownStyleRole.Strong => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
-                   MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => themeBackground is { } codeBg
-                                                                                      ? view.GetAttributeForRole (VisualRole.Code) with { Background = codeBg }
-                                                                                      : view.GetAttributeForRole (VisualRole.Code),
-                   MarkdownStyleRole.Link => MakeLinkAttribute (baseAttr, segment),
-                   MarkdownStyleRole.Quote => baseAttr with { Style = baseAttr.Style | TextStyle.Faint },
-                   MarkdownStyleRole.Table => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
-                   MarkdownStyleRole.ThematicBreak => baseAttr with { Style = baseAttr.Style | TextStyle.Faint },
-                   MarkdownStyleRole.ImageAlt => baseAttr with { Style = baseAttr.Style | TextStyle.Italic },
-                   MarkdownStyleRole.TaskDone => baseAttr with { Style = baseAttr.Style | TextStyle.Strikethrough },
-                   MarkdownStyleRole.TaskTodo => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
-                   MarkdownStyleRole.ListMarker => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
-                   MarkdownStyleRole.Strikethrough => baseAttr with { Style = baseAttr.Style | TextStyle.Strikethrough },
-                   _ => baseAttr
-               };
+        {
+            MarkdownStyleRole.Heading => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+            MarkdownStyleRole.HeadingMarker => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+            MarkdownStyleRole.Emphasis => baseAttr with { Style = baseAttr.Style | TextStyle.Italic },
+            MarkdownStyleRole.Strong => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+            MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => themeBackground is { } codeBg
+                                                                               ? view.GetAttributeForRole (VisualRole.Code) with { Background = codeBg }
+                                                                               : view.GetAttributeForRole (VisualRole.Code),
+            MarkdownStyleRole.Link => MakeLinkAttribute (baseAttr, segment),
+            MarkdownStyleRole.Quote => baseAttr with { Style = baseAttr.Style | TextStyle.Faint },
+            MarkdownStyleRole.Table => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+            MarkdownStyleRole.ThematicBreak => baseAttr with { Style = baseAttr.Style | TextStyle.Faint },
+            MarkdownStyleRole.ImageAlt => baseAttr with { Style = baseAttr.Style | TextStyle.Italic },
+            MarkdownStyleRole.TaskDone => baseAttr with { Style = baseAttr.Style | TextStyle.Strikethrough },
+            MarkdownStyleRole.TaskTodo => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+            MarkdownStyleRole.ListMarker => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+            MarkdownStyleRole.Strikethrough => baseAttr with { Style = baseAttr.Style | TextStyle.Strikethrough },
+            _ => baseAttr
+        };
     }
 
     private static Attribute ResolveRoleAttribute (View view, VisualRole role, Attribute roleAttr, Color? themeBackground)
@@ -122,11 +122,45 @@ internal static class MarkdownAttributeHelper
         return segments;
     }
 
-    private static Attribute MakeLinkAttribute (Attribute normal, StyledSegment segment)
-    {
-        bool isClickable = !string.IsNullOrWhiteSpace (segment.Url)
-                           && (Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute) || segment.Url!.StartsWith ('#'));
+    private static Attribute MakeLinkAttribute (Attribute normal, StyledSegment segment) =>
+        IsMarkdownLinkTarget (segment.Url) ? normal with { Style = normal.Style | TextStyle.Underline } : normal;
 
-        return isClickable ? normal with { Style = normal.Style | TextStyle.Underline } : normal;
+    internal static bool IsMarkdownLinkTarget (string? url)
+    {
+        if (string.IsNullOrWhiteSpace (url))
+        {
+            return false;
+        }
+
+        if (url.StartsWith ('#'))
+        {
+            return true;
+        }
+
+        if (TryCreateSafeAbsoluteUri (url, out _))
+        {
+            return true;
+        }
+
+        return Uri.TryCreate (url, UriKind.Relative, out _);
+    }
+
+    internal static bool TryCreateSafeAbsoluteUri (string? url, out Uri? absoluteUri)
+    {
+        absoluteUri = null;
+
+        if (!Uri.TryCreate (url, UriKind.Absolute, out Uri? parsed) || parsed is null)
+        {
+            return false;
+        }
+
+        if (!Link.SafeSchemes.Contains (parsed.Scheme))
+        {
+            return false;
+        }
+
+        absoluteUri = parsed;
+
+        return true;
     }
 }

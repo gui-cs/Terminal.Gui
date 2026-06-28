@@ -276,6 +276,21 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             {
                 Logging.Warning ($"Sixel support detection failed: {ex.Message}");
             }
+
+            try
+            {
+                KittyGraphicsSupportDetector kittyDetector = new (_driver);
+
+                kittyDetector.Detect (result =>
+                                      {
+                                          _driver.SetKittyGraphicsSupport (result);
+                                          Logging.Trace ($"app: Kitty graphics support: {result.IsSupported}, Resolution: {result.Resolution}");
+                                      });
+            }
+            catch (Exception ex)
+            {
+                Logging.Warning ($"Kitty graphics support detection failed: {ex.Message}");
+            }
         }
 
 

@@ -252,13 +252,10 @@ public class InjectMouseEventTests (ITestOutputHelper output)
     [InlineData (MouseFlags.Ctrl)]
     [InlineData (MouseFlags.Alt)]
     [InlineData (MouseFlags.Ctrl | MouseFlags.Alt)]
-
-    // Note: Shift modifier encoding in ANSI mouse protocol is complex and doesn't always round-trip correctly
-    // The AnsiMouseEncoder uses approximations for Shift combinations that may not match the parser exactly
-    // [InlineData (MouseFlags.Shift)] // Known limitation
-    // [InlineData (MouseFlags.Shift | MouseFlags.Ctrl)] // Known limitation
-    // [InlineData (MouseFlags.Shift | MouseFlags.Alt)] // Known limitation
-    // [InlineData (MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)] // Known limitation
+    [InlineData (MouseFlags.Shift)]
+    [InlineData (MouseFlags.Shift | MouseFlags.Ctrl)]
+    [InlineData (MouseFlags.Shift | MouseFlags.Alt)]
+    [InlineData (MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)]
     public void InjectMouseEvent_PreservesModifiers (MouseFlags modifiers)
     {
         // Arrange
@@ -296,6 +293,11 @@ public class InjectMouseEventTests (ITestOutputHelper output)
         if (modifiers.HasFlag (MouseFlags.Alt))
         {
             Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.Alt));
+        }
+
+        if (modifiers.HasFlag (MouseFlags.Shift))
+        {
+            Assert.True (receivedEvent.Flags.HasFlag (MouseFlags.Shift));
         }
     }
 

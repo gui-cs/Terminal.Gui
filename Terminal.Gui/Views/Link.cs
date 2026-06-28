@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     Displays a clickable hyperlink with optional display text and a target URL.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Link.gif" alt="Link demo"/>
 ///     <para>
 ///         <see cref="Link"/> has three independent text-related properties:
 ///     </para>
@@ -442,12 +443,15 @@ public class Link : View, IDesignable
     bool IDesignable.EnableForDesign ()
     {
         Title = "_Link";
-        Url = "https://github.com/gui-cs";
+        Url = "https://github.com/tui-cs";
 
         Initialized += (_, _) => { App?.ToolTips?.SetToolTip (this, "This is a Link. Click to open the URL in the default browser."); };
 
         return true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
 
 
 }

@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     Provides date editing functionality using <see cref="TextValidateField"/> with culture-aware formatting.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/DateEditor.gif" alt="DateEditor demo"/>
 ///     <para>
 ///         DateEditor extends <see cref="TextValidateField"/> with date-specific functionality:
 ///         <list type="bullet">
@@ -229,6 +230,9 @@ public class DateEditor : TextValidateField, IValue<DateTime>, IDesignable
         SuppressValueEvents = false;
         SetNeedsDraw ();
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorRight,wait:300,CursorRight,wait:300,CursorUp,wait:600,CursorUp,wait:800";
 
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()

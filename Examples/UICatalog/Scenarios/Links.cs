@@ -62,7 +62,7 @@ public class Links : Scenario
 
         titleTextField.Text = "Title";
         textTextField.Text = "GitHub repo";
-        urlTextField.Text = "https://github.com/gui-cs/Terminal.Gui";
+        urlTextField.Text = "https://github.com/tui-cs/Terminal.Gui";
 
         Button copyButton = new () { Title = "_Copy", X = Pos.Right (linkWithBorder) + 1, Y = Pos.Top (linkWithBorder) + 1 };
         copyButton.Accepting += (_, _) => linkWithBorder.Copy ();
@@ -73,7 +73,7 @@ public class Links : Scenario
 
         Link link = new ()
         {
-            X = Pos.Right (label) + 1, Y = Pos.Top (label), Text = "Terminal.Gui.Views.Link", Url = "https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Link.html"
+            X = Pos.Right (label) + 1, Y = Pos.Top (label), Text = "Terminal.Gui.Views.Link", Url = "https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Link.html"
         };
         appWindow.Add (label, link);
         app.ToolTips!.SetToolTip (link, () => link.Url);

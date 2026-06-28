@@ -10,7 +10,7 @@ internal class FileSystemCollectionNavigationMatcher : DefaultCollectionNavigato
 
     public override bool IsMatch (string search, object? value)
     {
-        if(value is IFileSystemInfo fsi)
+        if (value is IFileSystemInfo fsi)
         {
             return fsi.Name.StartsWith (search, Comparer);
         }

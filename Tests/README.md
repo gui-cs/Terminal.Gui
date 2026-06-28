@@ -28,6 +28,10 @@ Integration tests for Terminal.Gui.
 
 Stress tests for Terminal.Gui.
 
+### ./NativeAotSmoke
+
+Native AOT smoke-test application used by CI to validate trimming and AOT compatibility in-repo.
+
 ---
 
 ## Static State in Terminal.Gui
@@ -88,4 +92,4 @@ go in `UnitTestsParallelizable` — they belong in `UnitTests.NonParallelizable`
 
 ---
 
-See the [Testing wiki](https://github.com/gui-cs/Terminal.Gui/wiki/Testing) for details on how to add more tests.
+See the [Testing wiki](https://github.com/tui-cs/Terminal.Gui/wiki/Testing) for details on how to add more tests.

@@ -67,6 +67,31 @@ public partial class View // Drawing APIs
     }
 
     /// <summary>
+    ///     Collects the ids of raster graphics (Sixel/Kitty) this view and its rendered SubViews currently keep
+    ///     resident in the terminal. The framework calls this after drawing and passes the result to
+    ///     <see cref="IOutputBuffer.RetainRasterImages"/> so raster graphics whose owning view is no longer
+    ///     rendered (hidden, removed, or on a runnable that has ended) are released instead of lingering on screen.
+    /// </summary>
+    /// <remarks>
+    ///     A view that transmits a raster image (e.g. <see cref="Views.ImageView"/>) overrides this to add its
+    ///     id when it is currently rendering. Invisible views and their SubViews are skipped, so a view that was
+    ///     hidden releases its raster graphics.
+    /// </remarks>
+    /// <param name="ids">The set to add active raster image ids to.</param>
+    internal virtual void CollectActiveRasterImageIds (HashSet<string> ids)
+    {
+        if (!Visible)
+        {
+            return;
+        }
+
+        foreach (View subView in InternalSubViews)
+        {
+            subView.CollectActiveRasterImageIds (ids);
+        }
+    }
+
+    /// <summary>
     ///     Draws the view if it needs to be drawn.
     /// </summary>
     /// <remarks>
@@ -77,7 +102,7 @@ public partial class View // Drawing APIs
     ///     </para>
     ///     <para>
     ///         See the View Drawing Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/>.
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/drawing.html"/>.
     ///     </para>
     /// </remarks>
     public void Draw (DrawContext? context = null)
@@ -91,8 +116,12 @@ public partial class View // Drawing APIs
 
         Region? originalClip = GetClip ();
 
-        // TODO: This can be further optimized by checking NeedsDraw below and only
-        // TODO: clearing, drawing text, drawing content, etc. if it is true.
+        // Capture whether THIS view's own content needs redrawing BEFORE DoDrawAdornments
+        // escalates NeedsDrawRect (see View.Drawing.Adornments.cs DoDrawAdornments).
+        // When only SubViewNeedsDraw is true, needsDrawSelf is false and we skip
+        // ClearViewport/DrawText/DrawContent so child-only invalidations stay narrow.
+        bool needsDrawSelf = NeedsDraw;
+
         if (NeedsDraw || SubViewNeedsDraw)
         {
             // ------------------------------------
@@ -114,16 +143,17 @@ public partial class View // Drawing APIs
             // If no context ...
             context ??= new DrawContext ();
 
-            // Per-view context tracks only what THIS view draws (text + content).
-            // Used for CachedDrawnRegion (TransparentMouse hit-testing) so that a
-            // transparent view's hit region reflects only its own draws, not its
-            // SuperView's ClearViewport or peer SubViews' content.
-            // This follows the same pattern as DrawAdornments(), which creates
-            // per-adornment DrawContexts for the same reason.
-            _localDrawContext = new DrawContext ();
-
-            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
-            DoClearViewport (context);
+            // Self-draw is gated on needsDrawSelf and intentionally SPLIT around DoDrawSubViews
+            // to preserve the required order: Clear (self) -> SubViews -> Text/Content (self).
+            // The "clear self viewport" half is here; the "draw self content" half — which owns the
+            // _localDrawContext lifecycle (see DrawSelfContent and the _localDrawContext field) —
+            // runs after SubViews below. DoClearViewport draws into the shared context only, so the
+            // local context is not needed until DrawSelfContent.
+            if (needsDrawSelf)
+            {
+                SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
+                DoClearViewport (context);
+            }
 
             // ------------------------------------
             // Draw the SubViews first (order matters: SubViews, Text, Content)
@@ -142,20 +172,10 @@ public partial class View // Drawing APIs
                 _lastClearedViewport = null;
             }
 
-            // ------------------------------------
-            // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
-            Trace.Draw (this.ToIdentifyingString (), "Text");
-            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
-            DoDrawText (_localDrawContext);
-
-            // ------------------------------------
-            // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
-            Trace.Draw (this.ToIdentifyingString (), "Content");
-            DoDrawContent (_localDrawContext);
-
-            // Merge this view's own draws into the shared context so the SuperView
-            // can track the aggregate for clip exclusion.
-            context.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
+            if (needsDrawSelf)
+            {
+                DrawSelfContent (context);
+            }
 
             // ------------------------------------
             // Draw adornment SubViews BEFORE rendering LineCanvas so their lines
@@ -198,6 +218,43 @@ public partial class View // Drawing APIs
         // a clip with "holes" where this view (and any SubViews drawn before it) are located.
     }
 
+    /// <summary>
+    ///     Draws this view's own Text and Content (not SubViews or adornments) and maintains the
+    ///     per-view <see cref="_localDrawContext"/> used for <see cref="CachedDrawnRegion"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Called from <see cref="Draw(DrawContext)"/> only when the view's own content needs redrawing
+    ///     (<c>needsDrawSelf</c>), after SubViews have drawn. This is the second half of the
+    ///     self-draw step (the first half clears the viewport before SubViews). It owns the whole
+    ///     <see cref="_localDrawContext"/> lifecycle for a self-redraw pass: (re)create it, draw
+    ///     Text and Content into it, then merge its drawn region into <paramref name="sharedContext"/>.
+    /// </remarks>
+    /// <param name="sharedContext">
+    ///     The shared <see cref="DrawContext"/> for the current draw pass; this view's drawn region is
+    ///     merged into it so the SuperView can track the aggregate for clip exclusion.
+    /// </param>
+    private void DrawSelfContent (DrawContext sharedContext)
+    {
+        // Recreate the per-view context for this self-redraw pass. It is created here (rather than
+        // alongside the viewport clear) so its creation, population, and merge stay in one place.
+        _localDrawContext = new DrawContext ();
+
+        // ------------------------------------
+        // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
+        Trace.Draw (this.ToIdentifyingString (), "Text");
+        SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
+        DoDrawText (_localDrawContext);
+
+        // ------------------------------------
+        // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
+        Trace.Draw (this.ToIdentifyingString (), "Content");
+        DoDrawContent (_localDrawContext);
+
+        // Merge this view's own draws into the shared context so the SuperView
+        // can track the aggregate for clip exclusion.
+        sharedContext.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
+    }
+
     // DrawAdornments region (DoDrawAdornmentsSubViews, DoDrawAdornments, DrawAdornments,
     // OnDrawingAdornments) is in View.Drawing.Adornments.cs.
 
@@ -221,9 +278,70 @@ public partial class View // Drawing APIs
             return;
         }
 
-        ClearViewport (context);
+        // Issue #5358: narrow the framework's clear to NeedsDrawRect when it's a true
+        // partial region. Narrowing in the public ClearViewport API would silently change the
+        // contract for direct callers (Code.OnClearingViewport, MarkdownCodeBlock, direct test
+        // calls) that expect a full fill of the viewport background — see review feedback
+        // items 1, 3 on PR #5431. Issue #5359 normalized NeedsDrawRect on viewport-local
+        // coordinates, so narrowing is now safe regardless of scroll state.
+        if (CanNarrowClearToNeedsDrawRect (out Rectangle narrowedScreen))
+        {
+            Driver?.FillRect (narrowedScreen);
+            _lastClearedViewport = narrowedScreen;
+            SetNeedsDraw (NeedsDrawRect);
+        }
+        else
+        {
+            ClearViewport (context);
+        }
+
         OnClearedViewport ();
         ClearedViewport?.Invoke (this, new DrawEventArgs (Viewport, Viewport, null));
+    }
+
+    /// <summary>
+    ///     Determines whether the framework's <see cref="DoClearViewport"/> can safely narrow
+    ///     the clear to just <see cref="NeedsDrawRect"/>. See <see cref="DoClearViewport"/> for
+    ///     the rationale.
+    /// </summary>
+    private bool CanNarrowClearToNeedsDrawRect (out Rectangle narrowedScreen)
+    {
+        narrowedScreen = Rectangle.Empty;
+
+        if (Driver is null)
+        {
+            return false;
+        }
+
+        if (NeedsDrawRect.IsEmpty)
+        {
+            return false;
+        }
+
+        Rectangle viewport = Viewport;
+
+        // Only narrow when NeedsDrawRect is strictly smaller than the viewport. SetNeedsDraw()
+        // (no-arg) sets NeedsDrawRect to (Point.Empty, Viewport.Size), meaning "everything is
+        // dirty"; we don't want to narrow in that case.
+        if (NeedsDrawRect.Width >= viewport.Width && NeedsDrawRect.Height >= viewport.Height)
+        {
+            return false;
+        }
+
+        // ClearContentOnly: skip narrowing; the existing visible-content intersection is
+        // already a content-area optimization and combining the two correctly is non-trivial.
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.ClearContentOnly))
+        {
+            return false;
+        }
+
+        // NeedsDrawRect is viewport-LOCAL — (0, 0) is the top-left visible cell — so
+        // ViewportToScreen converts it correctly regardless of any scroll on this view.
+        Rectangle dirtyScreen = ViewportToScreen (NeedsDrawRect);
+        Rectangle toClear = ViewportToScreen (viewport with { Location = Point.Empty });
+        narrowedScreen = Rectangle.Intersect (toClear, dirtyScreen);
+
+        return !narrowedScreen.IsEmpty;
     }
 
     /// <summary>
@@ -567,9 +685,46 @@ public partial class View // Drawing APIs
         // SubViews earlier in the collection are drawn last (on top).
         // NOTE: Do not use SubViews or GetSubViews() here as GetSubViews can be overridden to return a different set of views or ordering.
         // NOTE: We need to draw exactly the views in InternalSubViews.
-        foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
+        View [] drawOrder = InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ().ToArray ();
+
+        // Occlusion culling (issue #5360): when Overlapped opaque siblings stack (e.g. Tabs pages,
+        // overlapped Windows), a lower-Z sibling that is fully covered by the higher-Z opaque peers
+        // already drawn produces no visible output — every cell it would draw, including its own
+        // RenderLineCanvas, is clipped away by the clip "holes" those peers punched in DoDrawComplete.
+        // Skipping such a sibling's Draw is therefore output-neutral. opaqueCoverage accumulates the
+        // screen region opaquely covered by higher-Z peers (iterated highest-Z first). The whole
+        // check is gated on at least one Overlapped sibling so the common (non-overlapping) path is
+        // zero-overhead.
+        bool considerOcclusion = Driver is { } && drawOrder.Length > 1 && drawOrder.Any (v => v.Arrangement.FastHasFlags (ViewArrangement.Overlapped));
+        Region? opaqueCoverage = null;
+
+        foreach (View view in drawOrder)
         {
+            Rectangle coveredScreenRect = Rectangle.Empty;
+            bool opaque = considerOcclusion && view.IsOpaqueForOcclusion (out coveredScreenRect);
+
+            if (opaque
+                && view.Arrangement.FastHasFlags (ViewArrangement.Overlapped)
+                && !view.SuperViewRendersLineCanvas
+                && view.ShadowStyle is null or ShadowStyles.None
+                && !view.ParticipatesInTransparentMouseHitTesting ()
+                && IsFullyCovered (view.FrameToScreen (), opaqueCoverage))
+            {
+                // Fully occluded by higher-Z opaque peers. Clear the draw flags to mirror a
+                // drawn-but-fully-clipped pass (Draw() would have called ClearNeedsDraw at its end);
+                // otherwise this view would stay dirty forever and keep the SuperView redrawing.
+                view.ClearNeedsDraw ();
+
+                continue;
+            }
+
             view.Draw (context);
+
+            if (opaque)
+            {
+                opaqueCoverage ??= new ();
+                opaqueCoverage.Union (coveredScreenRect);
+            }
 
             if (!view.SuperViewRendersLineCanvas)
             {
@@ -602,6 +757,113 @@ public partial class View // Drawing APIs
         // Store for compositing during RenderLineCanvas.
         // List is ordered highest-Z first (matching the iteration order above).
         _pendingOverlappedCellMaps = overlappedCellMaps;
+    }
+
+    /// <summary>
+    ///     Determines whether this view opaquely covers a screen rectangle — such that nothing drawn behind
+    ///     that rectangle can show through it. Used by <see cref="DrawSubViews"/> occlusion culling
+    ///     (issue #5360).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The view's content is opaque only when its content layer, <see cref="Border"/>, and
+    ///         <see cref="Padding"/> are not <see cref="ViewportSettingsFlags.Transparent"/>. The
+    ///         <see cref="Margin"/> is transparent by default; when it is, the opaquely-covered region is the
+    ///         area inside the Margin (<see cref="Border"/>'s frame). When the Margin is explicitly opaque,
+    ///         the full <see cref="Frame"/> is covered.
+    ///     </para>
+    ///     <para>
+    ///         This is the same notion of "opaque" used by <see cref="DoDrawComplete"/> to exclude a view's
+    ///         drawn area from the clip; here it is the area a higher-Z peer hides from the views drawn after
+    ///         it.
+    ///     </para>
+    /// </remarks>
+    /// <param name="coveredScreenRect">
+    ///     When this returns <see langword="true"/>, the screen-relative rectangle this view covers opaquely.
+    ///     <see cref="Rectangle.Empty"/> otherwise.
+    /// </param>
+    /// <returns><see langword="true"/> if the view opaquely covers <paramref name="coveredScreenRect"/>; otherwise <see langword="false"/>.</returns>
+    private bool IsOpaqueForOcclusion (out Rectangle coveredScreenRect)
+    {
+        coveredScreenRect = Rectangle.Empty;
+
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent)
+            || Border.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent)
+            || Padding.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent))
+        {
+            return false;
+        }
+
+        bool marginTransparent = Margin.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent);
+        coveredScreenRect = marginTransparent ? Border.FrameToScreen () : Margin.FrameToScreen ();
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Determines whether culling this view would diverge mouse hit-testing state, so the view must not be
+    ///     culled by <see cref="DrawSubViews"/> occlusion culling (issue #5360).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The cull path skips <see cref="Draw(DrawContext?)"/>, hence <see cref="DoDrawComplete"/>, which
+    ///         repopulates the <see cref="CachedDrawnRegion"/> that <see cref="GetViewsUnderLocation"/> consults
+    ///         for <see cref="ViewportSettingsFlags.TransparentMouse"/> layers. A view's own
+    ///         <see cref="CachedDrawnRegion"/> is invalidated by <see cref="SetNeedsDraw()"/>, so a
+    ///         <see cref="ViewportSettingsFlags.TransparentMouse"/> view that is culled would be left with a null
+    ///         cache and dropped from hit-testing.
+    ///     </para>
+    ///     <para>
+    ///         Adornment caches survive <see cref="SetNeedsDraw()"/>, but hit-testing only consults them when the
+    ///         adornment is <see cref="ViewportSettingsFlags.TransparentMouse"/> with non-empty
+    ///         <see cref="AdornmentImpl.Thickness"/>; those are excluded too so the first draw cannot leave a thick
+    ///         transparent-mouse adornment without a cache. <see cref="Margin"/> is
+    ///         <see cref="ViewportSettingsFlags.TransparentMouse"/> by default, so this only excludes views with an
+    ///         actual Margin thickness — the common (empty-margin) overlapped view is still culled.
+    ///     </para>
+    /// </remarks>
+    /// <returns><see langword="true"/> if culling would diverge hit-testing; otherwise <see langword="false"/>.</returns>
+    private bool ParticipatesInTransparentMouseHitTesting ()
+    {
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.TransparentMouse))
+        {
+            return true;
+        }
+
+        return IsThickTransparentMouse (Margin) || IsThickTransparentMouse (Border) || IsThickTransparentMouse (Padding);
+
+        static bool IsThickTransparentMouse (AdornmentImpl adornment) =>
+            adornment.Thickness != Thickness.Empty && adornment.ViewportSettings.FastHasFlags (ViewportSettingsFlags.TransparentMouse);
+    }
+
+    /// <summary>
+    ///     Determines whether <paramref name="screenRect"/> is entirely contained within the region opaquely
+    ///     covered by higher-Z peers (<paramref name="opaqueCoverage"/>). Used by <see cref="DrawSubViews"/>
+    ///     occlusion culling (issue #5360).
+    /// </summary>
+    /// <param name="screenRect">The screen-relative rectangle to test.</param>
+    /// <param name="opaqueCoverage">
+    ///     The accumulated screen region covered opaquely by higher-Z peers, or <see langword="null"/> if no
+    ///     opaque peer has been drawn yet.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if <paramref name="screenRect"/> is non-empty and fully covered; otherwise
+    ///     <see langword="false"/>.
+    /// </returns>
+    private static bool IsFullyCovered (Rectangle screenRect, Region? opaqueCoverage)
+    {
+        if (screenRect.IsEmpty || opaqueCoverage is null)
+        {
+            return false;
+        }
+
+        // Subtract the covered region from the candidate's frame; if nothing is left, the candidate is
+        // fully covered. Using Region difference (rather than Region.Contains, which only tests a single
+        // stored rectangle) correctly handles coverage spread across multiple opaque peers.
+        Region remaining = new (screenRect);
+        remaining.Exclude (opaqueCoverage);
+
+        return remaining.IsEmpty ();
     }
 
     #endregion DrawSubViews
@@ -655,6 +917,14 @@ public partial class View // Drawing APIs
     ///     isolated from the shared context. Used to compute <see cref="CachedDrawnRegion"/> for
     ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> hit-testing.
     /// </summary>
+    /// <remarks>
+    ///     Lifecycle (issue #5358 review feedback item 2): (re)created and populated only on
+    ///     self-redraw passes, in <see cref="DrawSelfContent"/>. On child-only passes (parent
+    ///     entered <see cref="Draw(DrawContext)"/> via <see cref="SubViewNeedsDraw"/> with its own content
+    ///     clean) it is intentionally left untouched so <see cref="DoDrawComplete"/> can still
+    ///     read a valid <see cref="CachedDrawnRegion"/> — recreating it there would wipe the
+    ///     transparent view's hit region to empty until the next self-redraw.
+    /// </remarks>
     private DrawContext? _localDrawContext;
 
     /// <summary>

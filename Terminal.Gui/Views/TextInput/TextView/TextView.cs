@@ -4,6 +4,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Fully featured multi-line text editor.</summary>
 /// <remarks>
+/// <img src="../images/views/TextView.gif" alt="TextView demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>
@@ -95,9 +96,9 @@ namespace Terminal.Gui.Views;
 ///         </item>
 ///     </list>
 /// </remarks>
-[Obsolete ("TextView is superseded by gui-cs/Editor's EditorView, which provides a rope-backed document model, "
+[Obsolete ("TextView is superseded by tui-cs/Editor's EditorView, which provides a rope-backed document model, "
            + "cell-aware rendering, multi-caret editing, undo, syntax highlighting, folding, find/replace, and soft wrap. "
-           + "See https://github.com/gui-cs/Editor for details.", error: false)]
+           + "See https://github.com/tui-cs/Editor for details.", error: false)]
 public partial class TextView : View, IDesignable
 {
     /// <summary>
@@ -327,6 +328,9 @@ public partial class TextView : View, IDesignable
 
     /// <summary>Get the Context Menu.</summary>
     public PopoverMenu? ContextMenu { get; private set; }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,End,wait:300,` Editing`,wait:400,` text!`,wait:800";
 
     /// <inheritdoc/>
     public bool EnableForDesign ()

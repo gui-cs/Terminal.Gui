@@ -5,6 +5,7 @@ namespace Terminal.Gui.Views;
 ///     Serves as the base class for <see cref="Menu"/>, <see cref="MenuBar"/>, and <see cref="StatusBar"/>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Bar.gif" alt="Bar demo"/>
 ///     <para>
 ///         Any <see cref="View"/> can be added to a <see cref="Bar"/>. However, <see cref="Bar"/> is designed to work
 ///         with <see cref="Shortcut"/> objects, which display a command, help text, and key binding aligned
@@ -40,11 +41,11 @@ namespace Terminal.Gui.Views;
 ///         within the <see cref="Bar"/>. The default is <see cref="ViewBase.AlignmentModes.StartToEnd"/>.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
 ///         for details on the <see cref="Shortcut"/> items contained by <see cref="Bar"/>.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
 ///         how <see cref="Bar"/> fits into the menu system class hierarchy as the base of
 ///         <see cref="Menu"/> and <see cref="MenuBar"/>.
 ///     </para>
@@ -348,4 +349,7 @@ public class Bar : View, IOrientation, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public virtual string? GetDemoKeyStrokes () => "wait:500,Tab,wait:500,Tab,wait:500,Tab,wait:800";
 }

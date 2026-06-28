@@ -142,7 +142,7 @@ public class WindowsConsole
         public uint Value;
     }
 
-    // See: https://github.com/gui-cs/Terminal.Gui/issues/357
+    // See: https://github.com/tui-cs/Terminal.Gui/issues/357
 
     [StructLayout (LayoutKind.Sequential)]
     public struct CONSOLE_SCREEN_BUFFER_INFOEX
@@ -257,14 +257,14 @@ public class WindowsConsole
         public readonly override string ToString ()
         {
             return (EventType switch
-                    {
-                        EventType.Focus => FocusEvent.ToString (),
-                        EventType.Key => KeyEvent.ToString (),
-                        EventType.Menu => MenuEvent.ToString (),
-                        EventType.Mouse => MouseEvent.ToString (),
-                        EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
-                        _ => "Unknown event type: " + EventType
-                    })!;
+            {
+                EventType.Focus => FocusEvent.ToString (),
+                EventType.Key => KeyEvent.ToString (),
+                EventType.Menu => MenuEvent.ToString (),
+                EventType.Mouse => MouseEvent.ToString (),
+                EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
+                _ => "Unknown event type: " + EventType
+            })!;
         }
     }
 

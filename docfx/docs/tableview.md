@@ -309,6 +309,8 @@ tv.Table = src;
 
 Arrow Left/Right collapse/expand nodes when the tree column has focus.
 
+> **Note:** `TreeTableSource` renders tree structure (branch lines, expand/collapse symbols) in column 0 but does **not** render checkboxes from `TreeView.CheckboxMode`. To add checkboxes to a tree-table, wrap the `TreeTableSource` with a `CheckBoxTableSourceWrapperByIndex` or `CheckBoxTableSourceWrapperByObject<T>` (see [Checkbox Columns](#checkbox-columns) above).
+
 ---
 
 ## Events

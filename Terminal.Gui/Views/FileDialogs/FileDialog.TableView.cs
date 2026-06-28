@@ -160,8 +160,11 @@ public partial class FileDialog
         {
             Normal = new Attribute (foreground, background),
             HotNormal = new Attribute (foreground, background),
-            Focus = new Attribute (background, foreground),
-            HotFocus = new Attribute (background, foreground)
+            Focus = args.RowScheme.Focus,
+            HotFocus = args.RowScheme.HotFocus,
+            Active = args.RowScheme.Active,
+            HotActive = args.RowScheme.HotActive,
+            Disabled = args.RowScheme.Disabled
         };
     }
 
@@ -286,10 +289,10 @@ public partial class FileDialog
         }
     }
 
-    // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/5087#issuecomment-4328093883
+    // BUGBUG: See https://github.com/tui-cs/Terminal.Gui/issues/5087#issuecomment-4328093883
     private void TableViewOnValueChanged (object? sender, ValueChangedEventArgs<TableSelection?> e)
     {
-        if (!_tableView.HasFocus || _tableView.Value is null || _tableView.Table?.Rows == 0)
+        if (_pushingState || !_tableView.HasFocus || _tableView.Value is null || _tableView.Table?.Rows == 0)
         {
             return;
         }

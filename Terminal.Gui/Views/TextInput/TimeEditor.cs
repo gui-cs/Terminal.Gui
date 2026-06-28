@@ -6,6 +6,7 @@ namespace Terminal.Gui.Views;
 ///     Provides time editing functionality using <see cref="TextValidateField"/> with culture-aware formatting.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/TimeEditor.gif" alt="TimeEditor demo"/>
 ///     <para>
 ///         TimeEditor extends <see cref="TextValidateField"/> with time-specific functionality:
 ///         <list type="bullet">
@@ -244,6 +245,9 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
         SuppressValueEvents = false;
         SetNeedsDraw ();
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,CursorRight,wait:300,CursorUp,wait:600,CursorUp,wait:800";
 
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()

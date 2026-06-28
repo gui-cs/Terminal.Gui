@@ -9,15 +9,15 @@ public sealed class LoggingBackend : ITraceBackend
     public void Log (TraceEntry entry)
     {
         string prefix = entry.Category switch
-                        {
-                            TraceCategory.Lifecycle => FormatLifecycle (entry),
-                            TraceCategory.Command => FormatCommand (entry),
-                            TraceCategory.Mouse => FormatMouse (entry),
-                            TraceCategory.Keyboard => FormatKeyboard (entry),
-                            TraceCategory.Navigation => FormatNavigation (entry),
-                            TraceCategory.Configuration => string.Empty,
-                            _ => $"[{entry.Category}]"
-                        };
+        {
+            TraceCategory.Lifecycle => FormatLifecycle (entry),
+            TraceCategory.Command => FormatCommand (entry),
+            TraceCategory.Mouse => FormatMouse (entry),
+            TraceCategory.Keyboard => FormatKeyboard (entry),
+            TraceCategory.Navigation => FormatNavigation (entry),
+            TraceCategory.Configuration => string.Empty,
+            _ => $"[{entry.Category}]"
+        };
 
         var message = $"{prefix}@\"{entry.Id}\"";
 
@@ -47,12 +47,12 @@ public sealed class LoggingBackend : ITraceBackend
         }
 
         string arrow = routing switch
-                       {
-                           CommandRouting.BubblingUp => "↑",
-                           CommandRouting.DispatchingDown => "↓",
-                           CommandRouting.Bridged => "↔",
-                           _ => "•"
-                       };
+        {
+            CommandRouting.BubblingUp => "↑",
+            CommandRouting.DispatchingDown => "↓",
+            CommandRouting.Bridged => "↔",
+            _ => "•"
+        };
 
         return $"{arrow} {cmd}";
     }
@@ -64,11 +64,11 @@ public sealed class LoggingBackend : ITraceBackend
             case (MouseFlags flags, Point pos): return $"{flags} @({pos.X},{pos.Y})";
 
             case Mouse mouse:
-            {
-                Point mousePos = mouse.Position ?? Point.Empty;
+                {
+                    Point mousePos = mouse.Position ?? Point.Empty;
 
-                return $"{mouse.Flags} @({mousePos.X},{mousePos.Y})";
-            }
+                    return $"{mouse.Flags} @({mousePos.X},{mousePos.Y})";
+                }
 
             default: return string.Empty;
         }

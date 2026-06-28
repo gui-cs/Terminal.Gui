@@ -26,8 +26,8 @@ public class SixelEncoderTests
                            *     $ (return to start of line)
                            *     - (move down to next line)
                            */
-                          + "#0!12~$-"
-                          + "#0!12~$" // Next 6 rows of red pixels
+                          + "#0!12~-"
+                          + "#0!12~" // Next 6 rows of red pixels (no trailing $ — last color layer)
                           + "\u001b\\"; // End sixel sequence
 
         // Arrange: Create a 12x12 bitmap filled with red
@@ -108,10 +108,10 @@ public class SixelEncoderTests
                            *   #1 (Select white)
                            */
                           + "#0FFFwwwFFFwww$" // First pass of top band (Filling black)
-                          + "#1wwwFFFwwwFFF$-" // Second pass of top band (Filling white)
-                                               // Sequence repeats exactly the same because top band is actually identical pixels to bottom band
+                          + "#1wwwFFFwwwFFF-" // Second pass of top band (Filling white) — no trailing $ on last color layer
+                                              // Sequence repeats exactly the same because top band is actually identical pixels to bottom band
                           + "#0FFFwwwFFFwww$" // First pass of bottom band (Filling black)
-                          + "#1wwwFFFwwwFFF$" // Second pass of bottom band (Filling white)
+                          + "#1wwwFFFwwwFFF" // Second pass of bottom band (Filling white) — no trailing $ on last color layer
                           + "\u001b\\"; // End sixel sequence
 
         // Arrange: Create a 12x12 bitmap with a 3x3 checkerboard pattern
@@ -202,8 +202,8 @@ public class SixelEncoderTests
                            * Since we have 12 pixels horizontally, we'll see this pattern repeat across the row so we see
                            * the 'sequence repeat' 12 times i.e. !12 (do the next letter 'T' 12 times).
                            */
-                          + "#0!12T$-" // First band of alternating red and transparent pixels
-                          + "#0!12T$" // Second band, same alternating red and transparent pixels
+                          + "#0!12T-" // First band of alternating red and transparent pixels (no trailing $ — single color layer)
+                          + "#0!12T" // Second band, same alternating red and transparent pixels (no trailing $)
                           + "\u001b\\"; // End sixel sequence
 
         // Arrange: Create a 12x12 bitmap with alternating transparent and red pixels in a vertical band
@@ -258,7 +258,7 @@ public class SixelEncoderTests
                           + "q"
                           + "\"1;1;1;1" // no-scaling + width;height
                           + "#0;2;100;0;0" // palette
-                          + "#0@$" // single column, single row -> code 1 -> char(1+63) = '@', then $ terminator
+                          + "#0@" // single column, single row -> code 1 -> char(1+63) = '@' (no trailing $ — last color layer)
                           + "\u001b\\";
 
         Assert.Equal (expected, result);
@@ -424,5 +424,34 @@ public class SixelEncoderTests
         int result = encoder.GetHeightInPixels (maxSizeHeight, pixelsPerCellY);
 
         Assert.Equal (expected, result);
+    }
+
+    [Fact] // Copilot
+    public void EncodeSixel_MultiBandMultiColor_NoTrailingDollarOnLastColorLayer ()
+    {
+        // Arrange: 4x12 image — two bands of 6 rows each, two colors (red left half, blue right half)
+        Color [,] pixels = new Color [4, 12];
+
+        for (var y = 0; y < 12; y++)
+        {
+            for (var x = 0; x < 4; x++)
+            {
+                pixels [x, y] = x < 2 ? new Color (255, 0) : new Color (0, 0, 255);
+            }
+        }
+
+        var encoder = new SixelEncoder ();
+
+        // Act
+        string result = encoder.EncodeSixel (pixels);
+
+        // Assert: No color layer data should end with '$' immediately before '-' or before the terminator.
+        // Between color layers '$' IS expected.
+        // Band structure: #<idx>data$#<idx>data- (for non-last band)
+        //                 #<idx>data$#<idx>data   (for last band — no trailing $)
+        Assert.DoesNotContain ("$-", result); // No trailing $ before band separator
+        Assert.DoesNotContain ("$\u001b\\", result); // No trailing $ before sequence terminator
+        Assert.Contains ("-", result); // Has band separator (two bands)
+        Assert.Contains ("$", result); // Has $ between color layers within a band
     }
 }

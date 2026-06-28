@@ -4,6 +4,16 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class BorderView
 {
+    /// <summary>
+    ///     Gets or sets mouse bindings unique to <see cref="BorderView"/>.
+    ///     Shared bindings come from <see cref="View.DefaultMouseBindings"/>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public new static Dictionary<Command, PlatformMouseBinding>? DefaultMouseBindings { get; set; } = new ()
+    {
+        [Command.Arrange] = BindMouse.All (MouseFlags.LeftButtonPressed)
+    };
+
     private Arranger? _arranger;
 
     /// <summary>
@@ -12,12 +22,20 @@ public partial class BorderView
     ///     keyboard-based arrangement via <c>Ctrl+F5</c>.
     /// </summary>
     /// <remarks>
-    ///     See the <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
+    ///     See the <see href="https://tui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
     /// </remarks>
     internal Arranger Arranger => _arranger ??= new Arranger (this);
 
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouseEvent) => Arranger.HandleMouseEvent (mouseEvent);
+
+    private bool? HandleArrangeCommand (ICommandContext? context) => Arranger.HandleArrangeCommand (context);
+
+    private void SetupArrangeCommands ()
+    {
+        AddCommand (Command.Arrange, HandleArrangeCommand);
+        ApplyMouseBindings (DefaultMouseBindings);
+    }
 
     private void DisposeArranger () => _arranger?.Dispose ();
 }

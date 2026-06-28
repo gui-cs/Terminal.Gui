@@ -14,6 +14,12 @@ public interface IOutput : IDisposable
     /// <seealso cref="IDriver.IsLegacyConsole"/>
     bool IsLegacyConsole { get; set; }
 
+    /// <summary>
+    ///     Gets or sets whether raster images should be emitted using the Kitty graphics protocol
+    ///     instead of Sixel. Set to <see langword="true"/> when the terminal reports Kitty support.
+    /// </summary>
+    bool UseKittyGraphics { get; set; }
+
     /// <seealso cref="IDriver.GetSixels"/>
     ConcurrentQueue<SixelToRender> GetSixels ();
 

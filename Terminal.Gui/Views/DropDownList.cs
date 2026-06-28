@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 ///     for selecting from a list of items.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/DropDownList.gif" alt="DropDownList demo"/>
 ///     <para>
 ///         <see cref="DropDownList"/> provides a modern dropdown control that can operate in two modes:
 ///     </para>
@@ -157,25 +158,15 @@ public class DropDownList : TextField
 
                                              return Math.Min (Source?.Count ?? 0, Math.Max (1, available));
                                          })),
-            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar,
+
+            // Use the Menu scheme so the dropped list "floats" with its own background, distinct from the
+            // SuperView's. See https://github.com/gui-cs/Terminal.Gui/issues/5517.
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu)
         };
 
         // Create popover
         _listPopover = new Popover<ListView, string?> (listView) { Anchor = GetAnchor };
-
-        // This ensures the Normal attribute is always that of the host
-        _listPopover.GettingAttributeForRole += (sender, args) =>
-                                                {
-                                                    if (sender is not View || args.Role != VisualRole.Normal)
-                                                    {
-                                                        return;
-                                                    }
-
-                                                    Attribute? res = App?.TopRunnableView?.MostFocused?.GetAttributeForRole (VisualRole.Normal);
-                                                    args.Handled = true;
-
-                                                    args.Result = res;
-                                                };
 
 #if DEBUG
         _listPopover.Id = "dropDownListPopover";
@@ -332,18 +323,18 @@ public class DropDownList : TextField
             case VisualRole.ReadOnly when ReadOnly:
 
             case VisualRole.Active when ReadOnly:
-            {
-                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                {
+                    currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
 
-                return true;
-            }
+                    return true;
+                }
 
             case VisualRole.Editable when ReadOnly:
-            {
-                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                {
+                    currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
 
-                break;
-            }
+                    break;
+                }
         }
 
         return false;
@@ -604,6 +595,9 @@ public class DropDownList : TextField
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public override string? GetDemoKeyStrokes () => "wait:500,F4,wait:600,CursorDown,wait:400,CursorDown,wait:400,Enter,wait:800";
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

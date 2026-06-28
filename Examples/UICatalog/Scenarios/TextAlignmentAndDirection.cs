@@ -16,7 +16,7 @@ public class TextAlignmentAndDirection : Scenario
 
         using Window window = new () { Title = GetQuitKeyAndName () };
 
-        var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}?? ??";
+        var txt = $"Hello World{Environment.NewLine}HELLO WORLD{Environment.NewLine}🦮 👨‍👩‍👧";
 
         SchemeManager.AddScheme ("TextAlignmentAndDirection1", new Scheme { Normal = new Attribute (Color.Black, Color.Gray) });
         SchemeManager.AddScheme ("TextAlignmentAndDirection2", new Scheme { Normal = new Attribute (Color.Black, Color.DarkGray) });
@@ -423,21 +423,27 @@ public class TextAlignmentAndDirection : Scenario
             Text = "Edit Text:"
         };
 
-        Editor editText = new () { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Fill (31), Height = 3 };
-        editText.Text = txt;
+        Editor editText = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Width = Dim.Fill (31),
+            Height = 3,
+            Text = txt
+        };
 
-        window.KeyDown += (_, _) =>
-                          {
-                              foreach (View v in singleLineLabels)
-                              {
-                                  v.Text = editText.Text;
-                              }
+        editText.Document?.Changed += (_, _) =>
+                                      {
+                                          foreach (View v in singleLineLabels)
+                                          {
+                                              v.Text = editText.Text;
+                                          }
 
-                              foreach (View v in multiLineLabels)
-                              {
-                                  v.Text = editText.Text;
-                              }
-                          };
+                                          foreach (View v in multiLineLabels)
+                                          {
+                                              v.Text = editText.Text;
+                                          }
+                                      };
 
         editText.SetFocus ();
 

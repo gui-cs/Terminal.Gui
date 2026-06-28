@@ -6,13 +6,14 @@ namespace Terminal.Gui.Views;
 ///     is set to the button's index (0-based).
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Dialog.gif" alt="Dialog demo"/>
 ///     <para>
 ///         This is the standard dialog class for simple button-index-based results. For dialogs that need to return
 ///         custom result types, derive from <see cref="Dialog{TResult}"/> instead.
 ///     </para>
 ///     <para>
 ///         By default, <see cref="Dialog"/> is centered with <see cref="Dim.Auto"/> sizing and uses the
-///         <see cref="Schemes.Dialog"/> color scheme when running.
+///         <see cref="Schemes.Dialog"/> color scheme (applied at construction time, regardless of running state).
 ///     </para>
 ///     <para>
 ///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.

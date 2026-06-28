@@ -11,9 +11,11 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class WizardStep : View, IDesignable
 {
-    private readonly Code _helpTextView = new ()
+    private readonly Markdown _helpTextView = new ()
     {
-        SyntaxHighlighter = null,
+        SyntaxHighlighter = new TextMateSyntaxHighlighter (),
+        ShowHeadingPrefix = false,
+        ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar,
         X = Pos.AnchorEnd () + 1,
         Height = Dim.Fill (),
 #if DEBUG
@@ -30,6 +32,7 @@ public class WizardStep : View, IDesignable
         CanFocus = true;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
+        CommandsToBubbleUp = [Command.Accept];
     }
 
     /// <inheritdoc/>
@@ -69,7 +72,7 @@ public class WizardStep : View, IDesignable
     ///     The help text displayed in the right <see cref="Padding"/>.
     ///     If empty, the right padding is hidden and content fills the entire step.
     /// </summary>
-    /// <remarks>The help text is displayed using a read-only <see cref="Code"/> view.</remarks>
+    /// <remarks>The help text is displayed using a read-only <see cref="Markdown"/> view that supports markdown formatting.</remarks>
     public string HelpText
     {
         get => _helpTextView.Text;
@@ -112,23 +115,12 @@ public class WizardStep : View, IDesignable
     {
         Title = "Example Step";
 
-        Label label = new ()
-        {
-            Title = "_Enter Text:"
-        };
+        Label label = new () { Title = "_Enter Text:" };
 
-        TextField textField = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Width = 20
-        };
+        TextField textField = new () { X = Pos.Right (label) + 1, Width = 20 };
         Add (label, textField);
 
-        label = new Label
-        {
-            Title = "    _A List:",
-            Y = Pos.Bottom (label) + 1
-        };
+        label = new Label { Title = "    _A List:", Y = Pos.Bottom (label) + 1 };
 
         ListView listView = new ()
         {
@@ -143,8 +135,13 @@ public class WizardStep : View, IDesignable
         Add (label, listView);
 
         HelpText = """
-                   This is some help text for the WizardStep. 
-                   You can provide instructions or information to guide the user through this step of the wizard.
+                   ## WizardStep Help
+
+                   Provide **markdown-formatted** instructions or information to guide the user through each step of the wizard.
+
+                   Set `WizardStep.HelpText` to update this content. If `HelpText` is empty, the right padding will be hidden and the content will fill the entire step.
+
+                   [Learn more about markdown formatting](https://www.markdownguide.org/basic-syntax/)
                    """;
 
         return true;

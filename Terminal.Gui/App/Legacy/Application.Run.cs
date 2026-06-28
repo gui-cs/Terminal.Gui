@@ -8,7 +8,7 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
 
     /// <inheritdoc cref="IApplication.Run{TRunnable}(Func{Exception, bool}, string)"/>
     [Obsolete ("The legacy static Application object is going away.")]
-    public static IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new () =>
+    public static IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new() =>
         ApplicationImpl.Instance.Run<TRunnable> (errorHandler, driverName);
 
     /// <inheritdoc cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>

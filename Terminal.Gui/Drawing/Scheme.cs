@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drawing;
 ///     <see cref="VisualRole.Disabled"/>, etc.)
 ///     to an <see cref="Attribute"/> describing its foreground color, background color, and text style.
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
 ///     </para>
 /// </summary>
 /// <remarks>
@@ -330,32 +330,32 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     {
         // Use a HashSet to guard against recursion cycles
         attribute = role switch
-                    {
-                        VisualRole.Normal => _normal,
-                        VisualRole.HotNormal => _hotNormal,
-                        VisualRole.Focus => _focus,
-                        VisualRole.HotFocus => _hotFocus,
-                        VisualRole.Active => _active,
-                        VisualRole.HotActive => _hotActive,
-                        VisualRole.Highlight => _highlight,
-                        VisualRole.Editable => _editable,
-                        VisualRole.ReadOnly => _readOnly,
-                        VisualRole.Disabled => _disabled,
-                        VisualRole.Code => _code,
-                        VisualRole.CodeComment => _codeComment,
-                        VisualRole.CodeKeyword => _codeKeyword,
-                        VisualRole.CodeString => _codeString,
-                        VisualRole.CodeNumber => _codeNumber,
-                        VisualRole.CodeOperator => _codeOperator,
-                        VisualRole.CodeType => _codeType,
-                        VisualRole.CodePreprocessor => _codePreprocessor,
-                        VisualRole.CodeIdentifier => _codeIdentifier,
-                        VisualRole.CodeConstant => _codeConstant,
-                        VisualRole.CodePunctuation => _codePunctuation,
-                        VisualRole.CodeFunctionName => _codeFunctionName,
-                        VisualRole.CodeAttribute => _codeAttribute,
-                        _ => null
-                    };
+        {
+            VisualRole.Normal => _normal,
+            VisualRole.HotNormal => _hotNormal,
+            VisualRole.Focus => _focus,
+            VisualRole.HotFocus => _hotFocus,
+            VisualRole.Active => _active,
+            VisualRole.HotActive => _hotActive,
+            VisualRole.Highlight => _highlight,
+            VisualRole.Editable => _editable,
+            VisualRole.ReadOnly => _readOnly,
+            VisualRole.Disabled => _disabled,
+            VisualRole.Code => _code,
+            VisualRole.CodeComment => _codeComment,
+            VisualRole.CodeKeyword => _codeKeyword,
+            VisualRole.CodeString => _codeString,
+            VisualRole.CodeNumber => _codeNumber,
+            VisualRole.CodeOperator => _codeOperator,
+            VisualRole.CodeType => _codeType,
+            VisualRole.CodePreprocessor => _codePreprocessor,
+            VisualRole.CodeIdentifier => _codeIdentifier,
+            VisualRole.CodeConstant => _codeConstant,
+            VisualRole.CodePunctuation => _codePunctuation,
+            VisualRole.CodeFunctionName => _codeFunctionName,
+            VisualRole.CodeAttribute => _codeAttribute,
+            _ => null
+        };
 
         return attribute is { };
     }
@@ -389,81 +389,81 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         switch (role)
         {
             case VisualRole.Focus:
-            {
-                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
-
-                result = normal with
                 {
-                    Foreground = ResolveNone (normal.Background, defaultTerminalColors),
-                    Background = ResolveNone (normal.Foreground, defaultTerminalColors, true)
-                };
+                    Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
 
-                break;
-            }
+                    result = normal with
+                    {
+                        Foreground = ResolveNone (normal.Background, defaultTerminalColors),
+                        Background = ResolveNone (normal.Foreground, defaultTerminalColors, true)
+                    };
+
+                    break;
+                }
 
             case VisualRole.Active:
-            {
-                Attribute focus = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors);
-                Color focusBg = ResolveNone (focus.Background, defaultTerminalColors);
-                bool isDark = focusBg.IsDarkColor ();
-
-                result = focus with
                 {
-                    Foreground = ResolveNone (focus.Foreground, defaultTerminalColors, true).GetBrighterColor (0.2, isDark),
-                    Background = focusBg.GetDimmerColor (0.2, !isDark),
-                    Style = focus.Style | TextStyle.Bold
-                };
+                    Attribute focus = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors);
+                    Color focusBg = ResolveNone (focus.Background, defaultTerminalColors);
+                    bool isDark = focusBg.IsDarkColor ();
 
-                break;
-            }
+                    result = focus with
+                    {
+                        Foreground = ResolveNone (focus.Foreground, defaultTerminalColors, true).GetBrighterColor (0.2, isDark),
+                        Background = focusBg.GetDimmerColor (0.2, !isDark),
+                        Style = focus.Style | TextStyle.Bold
+                    };
+
+                    break;
+                }
 
             case VisualRole.Highlight:
-            {
-                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
-                Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
-                bool isDark = normalBg.IsDarkColor ();
-
-                result = normal with
                 {
-                    Foreground = normalBg.GetBrighterColor (0.2, isDark),
-                    Background = normal.Background,
-                    Style = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors).Style | TextStyle.Italic
-                };
+                    Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+                    Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
+                    bool isDark = normalBg.IsDarkColor ();
 
-                break;
-            }
+                    result = normal with
+                    {
+                        Foreground = normalBg.GetBrighterColor (0.2, isDark),
+                        Background = normal.Background,
+                        Style = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors).Style | TextStyle.Italic
+                    };
+
+                    break;
+                }
 
             case VisualRole.Editable:
-            {
-                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
-                Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
-                bool isDark = normalBg.IsDarkColor ();
-                Color resolvedFg = ResolveNone (normal.Foreground, defaultTerminalColors, true);
+                {
+                    Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+                    Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
+                    bool isDark = normalBg.IsDarkColor ();
+                    Color resolvedFg = ResolveNone (normal.Foreground, defaultTerminalColors, true);
 
-                result = normal with { Foreground = resolvedFg, Background = resolvedFg.GetDimmerColor (0.5, isDark) };
+                    result = normal with { Foreground = resolvedFg, Background = resolvedFg.GetDimmerColor (0.5, isDark) };
 
-                break;
-            }
+                    break;
+                }
 
             case VisualRole.ReadOnly:
-            {
-                Attribute editable = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors);
-                bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
+                {
+                    Attribute editable = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors);
+                    bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
 
-                result = editable with { Foreground = editable.Foreground.GetDimmerColor (0.05, isDark) };
+                    result = editable with { Foreground = editable.Foreground.GetDimmerColor (0.05, isDark) };
 
-                break;
-            }
+                    break;
+                }
 
             case VisualRole.Code:
-            {
-                Attribute editable = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors);
-                bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
+                {
+                    Attribute editable = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors);
+                    bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
 
-                result = editable with { Background = editable.Background.GetDimmerColor (0.2, isDark), Style = editable.Style | TextStyle.Bold };
+                    result = editable with { Background = editable.Background.GetDimmerColor (0.2, isDark), Style = editable.Style | TextStyle.Bold };
 
-                break;
-            }
+                    break;
+                }
 
             case VisualRole.CodeComment:
             case VisualRole.CodeKeyword:
@@ -477,49 +477,49 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             case VisualRole.CodePunctuation:
             case VisualRole.CodeFunctionName:
             case VisualRole.CodeAttribute:
-            {
-                result = GetAttributeForRoleCore (VisualRole.Code, stack, defaultTerminalColors);
+                {
+                    result = GetAttributeForRoleCore (VisualRole.Code, stack, defaultTerminalColors);
 
-                break;
-            }
+                    break;
+                }
 
             case VisualRole.Disabled:
-            {
-                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
-                Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
-                bool isDark = normalBg.IsDarkColor ();
+                {
+                    Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+                    Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
+                    bool isDark = normalBg.IsDarkColor ();
 
-                result = normal with { Foreground = ResolveNone (normal.Foreground, defaultTerminalColors, true).GetDimmerColor (0.05, isDark) };
+                    result = normal with { Foreground = ResolveNone (normal.Foreground, defaultTerminalColors, true).GetDimmerColor (0.05, isDark) };
 
-                break;
-            }
+                    break;
+                }
 
             case VisualRole.HotNormal:
-            {
-                Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
+                {
+                    Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
 
-                result = normal with { Style = normal.Style | TextStyle.Underline };
+                    result = normal with { Style = normal.Style | TextStyle.Underline };
 
-                break;
-            }
+                    break;
+                }
 
             case VisualRole.HotFocus:
-            {
-                Attribute focus = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors);
+                {
+                    Attribute focus = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors);
 
-                result = focus with { Style = focus.Style | TextStyle.Underline };
+                    result = focus with { Style = focus.Style | TextStyle.Underline };
 
-                break;
-            }
+                    break;
+                }
 
             case VisualRole.HotActive:
-            {
-                Attribute active = GetAttributeForRoleCore (VisualRole.Active, stack, defaultTerminalColors);
+                {
+                    Attribute active = GetAttributeForRoleCore (VisualRole.Active, stack, defaultTerminalColors);
 
-                result = active with { Style = active.Style | TextStyle.Underline };
+                    result = active with { Style = active.Style | TextStyle.Underline };
 
-                break;
-            }
+                    break;
+                }
 
             default:
                 result = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);

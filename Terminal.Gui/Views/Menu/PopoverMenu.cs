@@ -25,7 +25,7 @@ namespace Terminal.Gui.Views;
 ///         menu.MakeVisible (); // or Application.Popover?.Show (menu);
 ///     </code>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
 ///     </para>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
@@ -591,7 +591,8 @@ public class PopoverMenu : Popover<Menu, MenuItem>
                              new MenuItem (targetView as View, Command.SelectAll),
                              new Line (),
                              new MenuItem (targetView as View, Command.Quit)
-                         ]) { Id = "enableForDesignRoot" };
+                         ])
+        { Id = "enableForDesignRoot" };
 
         // NOTE: This is a workaround for the fact that the PopoverMenu is not visible in the designer
         // NOTE: without being activated via App?.Popover. But we want it to be visible.

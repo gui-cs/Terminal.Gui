@@ -43,6 +43,14 @@ namespace Terminal.Gui.ViewBase;
 ///             <term>Ctrl+Left Button Released</term>
 ///             <description>Opens the context menu (<see cref="Command.Context"/>).</description>
 ///         </item>
+///         <item>
+///             <term>Shift+Left Button Pressed (Linux/macOS), Alt+Left Button Pressed (Windows)</term>
+///             <description>Starts selection extension (<see cref="Command.StartSelection"/>).</description>
+///         </item>
+///         <item>
+///             <term>Shift+Ctrl+Left Button Pressed (Linux/macOS), Alt+Ctrl+Left Button Pressed (Windows)</term>
+///             <description>Starts rectangle selection extension (<see cref="Command.StartRectangleSelection"/>).</description>
+///         </item>
 ///     </list>
 /// </remarks>
 public partial class View : IDisposable, ISupportInitializeNotification

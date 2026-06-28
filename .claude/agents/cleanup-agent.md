@@ -70,7 +70,7 @@ Successfully cleaned files meet:
 - Applies "Full Cleanup" profile from `Terminal.sln.DotSettings`
 - Uses `--include` parameter to target specific files
 - Respects all project code style settings
-- Command: `jb cleanupcode Terminal.sln --profile="Full Cleanup" --include="path/to/file.cs" --no-build`
+- Command: `jb cleanupcode Terminal.slnx --profile="Full Cleanup" --include="path/to/file.cs" --no-build`
 
 ### 3. Backing Field Reordering
 - Places backing fields immediately before their properties
@@ -118,7 +118,7 @@ The `--include` parameter **WORKS CORRECTLY** for single-file cleanup:
 
 ```powershell
 # Cleanup a single file
-jb cleanupcode Terminal.sln `
+jb cleanupcode Terminal.slnx `
     --profile="Full Cleanup" `
     --include="Terminal.Gui/Views/TableView/TableView.cs" `
     --no-build `
@@ -139,7 +139,7 @@ jb cleanupcode Terminal.sln `
 
 ```powershell
 # Inspect a single file for warnings
-jb inspectcode Terminal.sln `
+jb inspectcode Terminal.slnx `
     --output="inspect-report.xml" `
     --include="Terminal.Gui/Views/TableView/TableView.cs" `
     --severity=WARNING `

@@ -232,13 +232,13 @@ public sealed class TitleView : View, ITitleView, IDesignable
 
         Thickness padding = hasFocus && tabDepth > 2
                                 ? TabSide switch
-                                  {
-                                      Side.Top => new Thickness (0, 0, 0, 1),
-                                      Side.Bottom => new Thickness (0, 1, 0, 0),
-                                      Side.Right => new Thickness (1, 0, 0, 0),
-                                      Side.Left => new Thickness (0, 0, 1, 0),
-                                      _ => new Thickness (0)
-                                  }
+                                {
+                                    Side.Top => new Thickness (0, 0, 0, 1),
+                                    Side.Bottom => new Thickness (0, 1, 0, 0),
+                                    Side.Right => new Thickness (1, 0, 0, 0),
+                                    Side.Left => new Thickness (0, 0, 1, 0),
+                                    _ => new Thickness (0)
+                                }
                                 : new Thickness (0);
 
         Padding.Thickness = padding;
@@ -317,13 +317,13 @@ public sealed class TitleView : View, ITitleView, IDesignable
         int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
 
         return tabSide switch
-               {
-                   Side.Top => new Thickness (1, cap, 1, contentSide),
-                   Side.Bottom => new Thickness (1, contentSide, 1, cap),
-                   Side.Left => new Thickness (cap, 1, contentSide, 1),
-                   Side.Right => new Thickness (contentSide, 1, cap, 1),
-                   _ => Thickness.Empty
-               };
+        {
+            Side.Top => new Thickness (1, cap, 1, contentSide),
+            Side.Bottom => new Thickness (1, contentSide, 1, cap),
+            Side.Left => new Thickness (cap, 1, contentSide, 1),
+            Side.Right => new Thickness (contentSide, 1, cap, 1),
+            _ => Thickness.Empty
+        };
     }
 
     #endregion

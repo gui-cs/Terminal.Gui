@@ -8,6 +8,7 @@ namespace Terminal.Gui.Views;
 ///     more.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Markdown.gif" alt="Markdown demo"/>
 ///     <para>
 ///         Set the <see cref="Text"/> property to supply content. The view parses the Markdown,
 ///         performs word-wrap layout, and draws styled output. Fenced code blocks receive a
@@ -419,6 +420,16 @@ public partial class Markdown : View, IDesignable
 
         BuildRenderedLines ();
 
+        // Clear any auto-focus that Add() triggered when a focusable table was added
+        // while this view has focus. Tables should only receive focus via explicit Tab.
+        // The cascade from HasFocus=false calls OnAdvancingFocus(Forward, TabStop) which
+        // just sets _activeLinkIndex without focusing another table — safe here.
+        if (Focused is MarkdownTable)
+        {
+            Focused.HasFocus = false;
+            _activeLinkIndex = -1;
+        }
+
         // Update content size so the viewport knows the scrollable extent
         int contentWidth = Math.Max (effectiveWidth, _maxLineWidth);
         _inLayout = true;
@@ -498,6 +509,9 @@ public partial class Markdown : View, IDesignable
     }
 
     /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:300," + string.Join (",", Enumerable.Repeat ("CursorDown,wait:80", 50)) + ",wait:800";
+
+    /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
         SyntaxHighlighter = new TextMateSyntaxHighlighter ();
@@ -529,13 +543,14 @@ public partial class Markdown : View, IDesignable
 
                                                           ## Links
 
-                                                          * [Markdown API docs](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
+                                                          * [Markdown API docs](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
+                                                          * [Relative local link](docs/getting-started.md) renders as a link without opening a URI handler by default.
 
                                                           ## Checklist
 
                                                           - [x] Text with **bold**, *italic*, `inline code`, and ~~strikethrough~~ ✅
                                                           - [x] Inline `Code` 🔧
-                                                          - [x] [Links](https://github.com/gui-cs) 🎉
+                                                          - [x] [Links](https://github.com/tui-cs) 🎉
                                                           - [ ] Images 😒
 
                                                           ## Code Blocks
@@ -554,7 +569,7 @@ public partial class Markdown : View, IDesignable
 
                                                           Plain text. *Formatted text* with **bold** and `inline code`.
 
-                                                          Link:  [SyntaxHighlighting](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
+                                                          Link:  [SyntaxHighlighting](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
 
                                                           - [x] Checked
 
@@ -570,7 +585,7 @@ public partial class Markdown : View, IDesignable
 
                                                           | Feature        | Status        |
                                                           |----------------|---------------|
-                                                          | [Links](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! |
+                                                          | [Links](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! |
                                                           | Inline `code`  | ✅ *Awesome!*   |
                                                           | Emojis 🎉      | ✅ **Whoa!**      |
 

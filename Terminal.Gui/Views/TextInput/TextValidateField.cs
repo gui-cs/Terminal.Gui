@@ -2,6 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/>.</summary>
 /// <remarks>
+/// <img src="../images/views/TextValidateField.gif" alt="TextValidateField demo"/>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>
@@ -582,12 +583,12 @@ public class TextValidateField : View, IDesignable, IValue<string>
         int total = width - count;
 
         return TextAlignment switch
-               {
-                   Alignment.Start => (0, total),
-                   Alignment.Center => (total / 2, total / 2 + total % 2),
-                   Alignment.End => (total, 0),
-                   _ => (0, total)
-               };
+        {
+            Alignment.Start => (0, total),
+            Alignment.Center => (total / 2, total / 2 + total % 2),
+            Alignment.End => (total, 0),
+            _ => (0, total)
+        };
     }
 
     /// <summary>Moves the cursor to first char.</summary>

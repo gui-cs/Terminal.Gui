@@ -266,7 +266,7 @@ public class FileDialogTests : TestsAllDrivers
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4950
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4950
     ///     OpenFileDialog only closes after clicking Cancel or OK three times.
     ///     The first mouse-press triggers a layout pass that repositions the button,
     ///     so the subsequent mouse-release misses it.
@@ -406,6 +406,52 @@ public class FileDialogTests : TestsAllDrivers
         {
             c.AssertContains ("empty-dir", sd!.Path).AssertDoesNotContain ("hello", sd!.Path);
         }
+
+        c.Stop ();
+    }
+
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void SaveFileDialog_TableView_EnterOnDirectory_PreserveFilenameOnDirectoryChanges_True (string d)
+    {
+        // Copilot
+        SaveDialog? sd = null;
+        MockFileSystem? fs = null;
+
+        using AppTestHelper c = With.A (() =>
+                                        {
+                                            IRunnable r = NewSaveDialog (out sd, out fs);
+                                            sd.Style.PreserveFilenameOnDirectoryChanges = true;
+                                            sd.AllowedTypes = [new AllowedType ("C# File", ".cs")];
+
+                                            return r;
+                                        }, 100, 20, d)
+                                    .Then (_ =>
+                                          {
+                                              sd!.Path = fs!.Path.Combine (GetFileSystemRoot (fs), "hello.cs");
+                                          })
+                                    .ScreenShot ("Save dialog with filename", _out)
+                                    .Focus<TableView> (_ => true)
+                                    .KeyDown (Key.CursorDown)
+                                    .ScreenShot ("After selecting logs directory", _out)
+                                    .KeyDown (Key.Enter)
+                                    .ScreenShot ("After entering logs directory", _out)
+                                    .Then (_ =>
+                                          {
+                                              Assert.True (sd!.IsRunning);
+                                              Assert.True (sd.Canceled);
+                                              Assert.Contains ("logs", sd.Path);
+                                              Assert.EndsWith ("hello.cs", sd.Path);
+                                          })
+                                    .KeyDown (Key.Enter)
+                                    .ScreenShot ("After entering parent directory row", _out)
+                                    .Then (_ =>
+                                          {
+                                              Assert.True (sd!.IsRunning);
+                                              Assert.True (sd.Canceled);
+                                              Assert.DoesNotContain ("logs", sd.Path);
+                                              Assert.EndsWith ("hello.cs", sd.Path);
+                                          });
 
         c.Stop ();
     }

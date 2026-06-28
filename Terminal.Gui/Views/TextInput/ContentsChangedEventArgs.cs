@@ -4,7 +4,7 @@ namespace Terminal.Gui.Views;
 ///     Event arguments for events for when the contents of the TextView change. E.g. the
 ///     <see cref="TextView.ContentsChanged"/> event.
 /// </summary>
-[Obsolete ("ContentsChangedEventArgs is obsolete because TextView is superseded by gui-cs/Editor. See https://github.com/gui-cs/Editor.", error: false)]
+[Obsolete ("ContentsChangedEventArgs is obsolete because TextView is superseded by tui-cs/Editor. See https://github.com/tui-cs/Editor.", error: false)]
 public class ContentsChangedEventArgs : EventArgs
 {
     /// <summary>Creates a new <see cref="TextView.ContentsChanged"/> instance.</summary>

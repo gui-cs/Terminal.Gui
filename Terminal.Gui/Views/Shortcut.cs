@@ -5,6 +5,7 @@ namespace Terminal.Gui.Views;
 ///     <see cref="Bar"/>, <see cref="Menu"/>, <see cref="MenuBar"/>, and <see cref="StatusBar"/>.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/Shortcut.gif" alt="Shortcut demo"/>
 ///     <para>
 ///         A <see cref="Shortcut"/> is a composite view containing three subviews:
 ///         <see cref="CommandView"/> (command text and hotkey, left side by default),
@@ -77,12 +78,12 @@ namespace Terminal.Gui.Views;
 ///         <see cref="Shortcut"/> to highlight when the mouse is over it.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see>
 ///         for detailed information on command routing, the BubbleDown pattern, dispatch flows, and
 ///         <see cref="CommandView"/> variant behaviors.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for
 ///         how <see cref="Shortcut"/> fits into the menu system class hierarchy.
 ///     </para>
 /// </remarks>
@@ -869,6 +870,9 @@ public class Shortcut : View, IOrientation, IDesignable
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public string? GetDemoKeyStrokes () => "wait:500,Enter,wait:1000";
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

@@ -42,12 +42,12 @@ public abstract class AnsiKeyboardParserPattern
     {
         Key? key = GetKeyImpl (input);
 
-        // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+        // See https://github.com/tui-cs/Terminal.Gui/issues/5067
         Debug.Assert (key is { Handled: false });
 
         // Create a copy just to be safe; the patterns are supposed to create new Key instances,
         // but we don't want to accidentally share references
-        // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+        // See https://github.com/tui-cs/Terminal.Gui/issues/5067
         return new Key (key);
     }
 

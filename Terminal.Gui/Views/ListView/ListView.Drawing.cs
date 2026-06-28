@@ -12,7 +12,8 @@ public partial class ListView
 
         var current = Attribute.Default;
         int item = Viewport.Y;
-        int col = ShowMarks ? 2 : 0;
+        // Reserve mark glyph + separator column. If a configured mark glyph is wide, it can consume the separator.
+        int reservedMarkColumns = ShowMarks ? 2 : 0;
         Move (0, 0);
 
         for (var row = 0; row < Viewport.Height; row++, item++)
@@ -35,30 +36,30 @@ public partial class ListView
                     break;
 
                 case false when MarkMultiple:
-                {
-                    switch (isSelected)
                     {
-                        // Combination 2: Hidden marks with visual role indicators
-                        // Mark glyphs: None (MarkWidth = 0) - marks exist internally
-                        // Visual roles use Highlight for marked items; compose TextStyle when marked+selected+focused
-                        case true when isMarked:
-                            role = HasFocus ? VisualRole.Focus : VisualRole.Highlight;
-                            applyHighlightStyle = HasFocus; // Apply Highlight's TextStyle to Focus
-
-                            break;
-
-                        case true: role = HasFocus ? VisualRole.Focus : VisualRole.Normal; break;
-
-                        default:
+                        switch (isSelected)
                         {
-                            role = isMarked ? VisualRole.Highlight : VisualRole.Normal;
+                            // Combination 2: Hidden marks with visual role indicators
+                            // Mark glyphs: None (MarkWidth = 0) - marks exist internally
+                            // Visual roles use Highlight for marked items; compose TextStyle when marked+selected+focused
+                            case true when isMarked:
+                                role = HasFocus ? VisualRole.Focus : VisualRole.Highlight;
+                                applyHighlightStyle = HasFocus; // Apply Highlight's TextStyle to Focus
 
-                            break;
+                                break;
+
+                            case true: role = HasFocus ? VisualRole.Focus : VisualRole.Normal; break;
+
+                            default:
+                                {
+                                    role = isMarked ? VisualRole.Highlight : VisualRole.Normal;
+
+                                    break;
+                                }
                         }
-                    }
 
-                    break;
-                }
+                        break;
+                    }
 
                 case true when !MarkMultiple:
                     // Combination 3: Radio button style
@@ -70,7 +71,7 @@ public partial class ListView
 
                 default:
                     // Combination 4: Checkbox style
-                    // Mark glyphs: Checkbox style (☒ marked, ☐ unmarked)
+                    // Mark glyphs: Checkbox style (☑ marked, ☐ unmarked)
                     // Visual roles: Standard selection (mark glyphs provide visual indication)
                     role = isSelected ? HasFocus ? VisualRole.Focus : VisualRole.Active : VisualRole.Normal;
 
@@ -145,7 +146,7 @@ public partial class ListView
                     }
                 }
 
-                int contentCol = col > 0 ? col : markWidth;
+                int contentCol = reservedMarkColumns > 0 ? reservedMarkColumns : markWidth;
                 Source.Render (this, isSelected, item, contentCol, row, Viewport.Width - contentCol, Viewport.X);
             }
         }

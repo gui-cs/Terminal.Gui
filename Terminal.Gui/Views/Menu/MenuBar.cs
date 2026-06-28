@@ -9,6 +9,7 @@ namespace Terminal.Gui.Views;
 ///     the item is selected. Typically placed at the top of a window or view.
 /// </summary>
 /// <remarks>
+/// <img src="../images/views/MenuBar.gif" alt="MenuBar demo"/>
 ///     <para>
 ///         <see cref="MenuBar"/> extends <see cref="Menu"/> with horizontal orientation and specializes it for
 ///         <see cref="MenuBarItem"/> items. By default, it is positioned at <c>Y = 0</c> with
@@ -40,11 +41,11 @@ namespace Terminal.Gui.Views;
 ///         popover and deactivate the <see cref="MenuBar"/>.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/shortcut.html">Shortcut Deep Dive</see> for
 ///         details on the <see cref="Shortcut"/> base class and command routing patterns.
 ///     </para>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
 ///         full menu system architecture, class hierarchy, command routing, and usage examples.
 ///     </para>
 ///     <para>Default key bindings:</para>
@@ -326,7 +327,7 @@ public class MenuBar : Menu, IDesignable
         MenuItem onlineHelpMi = new () { Title = "_Online Help..." };
 
         // Demonstrate using Activating
-        onlineHelpMi.Activated += (_, _) => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk);
+        onlineHelpMi.Activated += (_, _) => MessageBox.Query (App!, "Online Help", "https://tui-cs.github.io/Terminal.Gui", Strings.btnOk);
 
         Add (new MenuBarItem (Strings.menuHelp,
                               [
@@ -337,6 +338,7 @@ public class MenuBar : Menu, IDesignable
         return true;
 
         void ToggleMenuBorders ()
+
         {
             foreach (MenuBarItem mbi in SubViews.OfType<MenuBarItem> ())
             {
@@ -777,7 +779,7 @@ public class MenuBar : Menu, IDesignable
             // BUGBUG: This is a hack for avoiding a race condition in ConfigurationManager.Apply
             // BUGBUG: For some reason in some unit tests, when Top is disposed, MenuBar.Dispose does not get called.
             // BUGBUG: Yet, the MenuBar does get Removed from Top (and it's SuperView set to null).
-            // BUGBUG: Related: https://github.com/gui-cs/Terminal.Gui/issues/4021
+            // BUGBUG: Related: https://github.com/tui-cs/Terminal.Gui/issues/4021
             ConfigurationManager.Applied -= OnConfigurationManagerApplied;
         }
     }
@@ -1021,4 +1023,7 @@ public class MenuBar : Menu, IDesignable
 
         menuBarItem.PopoverMenuOpen = true;
     }
+
+    /// <inheritdoc/>
+    string? IDesignable.GetDemoKeyStrokes () => "wait:500,F9,wait:800,CursorDown,wait:400,CursorDown,wait:400,Escape,wait:500";
 }

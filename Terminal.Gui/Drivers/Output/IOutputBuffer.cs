@@ -113,6 +113,37 @@ public interface IOutputBuffer
     void Move (int col, int row);
 
     /// <summary>
+    ///     Adds or replaces a raster image command, capturing the current <see cref="Clip"/> for later composition.
+    /// </summary>
+    /// <param name="command">The raster image command to add.</param>
+    void AddRasterImage (RasterImageCommand command);
+
+    /// <summary>
+    ///     Removes a raster image command from the output buffer.
+    /// </summary>
+    /// <param name="id">The raster image command identifier.</param>
+    void RemoveRasterImage (string id);
+
+    /// <summary>
+    ///     Removes every raster image command whose <see cref="RasterImageCommand.Id"/> is not in
+    ///     <paramref name="activeIds"/>, marking the cells they covered dirty so they are repainted.
+    /// </summary>
+    /// <remarks>
+    ///     Raster graphics (Sixel/Kitty) are emitted out-of-band and persist on screen until explicitly
+    ///     deleted, so they linger after the view that transmitted them is no longer rendered (hidden,
+    ///     removed, or on a runnable that has ended). The framework calls this after each draw with the ids
+    ///     of the images still owned by rendered views, releasing the rest. See <see cref="RemoveRasterImage"/>.
+    /// </remarks>
+    /// <param name="activeIds">The ids of raster images still owned by a rendered view.</param>
+    void RetainRasterImages (IReadOnlyCollection<string> activeIds);
+
+    /// <summary>
+    ///     Gets the raster image commands currently held by the output buffer.
+    /// </summary>
+    /// <returns>The raster image commands.</returns>
+    IReadOnlyList<RasterImageCommand> GetRasterImages ();
+
+    /// <summary>
     ///     Gets the row last set by <see cref="Move"/>. <see cref="Col"/> and <see cref="Row"/> are used by
     ///     <see cref="AddRune(Rune)"/> and <see cref="AddStr"/> to determine where to add content.
     /// </summary>

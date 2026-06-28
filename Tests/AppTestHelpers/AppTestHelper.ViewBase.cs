@@ -17,7 +17,7 @@ public partial class AppTestHelper
                            View top = App?.TopRunnableView ?? throw new ("Top was null so could not add view");
                            top.Add (v);
                            // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-                           // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
+                           // BUGBUG: See https://github.com/tui-cs/Terminal.Gui/issues/4522
                            top.Layout ();
                            _lastView = v;
                        });

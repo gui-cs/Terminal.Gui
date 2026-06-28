@@ -165,11 +165,11 @@ public sealed class UICatalogRunnable : Runnable
                                                     [
                                                         new MenuItem ("_Documentation",
                                                                       "API docs",
-                                                                      () => Link.OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
+                                                                      () => Link.OpenUrl ("https://tui-cs.github.io/Terminal.Gui"),
                                                                       Key.F1),
                                                         new MenuItem ("_README",
                                                                       "Project readme",
-                                                                      () => Link.OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
+                                                                      () => Link.OpenUrl ("https://github.com/tui-cs/Terminal.Gui"),
                                                                       Key.F2),
                                                         new MenuItem ("_About...", "About UI Catalog", ShowAboutDialog, Key.A.WithCtrl)
                                                     ])
@@ -897,7 +897,7 @@ public sealed class UICatalogRunnable : Runnable
     /// <summary>
     ///     The URL displayed in the About Box.
     /// </summary>
-    public const string ABOUT_URL = "https://github.com/gui-cs/Terminal.Gui";
+    public const string ABOUT_URL = "https://github.com/tui-cs/Terminal.Gui";
 
     private void ShowAboutDialog ()
     {

@@ -7,7 +7,7 @@ namespace DriverTests.Output;
 ///     Proves the race conditions in <see cref="OutputBufferImpl"/> where
 ///     <see cref="OutputBufferImpl.ClearContents()"/> replaces the <c>Contents</c>
 ///     reference while other methods are concurrently operating on it.
-///     See: https://github.com/gui-cs/Terminal.Gui/issues/5130
+///     See: https://github.com/tui-cs/Terminal.Gui/issues/5130
 /// </summary>
 public class OutputBufferImplConcurrencyTests
 {

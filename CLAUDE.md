@@ -19,10 +19,11 @@ Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data is **wrong**.
 | **"Build me an app that..."** | [.claude/tasks/build-app.md](.claude/tasks/build-app.md) |
 | **"Add a feature to Terminal.Gui..."** | Continue below (Contributor Guide) |
 | **"Fix a bug in Terminal.Gui..."** | Continue below (Contributor Guide) |
+| **"Record a GIF / verify a UI change..."** | [Scripts/tuirec/README.md](Scripts/tuirec/README.md) |
 
 ### App Builder Quick Start
 ```bash
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
+dotnet new install Terminal.Gui.Templates@2.*
 dotnet new tui-simple -n myapp
 cd myapp
 dotnet run
@@ -55,15 +56,17 @@ See `.claude/rules/` for detailed guidance:
 - `event-patterns.md` - Lambdas, closures, handlers
 - `early-return.md` - **Guard clauses, minimal nesting** (commonly violated!)
 - `collection-expressions.md` - Use `[...]` syntax
+- `unicode-graphemes.md` - **Think in graphemes** - `GetColumns()`, `GraphemeHelper.GetGraphemes()`
 - `cwp-pattern.md` - Cancellable Workflow Pattern
 - `code-layout.md` - Backing fields, member ordering
 - `api-documentation.md` - XML documentation requirements
 - `testing-patterns.md` - Test patterns and requirements
+- `logging-tracing.md` - **No Console.WriteLine** - use Logging/TestLogging/Trace
+- `fragile-areas.md` - Code that must not be refactored in passing (TextView init)
 
 ## Task-Specific Guides
 
 See `.claude/tasks/` for task checklists:
-- `scenario-modernization.md` - Upgrading UICatalog scenarios
 - `clean-code-review.md` - Creating clean git commit histories
 - `build-app.md` - Building applications with Terminal.Gui
 
@@ -83,7 +86,7 @@ When in planning mode:
 
 - **Language**: C# 14 (net10.0)
 - **Branch**: `develop`
-- **Version**: v2 (Alpha)
+- **Version**: v2 (stable)
 
 ## Build & Test
 
@@ -100,11 +103,23 @@ dotnet test --project Tests/UnitTests.NonParallelizable --no-build
 # Legacy tests — do NOT add new tests here; candidates for rewrite/deletion
 dotnet test --project Tests/UnitTests.Legacy --no-build
 
-# Run a single test by fully-qualified name
-dotnet test --project Tests/UnitTestsParallelizable --no-build --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
+# Run a single test by method name (Microsoft Testing Platform)
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "*MyTestMethod"
+
+# Run all tests in a class
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-class "*MyTestClass"
 ```
 
 See `Tests/README.md` for the full list of test projects (including `IntegrationTests`, `StressTests`, `Benchmarks`) and the static-state classification that determines where a new test belongs.
+
+## Seeing Your Changes (Visual Verification)
+
+Agents can observe a running Terminal.Gui app — don't ship UI changes blind. Use [`tuirec`](https://github.com/tui-cs/tuirec) to run the app in a PTY, inject keystrokes, and capture the result:
+
+- **Full guide:** [Scripts/tuirec/README.md](Scripts/tuirec/README.md) — install, keystroke syntax, UICatalog scenario recipes, validation checklist
+- The `.cast` output is asciinema v2 JSON (plain text) — **read it back** to verify what actually rendered, frame by frame
+- The `.gif` output is for humans — attach it to PRs that change visuals
+- For deterministic in-process assertions, use `InputInjector`/`VirtualTimeProvider` (see `docfx/docs/input-injection.md`) and driver `ToString ()` screen captures
 
 ## Key Concepts
 
