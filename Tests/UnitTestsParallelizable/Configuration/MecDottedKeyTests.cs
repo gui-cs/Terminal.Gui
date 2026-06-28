@@ -4,6 +4,7 @@
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Terminal.Gui.Configuration;
+using Terminal.Gui.Input;
 
 namespace ConfigurationTests;
 
@@ -152,6 +153,30 @@ public class MecDottedKeyTests
         finally
         {
             DriverSettings.Defaults = original;
+        }
+    }
+
+    /// <summary>
+    ///     Verifies issue #5561 fix: a flat dotted <see cref="Key"/> key (<c>PopoverMenu.DefaultKey</c>) binds via
+    ///     the AOT-safe <see cref="Key"/> fast path — i.e. without the trim-unsafe <c>TypeDescriptor.GetConverter</c>
+    ///     fallback that was removed.
+    /// </summary>
+    [Fact]
+    public void ApplyToStaticFacades_BindsFlatDottedKeyTypedProperty ()
+    {
+        PopoverMenuSettings original = PopoverMenuSettings.Defaults;
+
+        try
+        {
+            TuiConfigurationBuilder builder = new ();
+            builder.RuntimeConfig = """{ "PopoverMenu.DefaultKey": "Ctrl+P" }""";
+            builder.ApplyToStaticFacades ();
+
+            Assert.Equal (Key.P.WithCtrl, PopoverMenuSettings.Defaults.DefaultKey);
+        }
+        finally
+        {
+            PopoverMenuSettings.Defaults = original;
         }
     }
 }
