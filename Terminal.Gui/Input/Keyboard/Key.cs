@@ -1335,13 +1335,13 @@ public class Key : EventArgs, IEquatable<Key>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Rune Separator
     {
-        get;
+        get => KeySettings.Defaults.Separator;
         set
         {
-            if (field != value)
+            if (KeySettings.Defaults.Separator != value)
             {
-                field = value == default (Rune) ? new Rune ('+') : value;
+                KeySettings.Defaults.Separator = value == default (Rune) ? new Rune ('+') : value;
             }
         }
-    } = new ('+');
+    }
 }

@@ -29,11 +29,11 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Driver.Force16Colors"].PropertyValue = false;
+        settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue = false;
 
         var json = """
                    {
-                        "Driver.Force16Colors": true
+                        "ConfigurationManager.ThrowOnJsonErrors": true
                    }
                    """;
         var location = ConfigLocations.HardCoded;
@@ -50,7 +50,7 @@ public class SourcesManagerTests
 
         // Assert
         Assert.True (result);
-        Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
+        Assert.Equal (true, settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue);
         Assert.Contains (source, sourcesManager.Sources.Values);
     }
 
@@ -83,11 +83,11 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Driver.Force16Colors"].PropertyValue = false;
+        settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue = false;
 
         var json = """
                    {
-                        "Driver.Force16Colors": true
+                        "ConfigurationManager.ThrowOnJsonErrors": true
                    }
                    """;
         string source = Path.GetTempFileName ();
@@ -102,7 +102,7 @@ public class SourcesManagerTests
 
             // Assert
             Assert.True (result);
-            Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
+            Assert.Equal (true, settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue);
             Assert.Contains (source, sourcesManager.Sources.Values);
         }
         finally
@@ -172,11 +172,11 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Driver.Force16Colors"].PropertyValue = false;
+        settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue = false;
 
         var json = """
                    {
-                        "Driver.Force16Colors": true
+                        "ConfigurationManager.ThrowOnJsonErrors": true
                    }
                    """;
         var source = "Load_WithValidJson_UpdatesSettingsScope";
@@ -187,7 +187,7 @@ public class SourcesManagerTests
 
         // Assert
         Assert.True (result);
-        Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
+        Assert.Equal (true, settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue);
         Assert.Contains (source, sourcesManager.Sources.Values);
     }
 
@@ -228,7 +228,7 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Driver.Force16Colors"].PropertyValue = false;
+        settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue = false;
 
         var assembly = Assembly.GetExecutingAssembly ();
         var location = ConfigLocations.AppResources;
@@ -272,11 +272,11 @@ public class SourcesManagerTests
         var location = ConfigLocations.LibraryResources;
         sourcesManager.Load (settingsScope, assembly!, resourceName, location);
 
-        Assert.Equal (false, settingsScope ["Driver.Force16Colors"].PropertyValue);
+        Assert.Equal (false, settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue);
 
         var runtimeJson = """
                           {
-                               "Driver.Force16Colors": true
+                               "ConfigurationManager.ThrowOnJsonErrors": true
                           }
                           """;
         var runtimeSource = "runtime.json";
@@ -294,7 +294,7 @@ public class SourcesManagerTests
         Assert.True (result);
 
         // Verify settingsScope is updated as expected
-        Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
+        Assert.Equal (true, settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue);
     }
 
     #endregion
@@ -308,13 +308,13 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Driver.Force16Colors"].PropertyValue = true;
+        settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue = true;
 
         // Act
         string json = sourcesManager.ToJson (settingsScope);
 
         // Assert
-        Assert.Contains ("\"Driver.Force16Colors\": true", json);
+        Assert.Contains ("\"ConfigurationManager.ThrowOnJsonErrors\": true", json);
     }
 
     [Fact]
@@ -324,7 +324,7 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Driver.Force16Colors"].PropertyValue = true;
+        settingsScope ["ConfigurationManager.ThrowOnJsonErrors"].PropertyValue = true;
 
         // Act
         var stream = sourcesManager.ToStream (settingsScope);
@@ -334,7 +334,7 @@ public class SourcesManagerTests
         stream.Position = 0;
         StreamReader reader = new (stream);
         string json = reader.ReadToEnd ();
-        Assert.Contains ("\"Driver.Force16Colors\": true", json);
+        Assert.Contains ("\"ConfigurationManager.ThrowOnJsonErrors\": true", json);
     }
 
     #endregion
@@ -361,11 +361,11 @@ public class SourcesManagerTests
 
         // Act - Update with first source for location
         var firstSource = "first.json";
-        sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": true}""", firstSource, ConfigLocations.Runtime);
+        sourcesManager.Load (settingsScope, """{"ConfigurationManager.ThrowOnJsonErrors": true}""", firstSource, ConfigLocations.Runtime);
 
         // Update with second source for same location
         var secondSource = "second.json";
-        sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": false}""", secondSource, ConfigLocations.Runtime);
+        sourcesManager.Load (settingsScope, """{"ConfigurationManager.ThrowOnJsonErrors": false}""", secondSource, ConfigLocations.Runtime);
 
         // Assert - Only the last source should be stored for the location
         Assert.Single (sourcesManager.Sources);
@@ -385,7 +385,7 @@ public class SourcesManagerTests
         foreach (ConfigLocations location in locations)
         {
             var source = $"config-{location}.json";
-            sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": true}""", source, location);
+            sourcesManager.Load (settingsScope, """{"ConfigurationManager.ThrowOnJsonErrors": true}""", source, location);
         }
 
         // Assert
@@ -462,14 +462,14 @@ public class SourcesManagerTests
         // Second operation - json string update
         var jsonSource = "jsonstring";
         var location2 = ConfigLocations.Runtime;
-        sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": true}""", jsonSource, location2);
+        sourcesManager.Load (settingsScope, """{"ConfigurationManager.ThrowOnJsonErrors": true}""", jsonSource, location2);
 
         // Perform a stream operation
         var streamSource = "streamdata";
         var location3 = ConfigLocations.GlobalCurrent;
         var stream = new MemoryStream ();
         var writer = new StreamWriter (stream);
-        writer.Write ("""{"Driver.Force16Colors": true}""");
+        writer.Write ("""{"ConfigurationManager.ThrowOnJsonErrors": true}""");
         writer.Flush ();
         stream.Position = 0;
         sourcesManager.Load (settingsScope, stream, streamSource, location3);

@@ -6,6 +6,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 
+#pragma warning disable CS0618 // Obsolete - ScopeJsonConverter still uses ConfigurationManager internally during transition
+
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
@@ -131,13 +133,11 @@ TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
                     // Set the value of propertyName on the scopeT.
                     PropertyInfo prop = typeof (TScopeT).GetProperty (propertyName!)!;
 
-                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
+                    prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, TuiSerializerContext.Instance));
                 }
                 else
                 {
                     // Unknown property
-                    // TODO: To support forward compatibility, we should just ignore unknown properties?
-                    // TODO: Eg if we read an unknown property, it's possible that the property was added in a later version
                     throw new JsonException ($"{propertyName}: Unknown property name.");
                 }
             }
@@ -164,7 +164,7 @@ TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
             object? prop = p.GetValue (scope);
-            JsonSerializer.Serialize (writer, prop, p.PropertyType, ConfigurationManager.SerializerContext);
+            JsonSerializer.Serialize (writer, prop, p.PropertyType, TuiSerializerContext.Instance);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope.Where (cp => cp.Value.ScopeType == typeof (TScopeT).Name)
@@ -215,7 +215,7 @@ TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
                     continue;
                 }
 
-                JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (prop.GetType ());
+                JsonTypeInfo? jsonTypeInfo = TuiSerializerContext.Instance.GetTypeInfo (prop.GetType ());
 
                 if (jsonTypeInfo is null)
                 {
@@ -249,7 +249,7 @@ TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
             }
         }
 
-        JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (propertyType);
+        JsonTypeInfo? jsonTypeInfo = TuiSerializerContext.Instance.GetTypeInfo (propertyType);
 
         if (jsonTypeInfo is null)
         {

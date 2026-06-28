@@ -15,12 +15,12 @@ public sealed class Driver
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static bool Force16Colors
     {
-        get;
+        get => DriverSettings.Defaults.Force16Colors;
         set
         {
-            bool oldValue = field;
-            field = value;
-            Force16ColorsChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, field));
+            bool oldValue = DriverSettings.Defaults.Force16Colors;
+            DriverSettings.Defaults.Force16Colors = value;
+            Force16ColorsChanged?.Invoke (null, new ValueChangedEventArgs<bool> (oldValue, value));
         }
     }
 
@@ -40,7 +40,11 @@ public sealed class Driver
     /// </summary>
     /// <seealso cref="SizeDetectionMode"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static SizeDetectionMode SizeDetection { get; set; } = SizeDetectionMode.AnsiQuery;
+    public static SizeDetectionMode SizeDetection
+    {
+        get => DriverSettings.Defaults.SizeDetection;
+        set => DriverSettings.Defaults.SizeDetection = value;
+    }
 
     /// <summary>
     ///     Determines whether the process has a controlling terminal usable for TUI rendering and input.

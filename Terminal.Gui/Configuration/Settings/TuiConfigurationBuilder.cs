@@ -1,0 +1,286 @@
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
+
+namespace Terminal.Gui.Configuration;
+
+/// <summary>
+///     Builds and manages a Terminal.Gui MEC-based configuration, loading from all standard sources
+///     in the correct precedence order.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This is the MEC-based replacement for the legacy <see cref="ConfigurationManager"/>.
+///         It provides the same multi-source precedence (library defaults → app defaults → user files
+///         → environment variables → runtime config) using standard Microsoft.Extensions.Configuration.
+///     </para>
+///     <para><b>App Developer Usage:</b></para>
+///     <code>
+///     // Define your app settings POCO:
+///     public class MyAppSettings
+///     {
+///         public string Title { get; set; } = "My App";
+///         public bool DarkMode { get; set; }
+///         public static MyAppSettings Defaults { get; set; } = new ();
+///     }
+///
+///     // In your app startup:
+///     var builder = new TuiConfigurationBuilder ("MyApp");
+///     builder.BindAppSettings&lt;MyAppSettings&gt; ("MyApp", s =&gt; MyAppSettings.Defaults = s);
+///     builder.ApplyToStaticFacades ();
+///
+///     // Access settings:
+///     string title = MyAppSettings.Defaults.Title;
+///     </code>
+///     <para>
+///         To add custom configuration sources, use the MEC extension methods directly:
+///     </para>
+///     <code>
+///     IConfigurationBuilder configBuilder = new ConfigurationBuilder ()
+///         .AddTuiLibraryDefaults ()
+///         .AddTuiUserFiles ("MyApp")
+///         .AddJsonFile ("custom-settings.json", optional: true);
+///     IConfiguration config = configBuilder.Build ();
+///     </code>
+/// </remarks>
+public class TuiConfigurationBuilder
+{
+    private readonly string? _appName;
+    private string? _runtimeConfig;
+    private IConfiguration? _configuration;
+
+    /// <summary>Initializes a new instance of <see cref="TuiConfigurationBuilder"/>.</summary>
+    /// <param name="appName">The application name for app-specific config file discovery. If null, uses entry assembly name.</param>
+    public TuiConfigurationBuilder (string? appName = null)
+    {
+        _appName = appName ?? System.Reflection.Assembly.GetEntryAssembly ()?.GetName ().Name;
+    }
+
+    /// <summary>
+    ///     Gets or sets the runtime configuration JSON string (highest priority).
+    ///     Setting this invalidates the cached configuration, causing a rebuild on next access.
+    /// </summary>
+    public string? RuntimeConfig
+    {
+        get => _runtimeConfig;
+        set
+        {
+            _runtimeConfig = value;
+            _configuration = null; // force rebuild
+        }
+    }
+
+    /// <summary>
+    ///     Gets the built <see cref="IConfiguration"/> instance. Lazily built on first access.
+    ///     Rebuilt when <see cref="RuntimeConfig"/> changes.
+    /// </summary>
+    public IConfiguration Configuration => _configuration ??= Build ();
+
+    /// <summary>
+    ///     Builds the configuration from all sources in precedence order.
+    /// </summary>
+    /// <returns>The built configuration root.</returns>
+    public IConfiguration Build ()
+    {
+        IConfigurationBuilder builder = new ConfigurationBuilder ()
+                                        .AddTuiLibraryDefaults ()
+                                        .AddTuiAppDefaults (_appName)
+                                        .AddTuiUserFiles (_appName)
+                                        .AddTuiEnvironmentVariable ()
+                                        .AddTuiRuntimeConfig (_runtimeConfig);
+
+        _configuration = builder.Build ();
+
+        return _configuration;
+    }
+
+    /// <summary>
+    ///     Gets the MEC-backed theme manager instance for this builder.
+    /// </summary>
+    public IThemeManager ThemeManager => _themeManager ??= new MecThemeManager (this);
+    private IThemeManager? _themeManager;
+
+    /// <summary>
+    ///     Gets the MEC-backed scheme manager instance for this builder.
+    /// </summary>
+    public ISchemeManager SchemeManager => _schemeManager ??= new MecSchemeManager ();
+    private ISchemeManager? _schemeManager;
+
+    /// <summary>
+    ///     Applies the current configuration to all static settings facades.
+    ///     Call this after building or rebuilding to push MEC values to the static <c>Defaults</c> properties.
+    /// </summary>
+    public void ApplyToStaticFacades ()
+    {
+        IConfiguration config = Configuration;
+
+        // ThemeSettings is special: the active theme is a scalar "Theme" key, not a nested section.
+        BindThemeScalar (config);
+
+        // SettingsScope POCOs
+        BindSection<ApplicationSettings> (config, "Application", s => ApplicationSettings.Defaults = s);
+        BindSection<DriverSettings> (config, "Driver", s => DriverSettings.Defaults = s);
+        BindSection<FileDialogSettings> (config, "FileDialog", s => FileDialogSettings.Defaults = s);
+        BindSection<FileDialogStyleSettings> (config, "FileDialogStyle", s => FileDialogStyleSettings.Defaults = s);
+        BindSection<KeySettings> (config, "Key", s => KeySettings.Defaults = s);
+        BindSection<TraceSettings> (config, "Trace", s => TraceSettings.Defaults = s);
+
+        // ThemeScope POCOs
+        BindSection<ButtonSettings> (config, "Button", s => ButtonSettings.Defaults = s);
+        BindSection<CheckBoxSettings> (config, "CheckBox", s => CheckBoxSettings.Defaults = s);
+        BindSection<CharMapSettings> (config, "CharMap", s => CharMapSettings.Defaults = s);
+        BindSection<DialogSettings> (config, "Dialog", s => DialogSettings.Defaults = s);
+        BindSection<FrameViewSettings> (config, "FrameView", s => FrameViewSettings.Defaults = s);
+        BindSection<HexViewSettings> (config, "HexView", s => HexViewSettings.Defaults = s);
+        BindSection<LinearRangeSettings> (config, "LinearRange", s => LinearRangeSettings.Defaults = s);
+        BindSection<MenuBarSettings> (config, "MenuBar", s => MenuBarSettings.Defaults = s);
+        BindSection<MenuSettings> (config, "Menu", s => MenuSettings.Defaults = s);
+        BindSection<MessageBoxSettings> (config, "MessageBox", s => MessageBoxSettings.Defaults = s);
+        BindSection<NerdFontsSettings> (config, "NerdFonts", s => NerdFontsSettings.Defaults = s);
+        BindSection<PopoverMenuSettings> (config, "PopoverMenu", s => PopoverMenuSettings.Defaults = s);
+        BindSection<SelectorBaseSettings> (config, "SelectorBase", s => SelectorBaseSettings.Defaults = s);
+        BindSection<StatusBarSettings> (config, "StatusBar", s => StatusBarSettings.Defaults = s);
+        BindSection<TextFieldSettings> (config, "TextField", s => TextFieldSettings.Defaults = s);
+        BindSection<TextViewSettings> (config, "TextView", s => TextViewSettings.Defaults = s);
+        BindSection<WindowSettings> (config, "Window", s => WindowSettings.Defaults = s);
+        BindSection<GlyphSettings> (config, "Glyphs", s => GlyphSettings.Defaults = s);
+    }
+
+    /// <summary>
+    ///     Binds a custom application settings section from the configuration to a POCO instance.
+    ///     This is the MEC replacement for the legacy <see cref="AppSettingsScope"/>.
+    /// </summary>
+    /// <typeparam name="T">The settings POCO type.</typeparam>
+    /// <param name="sectionName">The JSON section name to bind from.</param>
+    /// <param name="apply">Action to apply the bound settings (typically update a static Defaults property).</param>
+    /// <returns>This builder for chaining.</returns>
+    [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050", Justification = "Settings POCOs are simple types; no generic instantiation needed at runtime.")]
+    public TuiConfigurationBuilder BindAppSettings<T> (string sectionName, Action<T> apply) where T : new ()
+    {
+        T settings = new ();
+        Configuration.GetSection (sectionName).Bind (settings);
+        apply (settings);
+
+        return this;
+    }
+
+    [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050", Justification = "Settings POCOs are simple types; no generic instantiation needed at runtime.")]
+    private static void BindSection<T> (IConfiguration config, string sectionName, Action<T> apply) where T : new ()
+    {
+        T settings = new ();
+        IConfigurationSection section = config.GetSection (sectionName);
+
+        if (section.Exists ())
+        {
+            // Nested object format: { "Driver": { "Force16Colors": true } }
+            section.Bind (settings);
+        }
+        else
+        {
+            // Flat dotted-key format: { "Driver.Force16Colors": true }. The MEC JSON provider stores
+            // these literally (a dot is not a section separator), so map them to properties by hand.
+            BindFlatDottedKeys (config, sectionName, settings);
+        }
+
+        apply (settings);
+    }
+
+    /// <summary>
+    ///     Binds the scalar <c>Theme</c> key from configuration to <see cref="ThemeSettings.Defaults"/>.
+    ///     Unlike other settings, the active theme is a scalar value (e.g. <c>"Dark"</c>), not a nested section.
+    /// </summary>
+    private static void BindThemeScalar (IConfiguration config)
+    {
+        string? themeValue = config ["Theme"];
+
+        if (string.IsNullOrEmpty (themeValue))
+        {
+            return;
+        }
+
+        ThemeSettings.Defaults = new () { Theme = themeValue };
+    }
+
+    /// <summary>
+    ///     Binds flat dotted keys (e.g. <c>Driver.Force16Colors</c>) from the configuration root to the
+    ///     corresponding properties on the settings POCO.
+    /// </summary>
+    [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
+    private static void BindFlatDottedKeys<T> (IConfiguration config, string sectionName, T settings)
+    {
+        string prefix = sectionName + ".";
+
+        foreach (PropertyInfo prop in typeof (T).GetProperties (BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (!prop.CanWrite)
+            {
+                continue;
+            }
+
+            string? value = config [prefix + prop.Name];
+
+            if (value is null)
+            {
+                continue;
+            }
+
+            try
+            {
+                object? converted = ConvertValue (value, prop.PropertyType);
+
+                if (converted is not null)
+                {
+                    prop.SetValue (settings, converted);
+                }
+            }
+            catch (Exception)
+            {
+                // Skip properties whose value cannot be converted to the target type.
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Converts a configuration string value to the target property type, using a fast path for the
+    ///     common scalar types and falling back to a <see cref="TypeConverter"/>.
+    /// </summary>
+    private static object? ConvertValue (string value, Type targetType)
+    {
+        if (targetType == typeof (string))
+        {
+            return value;
+        }
+
+        if (targetType == typeof (bool))
+        {
+            return bool.Parse (value);
+        }
+
+        if (targetType == typeof (int))
+        {
+            return int.Parse (value);
+        }
+
+        if (targetType == typeof (Rune))
+        {
+            return value.Length > 0 ? new Rune (value [0]) : new Rune ('+');
+        }
+
+        if (targetType.IsEnum)
+        {
+            return Enum.Parse (targetType, value);
+        }
+
+        TypeConverter converter = TypeDescriptor.GetConverter (targetType);
+
+        if (converter.CanConvertFrom (typeof (string)))
+        {
+            return converter.ConvertFromInvariantString (value);
+        }
+
+        return null;
+    }
+}

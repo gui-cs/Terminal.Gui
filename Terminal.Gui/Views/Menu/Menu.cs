@@ -1,5 +1,7 @@
 using Terminal.Gui.Tracing;
 
+#pragma warning disable CS0618 // Obsolete - Menu uses [ConfigurationProperty] for DefaultBorderStyle during transition
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -51,7 +53,11 @@ public class Menu : Bar, IValue<MenuItem?>
     ///     Gets or sets the default Border Style for Menus. The default is <see cref="LineStyle.None"/>.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static LineStyle DefaultBorderStyle { get; set; } = LineStyle.None;
+    public static LineStyle DefaultBorderStyle
+    {
+        get => MenuSettings.Defaults.DefaultBorderStyle;
+        set => MenuSettings.Defaults.DefaultBorderStyle = value;
+    }
 
     /// <inheritdoc/>
     public Menu () : this ([]) { }
@@ -79,10 +85,10 @@ public class Menu : Bar, IValue<MenuItem?>
         KeyBindings.Clear ();
         MouseBindings.Clear ();
 
-        ConfigurationManager.Applied += OnConfigurationManagerApplied;
+        ThemeChanges.ThemeChanged += OnThemeChanged;
     }
 
-    private void OnConfigurationManagerApplied (object? sender, ConfigurationManagerEventArgs e)
+    private void OnThemeChanged (object? sender, App.EventArgs<string> e)
     {
         if (SuperView is { })
         {
@@ -507,7 +513,7 @@ public class Menu : Bar, IValue<MenuItem?>
 
         if (disposing)
         {
-            ConfigurationManager.Applied -= OnConfigurationManagerApplied;
+            ThemeChanges.ThemeChanged -= OnThemeChanged;
         }
     }
 }
