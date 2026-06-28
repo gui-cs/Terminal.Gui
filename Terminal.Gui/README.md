@@ -110,7 +110,7 @@ All workflows are in [`.github/workflows/`](../.github/workflows/):
 |----------|---------|---------|
 | **[prepare-release.yml](../.github/workflows/prepare-release.yml)** | Manual dispatch | Creates a release PR from `develop` → `main` with label updates |
 | **[finalize-release.yml](../.github/workflows/finalize-release.yml)** | Release PR merged to `main` | Creates tag, GitHub Release, back-merge PR to `develop` |
-| **[publish.yml](../.github/workflows/publish.yml)** | Push to `main` or `develop`, version tags | Builds Release config, packs, and publishes to NuGet.org |
+| **[publish.yml](../.github/workflows/publish.yml)** | Push to `develop`, or `v*` tags | Builds Release config, packs, and publishes to NuGet.org |
 | **[build-validation.yml](../.github/workflows/build-validation.yml)** | Push/PR to `main` or `develop` | Builds all configurations to validate compilation |
 | **[unit-tests.yml](../.github/workflows/unit-tests.yml)** | Push/PR to `main` or `develop` | Runs all unit tests |
 | **[api-docs.yml](../.github/workflows/api-docs.yml)** | Push to `develop` | Builds and deploys API docs to GitHub Pages |

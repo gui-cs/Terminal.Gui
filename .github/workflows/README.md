@@ -58,7 +58,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 
 ### 5) Build and publish API docs (`.github/workflows/api-docs.yml`)
 
-- **Triggers**: push to `main`
+- **Triggers**: push to `develop`, and `workflow_dispatch`
 - Builds DocFX site on Windows and deploys to GitHub Pages
 
 

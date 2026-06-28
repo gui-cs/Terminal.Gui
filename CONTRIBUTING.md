@@ -346,7 +346,7 @@ Releases are automated using GitHub Actions to prevent manual errors. The flow i
    - **Version override:** (Optional) Specify exact version (e.g., `2.0.0`), otherwise GitVersion calculates it automatically
 5. **Click "Run workflow"** to create the release PR
 
-Prepare Release creates a `release/vX.Y.Z` branch (with the GitVersion label updated for the release type) and opens a PR into `main`. After CI passes, **review and merge that PR**. Merging triggers **Finalize Release**, which:
+Prepare Release creates a `release/<tag>` branch — where `<tag>` is the full version tag, e.g. `release/v2.0.0` for a stable release or `release/v2.0.0-beta.1` for a pre-release — with the GitVersion label updated for the release type, and opens a PR into `main`. After CI passes, **review and merge that PR**. Merging triggers **Finalize Release**, which:
 - Creates an annotated git tag (e.g., `v2.0.0-beta.1` or `v2.0.0`)
 - Creates a GitHub Release with auto-generated notes
 - Opens a back-merge PR from `main` → `develop`
