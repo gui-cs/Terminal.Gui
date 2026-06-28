@@ -296,6 +296,26 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// </summary>
     public ITreeViewFilter<T>? Filter { get; set; } = null;
 
+    /// <summary>Enables built-in checkbox rendering and toggling for tree nodes.</summary>
+    public bool CheckboxMode
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            UpdateContentSize ();
+            SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>Raised when a node check state changes.</summary>
+    public event EventHandler<CheckedChangedEventArgs<T>>? CheckedChanged;
+
     /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
     public bool AllowLetterBasedNavigation { get; set; } = true;
 
@@ -306,9 +326,32 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
     /// <summary>
-    ///     Delegate for multi-colored tree views. Return the <see cref="Scheme"/> to use for each passed object or
-    ///     null to use the default.
+    ///     Delegate for basic multi-colored tree view use cases. Return the <see cref="Scheme"/> to use for each passed
+    ///     object, or <see langword="null"/> to use the default tree view scheme.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         TreeView uses only <see cref="Scheme.Normal"/>, <see cref="Scheme.Focus"/>, and <see cref="Scheme.Active"/>
+    ///         from the returned scheme.
+    ///         <list type="bullet">
+    ///             <item>
+    ///                 <term>Normal</term>
+    ///                 <description>Used for unselected branches.</description>
+    ///             </item>
+    ///             <item>
+    ///                <term>Focus</term>
+    ///               <description>Used for selected branches when the tree view has focus.</description>
+    ///             </item>
+    ///             <item>
+    ///                 <term>Active</term>
+    ///                 <description>Used for selected branches when the tree view does not have focus.</description>
+    ///             </item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         For greater control over rendering, handle the <see cref="DrawLine"/> event instead.
+    ///     </para>
+    /// </remarks>
     public Func<T, Scheme?>? ColorGetter { get; set; }
 
     /// <summary>
@@ -393,11 +436,15 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
     private readonly Stack<TreeSelection<T>> _multiSelectedRegions = new ();
 
+    /// <summary>Explicit check states for nodes in checkbox mode.</summary>
+    private readonly Dictionary<T, CheckState> _checkedStates = new ();
+
     /// <summary>Removes all objects from the tree and clears <see cref="SelectedObject"/>.</summary>
     public void ClearObjects ()
     {
         SelectedObject = null;
         _multiSelectedRegions.Clear ();
+        _checkedStates.Clear ();
         Roots = new Dictionary<T, Branch<T>> ();
         InvalidateLineMap ();
         SetNeedsDraw ();
@@ -408,18 +455,9 @@ public partial class TreeView<T> : View, ITreeView where T : class
     {
         base.OnActivated (ctx);
 
-        T? o = SelectedObject;
-
-        if (o is null)
-        {
-            return;
-        }
-
-        var isExpandToggleAttempt = true;
-
+        // Mouse activation: use hit-test to find the clicked branch directly
         if (ctx?.Binding is MouseBinding { MouseEvent: { } } mouseBinding)
         {
-            // The line they clicked on a branch
             Branch<T>? clickedBranch = HitTest (mouseBinding.MouseEvent.Position!.Value.Y);
 
             if (clickedBranch is null)
@@ -429,13 +467,37 @@ public partial class TreeView<T> : View, ITreeView where T : class
 
             SelectedObject = clickedBranch.Model;
 
-            isExpandToggleAttempt = clickedBranch.IsHitOnExpandableSymbol (mouseBinding.MouseEvent.Position!.Value.X);
+            if (clickedBranch.IsHitOnCheckbox (mouseBinding.MouseEvent.Position!.Value.X))
+            {
+                ToggleChecked (clickedBranch.Model);
+
+                return;
+            }
+
+            if (clickedBranch.IsHitOnExpandableSymbol (mouseBinding.MouseEvent.Position!.Value.X))
+            {
+                Toggle (clickedBranch.Model);
+            }
+
+            return;
         }
 
-        if (isExpandToggleAttempt)
+        // Keyboard activation: operate on currently selected object
+        T? o = SelectedObject;
+
+        if (o is null)
         {
-            Toggle (SelectedObject);
+            return;
         }
+
+        if (CheckboxMode)
+        {
+            ToggleChecked (o);
+
+            return;
+        }
+
+        Toggle (o);
     }
 
     /// <inheritdoc/>
@@ -559,6 +621,11 @@ public partial class TreeView<T> : View, ITreeView where T : class
         if (Roots is null || !Roots.ContainsKey (o))
         {
             return;
+        }
+
+        foreach (T model in EnumerateKnownObjects (o, [], 0))
+        {
+            _checkedStates.Remove (model);
         }
 
         Roots.Remove (o);

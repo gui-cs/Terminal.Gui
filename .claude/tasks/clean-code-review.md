@@ -51,8 +51,8 @@ Run these for each commit:
 ```bash
 dotnet build --no-restore
 dotnet test --project Tests/IntegrationTests --no-build
-dotnet test --project Tests/UnitTests --no-build
 dotnet test --project Tests/UnitTestsParallelizable --no-build
+dotnet test --project Tests/UnitTests.NonParallelizable --no-build
 ```
 
 ## Terminal.Gui Specific Requirements

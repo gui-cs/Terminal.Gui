@@ -21,4 +21,4 @@ Add a test here if it does **any** of the following:
   `UnitTestsParallelizable` after review.
 - New feature tests — those belong in `UnitTestsParallelizable`.
 
-See the [Testing wiki](https://github.com/gui-cs/Terminal.Gui/wiki/Testing) for details.
+See the [Testing wiki](https://github.com/tui-cs/Terminal.Gui/wiki/Testing) for details.

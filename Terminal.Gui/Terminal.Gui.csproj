@@ -140,7 +140,7 @@
     <PropertyGroup>
         <PackageId>$(AssemblyName)</PackageId>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/gui-cs/$(AssemblyName)</PackageProjectUrl>
+        <PackageProjectUrl>https://github.com/tui-cs/$(AssemblyName)</PackageProjectUrl>
         <PackageIcon>logo.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>csharp, terminal, c#, f#, gui, toolkit, console, tui</PackageTags>
@@ -154,7 +154,7 @@
         <DocumentationFile>bin\$(Configuration)\$(AssemblyName).xml</DocumentationFile>
         <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Debug' ">true</GeneratePackageOnBuild>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <RepositoryUrl>https://github.com/gui-cs/$(AssemblyName).git</RepositoryUrl>
+        <RepositoryUrl>https://github.com/tui-cs/$(AssemblyName).git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>

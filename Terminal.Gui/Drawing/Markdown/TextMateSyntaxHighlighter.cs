@@ -42,18 +42,18 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// </summary>
     private static readonly Dictionary<MarkdownStyleRole, string [] []> _scopeMap = new ()
     {
-        [MarkdownStyleRole.Heading] = [["entity.name.section"], ["markup.heading"]],
-        [MarkdownStyleRole.HeadingMarker] = [["entity.name.section"], ["markup.heading"]],
-        [MarkdownStyleRole.Emphasis] = [["markup.italic"]],
-        [MarkdownStyleRole.Strong] = [["markup.bold"]],
-        [MarkdownStyleRole.InlineCode] = [["markup.inline.raw"], ["markup.raw"]],
-        [MarkdownStyleRole.CodeBlock] = [["markup.fenced_code.block.markdown"], ["markup.raw"]],
-        [MarkdownStyleRole.Link] = [["markup.underline.link"], ["string.other.link"], ["markup.underline"]],
-        [MarkdownStyleRole.Quote] = [["markup.quote"], ["markup.changed"]],
-        [MarkdownStyleRole.ListMarker] = [["punctuation.definition.list.begin.markdown"], ["keyword.control"]],
-        [MarkdownStyleRole.ImageAlt] = [["markup.italic"]],
-        [MarkdownStyleRole.TaskDone] = [["markup.strikethrough"], ["markup.deleted"]],
-        [MarkdownStyleRole.ThematicBreak] = [["meta.separator.markdown"], ["comment"]]
+        [MarkdownStyleRole.Heading] = [ ["entity.name.section"], ["markup.heading"]],
+        [MarkdownStyleRole.HeadingMarker] = [ ["entity.name.section"], ["markup.heading"]],
+        [MarkdownStyleRole.Emphasis] = [ ["markup.italic"]],
+        [MarkdownStyleRole.Strong] = [ ["markup.bold"]],
+        [MarkdownStyleRole.InlineCode] = [ ["markup.inline.raw"], ["markup.raw"]],
+        [MarkdownStyleRole.CodeBlock] = [ ["markup.fenced_code.block.markdown"], ["markup.raw"]],
+        [MarkdownStyleRole.Link] = [ ["markup.underline.link"], ["string.other.link"], ["markup.underline"]],
+        [MarkdownStyleRole.Quote] = [ ["markup.quote"], ["markup.changed"]],
+        [MarkdownStyleRole.ListMarker] = [ ["punctuation.definition.list.begin.markdown"], ["keyword.control"]],
+        [MarkdownStyleRole.ImageAlt] = [ ["markup.italic"]],
+        [MarkdownStyleRole.TaskDone] = [ ["markup.strikethrough"], ["markup.deleted"]],
+        [MarkdownStyleRole.ThematicBreak] = [ ["meta.separator.markdown"], ["comment"]]
     };
 
     internal static readonly (string ScopePrefix, VisualRole Role) [] TmScopeRoleMap =

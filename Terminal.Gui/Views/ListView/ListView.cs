@@ -252,7 +252,10 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e) => SetContentSize (new Size (EffectiveMaxItemLength, Source?.Count ?? Viewport.Height));
 
-    /// <summary>INTERNAL: Gets the width reserved for mark rendering (checkbox and space).</summary>
+    /// <summary>
+    ///     INTERNAL: Gets the columns reserved for mark rendering (mark glyph + separator column). Wide glyphs may
+    ///     consume the separator column.
+    /// </summary>
     private int MarkWidth => ShowMarks ? 2 : 0;
 
     /// <summary>INTERNAL: Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
@@ -291,7 +294,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
     protected override bool OnKeyDown (Key key)
     {
         // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
+        // See: https://github.com/tui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
         if (KeyBindings.TryGet (key, out _))
         {
             return false;

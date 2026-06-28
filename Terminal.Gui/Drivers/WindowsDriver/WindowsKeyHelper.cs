@@ -149,13 +149,13 @@ internal static class WindowsKeyHelper
                         // returned (e.g. on ENG OemPlus un-shifted is =, not +). This is important
                         // for key persistence ("Ctrl++" vs. "Ctrl+=").
                         mappedChar = keyInfo.Key switch
-                                     {
-                                         ConsoleKey.OemPeriod => '.',
-                                         ConsoleKey.OemComma => ',',
-                                         ConsoleKey.OemPlus => '+',
-                                         ConsoleKey.OemMinus => '-',
-                                         _ => mappedChar
-                                     };
+                        {
+                            ConsoleKey.OemPeriod => '.',
+                            ConsoleKey.OemComma => ',',
+                            ConsoleKey.OemPlus => '+',
+                            ConsoleKey.OemMinus => '-',
+                            _ => mappedChar
+                        };
                     }
 
                     // Return the mappedChar with modifiers. Because mappedChar is un-shifted, if Shift was down

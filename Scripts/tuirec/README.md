@@ -1,7 +1,7 @@
 # Recording Terminal.Gui Apps with `tuirec`
 
 Use this guide when an issue or PR asks for a GIF/video capture of a Terminal.Gui
-app or scenario. The recording tool is [`gui-cs/tuirec`](https://github.com/gui-cs/tuirec) —
+app or scenario. The recording tool is [`tui-cs/tuirec`](https://github.com/tui-cs/tuirec) —
 a Go CLI that spawns the target app in a PTY, injects keystrokes, records terminal
 output as an asciinema v2 cast, and renders an animated GIF via `agg`.
 
@@ -9,13 +9,39 @@ output as an asciinema v2 cast, and renders an animated GIF via `agg`.
 
 ```powershell
 # Requires Go 1.22+
-go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+go install github.com/tui-cs/tuirec/cmd/tuirec@latest
 tuirec --version
 
 # agg is auto-downloaded on first use — no separate install needed.
 ```
 
-Verify: `tuirec --version`. If not on PATH, add `$(go env GOPATH)\bin` to PATH.
+Verify: `tuirec --version`. If not on PATH, add Go's bin dir
+(`$(go env GOPATH)\bin` on Windows, `$(go env GOPATH)/bin` on Linux/macOS) to PATH.
+
+> **PowerShell vs. bash.** The snippets below are PowerShell (the project's
+> default shell). The **raster recipes are Linux/macOS only** (Windows ConPTY
+> can't capture Kitty/sixel), so where it matters this guide gives a bash version
+> too. The mechanical translations: `Select-String -Pattern 'x'` →
+> `grep -o 'x' | wc -l`, `Copy-Item a b` → `cp a b`, `$ks = '...'` →
+> `ks='...'`, and the backtick line-continuation `` ` `` → `\`.
+
+### Fresh container / clean clone
+
+`tuirec` (Go) and `ScenarioRunner` (.NET) both need toolchains the Install
+section assumes are present. On a clean Linux box:
+
+```bash
+# .NET SDK — match global.json (read the version from it; currently 10.0.100)
+curl -sSL https://dot.net/v1/dotnet-install.sh | bash -s -- --version 10.0.100 --install-dir ~/.dotnet
+export PATH="$HOME/.dotnet:$PATH"
+
+# Go 1.22+ (if missing: distro package manager, or https://go.dev/dl)
+# tuirec installs into GOPATH/bin, which is often off-PATH:
+go install github.com/tui-cs/tuirec/cmd/tuirec@latest
+export PATH="$(go env GOPATH)/bin:$PATH"
+
+tuirec --version && dotnet --version
+```
 
 ## Quick Start — Recording a UICatalog Scenario
 
@@ -138,7 +164,7 @@ file is named correctly. The `--name` value determines the artifact filenames.
 
 ### Critical: `--kitty-keyboard` Decision
 
-**Known bug ([gui-cs/tuirec#54](https://github.com/gui-cs/tuirec/issues/54)):**
+**Known bug ([tui-cs/tuirec#54](https://github.com/tui-cs/tuirec/issues/54)):**
 tuirec currently encodes navigation keys (`CursorUp`, `CursorDown`, `CursorLeft`,
 `CursorRight`, `PageUp`, `PageDown`, `Home`, `End`) incorrectly under
 `--kitty-keyboard` — it sends fabricated CSI u codepoints that the Kitty spec
@@ -252,6 +278,160 @@ tuirec record `
 
 ---
 
+## Raster graphics: Kitty (default) and sixel
+
+Terminal.Gui's `ImageView` (with `UseRasterGraphics = true`) picks the best
+raster protocol the terminal advertises: **Kitty graphics** when available,
+otherwise **sixel**, otherwise cell rendering. Which one a recording captures
+depends on what identity `tuirec` presents to the app.
+
+- **`tuirec` ≥ v0.9.0 defaults to Kitty graphics.** It advertises a deterministic
+  Kitty identity (a `KITTY_WINDOW_ID` marker) to the recorded app, so apps that
+  prefer Kitty emit Kitty image escapes (`ESC _ G … ST`). The pinned
+  `agg` (`v1.11.0-sixel`, built on a Kitty-capable `avt`) renders them in the GIF.
+  This is the path the UICatalog **Mandelbrot** and **Images** scenarios take by
+  default. Terminal.Gui detects Kitty support purely from the environment, so the
+  app reports `Kitty … active` in its capability matrix with no extra flags.
+- **Sixel** is still used when the app does not support Kitty, or you force the
+  sixel path in-app (e.g. the Mandelbrot scenario's "Sixel" protocol option).
+- **Both are Linux/macOS only.** Windows ConPTY strips both Kitty graphics APC
+  strings and sixel DCS from the output stream, so neither is captured there.
+
+**Confirm which protocol the cast captured** (the `.cast` is JSON, so the escape
+introducer shows up as ``):
+
+```powershell
+# PowerShell
+Select-String -Path artifacts/<name>.cast -Pattern 'u001b_G' | Measure-Object  # Kitty
+Select-String -Path artifacts/<name>.cast -Pattern 'u001bPq' | Measure-Object  # sixel
+```
+
+```bash
+# Linux/macOS — the raster recipes only run here
+grep -o 'u001b_G' artifacts/<name>.cast | wc -l   # Kitty (expected by default)
+grep -o 'u001bPq' artifacts/<name>.cast | wc -l   # sixel (only when forced)
+```
+
+The sixel cell-size verification below applies to the **sixel** path; the
+[#84](https://github.com/tui-cs/tuirec/issues/84) cell-resolution mismatch is a
+sixel concern and does not apply when the app renders via Kitty graphics.
+
+> **The `adjusted agg font-size … to align the sixel cell grid (#84)` log line is
+> expected, not an error.** `tuirec` ≥ v0.9.0 auto-calibrates agg's font size to
+> close the #84 mismatch during recording. It's harmless for the Kitty path —
+> don't chase it.
+
+> **Smooth zoom/pan recordings.** Each keystroke pauses `--keystroke-delay` ms
+> (default 200). For continuous-looking motion (e.g. zooming/panning an image),
+> use a shorter delay (`--keystroke-delay 130`) and many small steps rather than
+> a few large ones. Note that in-app *mouse-wheel* zoom may not work under
+> `tuirec` (some views bind the wheel to pan); prefer the keyboard zoom keys.
+
+### Exact recipe — `docfx/images/Mandelbrot.gif`
+
+This reproduces the committed Mandelbrot hero GIF in one shot. Because raster
+capture is **Linux/macOS only**, the recipe is shown in bash; build
+`ScenarioRunner` first (see Prerequisites), then run from the repo root. (In
+PowerShell on macOS, translate per the *PowerShell vs. bash* note above:
+`$ks = '...'`, backtick line-continuations, `Copy-Item`.)
+
+```bash
+dll="./Examples/ScenarioRunner/bin/Release/net10.0/ScenarioRunner.dll"
+# Tour: full set → zoom into the seahorse valley → pan across it → zoom out → reset
+ks='wait:1600,PageUp,wait:150,CursorLeft,CursorDown,CursorDown,wait:300,PageUp,wait:120,PageUp,wait:120,PageUp,wait:120,PageUp,wait:850,CursorRight,wait:150,CursorRight,wait:150,CursorUp,wait:180,CursorLeft,wait:150,CursorLeft,wait:150,CursorLeft,wait:150,CursorDown,wait:180,CursorRight,wait:150,CursorRight,wait:600,PageDown,wait:120,PageDown,wait:120,PageDown,wait:120,PageDown,wait:120,PageDown,wait:300,Home,wait:1100,Esc'
+
+tuirec record --binary dotnet --args "$dll,run,Mandelbrot" --name Mandelbrot \
+    --title "Mandelbrot" --keystrokes "$ks" \
+    --startup-delay 2000 --drain 1200 --cols 120 --rows 30 --keystroke-delay 130
+
+cp artifacts/Mandelbrot.gif docfx/images/Mandelbrot.gif
+```
+
+Validate (robust invariants — see the softened counts below):
+
+```bash
+grep -o 'u001b_G' artifacts/Mandelbrot.cast | wc -l   # Kitty: expect thousands
+grep -o 'u001bPq' artifacts/Mandelbrot.cast | wc -l   # sixel: expect 0
+# Extract a mid-zoom frame without ImageMagick/ffmpeg (needs python3 + Pillow):
+python3 -c "from PIL import Image; im=Image.open('artifacts/Mandelbrot.gif'); im.seek(im.n_frames//2); im.convert('RGB').save('/tmp/mid.png')"
+```
+
+**Why each part matters (don't "improve" these blindly):**
+
+- **The image view fills the display.** The scenario anchors `MandelbrotImageView`
+  at `(0,0)` with `Dim.Fill()` so the fractal is large enough for motion to read.
+  If you record a small centered image, the demo looks cramped.
+- **Zoom is keyboard-only and center-anchored.** `PageUp`/`PageDown` zoom about
+  the *center* (the in-app mouse wheel pans, it does not zoom). So you must pan
+  the target to the center first, then zoom.
+- **Target = the seahorse valley**, center ≈ `(-0.745, +0.11)` — the cusp where
+  the main cardioid meets the period-2 bulb. The opening `PageUp` shrinks the pan
+  step so `CursorLeft,CursorDown,CursorDown` lands at ≈ `(-0.74, +0.105)` instead
+  of overshooting onto the (mostly black) antenna filament at `-0.8`.
+- **Stop around span ≈ 1.0** (about 5 `PageUp`s total). At the scenario's default
+  80 iterations the valley goes mostly black past ~span 0.5; span ≈ 1.0 keeps the
+  colorful seahorse filaments. For a deeper dive you'd raise the iteration count
+  first (the Iterations control, or `DEFAULT_ITERATIONS`).
+- **Validate against invariants, not exact counts.** The cast holds **thousands**
+  of `u001b_G` (Kitty) payloads and **zero** `u001bPq` (sixel), and the GIF is
+  **~0.9 MB**. The precise payload count drifts (±a few hundred) with timing and
+  the auto font-size adjust — don't treat it as a target. Then open `/tmp/mid.png`
+  (extracted above) and confirm the in-app readout reads **Center X ≈ −0.74,
+  Center Y ≈ 0.105, Span ≈ 1.0** over colorful seahorse structure — measuring the
+  landmark, per this guide's "measure, don't eyeball" tenet, not eyeballing a vibe.
+
+---
+
+## Verifying Placement and Size (measure — don't eyeball)
+
+**The recurring trap.** Confirming a sixel *appears* in the GIF — or that agg
+rendered it faithfully at the cursor cell the app requested — does **not** prove
+it is correct. A pixel-perfect render of a raster that was *built from the wrong
+cell size* is still the wrong size on screen. "Looks present" and "pipeline is
+faithful" are proxies. The invariant you must actually check is:
+
+> **Does the rendered sixel cover the cells the app intended — in both position
+> and size?**
+
+Verify that with a measurement, not your eyes. A ~4% size error is invisible by
+sight and obvious by arithmetic.
+
+**Why this bites with tuirec specifically.** tuirec advertises a sixel cell
+resolution (e.g. `8×17` px) that does **not** match agg's actual rendered font
+cell (~`8.3×18.8` px at the default `--font-size 14`) — see
+[#84](https://github.com/tui-cs/tuirec/issues/84). An app that *correctly* sizes
+its raster as `cells × reportedResolution` (and fills exactly on a real sixel
+terminal) therefore renders ~4% **undersized** under tuirec. Do not "fix" the app
+for this; verify it and attribute it correctly.
+
+**The check — calibrate agg's real cell, then reconcile:**
+
+1. Extract a frame from the GIF (any decoder; e.g. ImageSharp
+   `Image.Load(gif).Frames.CloneFrame(i)`).
+2. Measure agg's **actual** cell size from a *known* grid reference — e.g. a
+   border/box that spans a known number of columns:
+   `cellPx = borderSpanPx / (spannedCells)`. (Don't trust `imageWidth / cols` —
+   agg adds margins.)
+3. Read the resolution the **app** used from the cast: the sixel DCS header
+   `P…q"asp;asp;WIDTH;HEIGHT` gives raster pixel size; divide by the raster's
+   cell count to get the app's px-per-cell.
+4. **If agg's measured cell ≠ the app's px-per-cell, the sixel is mis-sized —
+   and that is the tuirec mismatch ([#84](https://github.com/tui-cs/tuirec/issues/84)),
+   not an app bug.** Then confirm the sixel's rendered bounding box actually spans
+   the target region (the columns/rows it was meant to cover), not merely that it
+   exists.
+
+Run this whenever a sixel is sized or aligned to the text grid (bordered image
+views, insets, bottom bands — anything grid-anchored). It turns "I think it looks
+right" into a number, which is the only thing that catches sub-cell and
+few-percent errors.
+
+> **General principle (applies beyond sixel):** verify the *invariant the change
+> was supposed to satisfy*, measured against the design intent — not that the tool
+> ran, the file is non-empty, or the screenshot "has the thing in it." When you've
+> just fixed one symptom, the next bug often hides in the dimension you didn't
+> measure.
+
 ## Validation Checklist
 
 After every recording, verify:
@@ -260,6 +440,9 @@ After every recording, verify:
 - [ ] **Error check** — no errors in the cast:
   ```powershell
   Select-String -Path artifacts/<name>.cast -Pattern "error|unknown|not found|usage:" -CaseSensitive:$false
+  ```
+  ```bash
+  grep -iE "error|unknown|not found|usage:" artifacts/<name>.cast
   ```
 - [ ] **GIF is not blank** — file size > 100KB for a typical scenario recording.
       (A blank/static GIF is typically < 50KB.)
@@ -271,6 +454,23 @@ After every recording, verify:
   ```
   Examples/UICatalog/Scenarios/<ScenarioDir>/<ScenarioName>.gif
   ```
+- [ ] **Raster content recorded on Linux/macOS** — Kitty graphics APC and sixel
+      DCS cannot be captured through Windows ConPTY. Confirm the expected protocol
+      made it into the cast (Kitty is the default for raster apps; see *Raster
+      graphics* above):
+  ```powershell
+  Select-String -Path artifacts/<name>.cast -Pattern 'u001b_G' | Measure-Object  # Kitty
+  Select-String -Path artifacts/<name>.cast -Pattern 'u001bPq' | Measure-Object  # sixel
+  ```
+  ```bash
+  grep -o 'u001b_G' artifacts/<name>.cast | wc -l   # Kitty
+  grep -o 'u001bPq' artifacts/<name>.cast | wc -l   # sixel
+  ```
+- [ ] **Grid-anchored sixel measured, not eyeballed** — if the sixel is sized or
+      aligned to the text grid, calibrate agg's real cell and confirm the rendered
+      bbox covers the target columns/rows (see *Verifying Placement and Size*
+      above). A ~4% undersize from [#84](https://github.com/tui-cs/tuirec/issues/84)
+      is invisible by sight.
 
 ---
 
@@ -278,8 +478,11 @@ After every recording, verify:
 
 | Problem | Cause | Fix |
 |---------|-------|-----|
+| No raster output on Windows | **Windows ConPTY strips Kitty graphics APC and sixel DCS** and does not pass the DA1 sixel handshake — the app detects no raster support | Record raster content (Kitty or sixel) on Linux/macOS (see `tuirec agent-guide`). On Windows you can still verify the app's raster code path runs (e.g., via an app-level force flag) by checking redraw activity in the `.cast`, but image pixels will not appear |
+| Image renders via sixel instead of Kitty (or vice versa) | The app picks its preferred protocol from what the terminal advertises; `tuirec` ≥ v0.9.0 advertises Kitty by default | Confirm the captured protocol in the cast (`u001b_G` for Kitty, `u001bPq` for sixel). To force sixel, use the app's own protocol control (e.g. the Mandelbrot scenario's "Sixel" option) |
+| Sixel renders ~4% too small / short of a border | tuirec advertises a cell resolution that doesn't match agg's rendered font cell ([#84](https://github.com/tui-cs/tuirec/issues/84)) | App is correct (fills on a real terminal). Verify by measurement (see *Verifying Placement and Size*); attribute to tuirec, not the app. Until fixed, only a tuirec-specific over-render hack would close the gap |
 | Wide glyphs misaligned in GIF | Emoji/CJK chars are 2-cell wide; agg renders per-cell | Avoid emoji/CJK categories; use single-width ranges (Arrows, Box Drawing, etc.) |
-| Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/gui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
+| Nav keys ignored with `--kitty-keyboard` | tuirec bug [#54](https://github.com/tui-cs/tuirec/issues/54) — sends wrong codepoints | Remove `--kitty-keyboard` |
 | App doesn't quit | Wrong quit key or key not delivered | Use `Escape` (the default quit key); check `--kitty-keyboard` interaction |
 | Blank frames at start/end | Pre/postroll not trimmed | `--trim` is on by default in v0.4.2+; ensure tuirec is up-to-date |
 | GIF validation: 1 frame | `--trim` removes all frames for static views | Use `--trim=false` for views with no visual change during demo |
@@ -298,7 +501,10 @@ When asked to record a scenario GIF:
 3. **Read `GetDemoKeyStrokes()`** — find it in the scenario source file
 4. **Compose keystrokes** — translate to tuirec syntax, add waits, keep short
 5. **Record** — `tuirec record --binary ... --args "run,<Name>" --keystrokes $ks ...`
-6. **Validate** — error-grep the cast, check GIF file size, visual confirm
+6. **Validate** — error-grep the cast, check GIF file size, confirm the interaction
+   played. For anything sized/aligned to the grid (sixels especially),
+   **measure** placement and size against the design intent — do not stop at
+   "the screenshot has the thing in it" (see *Verifying Placement and Size*).
 7. **If nav keys fail** — remove `--kitty-keyboard` and retry
 8. **Report** — share the output paths and exact command used
 
@@ -306,7 +512,7 @@ When asked to record a scenario GIF:
 
 ## Reference
 
-- **tuirec repo:** https://github.com/gui-cs/tuirec
+- **tuirec repo:** https://github.com/tui-cs/tuirec
 - **Full keystroke syntax:** `tuirec agent-guide` (embeds the complete reference)
 - **CLI flags:** `tuirec record --help`
 - **ScenarioRunner:** `Examples/ScenarioRunner/` — CLI that runs individual UICatalog scenarios

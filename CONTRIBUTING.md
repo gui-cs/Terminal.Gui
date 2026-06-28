@@ -25,10 +25,10 @@ Welcome! This guide provides everything you need to know to contribute effective
 **Terminal.Gui** is a cross-platform UI toolkit for creating console-based graphical user interfaces in .NET. It's a large codebase (~1,050 C# files) providing a comprehensive framework for building interactive console applications with support for keyboard and mouse input, customizable views, and a robust event system.
 
 **Key characteristics:**
-- **Language**: C# (net8.0)
+- **Language**: C# 14 (net10.0)
 - **Platform**: Cross-platform (Windows, macOS, Linux)
 - **Architecture**: Console UI toolkit with driver-based architecture
-- **Version**: v2 (Beta), v1 (maintenance mode)
+- **Version**: v2 (stable), v1 (maintenance mode)
 - **Branching**: GitFlow model (develop is default/active development)
 
 ## Key Architecture Concepts
@@ -47,8 +47,8 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 ### Required Tools
 
-- **.NET SDK**: 8.0.0 (see `global.json`)
-- **Runtime**: .NET 8.x (latest GA)
+- **.NET SDK**: 10.0.100 (see `global.json`)
+- **Runtime**: .NET 10.x (latest GA)
 - **Optional**: ReSharper/Rider for code formatting (honor `.editorconfig` and `Terminal.sln.DotSettings`)
 
 ### Build Commands (In Order)
@@ -78,7 +78,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 1. **Non-parallel tests** (depend on static state, ~10 min timeout):
    ```bash
-   dotnet test --project Tests/UnitTests --no-build --verbosity normal
+   dotnet test --project Tests/UnitTests.NonParallelizable --no-build --verbosity normal
    ```
    - Uses `Application.Init` and static state
    - Cannot run in parallel
@@ -97,14 +97,6 @@ Welcome! This guide provides everything you need to know to contribute effective
    ```
 
 ### Common Build Issues
-
-#### Issue: NativeAot/SelfContained Build
-
-- **Solution**: Restore these projects explicitly:
-  ```bash
-  dotnet restore ./Examples/NativeAot/NativeAot.csproj -f
-  dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
-  ```
 
 ## Coding Conventions
 
@@ -314,13 +306,13 @@ foreach (Rune rune in text.EnumerateRunes ())
 - `UnitTestsParallelizable/` - Parallel tests (no static dependencies) - **Preferred**
 - `IntegrationTests/` - Integration tests
 - `StressTests/` - Long-running stress tests (scheduled daily)
+- `NativeAotSmoke/` - AOT smoke-test app used in CI validation
 - `coverlet.runsettings` - Code coverage configuration
 
 **`/Examples/`**:
 - `UICatalog/` - Comprehensive demo app for manual testing
-- `Example/` - Basic example
-- `NativeAot/`, `SelfContained/` - Deployment examples
-- `ReactiveExample/`, `CommunityToolkitExample/` - Integration examples
+- `ScenarioRunner/` - Scenario automation tool
+- Additional examples live in [tui-cs/Examples](https://github.com/tui-cs/Examples)
 
 **`/docfx/`** - Documentation source:
 - `docs/` - Conceptual documentation (deep dives)

@@ -27,7 +27,7 @@
 3. **Follow existing test patterns**
    - Study tests in respective test projects before writing new ones
 
-4. **Avoid adding new tests to `UnitTests` Project**
+4. **Never add new tests to `UnitTests.Legacy`**
    - Make them parallelizable and add them to `UnitTestsParallelizable`
 
 5. **Avoid static dependencies**
@@ -38,7 +38,7 @@
 
 ## Test Projects
 
-### 1. Non-Parallel Tests (`Tests/UnitTests/`)
+### 1. Non-Parallel Tests (`Tests/UnitTests.NonParallelizable/`)
 
 **When to use:**
 - Testing functionality that depends on static state
@@ -48,11 +48,10 @@
 - ~10 min timeout
 - Uses `Application.Init` and static state
 - Cannot run in parallel
-- Includes `--diagnostic` flag for logging
 
 **Command:**
 ```bash
-dotnet test --project Tests/UnitTests --no-build --verbosity normal
+dotnet test --project Tests/UnitTests.NonParallelizable --no-build --verbosity normal
 ```
 
 ### 2. Parallel Tests (`Tests/UnitTestsParallelizable/`) - **PREFERRED**
@@ -84,8 +83,9 @@ dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
 
 ## Test Configuration Files
 
-- `xunit.runner.json` - xUnit configuration
-- `coverlet.runsettings` - Coverage settings (currently unused, pending MTP integration)
+- `xunit.runner.json` - Per-project xUnit configuration (parallelization, etc.)
+- `Tests/TestEnvironmentSetup.cs` - Compiled into every test project; its `[ModuleInitializer]` sets `DisableRealDriverIO=1` before any test code runs
+- Coverage tooling: each test project references the `coverlet.collector` package, but coverage is not actively collected in CI yet (see "Code Coverage" above — pending an MTP-compatible solution). `.runsettings` files are ignored by Microsoft Testing Platform (MTP).
 
 ## Example Test Pattern
 

@@ -8,4 +8,4 @@ Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 # History
 
-See [gui-cs](https://github.com/gui-cs/) for project history and origins.
+See [tui-cs](https://github.com/tui-cs/) for project history and origins.

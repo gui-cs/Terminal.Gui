@@ -265,7 +265,7 @@ public class CollectionNavigatorTests
         int? current = 0;
         var n = new CollectionNavigator (strings);
 
-        // https://github.com/gui-cs/Terminal.Gui/pull/2132#issuecomment-1298425573
+        // https://github.com/tui-cs/Terminal.Gui/pull/2132#issuecomment-1298425573
         // One thing that it currently does that is different from Explorer is that as soon as you hit a wrong key then it jumps to that index.
         // So if you type cand then z it jumps you to something beginning with z. In the same situation Windows Explorer beeps (not the best!)
         // but remains on candle.

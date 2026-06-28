@@ -149,314 +149,314 @@ public class TextFormatter
 
                 int x = 0, y = 0;
 
-            // Horizontal Alignment
-            if (Alignment is Alignment.End)
-            {
-                if (isVertical)
+                // Horizontal Alignment
+                if (Alignment is Alignment.End)
                 {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
-                    x = screen.Right - runesWidth;
-                    CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
-                }
-                else
-                {
-                    int runesWidth = strings.GetColumns ();
-                    x = screen.Right - runesWidth;
-                    CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
-                }
-            }
-            else if (Alignment is Alignment.Start)
-            {
-                if (isVertical)
-                {
-                    int runesWidth = line > 0
-                                         ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
-                                         : 0;
-                    x = screen.Left + runesWidth;
-                }
-                else
-                {
-                    x = screen.Left;
-                }
-
-                CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
-            }
-            else if (Alignment is Alignment.Fill)
-            {
-                if (isVertical)
-                {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
-                    int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
-                    int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
-                    int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
-                    var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
-
-                    x = line == 0
-                            ? screen.Left
-                            : line < linesFormatted.Count - 1
-                                ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
-                                : screen.Right - lastLineWidth;
-                }
-                else
-                {
-                    x = screen.Left;
-                }
-
-                CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
-            }
-            else if (Alignment is Alignment.Center)
-            {
-                if (isVertical)
-                {
-                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
-                    int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
-                    x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
-
-                    CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
-                }
-                else
-                {
-                    int runesWidth = strings.GetColumns ();
-                    x = screen.Left + (screen.Width - runesWidth) / 2;
-
-                    CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
-                }
-            }
-            else
-            {
-                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
-
-                return;
-            }
-
-            // Vertical Alignment
-            if (VerticalAlignment is Alignment.End)
-            {
-                if (isVertical)
-                {
-                    y = screen.Bottom - graphemeCount;
-                }
-                else
-                {
-                    y = screen.Bottom - linesFormatted.Count + line;
-                }
-            }
-            else if (VerticalAlignment is Alignment.Start)
-            {
-                if (isVertical)
-                {
-                    y = screen.Top;
-                }
-                else
-                {
-                    y = screen.Top + line;
-                }
-            }
-            else if (VerticalAlignment is Alignment.Fill)
-            {
-                if (isVertical)
-                {
-                    y = screen.Top;
-                }
-                else
-                {
-                    var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
-
-                    y = line == 0 ? screen.Top :
-                        line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
-                }
-            }
-            else if (VerticalAlignment is Alignment.Center)
-            {
-                if (isVertical)
-                {
-                    int s = (screen.Height - graphemeCount) / 2;
-                    y = screen.Top + s;
-                }
-                else
-                {
-                    int s = (screen.Height - linesFormatted.Count) / 2;
-                    y = screen.Top + line + s;
-                }
-            }
-            else
-            {
-                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
-
-                return;
-            }
-
-            int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
-            int start = isVertical ? screen.Top : screen.Left;
-            int size = isVertical ? screen.Height : screen.Width;
-            int current = start + colOffset;
-            List<Point?> lastZeroWidthPos = null!;
-            string text = string.Empty;
-            int zeroLengthCount = isVertical ? GraphemeHelper.GetGraphemes (strings).Sum (s => s.GetColumns (false) == 0 ? 1 : 0) : 0;
-
-            for (int idx = (isVertical ? start - y : start - x) + colOffset;
-                 current < start + size + zeroLengthCount;
-                 idx++)
-            {
-                string lastTextUsed = text;
-
-                if (lastZeroWidthPos is null)
-                {
-                    if (idx < 0
-                        || (isVertical
-                                ? VerticalAlignment != Alignment.End && current < 0
-                                : Alignment != Alignment.End && x + current + colOffset < 0))
+                    if (isVertical)
                     {
-                        current++;
-
-                        continue;
-                    }
-
-                    if (!FillRemaining && idx > graphemeCount - 1)
-                    {
-                        break;
-                    }
-
-                    if ((!isVertical
-                         && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
-                             || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width)))
-                        || (isVertical
-                            && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
-                                || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width))))
-                    {
-                        break;
-                    }
-                }
-
-                //if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - viewport.X + colOffset)
-                //	|| (isVertical && idx > maxBounds.Top + maxBounds.Height - viewport.Y))
-
-                //	break;
-
-                text = " ";
-
-                if (isVertical)
-                {
-                    if (idx >= 0 && idx < graphemeCount)
-                    {
-                        text = graphemes [idx];
-                    }
-
-                    if (lastZeroWidthPos is null)
-                    {
-                        driver?.Move (x, current);
+                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
+                        x = screen.Right - runesWidth;
+                        CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
                     }
                     else
                     {
-                        int foundIdx = lastZeroWidthPos.IndexOf (
-                                                                 p =>
-                                                                     p is { } && p.Value.Y == current
-                                                                );
+                        int runesWidth = strings.GetColumns ();
+                        x = screen.Right - runesWidth;
+                        CursorPosition = screen.Width - runesWidth + (_hotKeyPos > -1 ? _hotKeyPos : 0);
+                    }
+                }
+                else if (Alignment is Alignment.Start)
+                {
+                    if (isVertical)
+                    {
+                        int runesWidth = line > 0
+                                             ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
+                                             : 0;
+                        x = screen.Left + runesWidth;
+                    }
+                    else
+                    {
+                        x = screen.Left;
+                    }
 
-                        if (foundIdx > -1)
+                    CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
+                }
+                else if (Alignment is Alignment.Fill)
+                {
+                    if (isVertical)
+                    {
+                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                        int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
+                        int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
+                        int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
+                        var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
+
+                        x = line == 0
+                                ? screen.Left
+                                : line < linesFormatted.Count - 1
+                                    ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
+                                    : screen.Right - lastLineWidth;
+                    }
+                    else
+                    {
+                        x = screen.Left;
+                    }
+
+                    CursorPosition = _hotKeyPos > -1 ? _hotKeyPos : 0;
+                }
+                else if (Alignment is Alignment.Center)
+                {
+                    if (isVertical)
+                    {
+                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                        int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
+                        x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
+
+                        CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
+                    }
+                    else
+                    {
+                        int runesWidth = strings.GetColumns ();
+                        x = screen.Left + (screen.Width - runesWidth) / 2;
+
+                        CursorPosition = (screen.Width - runesWidth) / 2 + (_hotKeyPos > -1 ? _hotKeyPos : 0);
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+                    return;
+                }
+
+                // Vertical Alignment
+                if (VerticalAlignment is Alignment.End)
+                {
+                    if (isVertical)
+                    {
+                        y = screen.Bottom - graphemeCount;
+                    }
+                    else
+                    {
+                        y = screen.Bottom - linesFormatted.Count + line;
+                    }
+                }
+                else if (VerticalAlignment is Alignment.Start)
+                {
+                    if (isVertical)
+                    {
+                        y = screen.Top;
+                    }
+                    else
+                    {
+                        y = screen.Top + line;
+                    }
+                }
+                else if (VerticalAlignment is Alignment.Fill)
+                {
+                    if (isVertical)
+                    {
+                        y = screen.Top;
+                    }
+                    else
+                    {
+                        var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
+
+                        y = line == 0 ? screen.Top :
+                            line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
+                    }
+                }
+                else if (VerticalAlignment is Alignment.Center)
+                {
+                    if (isVertical)
+                    {
+                        int s = (screen.Height - graphemeCount) / 2;
+                        y = screen.Top + s;
+                    }
+                    else
+                    {
+                        int s = (screen.Height - linesFormatted.Count) / 2;
+                        y = screen.Top + line + s;
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+                    return;
+                }
+
+                int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
+                int start = isVertical ? screen.Top : screen.Left;
+                int size = isVertical ? screen.Height : screen.Width;
+                int current = start + colOffset;
+                List<Point?> lastZeroWidthPos = null!;
+                string text = string.Empty;
+                int zeroLengthCount = isVertical ? GraphemeHelper.GetGraphemes (strings).Sum (s => s.GetColumns (false) == 0 ? 1 : 0) : 0;
+
+                for (int idx = (isVertical ? start - y : start - x) + colOffset;
+                     current < start + size + zeroLengthCount;
+                     idx++)
+                {
+                    string lastTextUsed = text;
+
+                    if (lastZeroWidthPos is null)
+                    {
+                        if (idx < 0
+                            || (isVertical
+                                    ? VerticalAlignment != Alignment.End && current < 0
+                                    : Alignment != Alignment.End && x + current + colOffset < 0))
                         {
-                            if (Rune.GetRuneAt (text, 0).IsCombiningMark ())
-                            {
-                                lastZeroWidthPos [foundIdx] =
-                                    new Point (
-                                               lastZeroWidthPos [foundIdx]!.Value.X + 1,
-                                               current
-                                              );
+                            current++;
 
-                                driver?.Move (
-                                              lastZeroWidthPos [foundIdx]!.Value.X,
-                                              current
-                                             );
-                            }
-                            else if (!Rune.GetRuneAt (text, 0).IsCombiningMark () && Rune.GetRuneAt (lastTextUsed, 0).IsCombiningMark ())
+                            continue;
+                        }
+
+                        if (!FillRemaining && idx > graphemeCount - 1)
+                        {
+                            break;
+                        }
+
+                        if ((!isVertical
+                             && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
+                                 || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width)))
+                            || (isVertical
+                                && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
+                                    || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width))))
+                        {
+                            break;
+                        }
+                    }
+
+                    //if ((!isVertical && idx > maxBounds.Left + maxBounds.Width - viewport.X + colOffset)
+                    //	|| (isVertical && idx > maxBounds.Top + maxBounds.Height - viewport.Y))
+
+                    //	break;
+
+                    text = " ";
+
+                    if (isVertical)
+                    {
+                        if (idx >= 0 && idx < graphemeCount)
+                        {
+                            text = graphemes [idx];
+                        }
+
+                        if (lastZeroWidthPos is null)
+                        {
+                            driver?.Move (x, current);
+                        }
+                        else
+                        {
+                            int foundIdx = lastZeroWidthPos.IndexOf (
+                                                                     p =>
+                                                                         p is { } && p.Value.Y == current
+                                                                    );
+
+                            if (foundIdx > -1)
                             {
-                                current++;
-                                driver?.Move (x, current);
+                                if (Rune.GetRuneAt (text, 0).IsCombiningMark ())
+                                {
+                                    lastZeroWidthPos [foundIdx] =
+                                        new Point (
+                                                   lastZeroWidthPos [foundIdx]!.Value.X + 1,
+                                                   current
+                                                  );
+
+                                    driver?.Move (
+                                                  lastZeroWidthPos [foundIdx]!.Value.X,
+                                                  current
+                                                 );
+                                }
+                                else if (!Rune.GetRuneAt (text, 0).IsCombiningMark () && Rune.GetRuneAt (lastTextUsed, 0).IsCombiningMark ())
+                                {
+                                    current++;
+                                    driver?.Move (x, current);
+                                }
+                                else
+                                {
+                                    driver?.Move (x, current);
+                                }
                             }
                             else
                             {
                                 driver?.Move (x, current);
                             }
                         }
-                        else
+                    }
+                    else
+                    {
+                        driver?.Move (current, y);
+
+                        if (idx >= 0 && idx < graphemeCount)
                         {
-                            driver?.Move (x, current);
+                            text = graphemes [idx];
                         }
                     }
-                }
-                else
-                {
-                    driver?.Move (current, y);
 
-                    if (idx >= 0 && idx < graphemeCount)
+                    int textWidth = GetTextWidth (text, TabWidth);
+
+                    if (HotKeyPos > -1 && idx == HotKeyPos)
                     {
-                        text = graphemes [idx];
+                        if ((isVertical && VerticalAlignment == Alignment.Fill) || (!isVertical && Alignment == Alignment.Fill))
+                        {
+                            CursorPosition = idx - start;
+                        }
+
+                        driver?.SetAttribute (hotColor);
+                        driver?.AddStr (text);
+                        driver?.SetAttribute (normalColor);
                     }
-                }
-
-                int textWidth = GetTextWidth (text, TabWidth);
-
-                if (HotKeyPos > -1 && idx == HotKeyPos)
-                {
-                    if ((isVertical && VerticalAlignment == Alignment.Fill) || (!isVertical && Alignment == Alignment.Fill))
+                    else
                     {
-                        CursorPosition = idx - start;
+                        if (isVertical)
+                        {
+                            if (textWidth == 0)
+                            {
+                                if (lastZeroWidthPos is null)
+                                {
+                                    lastZeroWidthPos = new ();
+                                }
+
+                                int foundIdx = lastZeroWidthPos.IndexOf (
+                                                                         p =>
+                                                                             p is { } && p.Value.Y == current
+                                                                        );
+
+                                if (foundIdx == -1)
+                                {
+                                    current--;
+                                    lastZeroWidthPos.Add (new Point (x + 1, current));
+                                }
+
+                                driver?.Move (x + 1, current);
+                            }
+                        }
+
+                        driver?.AddStr (text);
                     }
 
-                    driver?.SetAttribute (hotColor);
-                    driver?.AddStr (text);
-                    driver?.SetAttribute (normalColor);
-                }
-                else
-                {
                     if (isVertical)
                     {
-                        if (textWidth == 0)
+                        if (textWidth > 0)
                         {
-                            if (lastZeroWidthPos is null)
-                            {
-                                lastZeroWidthPos = new ();
-                            }
-
-                            int foundIdx = lastZeroWidthPos.IndexOf (
-                                                                     p =>
-                                                                         p is { } && p.Value.Y == current
-                                                                    );
-
-                            if (foundIdx == -1)
-                            {
-                                current--;
-                                lastZeroWidthPos.Add (new Point (x + 1, current));
-                            }
-
-                            driver?.Move (x + 1, current);
+                            current++;
                         }
                     }
-
-                    driver?.AddStr (text);
-                }
-
-                if (isVertical)
-                {
-                    if (textWidth > 0)
+                    else
                     {
-                        current++;
+                        current += textWidth;
+                    }
+
+                    int nextTextWidth = idx + 1 > -1 && idx + 1 < graphemeCount
+                                            ? graphemes [idx + 1].GetColumns ()
+                                            : 0;
+
+                    if (!isVertical && idx + 1 < graphemeCount && current + nextTextWidth > start + size)
+                    {
+                        break;
                     }
                 }
-                else
-                {
-                    current += textWidth;
-                }
-
-                int nextTextWidth = idx + 1 > -1 && idx + 1 < graphemeCount
-                                        ? graphemes [idx + 1].GetColumns ()
-                                        : 0;
-
-                if (!isVertical && idx + 1 < graphemeCount && current + nextTextWidth > start + size)
-                {
-                    break;
-                }
-            }
             }
             finally
             {
@@ -912,7 +912,7 @@ public class TextFormatter
     /// <returns>A <see cref="Region"/> representing the areas where text would be drawn.</returns>
     public Region GetDrawRegion (Rectangle screen, Rectangle maximum = default)
     {
-        Region drawnRegion = new Region ();
+        Region drawnRegion = new();
 
         // With this check, we protect against subclasses with overrides of Text (like Button)
         if (string.IsNullOrEmpty (Text))
@@ -965,7 +965,7 @@ public class TextFormatter
             }
 
             string strings = linesFormatted [line];
-            
+
             // Use ArrayPool to avoid per-line allocations
             int estimatedCount = strings.Length + 10; // Add buffer for grapheme clusters
             string [] graphemes = ArrayPool<string>.Shared.Rent (estimatedCount);
@@ -990,195 +990,195 @@ public class TextFormatter
                 // When text is justified, we lost left or right, so we use the direction to align.
                 int x = 0, y = 0;
 
-            switch (Alignment)
-            {
-                // Horizontal Alignment
-                case Alignment.End when isVertical:
-                    {
-                        int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
-                        x = screen.Right - runesWidth;
-
-                        break;
-                    }
-                case Alignment.End:
-                    {
-                        int stringsWidth = strings.GetColumns ();
-                        x = screen.Right - stringsWidth;
-
-                        break;
-                    }
-                case Alignment.Start when isVertical:
-                    {
-                        int stringsWidth = line > 0
-                                               ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
-                                               : 0;
-                        x = screen.Left + stringsWidth;
-
-                        break;
-                    }
-                case Alignment.Start:
-                    x = screen.Left;
-
-                    break;
-                case Alignment.Fill when isVertical:
-                    {
-                        int stringsWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
-                        int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
-                        int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
-                        int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
-                        var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
-
-                        x = line == 0
-                                ? screen.Left
-                                : line < linesFormatted.Count - 1
-                                    ? screen.Width - stringsWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
-                                    : screen.Right - lastLineWidth;
-
-                        break;
-                    }
-                case Alignment.Fill:
-                    x = screen.Left;
-
-                    break;
-                case Alignment.Center when isVertical:
-                    {
-                        int stringsWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
-                        int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
-                        x = screen.Left + linesWidth + (screen.Width - stringsWidth) / 2;
-
-                        break;
-                    }
-                case Alignment.Center:
-                    {
-                        int stringsWidth = strings.GetColumns ();
-                        x = screen.Left + (screen.Width - stringsWidth) / 2;
-
-                        break;
-                    }
-                default:
-                    Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
-
-                    return drawnRegion;
-            }
-
-            switch (VerticalAlignment)
-            {
-                // Vertical Alignment
-                case Alignment.End when isVertical:
-                    y = screen.Bottom - graphemeCount;
-
-                    break;
-                case Alignment.End:
-                    y = screen.Bottom - linesFormatted.Count + line;
-
-                    break;
-                case Alignment.Start when isVertical:
-                    y = screen.Top;
-
-                    break;
-                case Alignment.Start:
-                    y = screen.Top + line;
-
-                    break;
-                case Alignment.Fill when isVertical:
-                    y = screen.Top;
-
-                    break;
-                case Alignment.Fill:
-                    {
-                        var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
-
-                        y = line == 0 ? screen.Top :
-                            line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
-
-                        break;
-                    }
-                case Alignment.Center when isVertical:
-                    {
-                        int s = (screen.Height - graphemeCount) / 2;
-                        y = screen.Top + s;
-
-                        break;
-                    }
-                case Alignment.Center:
-                    {
-                        int s = (screen.Height - linesFormatted.Count) / 2;
-                        y = screen.Top + line + s;
-
-                        break;
-                    }
-                default:
-                    Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
-
-                    return drawnRegion;
-            }
-
-            int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
-            int start = isVertical ? screen.Top : screen.Left;
-            int size = isVertical ? screen.Height : screen.Width;
-            int current = start + colOffset;
-            int zeroLengthCount = isVertical ? GraphemeHelper.GetGraphemes (strings).Sum (s => s.GetColumns (false) == 0 ? 1 : 0) : 0;
-
-            int lineX = x, lineY = y, lineWidth = 0, lineHeight = 1;
-
-            for (int idx = (isVertical ? start - y : start - x) + colOffset;
-                 current < start + size + zeroLengthCount;
-                 idx++)
-            {
-                if (idx < 0
-                    || (isVertical
-                            ? VerticalAlignment != Alignment.End && current < 0
-                            : Alignment != Alignment.End && x + current + colOffset < 0))
+                switch (Alignment)
                 {
-                    current++;
+                    // Horizontal Alignment
+                    case Alignment.End when isVertical:
+                        {
+                            int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
+                            x = screen.Right - runesWidth;
 
-                    continue;
+                            break;
+                        }
+                    case Alignment.End:
+                        {
+                            int stringsWidth = strings.GetColumns ();
+                            x = screen.Right - stringsWidth;
+
+                            break;
+                        }
+                    case Alignment.Start when isVertical:
+                        {
+                            int stringsWidth = line > 0
+                                                   ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
+                                                   : 0;
+                            x = screen.Left + stringsWidth;
+
+                            break;
+                        }
+                    case Alignment.Start:
+                        x = screen.Left;
+
+                        break;
+                    case Alignment.Fill when isVertical:
+                        {
+                            int stringsWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                            int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
+                            int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
+                            int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
+                            var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
+
+                            x = line == 0
+                                    ? screen.Left
+                                    : line < linesFormatted.Count - 1
+                                        ? screen.Width - stringsWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
+                                        : screen.Right - lastLineWidth;
+
+                            break;
+                        }
+                    case Alignment.Fill:
+                        x = screen.Left;
+
+                        break;
+                    case Alignment.Center when isVertical:
+                        {
+                            int stringsWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                            int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
+                            x = screen.Left + linesWidth + (screen.Width - stringsWidth) / 2;
+
+                            break;
+                        }
+                    case Alignment.Center:
+                        {
+                            int stringsWidth = strings.GetColumns ();
+                            x = screen.Left + (screen.Width - stringsWidth) / 2;
+
+                            break;
+                        }
+                    default:
+                        Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+                        return drawnRegion;
                 }
 
-                if (!FillRemaining && idx > graphemeCount - 1)
+                switch (VerticalAlignment)
                 {
-                    break;
+                    // Vertical Alignment
+                    case Alignment.End when isVertical:
+                        y = screen.Bottom - graphemeCount;
+
+                        break;
+                    case Alignment.End:
+                        y = screen.Bottom - linesFormatted.Count + line;
+
+                        break;
+                    case Alignment.Start when isVertical:
+                        y = screen.Top;
+
+                        break;
+                    case Alignment.Start:
+                        y = screen.Top + line;
+
+                        break;
+                    case Alignment.Fill when isVertical:
+                        y = screen.Top;
+
+                        break;
+                    case Alignment.Fill:
+                        {
+                            var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
+
+                            y = line == 0 ? screen.Top :
+                                line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
+
+                            break;
+                        }
+                    case Alignment.Center when isVertical:
+                        {
+                            int s = (screen.Height - graphemeCount) / 2;
+                            y = screen.Top + s;
+
+                            break;
+                        }
+                    case Alignment.Center:
+                        {
+                            int s = (screen.Height - linesFormatted.Count) / 2;
+                            y = screen.Top + line + s;
+
+                            break;
+                        }
+                    default:
+                        Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+                        return drawnRegion;
                 }
 
-                if ((!isVertical
-                     && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
-                         || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width)))
-                    || (isVertical
-                        && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
-                            || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width))))
-                {
-                    break;
-                }
+                int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
+                int start = isVertical ? screen.Top : screen.Left;
+                int size = isVertical ? screen.Height : screen.Width;
+                int current = start + colOffset;
+                int zeroLengthCount = isVertical ? GraphemeHelper.GetGraphemes (strings).Sum (s => s.GetColumns (false) == 0 ? 1 : 0) : 0;
 
-                string text = idx >= 0 && idx < graphemeCount ? graphemes [idx] : " ";
-                int textWidth = GetStringWidth (text, TabWidth);
+                int lineX = x, lineY = y, lineWidth = 0, lineHeight = 1;
 
-                if (isVertical)
+                for (int idx = (isVertical ? start - y : start - x) + colOffset;
+                     current < start + size + zeroLengthCount;
+                     idx++)
                 {
-                    if (textWidth > 0)
+                    if (idx < 0
+                        || (isVertical
+                                ? VerticalAlignment != Alignment.End && current < 0
+                                : Alignment != Alignment.End && x + current + colOffset < 0))
                     {
-                        // Update line height for vertical text (each rune is a column)
-                        lineHeight = Math.Max (lineHeight, current - y + 1);
-                        lineWidth = Math.Max (lineWidth, 1); // Width is 1 per rune in vertical
+                        current++;
+
+                        continue;
+                    }
+
+                    if (!FillRemaining && idx > graphemeCount - 1)
+                    {
+                        break;
+                    }
+
+                    if ((!isVertical
+                         && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
+                             || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width)))
+                        || (isVertical
+                            && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
+                                || (idx < graphemeCount && graphemes [idx].GetColumns () > screen.Width))))
+                    {
+                        break;
+                    }
+
+                    string text = idx >= 0 && idx < graphemeCount ? graphemes [idx] : " ";
+                    int textWidth = GetStringWidth (text, TabWidth);
+
+                    if (isVertical)
+                    {
+                        if (textWidth > 0)
+                        {
+                            // Update line height for vertical text (each rune is a column)
+                            lineHeight = Math.Max (lineHeight, current - y + 1);
+                            lineWidth = Math.Max (lineWidth, 1); // Width is 1 per rune in vertical
+                        }
+                    }
+                    else
+                    {
+                        // Update line width and position for horizontal text
+                        lineWidth += textWidth;
+                    }
+
+                    current += isVertical && textWidth > 0 ? 1 : textWidth;
+
+                    int nextStringWidth = idx + 1 > -1 && idx + 1 < graphemeCount
+                                            ? graphemes [idx + 1].GetColumns ()
+                                            : 0;
+
+                    if (!isVertical && idx + 1 < graphemeCount && current + nextStringWidth > start + size)
+                    {
+                        break;
                     }
                 }
-                else
-                {
-                    // Update line width and position for horizontal text
-                    lineWidth += textWidth;
-                }
-
-                current += isVertical && textWidth > 0 ? 1 : textWidth;
-
-                int nextStringWidth = idx + 1 > -1 && idx + 1 < graphemeCount
-                                        ? graphemes [idx + 1].GetColumns ()
-                                        : 0;
-
-                if (!isVertical && idx + 1 < graphemeCount && current + nextStringWidth > start + size)
-                {
-                    break;
-                }
-            }
 
                 // Add the line's drawn region to the overall region
                 if (lineWidth > 0 && lineHeight > 0)

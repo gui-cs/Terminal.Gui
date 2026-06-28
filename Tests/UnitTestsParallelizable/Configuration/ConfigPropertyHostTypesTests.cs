@@ -41,7 +41,7 @@ public class ConfigPropertyHostTypesTests
     ///     Guard-rail test: the hard-coded list in <see cref="ConfigPropertyHostTypes"/> must exhaustively cover every type in
     ///     the Terminal.Gui assembly that declares a <see cref="ConfigurationPropertyAttribute"/> property. Drift between
     ///     the list and the attribute usage would silently reintroduce the trim/AOT failure fixed by
-    ///     <see href="https://github.com/gui-cs/Terminal.Gui/issues/5069"/>.
+    ///     <see href="https://github.com/tui-cs/Terminal.Gui/issues/5069"/>.
     /// </summary>
     [Fact]
     public void ConfigPropertyHostTypes_GetTypes_Matches_Reflected_Hosts_In_TerminalGui_Assembly ()

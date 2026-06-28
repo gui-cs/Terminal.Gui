@@ -81,7 +81,7 @@ ConfigurationManager.Apply();
 ```
 
 To customize syntax highlighting colors, override the `Code*` visual roles on a scheme. See
-`Examples/Themes/code-dark.config.json` for a minimal Dark theme override.
+[tui-cs/Examples](https://github.com/tui-cs/Examples) for theme configuration examples.
 
 ---
 
@@ -858,13 +858,13 @@ Available styles (combinable):
 
 All configuration files must conform to the JSON schema:
 
-**Schema URL:** https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
+**Schema URL:** https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
 
 ### Root Structure
 
 ```json
 {
-  "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+  "$schema": "https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
   
   // SettingsScope properties
   "Application.DefaultKeyBindings.Quit": "Esc",
@@ -1133,8 +1133,8 @@ ConfigurationManager.Enable(ConfigLocations.Runtime);
 - **[Scheme Deep Dive](scheme.md)** - Color scheme details
 - **[Drawing Deep Dive](drawing.md)** - Color and attribute system
 - **[View Deep Dive](View.md)** - View configuration properties
-- **[Theme Schema](https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json)** - JSON schema for validation
-- **[Default Config](https://raw.githubusercontent.com/gui-cs/Terminal.Gui/develop/Terminal.Gui/Resources/config.json)** - Complete default configuration
+- **[Theme Schema](https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json)** - JSON schema for validation
+- **[Default Config](https://raw.githubusercontent.com/tui-cs/Terminal.Gui/develop/Terminal.Gui/Resources/config.json)** - Complete default configuration
 
 ### UICatalog Examples
 

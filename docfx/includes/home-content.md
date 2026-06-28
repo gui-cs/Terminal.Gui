@@ -20,11 +20,11 @@ Terminal.Gui enables building sophisticated console applications with modern UIs
 - **Cross-Platform** - Consistent experience on Windows, macOS, and Linux.
 - **Apps Work In-line or Full Screen** - Build CLI tools like Claude Code/Copilot/Codex CLI that scroll with the terminal (in-line) or full screen.
 
-See the [Views Overview](https://gui-cs.github.io/Terminal.Gui/docs/views) for available controls and [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2) for architectural improvements.
+See the [Views Overview](https://tui-cs.github.io/Terminal.Gui/docs/views) for available controls and [What's New in v2](https://tui-cs.github.io/Terminal.Gui/docs/newinv2) for architectural improvements.
 
 ## Quick Start
 
-Install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new TUI app, and run it:
+Install the [Terminal.Gui.Templates](https://github.com/tui-cs/Terminal.Gui.templates), create a new TUI app, and run it:
 
 ```powershell
 dotnet new install Terminal.Gui.Templates
@@ -55,25 +55,25 @@ window.Add (label);
 app.Run (window);
 ```
 
-See the [Examples](https://github.com/gui-cs/Terminal.Gui/tree/develop/Examples) directory for more.
+See the [Examples](https://github.com/tui-cs/Terminal.Gui/tree/develop/Examples) directory for more.
 
 # Documentation 
 
-Comprehensive documentation is at [gui-cs.github.io/Terminal.Gui](https://gui-cs.github.io/Terminal.Gui).
+Comprehensive documentation is at [tui-cs.github.io/Terminal.Gui](https://tui-cs.github.io/Terminal.Gui).
 
 ## Getting Started
 
-- **[Getting Started Guide](https://gui-cs.github.io/Terminal.Gui/docs/getting-started)** - First Terminal.Gui application
-- **[API Reference](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.App.html)** - Complete API documentation
-- **[What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2)** - New features and improvements
+- **[Getting Started Guide](https://tui-cs.github.io/Terminal.Gui/docs/getting-started)** - First Terminal.Gui application
+- **[API Reference](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.App.html)** - Complete API documentation
+- **[What's New in v2](https://tui-cs.github.io/Terminal.Gui/docs/newinv2)** - New features and improvements
 
 ## Migration & Deep Dives
 
-- **[Migrating from v1 to v2](https://gui-cs.github.io/Terminal.Gui/docs/migratingfromv1)** - Complete migration guide
-- **[Application Architecture](https://gui-cs.github.io/Terminal.Gui/docs/application)** - Instance-based model and IRunnable pattern
-- **[Layout System](https://gui-cs.github.io/Terminal.Gui/docs/layout)** - Positioning, sizing, and adornments
-- **[Keyboard Handling](https://gui-cs.github.io/Terminal.Gui/docs/keyboard)** - Key bindings and commands
-- **[View Documentation](https://gui-cs.github.io/Terminal.Gui/docs/View)** - View hierarchy and lifecycle
-- **[Configuration](https://gui-cs.github.io/Terminal.Gui/docs/config)** - Themes and persistent settings
+- **[Migrating from v1 to v2](https://tui-cs.github.io/Terminal.Gui/docs/migratingfromv1)** - Complete migration guide
+- **[Application Architecture](https://tui-cs.github.io/Terminal.Gui/docs/application)** - Instance-based model and IRunnable pattern
+- **[Layout System](https://tui-cs.github.io/Terminal.Gui/docs/layout)** - Positioning, sizing, and adornments
+- **[Keyboard Handling](https://tui-cs.github.io/Terminal.Gui/docs/keyboard)** - Key bindings and commands
+- **[View Documentation](https://tui-cs.github.io/Terminal.Gui/docs/View)** - View hierarchy and lifecycle
+- **[Configuration](https://tui-cs.github.io/Terminal.Gui/docs/config)** - Themes and persistent settings
 
-See the [documentation index](https://gui-cs.github.io/Terminal.Gui/docs/index) for all topics.
+See the [documentation index](https://tui-cs.github.io/Terminal.Gui/docs/index) for all topics.

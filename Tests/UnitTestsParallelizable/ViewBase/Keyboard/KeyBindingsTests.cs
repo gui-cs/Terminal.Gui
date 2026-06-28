@@ -218,6 +218,56 @@ public class KeyBindingsTests
         Assert.True (hotKeyFired);
     }
 
+    // Copilot - Opus 4.6
+    /// <summary>
+    ///     A view with Visible = false should not have its HotKey invoked via InvokeCommandsBoundToHotKey.
+    /// </summary>
+    [Fact]
+    public void HotKey_Visible_False_Does_Not_Invoke ()
+    {
+        IApplication app = Application.Create ();
+        app.Begin (new Runnable<bool> ());
+
+        ScopedKeyBindingView view = new ();
+        app!.TopRunnableView!.Add (view);
+
+        // Sanity check: hotkey works when visible
+        app.Keyboard.RaiseKeyDownEvent (Key.H);
+        Assert.True (view.HotKeyCommandInvoked);
+
+        // Now hide the view and try again
+        view.HotKeyCommandInvoked = false;
+        view.Visible = false;
+        app.Keyboard.RaiseKeyDownEvent (Key.H);
+        Assert.False (view.HotKeyCommandInvoked);
+    }
+
+    // Copilot - Opus 4.6
+    /// <summary>
+    ///     A SubView of an invisible SuperView should not have its HotKey invoked.
+    /// </summary>
+    [Fact]
+    public void HotKey_Invisible_SuperView_SubView_Does_Not_Invoke ()
+    {
+        IApplication app = Application.Create ();
+        app.Begin (new Runnable<bool> ());
+
+        View container = new () { Id = "container" };
+        ScopedKeyBindingView subView = new ();
+        container.Add (subView);
+        app!.TopRunnableView!.Add (container);
+
+        // Sanity check: hotkey works when container is visible
+        app.Keyboard.RaiseKeyDownEvent (Key.H);
+        Assert.True (subView.HotKeyCommandInvoked);
+
+        // Hide the container and try again
+        subView.HotKeyCommandInvoked = false;
+        container.Visible = false;
+        app.Keyboard.RaiseKeyDownEvent (Key.H);
+        Assert.False (subView.HotKeyCommandInvoked);
+    }
+
     // tests that test KeyBindingScope.Focus and KeyBindingScope.HotKey (tests for KeyBindingScope.Application are in Application/KeyboardTests.cs)
 
     public class ScopedKeyBindingView : View

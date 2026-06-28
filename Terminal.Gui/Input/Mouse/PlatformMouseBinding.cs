@@ -67,12 +67,12 @@ public record PlatformMouseBinding
         }
 
         MouseFlags []? platformFlags = PlatformDetection.GetCurrentPlatform () switch
-                                     {
-                                         TuiPlatform.Windows => Windows,
-                                         TuiPlatform.Linux => Linux,
-                                         TuiPlatform.Macos => Macos,
-                                         _ => null
-                                     };
+        {
+            TuiPlatform.Windows => Windows,
+            TuiPlatform.Linux => Linux,
+            TuiPlatform.Macos => Macos,
+            _ => null
+        };
 
         if (platformFlags is null)
         {

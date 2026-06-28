@@ -1,5 +1,5 @@
 #nullable disable
-﻿
+
 namespace Terminal.Gui.Views;
 
 /// <summary>

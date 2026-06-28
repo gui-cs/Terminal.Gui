@@ -3,21 +3,25 @@ name: Build and publish v2 API docs
 on:
   push:
     branches: [develop]
+  workflow_dispatch:
+    inputs:
+      regenerate-views:
+        description: Regenerate views.md and view GIF assets
+        type: boolean
+        default: true
 
 permissions:
+  contents: write
   id-token: write 
   pages: write
 
 jobs:
-  deploy:
-    name: Build and Deploy v2 API docs to github-pages ${{ github.ref_name }}
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
+    name: Build v2 API docs ${{ github.ref_name }}
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
@@ -26,6 +30,31 @@ jobs:
       with:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
+
+    - name: Detect view docs changes
+      id: view-docs
+      shell: pwsh
+      run: |
+        $shouldGenerate = $false
+
+        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+          $shouldGenerate = "${{ inputs.regenerate-views }}" -eq "true"
+        } else {
+          $before = "${{ github.event.before }}"
+
+          if ($before -match "^0+$") {
+            $before = "HEAD~1"
+          }
+
+          $changedFiles = git diff --name-only $before "${{ github.sha }}"
+          $shouldGenerate = [bool]($changedFiles | Where-Object {
+            $_ -match "^Terminal\.Gui/Views/" -or
+            $_ -match "^docfx/scripts/OutputView/" -or
+            $_ -match "^docfx/scripts/generate-views-doc\.ps1$"
+          } | Select-Object -First 1)
+        }
+
+        "should_generate=$($shouldGenerate.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
 
     - name: Restore dependencies
       run: dotnet restore
@@ -36,23 +65,79 @@ jobs:
     - name: Build EditorRef (for Terminal.Gui.Editor docs)
       run: dotnet build docfx/EditorRef/EditorRef.csproj --configuration Release
 
+    - name: Install DocFX
+      run: |
+        dotnet tool install -g docfx
+
+    - name: Setup Go
+      if: steps.view-docs.outputs.should_generate == 'true'
+      uses: actions/setup-go@v6
+      with:
+        go-version: stable
+
+    - name: Install views docs tools
+      if: steps.view-docs.outputs.should_generate == 'true'
+      run: |
+        # Pin to @main: tuirec's released tags (≤ v0.9.0) still declare the old
+        # module path github.com/gui-cs/tuirec, so go install ...@latest would
+        # fail the import-path check. main already declares github.com/tui-cs/tuirec.
+        go install github.com/tui-cs/tuirec/cmd/tuirec@main
+        Add-Content $env:GITHUB_PATH "$(go env GOPATH)\bin"
+        Install-Module powershell-yaml -Scope CurrentUser -Force
+
+    - name: Generate API metadata
+      working-directory: docfx
+      run: |
+        $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
+        docfx metadata
+
+    - name: Generate views docs
+      if: steps.view-docs.outputs.should_generate == 'true'
+      working-directory: docfx
+      run: |
+        ./scripts/generate-views-doc.ps1
+
     - name: DocFX Build
       working-directory: docfx
       run: |
-        dotnet tool install -g docfx
-        $env:DOCFX_SOURCE_BRANCH_NAME="${{ github.ref_name }}"
-        docfx metadata
         docfx build
       continue-on-error: false
 
+    - name: Commit regenerated views assets
+      if: github.event_name == 'workflow_dispatch' && steps.view-docs.outputs.should_generate == 'true'
+      shell: pwsh
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add docfx/docs/views.md docfx/images/views
+
+        if (git diff --cached --quiet) {
+          Write-Host "No regenerated view assets to commit."
+          exit 0
+        }
+
+        git commit -m "Regenerate docfx view GIF assets via CI"
+        git push
+
     - name: Setup Pages
+      if: github.event_name == 'push' && github.ref_name == 'develop'
       uses: actions/configure-pages@v6
-      
+       
     - name: Upload artifact
+      if: github.event_name == 'push' && github.ref_name == 'develop'
       uses: actions/upload-pages-artifact@v5
       with:
         path: docfx/_site
-       
+
+  deploy:
+    name: Deploy v2 API docs to github-pages ${{ github.ref_name }}
+    if: github.event_name == 'push' && github.ref_name == 'develop'
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: windows-latest
+    steps:
     - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v5

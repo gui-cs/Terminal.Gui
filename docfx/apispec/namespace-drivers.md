@@ -13,6 +13,7 @@ The `Drivers` namespace provides the platform abstraction layer enabling Termina
 - **AnsiKeyboardParser** / **AnsiMouseParser** - Keyboard and mouse input parsing
 - **EscSeqUtils** - ANSI escape sequence constants and utilities
 - **Cursor** / **CursorStyle** - Terminal cursor management
+- **IOutput** / **IOutputBuffer** - Output surfaces, including raster image dispatch
 
 ## Available Drivers
 
@@ -36,6 +37,10 @@ app.Init (DriverRegistry.Names.ANSI);
 app.ForceDriver = DriverRegistry.Names.UNIX;
 app.Init ();
 ```
+
+## Raster Graphics Capabilities
+
+Drivers expose raster protocol detection through `IDriver.KittyGraphicsSupport` and `IDriver.SixelSupport`, plus matching change events. Kitty graphics is the preferred raster protocol when supported. Sixel remains the fallback for terminals that do not support Kitty graphics. `IOutput.UseKittyGraphics` selects the Kitty output path; when it is false and Sixel is supported, raster commands are emitted as Sixel.
 
 ## See Also
 

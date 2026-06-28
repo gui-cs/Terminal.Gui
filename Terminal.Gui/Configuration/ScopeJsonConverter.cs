@@ -18,7 +18,7 @@ namespace Terminal.Gui.Configuration;
 internal class ScopeJsonConverter<
     [DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
                                  | DynamicallyAccessedMemberTypes.PublicProperties)]
-    TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
+TScopeT> : JsonConverter<TScopeT> where TScopeT : Scope<TScopeT>
 {
     [UnconditionalSuppressMessage ("AOT",
                                    "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
@@ -91,11 +91,7 @@ internal class ScopeJsonConverter<
                         continue;
                     }
 
-                    throw new JsonException ($"{
-                        propertyName
-                    }: Unsupported configuration converter type \"{
-                        converterType.FullName
-                    }\" when dynamic code is unavailable.");
+                    throw new JsonException ($"{propertyName}: Unsupported configuration converter type \"{converterType.FullName}\" when dynamic code is unavailable.");
                 }
                 scope! [propertyName].PropertyValue = DeserializePropertyValue (ref reader, propertyType!, options);
 

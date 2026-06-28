@@ -2,7 +2,7 @@
 
 This document provides a comprehensive guide for migrating applications from Terminal.Gui v1 to v2. 
 
-For detailed breaking change documentation, check out this Discussion: https://github.com/gui-cs/Terminal.Gui/discussions/2448
+For detailed breaking change documentation, check out this Discussion: https://github.com/tui-cs/Terminal.Gui/discussions/2448
 
 ## Table of Contents
 
@@ -404,7 +404,7 @@ myView.AddRune(col, row, new Rune('▄'));
 var width = rune.GetColumns();
 ```
 
-See [Unicode](https://gui-cs.github.io/Terminal.GuiV2Docs/docs/overview.html#unicode) for details.
+See [Unicode](https://tui-cs.github.io/Terminal.Gui/docs/overview#unicode) for details.
 
 ---
 

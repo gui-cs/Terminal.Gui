@@ -3,7 +3,7 @@
 namespace DriverTests.Output;
 
 /// <summary>
-///     Tests for https://github.com/gui-cs/Terminal.Gui/issues/4466.
+///     Tests for https://github.com/tui-cs/Terminal.Gui/issues/4466.
 ///     These tests validate that FillRect properly handles wide characters when overlapping existing content.
 ///     Specifically, they ensure that wide characters are properly invalidated and replaced when a MessageBox border or
 ///     similar UI element is drawn over them, preventing visual corruption.
@@ -109,7 +109,7 @@ public class OutputBufferWideCharTests
 
     /// <summary>
     ///     Tests the ChineseUI scenario: Drawing a MessageBox with borders over Chinese button text.
-    ///     This simulates the specific repro case from the issue. See: https://github.com/gui-cs/Terminal.Gui/issues/4466
+    ///     This simulates the specific repro case from the issue. See: https://github.com/tui-cs/Terminal.Gui/issues/4466
     /// </summary>
     [Fact]
     [Trait ("Category", "Output")]
@@ -530,7 +530,7 @@ public class OutputBufferWideCharTests
 
         // The second column should NOT be marked dirty by WriteWideGrapheme
         // The wide glyph naturally renders across both columns without modifying column N+1
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
+        // See: https://github.com/tui-cs/Terminal.Gui/issues/4258
         Assert.False (
                       buffer.Contents [1, 5].IsDirty,
                       "Adjacent cell should NOT be marked dirty when writing wide char (see #4258)");

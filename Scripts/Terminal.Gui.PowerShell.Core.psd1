@@ -104,10 +104,10 @@ PrivateData = @{
         # Tags = @()
 
         # A URL to the license for this module.
-        LicenseUri = 'https://github.com/gui-cs/Terminal.Gui/tree/develop/Scripts/COPYRIGHT'
+        LicenseUri = 'https://github.com/tui-cs/Terminal.Gui/tree/develop/Scripts/COPYRIGHT'
 
         # A URL to the main website for this project.
-        ProjectUri = 'https://github.com/gui-cs/Terminal.Gui'
+        ProjectUri = 'https://github.com/tui-cs/Terminal.Gui'
 
         # A URL to an icon representing this module.
         # IconUri = ''

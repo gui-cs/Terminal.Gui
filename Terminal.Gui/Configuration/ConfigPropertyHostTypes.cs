@@ -15,7 +15,7 @@ namespace Terminal.Gui.Configuration;
 ///         assembly at module-init time. That scan was not trim-safe: with <c>PublishTrimmed=true</c>, types
 ///         not otherwise referenced by the consuming application were stripped and
 ///         <c>Scope&lt;T&gt;.GetUninitializedProperty</c> would throw at startup.
-///         See <see href="https://github.com/gui-cs/Terminal.Gui/issues/5069"/>.
+///         See <see href="https://github.com/tui-cs/Terminal.Gui/issues/5069"/>.
 ///     </para>
 ///     <para>
 ///         The per-type <see cref="DynamicDependencyAttribute"/> entries on <see cref="GetTypes"/> root

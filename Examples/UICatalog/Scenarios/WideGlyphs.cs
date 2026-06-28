@@ -129,7 +129,7 @@ public sealed class WideGlyphs : Scenario
             BorderStyle = LineStyle.Dashed,
             SchemeName = "error"
         };
-        arrangeableViewAtOdd.Accepting += (sender, _) => { MessageBox.Query ((sender as View)?.App!, "Button Pressed", "You Pressed it!"); };
+        arrangeableViewAtOdd.Accepted += (sender, _) => { MessageBox.Query ((sender as View)?.App!, "Button Pressed", "You Pressed it!"); };
         appWindow.Add (arrangeableViewAtOdd);
 
         View superView = new ()

@@ -55,11 +55,7 @@ public class KittyKeyboardProtocolDetector
                     {
                         Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector),
                                          "Enable",
-                                         $"Post-enable detect did not update flags. IsSupported={
-                                             result.IsSupported
-                                         }, HasCapabilities={
-                                             _driver?.KittyKeyboardCapabilities is { }
-                                         }");
+                                         $"Post-enable detect did not update flags. IsSupported={result.IsSupported}, HasCapabilities={_driver?.KittyKeyboardCapabilities is { }}");
 
                         return;
                     }

@@ -309,14 +309,14 @@ public static class ConsoleKeyMapping
 
             // Special keys don't have printable characters
             char specialChar = specialKey switch
-                               {
-                                   ConsoleKey.Enter => '\r',
-                                   ConsoleKey.Tab => '\t',
-                                   ConsoleKey.Escape => '\u001B',
-                                   ConsoleKey.Backspace => '\b',
-                                   ConsoleKey.Spacebar => ' ',
-                                   _ => '\0' // Function keys, arrows, etc. have no character
-                               };
+            {
+                ConsoleKey.Enter => '\r',
+                ConsoleKey.Tab => '\t',
+                ConsoleKey.Escape => '\u001B',
+                ConsoleKey.Backspace => '\b',
+                ConsoleKey.Spacebar => ' ',
+                _ => '\0' // Function keys, arrows, etc. have no character
+            };
 
             return (specialKey, specialChar);
         }
@@ -360,16 +360,16 @@ public static class ConsoleKeyMapping
         if (Enum.IsDefined (typeof (ConsoleKey), (int)keyValue))
         {
             char standardChar = standardKey switch
-                                {
-                                    ConsoleKey.Enter => '\r',
-                                    ConsoleKey.Tab => '\t',
-                                    ConsoleKey.Escape => '\u001B',
-                                    ConsoleKey.Backspace => '\b',
-                                    ConsoleKey.Spacebar => ' ',
-                                    ConsoleKey.Clear => '\0',
-                                    _ when keyValue <= 0x1F => '\0', // Control characters
-                                    _ => (char)keyValue
-                                };
+            {
+                ConsoleKey.Enter => '\r',
+                ConsoleKey.Tab => '\t',
+                ConsoleKey.Escape => '\u001B',
+                ConsoleKey.Backspace => '\b',
+                ConsoleKey.Spacebar => ' ',
+                ConsoleKey.Clear => '\0',
+                _ when keyValue <= 0x1F => '\0', // Control characters
+                _ => (char)keyValue
+            };
 
             return (standardKey, standardChar);
         }

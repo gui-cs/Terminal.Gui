@@ -11,7 +11,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 /// <img src="../images/views/ScrollBar.gif" alt="ScrollBar demo"/>
 ///     <para>
-///         See the <see href="https://gui-cs.github.io/Terminal.Gui/docs/scrolling.html">Scrolling Deep Dive</see>.
+///         See the <see href="https://tui-cs.github.io/Terminal.Gui/docs/scrolling.html">Scrolling Deep Dive</see>.
 ///     </para>
 ///     <para>
 ///         By default, the built-in View scrollbars (<see cref="View.VerticalScrollBar"/>/
@@ -634,22 +634,25 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
                                   if (args.Value == Orientation.Vertical)
                                   {
                                       Width = 1;
-                                      Height = Dim.Fill ();
+                                      Height = 10;
                                   }
                                   else
                                   {
-                                      Width = Dim.Fill ();
+                                      Width = 30;
                                       Height = 1;
                                   }
                               };
 
-        Width = 1;
-        Height = Dim.Fill ();
+        Orientation = Orientation.Horizontal;
+        Width = 30;
+        Height = 1;
+        VisibleContentSize = 10;
         ScrollableContentSize = 250;
+        Value = 80;
 
         return true;
     }
 
     /// <inheritdoc/>
-    public string? GetDemoKeyStrokes () => "wait:500,CursorDown,wait:300,CursorDown,wait:300,CursorDown,wait:300,CursorDown,wait:800";
+    public string? GetDemoKeyStrokes () => "wait:2000";
 }

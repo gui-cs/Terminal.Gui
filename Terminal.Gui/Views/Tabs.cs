@@ -54,9 +54,15 @@ public class Tabs : View, IValue<View?>, IDesignable
         KeyBindings.Add (Key.CursorRight, Command.Right);
 
         CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
+
+        _tabCacheReadOnly = _tabCache.AsReadOnly ();
     }
 
     private readonly List<WeakReference<View>> _tabList = [];
+    private readonly List<View> _tabCache = [];
+    private readonly Dictionary<View, int> _tabIndexCache = new (ReferenceEqualityComparer.Instance);
+    private readonly ReadOnlyCollection<View> _tabCacheReadOnly;
+    private bool _tabCacheDirty = true;
 
     /// <summary>
     ///     Gets the logical index of the specified view within this <see cref="Tabs"/> container.
@@ -65,26 +71,14 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <returns>The zero-based index, or -1 if the view is not a tab in this container.</returns>
     public int IndexOf (View view)
     {
-        var i = 0;
-
-        foreach (WeakReference<View> wr in _tabList)
-        {
-            if (wr.TryGetTarget (out View? target) && target == view)
-            {
-                return i;
-            }
-
-            i++;
-        }
-
-        return -1;
+        return GetTabIndexCache ().TryGetValue (view, out int index) ? index : -1;
     }
 
     /// <summary>
     ///     Gets the tabs in logical order. This may differ from <see cref="View.SubViews"/> order because
     ///     the focused tab is moved to the end of the draw list to render on top.
     /// </summary>
-    public IEnumerable<View> TabCollection => ResolveTabCollection ();
+    public IEnumerable<View> TabCollection => EnumerateTabs ();
 
     /// <summary>
     ///     Gets or sets the depth of the tab header in rows (for <see cref="Side.Top"/>/<see cref="Side.Bottom"/>)
@@ -149,7 +143,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             _tabLineStyle = value;
 
-            foreach (View tab in TabCollection)
+            foreach (View tab in GetTabs ())
             {
                 tab.BorderStyle = _tabLineStyle;
             }
@@ -189,18 +183,71 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
     }
 
-    /// <summary>
-    ///     Resolves the tabs from the internal weak reference list, preserving logical order.
-    /// </summary>
-    private IEnumerable<View> ResolveTabCollection ()
+    private IReadOnlyDictionary<View, int> GetTabIndexCache ()
     {
-        foreach (WeakReference<View> wr in _tabList)
+        RebuildTabCacheIfNeeded ();
+
+        return _tabIndexCache;
+    }
+
+    private IEnumerable<View> EnumerateTabs ()
+    {
+        foreach (View tab in GetTabs ())
         {
-            if (wr.TryGetTarget (out View? view))
-            {
-                yield return view;
-            }
+            yield return tab;
         }
+    }
+
+    private IReadOnlyList<View> GetTabs ()
+    {
+        RebuildTabCacheIfNeeded ();
+
+        return _tabCacheReadOnly;
+    }
+
+    private void InvalidateTabCache ()
+    {
+        _tabCacheDirty = true;
+    }
+
+    private void RebuildTabCacheIfNeeded ()
+    {
+        if (!_tabCacheDirty)
+        {
+            return;
+        }
+
+        _tabCache.Clear ();
+        _tabIndexCache.Clear ();
+
+        int writeIndex = 0;
+
+        for (int readIndex = 0; readIndex < _tabList.Count; readIndex++)
+        {
+            WeakReference<View> weakReference = _tabList [readIndex];
+
+            if (!weakReference.TryGetTarget (out View? view))
+            {
+                continue;
+            }
+
+            _tabList [writeIndex] = weakReference;
+            writeIndex++;
+
+            if (!_tabIndexCache.ContainsKey (view))
+            {
+                _tabIndexCache.Add (view, _tabCache.Count);
+            }
+
+            _tabCache.Add (view);
+        }
+
+        if (writeIndex < _tabList.Count)
+        {
+            _tabList.RemoveRange (writeIndex, _tabList.Count - writeIndex);
+        }
+
+        _tabCacheDirty = false;
     }
 
     #region IValue<View?> Implementation
@@ -295,7 +342,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         // Find which tab view now has focus (using logical order)
-        View? focusedTab = TabCollection.FirstOrDefault (t => t.HasFocus);
+        View? focusedTab = GetTabs ().FirstOrDefault (t => t.HasFocus);
 
         if (focusedTab is { })
         {
@@ -315,12 +362,13 @@ public class Tabs : View, IValue<View?>, IDesignable
     public override IReadOnlyCollection<View> GetSubViews (bool includeMargin = false, bool includeBorder = false, bool includePadding = false)
     {
         List<View> subViewsOfThisTabs = new (base.GetSubViews (includeMargin, includeBorder, includePadding));
+        IReadOnlyDictionary<View, int> tabIndex = GetTabIndexCache ();
 
-        // Reorder according to TabsCollection
+        // Reorder according to TabCollection.
         subViewsOfThisTabs.Sort ((v1, v2) =>
                                  {
-                                     int index1 = TabCollection.TakeWhile (t => t != v1).Count ();
-                                     int index2 = TabCollection.TakeWhile (t => t != v2).Count ();
+                                     int index1 = tabIndex.TryGetValue (v1, out int v1Index) ? v1Index : tabIndex.Count;
+                                     int index2 = tabIndex.TryGetValue (v2, out int v2Index) ? v2Index : tabIndex.Count;
 
                                      return index1.CompareTo (index2);
                                  });
@@ -352,6 +400,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         // Add to internal tracking list
         _tabList.Add (new WeakReference<View> (args.Value));
+        InvalidateTabCache ();
 
         // Ensure CanFocus is false; otherwise Add will try to set focus on it, which can interfere
         // with the expected flow of focus being set to the first tab added, and then not changing on subsequent adds
@@ -422,12 +471,13 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         // Remove the view (and any dead refs) from the tracking list
         _tabList.RemoveAll (wr => !wr.TryGetTarget (out View? target) || target == view);
+        InvalidateTabCache ();
 
         // If the removed view was the selected one, select the first tab
         if (Value == view)
         {
             _value = null;
-            View? firstTab = TabCollection.FirstOrDefault ();
+            View? firstTab = GetTabs ().FirstOrDefault ();
 
             if (firstTab is { })
             {
@@ -456,6 +506,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         WeakReference<View> lastRef = _tabList [^1];
         _tabList.RemoveAt (_tabList.Count - 1);
         _tabList.Insert (Math.Clamp (index, 0, _tabList.Count), lastRef);
+        InvalidateTabCache ();
 
         UpdateTabOffsets ();
         UpdateZOrder ();
@@ -476,32 +527,45 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// </remarks>
     private void UpdateZOrder ()
     {
-        View? focusedTab = TabCollection.FirstOrDefault (t => t.HasFocus);
+        IReadOnlyList<View> tabs = GetTabs ();
+        int focusedIndex = -1;
 
-        if (focusedTab is { })
+        for (int i = 0; i < tabs.Count; i++)
         {
-            // Tabs before the focused tab are drawn in the order they were added (first added at back)
-            foreach (View tab in TabCollection.TakeWhile (t => t != focusedTab))
+            if (!tabs [i].HasFocus)
             {
-                MoveSubViewToEnd (tab);
+                continue;
             }
 
-            // Focused tab is drawn on top of all others
-            MoveSubViewToEnd (focusedTab);
+            focusedIndex = i;
 
-            // Tabs after the focused tab are drawn in reverse order they were added (last added at back)
-            foreach (View tab in TabCollection.SkipWhile (t => t != focusedTab).Skip (1))
-            {
-                MoveSubViewToStart (tab);
-            }
+            break;
         }
-        else
+
+        if (focusedIndex >= 0)
         {
-            // No focused tab - draw in reverse logical order (first tab at front)
-            foreach (View tab in TabCollection.Reverse ())
+            // Tabs before the focused tab are drawn in the order they were added (first added at back).
+            for (int i = 0; i < focusedIndex; i++)
             {
-                MoveSubViewToStart (tab);
+                MoveSubViewToEnd (tabs [i]);
             }
+
+            // Focused tab is drawn on top of all others.
+            MoveSubViewToEnd (tabs [focusedIndex]);
+
+            // Tabs after the focused tab are drawn in reverse order they were added (last added at back).
+            for (int i = focusedIndex + 1; i < tabs.Count; i++)
+            {
+                MoveSubViewToStart (tabs [i]);
+            }
+
+            return;
+        }
+
+        // No focused tab - draw in reverse logical order (first tab at front).
+        for (int i = tabs.Count - 1; i >= 0; i--)
+        {
+            MoveSubViewToStart (tabs [i]);
         }
     }
 
@@ -511,9 +575,9 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// </summary>
     internal void UpdateTabOffsets ()
     {
-        var offset = 0;
+        int offset = 0;
 
-        foreach (View tab in TabCollection)
+        foreach (View tab in GetTabs ())
         {
             if (tab.Border.View is not BorderView bv)
             {
@@ -541,9 +605,9 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <returns>The total header span in cells, or 0 if there are no tabs.</returns>
     private int GetTotalHeaderSpan ()
     {
-        var span = 0;
+        int span = 0;
 
-        foreach (View tab in TabCollection)
+        foreach (View tab in GetTabs ())
         {
             int tabLength = (tab.Border.View as BorderView)?.EffectiveTabLength ?? 0;
 
@@ -564,7 +628,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// </summary>
     private void UpdateTabBorderThickness ()
     {
-        foreach (View tab in TabCollection)
+        foreach (View tab in GetTabs ())
         {
             if (tab.Border.View is BorderView bv)
             {
@@ -572,13 +636,13 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
 
             tab.Border.Thickness = _tabSide switch
-                                   {
-                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
-                                       _ => new Thickness (1, TabDepth, 1, 1)
-                                   };
+            {
+                Side.Top => new Thickness (1, TabDepth, 1, 1),
+                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                Side.Right => new Thickness (1, 1, TabDepth, 1),
+                _ => new Thickness (1, TabDepth, 1, 1)
+            };
         }
     }
 
@@ -594,40 +658,71 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         return TabSide switch
-               {
-                   Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
-                   Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
+        {
+            Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
+            Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
 
-                   Side.Top when ctx.Command == Command.Down => FocusContent (),
-                   Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
+            Side.Top when ctx.Command == Command.Down => FocusContent (),
+            Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
 
-                   Side.Bottom when ctx.Command == Command.Up => FocusContent (),
-                   Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
+            Side.Bottom when ctx.Command == Command.Up => FocusContent (),
+            Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
 
-                   Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
-                   Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
+            Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
+            Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
 
-                   Side.Left when ctx.Command == Command.Right => FocusContent (),
-                   Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
+            Side.Left when ctx.Command == Command.Right => FocusContent (),
+            Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
 
-                   Side.Right when ctx.Command == Command.Left => FocusContent (),
-                   Side.Right when ctx.Command == Command.Right => SelectNextTab (),
-                   _ => false
-               };
+            Side.Right when ctx.Command == Command.Left => FocusContent (),
+            Side.Right when ctx.Command == Command.Right => SelectNextTab (),
+            _ => false
+        };
     }
 
     private bool? SelectNextTab ()
     {
-        View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
+        IReadOnlyList<View> tabs = GetTabs ();
 
-        return (nextTab?.Border.View as BorderView)?.TitleView?.SetFocus () ?? true;
+        if (tabs.Count == 0)
+        {
+            return true;
+        }
+
+        int focusedIndex = GetFocusedTabIndex (tabs);
+        int nextIndex = focusedIndex < 0 || focusedIndex == tabs.Count - 1 ? 0 : focusedIndex + 1;
+        View nextTab = tabs [nextIndex];
+
+        return (nextTab.Border.View as BorderView)?.TitleView?.SetFocus () ?? true;
     }
 
     private bool? SelectPreviousTab ()
     {
-        View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
+        IReadOnlyList<View> tabs = GetTabs ();
 
-        return (previousTab?.Border.View as BorderView)?.TitleView?.SetFocus () ?? true;
+        if (tabs.Count == 0)
+        {
+            return true;
+        }
+
+        int focusedIndex = GetFocusedTabIndex (tabs);
+        int previousIndex = focusedIndex <= 0 ? tabs.Count - 1 : focusedIndex - 1;
+        View previousTab = tabs [previousIndex];
+
+        return (previousTab.Border.View as BorderView)?.TitleView?.SetFocus () ?? true;
+    }
+
+    private static int GetFocusedTabIndex (IReadOnlyList<View> tabs)
+    {
+        for (int i = 0; i < tabs.Count; i++)
+        {
+            if (tabs [i].HasFocus)
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 
     private bool? FocusContent ()
@@ -700,7 +795,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// </summary>
     private void UpdateScrollButtonPositions ()
     {
-        foreach (View tab in TabCollection)
+        foreach (View tab in GetTabs ())
         {
             if (tab.Border.View is null)
             {
@@ -728,7 +823,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         bool canScrollBack = ScrollOffset > 0;
         bool canScrollForward = totalSpan > ScrollOffset + visibleSize;
 
-        foreach (View tab in TabCollection)
+        foreach (View tab in GetTabs ())
         {
             if (tab.Border.View is null)
             {
@@ -766,14 +861,17 @@ public class Tabs : View, IValue<View?>, IDesignable
                 return;
             }
 
-            if (value > GetTotalHeaderSpan ())
+            int totalHeaderSpan = GetTotalHeaderSpan ();
+
+            if (value > totalHeaderSpan)
             {
                 // If value is greater than the maximum scroll offset, clamp it such that the last tab is flush with the edge of the viewport
-                View? last = TabCollection.LastOrDefault ();
+                IReadOnlyList<View> tabs = GetTabs ();
+                View? last = tabs.Count > 0 ? tabs [^1] : null;
 
                 if (last is { })
                 {
-                    field = GetTotalHeaderSpan () - (((last.Border.View as BorderView)?.TabOffset ?? 0) - 2);
+                    field = totalHeaderSpan - (((last.Border.View as BorderView)?.TabOffset ?? 0) - 2);
                 }
             }
             else if (value < 0)
@@ -826,6 +924,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <param name="tab">The tab whose header should be scrolled into view.</param>
     private void EnsureTabVisible (View tab)
     {
+        IReadOnlyList<View> tabs = GetTabs ();
         int visibleSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
 
         // Don't adjust scroll before layout has determined the viewport size
@@ -835,7 +934,17 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         // Compute the absolute (unscrolled) offset for this tab
-        int absOffset = TabCollection.TakeWhile (t => t != tab).Sum (t => ((t.Border.View as BorderView)?.EffectiveTabLength ?? 0) + TabSpacing);
+        int absOffset = 0;
+
+        foreach (View candidate in tabs)
+        {
+            if (candidate == tab)
+            {
+                break;
+            }
+
+            absOffset += ((candidate.Border.View as BorderView)?.EffectiveTabLength ?? 0) + TabSpacing;
+        }
 
         int tabLength = (tab.Border.View as BorderView)?.EffectiveTabLength ?? 0;
         int tabEnd = absOffset + tabLength;
@@ -916,7 +1025,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
                                                     if (e.NewValue <= 0)
                                                     {
-                                                        foreach (View tab in TabCollection)
+                                                        foreach (View tab in GetTabs ())
                                                         {
                                                             ((BorderView)tab.Border.View!).TabLength = null;
                                                         }
@@ -924,7 +1033,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                     }
                                                     else
                                                     {
-                                                        foreach (View tab in TabCollection)
+                                                        foreach (View tab in GetTabs ())
                                                         {
                                                             ((BorderView)tab.Border.View!).TabLength = e.NewValue;
                                                         }
@@ -968,7 +1077,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         View addRemoveTab = new () { Id = "addRemoveTab", Title = "Add_/Remove" };
 
         // Tab list showing all tabs in logical order
-        ObservableCollection<string> tabListSource = new (TabCollection.Select (t => t.Title));
+        ObservableCollection<string> tabListSource = new (GetTabs ().Select (t => t.Title));
 
         ListView tabListView = new () { Width = Dim.Auto (), Height = Dim.Fill (), BorderStyle = LineStyle.Single, Title = "Ta_bs" };
         tabListView.SetSource (tabListSource);
@@ -978,7 +1087,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         TextField titleTextField = new () { X = Pos.Right (titleLabel) + 1, Y = Pos.Top (titleLabel), Text = "New Tab" };
 
-        var setTitleButton = new Button { X = Pos.AnchorEnd (), Y = Pos.Top (titleTextField), Title = "Set _Title" };
+        Button setTitleButton = new () { X = Pos.AnchorEnd (), Y = Pos.Top (titleTextField), Title = "Set _Title" };
 
         setTitleButton.Accepted += (_, _) =>
                                    {
@@ -988,7 +1097,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                                        {
                                            return;
                                        }
-                                       View tab = TabCollection.ElementAt (selectedIndex.Value);
+                                       View tab = GetTabs () [selectedIndex.Value];
                                        tab.Title = titleTextField.Text;
                                        RefreshList ();
                                    };
@@ -1033,7 +1142,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                                          return;
                                      }
 
-                                     List<View> tabs = TabCollection.ToList ();
+                                     List<View> tabs = GetTabs ().ToList ();
 
                                      if (selectedIndex.Value >= tabs.Count)
                                      {
@@ -1087,7 +1196,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         {
             tabListSource.Clear ();
 
-            foreach (View t in TabCollection)
+            foreach (View t in GetTabs ())
             {
                 tabListSource.Add (t.Title);
             }

@@ -26,7 +26,7 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0 # GitVersion.MsBuild needs full history
 
@@ -50,36 +50,26 @@ jobs:
     - name: Pack Release Terminal.Gui
       run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612
 
-    - name: Restore AOT and Self-Contained projects
-      run: |
-        dotnet restore ./Examples/NativeAot/NativeAot.csproj -f
-        dotnet restore ./Examples/SelfContained/SelfContained.csproj -f
+    - name: Pack Release Terminal.Gui.Interop.Spectre
+      run: dotnet pack Terminal.Gui.Interop.Spectre/Terminal.Gui.Interop.Spectre.csproj --configuration Release --output ./local_packages -property:NoWarn=0618%3B0612
 
-    - name: Restore Solution Packages
-      run: dotnet restore
-
-    - name: Build Release AOT and Self-Contained
-      run: |
-        dotnet build ./Examples/NativeAot/NativeAot.csproj --configuration Release -property:NoWarn=0618%3B0612
-        dotnet build ./Examples/SelfContained/SelfContained.csproj --configuration Release -property:NoWarn=0618%3B0612
-
-    - name: AOT Publish (catches trimming and reflection errors)
-      run: dotnet publish ./Examples/NativeAot/NativeAot.csproj --configuration Release --output ./aot-publish -property:NoWarn=0618%3B0612
+    - name: AOT Publish Test App (catches trimming and reflection errors)
+      run: dotnet publish ./Tests/NativeAotSmoke/NativeAotSmoke.csproj --configuration Release --output ./aot-publish -property:NoWarn=0618%3B0612
 
     - name: AOT Smoke Test (run the published AOT binary on Linux)
       if: runner.os == 'Linux'
       env:
         DisableRealDriverIO: "1"
       run: |
-        chmod +x ./aot-publish/NativeAot
-        ./aot-publish/NativeAot --smoke-test
+        chmod +x ./aot-publish/NativeAotSmoke
+        ./aot-publish/NativeAotSmoke --smoke-test
 
     - name: AOT Smoke Test (run the published AOT binary on Windows)
       if: runner.os == 'Windows'
       env:
         DisableRealDriverIO: "1"
       shell: pwsh
-      run: ./aot-publish/NativeAot.exe --smoke-test
+      run: ./aot-publish/NativeAotSmoke.exe --smoke-test
 
     - name: Build Release Solution
       run: dotnet build --configuration Release --no-restore -property:NoWarn=0618%3B0612

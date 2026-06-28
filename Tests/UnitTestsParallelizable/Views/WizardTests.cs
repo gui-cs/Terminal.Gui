@@ -2,6 +2,141 @@ namespace ViewsTests;
 
 public class WizardTests
 {
+    // Copilot
+    [Fact]
+    public void Enter_In_ListView_Moves_To_Next_Step ()
+    {
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "Step 1" };
+        ListView listView = new () { Width = 10, Height = 1, Source = new ListWrapper<string> (["One"]) };
+        WizardStep step2 = new () { Title = "Step 2" };
+        step1.Add (listView);
+        wizard.AddStep (step1);
+        wizard.AddStep (step2);
+        wizard.BeginInit ();
+        wizard.EndInit ();
+
+        listView.SetFocus ();
+        Assert.True (listView.HasFocus);
+
+        wizard.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (step2, wizard.CurrentStep);
+        Assert.False (wizard.StopRequested);
+
+        wizard.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Enter_In_TextField_Moves_To_Next_Step ()
+    {
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "Step 1" };
+        TextField textField = new () { Width = Dim.Fill () };
+        WizardStep step2 = new () { Title = "Step 2" };
+        step1.Add (textField);
+        wizard.AddStep (step1);
+        wizard.AddStep (step2);
+        wizard.BeginInit ();
+        wizard.EndInit ();
+
+        textField.SetFocus ();
+        Assert.True (textField.HasFocus);
+
+        wizard.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (step2, wizard.CurrentStep);
+        Assert.False (wizard.StopRequested);
+
+        wizard.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Enter_In_TextField_On_Last_Step_Accepts_Wizard ()
+    {
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "Step 1" };
+        TextField textField = new () { Width = Dim.Fill () };
+        step1.Add (textField);
+        wizard.AddStep (step1);
+        wizard.BeginInit ();
+        wizard.EndInit ();
+
+        var wizardAccepted = 0;
+
+        wizard.Accepted += (_, e) => { wizardAccepted++; };
+
+        textField.SetFocus ();
+        Assert.True (textField.HasFocus);
+
+        wizard.NewKeyDownEvent (Key.Enter);
+
+        Assert.Equal (1, wizardAccepted);
+        Assert.Equal (step1, wizard.CurrentStep);
+
+        wizard.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void MovingNext_Cancel_Prevents_Navigation_And_Does_Not_Bubble ()
+    {
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "Step 1" };
+        WizardStep step2 = new () { Title = "Step 2" };
+        wizard.AddStep (step1);
+        wizard.AddStep (step2);
+        wizard.BeginInit ();
+        wizard.EndInit ();
+
+        wizard.MovingNext += (_, args) => { args.Cancel = true; };
+
+        var wizardAccepting = 0;
+        wizard.Accepting += (_, _) => wizardAccepting++;
+
+        // Act
+        wizard.NextFinishButton.InvokeCommand (Command.Accept);
+
+        // Assert - step should not change
+        Assert.Equal (step1, wizard.CurrentStep);
+
+        // Assert - accept should not bubble to wizard (dialog would close)
+        Assert.Equal (0, wizardAccepting);
+
+        wizard.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void StepChanging_Cancel_Prevents_Navigation_And_Does_Not_Bubble ()
+    {
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "Step 1" };
+        WizardStep step2 = new () { Title = "Step 2" };
+        wizard.AddStep (step1);
+        wizard.AddStep (step2);
+        wizard.BeginInit ();
+        wizard.EndInit ();
+
+        wizard.StepChanging += (_, args) => { args.Handled = true; };
+
+        var wizardAccepting = 0;
+        wizard.Accepting += (_, _) => wizardAccepting++;
+
+        // Act
+        wizard.NextFinishButton.InvokeCommand (Command.Accept);
+
+        // Assert - step should not change
+        Assert.Equal (step1, wizard.CurrentStep);
+
+        // Assert - accept should not bubble to wizard (dialog would close)
+        Assert.Equal (0, wizardAccepting);
+
+        wizard.Dispose ();
+    }
+
     #region Constructor Tests
 
     [Fact]
@@ -15,9 +150,6 @@ public class WizardTests
         Assert.NotNull (wizard.BackButton);
         Assert.NotNull (wizard.NextFinishButton);
         Assert.Null (wizard.CurrentStep);
-        Assert.Equal (LineStyle.Dotted, wizard.BorderStyle);
-        Assert.False (wizard.Arrangement.HasFlag (ViewArrangement.Movable));
-        Assert.False (wizard.Arrangement.HasFlag (ViewArrangement.Resizable));
     }
 
     [Fact]
@@ -1014,12 +1146,56 @@ public class WizardTests
 
     #endregion Enabled State Tests
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    #region Regression Tests
+
+    // Copilot
     [Fact]
-    public void Wizard_NextButton_Accept_AdvancesStep ()
+    public void Enter_In_TextField_On_Last_Step_Does_Not_Navigate ()
     {
+        // Regression: OnAccepting must call base on last step so Dialog<TResult>.OnAccepting
+        // can call RequestStop() in modal mode. Without this, Enter from content views on the
+        // last step won't close the wizard. We verify OnAccepting doesn't intercept (navigate)
+        // on the last step, and that the accept propagates to Accepted (proving base chain ran).
+        Wizard wizard = new ();
+        WizardStep step1 = new () { Title = "Step 1" };
+        WizardStep step2 = new () { Title = "Step 2" };
+        TextField textField = new () { Width = Dim.Fill () };
+        step2.Add (textField);
+        wizard.AddStep (step1);
+        wizard.AddStep (step2);
+        wizard.BeginInit ();
+        wizard.EndInit ();
+        wizard.GoNext ();
+        Assert.Equal (step2, wizard.CurrentStep);
+
+        var accepted = 0;
+        wizard.Accepted += (_, _) => accepted++;
+
+        // MovingNext should NOT be raised on last step
+        var movingNextRaised = false;
+        wizard.MovingNext += (_, _) => movingNextRaised = true;
+
+        textField.SetFocus ();
+        Assert.True (textField.HasFocus);
+
+        wizard.NewKeyDownEvent (Key.Enter);
+
+        // Should stay on last step (not navigate)
+        Assert.Equal (step2, wizard.CurrentStep);
+        // MovingNext should not fire on last step
+        Assert.False (movingNextRaised);
+        // Accepted should fire (base chain processed it)
+        Assert.Equal (1, accepted);
+
+        wizard.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void MovingBack_Cancel_Does_Not_Bubble_Accept ()
+    {
+        // Bug: BackBtnOnAccepting doesn't set e.Handled when MovingBack is cancelled,
+        // so accept bubbles up to the dialog and may close it.
         Wizard wizard = new ();
         WizardStep step1 = new () { Title = "Step 1" };
         WizardStep step2 = new () { Title = "Step 2" };
@@ -1027,30 +1203,24 @@ public class WizardTests
         wizard.AddStep (step2);
         wizard.BeginInit ();
         wizard.EndInit ();
+        wizard.GoNext ();
+        Assert.Equal (step2, wizard.CurrentStep);
 
-        // Wizard uses buttons internally to navigate
-        // Verify the wizard is set up correctly
-        Assert.Equal (step1, wizard.CurrentStep);
+        wizard.MovingBack += (_, args) => { args.Cancel = true; };
 
-        wizard.Dispose ();
-    }
+        var wizardAccepting = 0;
+        wizard.Accepting += (_, _) => wizardAccepting++;
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void Wizard_FinishButton_Accept_Completes ()
-    {
-        Wizard wizard = new ();
-        WizardStep step1 = new () { Title = "Step 1" };
-        wizard.AddStep (step1);
-        wizard.BeginInit ();
-        wizard.EndInit ();
+        // Act
+        wizard.BackButton.InvokeCommand (Command.Accept);
 
-        // Wizard uses buttons internally to complete
-        // Verify the wizard is set up correctly
-        Assert.Equal (step1, wizard.CurrentStep);
+        // Assert - step should not change
+        Assert.Equal (step2, wizard.CurrentStep);
+        // Assert - accept should not bubble to wizard
+        Assert.Equal (0, wizardAccepting);
 
         wizard.Dispose ();
     }
+
+    #endregion Regression Tests
 }

@@ -172,15 +172,15 @@ internal partial class WindowsOutput : OutputBase, IOutput
                     cursorInfo.bVisible = true;
 
                     cursorInfo.dwSize = cursor.Style switch
-                                        {
-                                            CursorStyle.BlinkingBlock => 100,
-                                            CursorStyle.SteadyBlock => 100,
-                                            CursorStyle.BlinkingUnderline => 15,
-                                            CursorStyle.SteadyUnderline => 15,
-                                            CursorStyle.BlinkingBar => 15,
-                                            CursorStyle.SteadyBar => 15,
-                                            _ => 100
-                                        };
+                    {
+                        CursorStyle.BlinkingBlock => 100,
+                        CursorStyle.SteadyBlock => 100,
+                        CursorStyle.BlinkingUnderline => 15,
+                        CursorStyle.SteadyUnderline => 15,
+                        CursorStyle.BlinkingBar => 15,
+                        CursorStyle.SteadyBar => 15,
+                        _ => 100
+                    };
                 }
 
                 SetConsoleCursorInfo (!IsLegacyConsole ? _outputHandle : _screenBuffer, ref cursorInfo);

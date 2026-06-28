@@ -133,12 +133,16 @@ public partial class View
         Padding.View?.SetNeedsDraw ();
         Margin.View?.SetNeedsDraw ();
 
-        // Ensure NeedsDraw is true for the rest of the draw pipeline (DoClearViewport, DoDrawText, etc.)
-        // When adornment Views are null (lightweight), their NeedsDraw doesn't contribute to the parent's
-        // NeedsDraw property. But if we're here, the parent IS drawing, so we must set NeedsDrawRect.
+        // Keep NeedsDraw true for DoRenderLineCanvas and ClearNeedsDraw. The self-content
+        // methods (DoClearViewport, DoDrawText, DoDrawContent) are now gated on the
+        // needsDrawSelf snapshot captured in Draw() *before* this escalation, so this no
+        // longer forces a full parent redraw when only a child was dirty (issue #5358).
+        //
+        // Issue #5359: NeedsDrawRect is viewport-LOCAL, so set (0, 0, W, H) instead of
+        // Viewport (which carries the scroll offset and would corrupt the convention).
         if (NeedsDrawRect == Rectangle.Empty)
         {
-            NeedsDrawRect = Viewport;
+            NeedsDrawRect = new (Point.Empty, Viewport.Size);
         }
 
         if (OnDrawingAdornments ())
@@ -214,6 +218,12 @@ public partial class View
             }
             else if (Padding.Thickness != Thickness.Empty)
             {
+                // Thickness.Draw fills via the driver's CurrentAttribute and does not set one itself, so
+                // set the view's Normal here. Otherwise the padding inherits whatever attribute was last
+                // used — which is stale (e.g. a sibling raster view's Color.None) when the parent skipped
+                // its ClearViewport on a child-only redraw, bleeding foreign content into the padding
+                // column. (gui-cs/Terminal.Gui#5518.)
+                SetAttributeForRole (VisualRole.Normal);
                 Padding.Thickness.Draw (Driver, Padding.FrameToScreen (), Padding.Diagnostics);
                 Padding.LastDrawnRegion = null;
             }

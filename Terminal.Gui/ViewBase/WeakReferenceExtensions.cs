@@ -6,7 +6,7 @@ namespace Terminal.Gui.ViewBase;
 public static class WeakReferenceExtensions
 {
     /// <param name="weakRef">The weak reference to format.</param>
-    extension (WeakReference<View>? weakRef)
+    extension(WeakReference<View>? weakRef)
     {
         /// <summary>
         ///     Returns a formatted string representation of the <see cref="WeakReference{T}"/> to a View.

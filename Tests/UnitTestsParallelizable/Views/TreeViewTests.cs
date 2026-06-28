@@ -86,6 +86,63 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
                                               output,
                                               driver);
     }
+
+    // Codex - gpt 5.5 medium
+    // Regression for issue #5509.
+    [Fact]
+    public void Draw_ColorGetter_UsesActiveForSelectedRow_WhenTreeViewDoesNotHaveFocus ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 4);
+
+        const string selected = "selected";
+        Attribute normal = new (Color.BrightRed, Color.Black);
+        Attribute focus = new (Color.BrightYellow, Color.Blue);
+        Attribute active = new (Color.BrightYellow, Color.DarkGray);
+
+        Scheme treeScheme = new ()
+        {
+            Normal = new Attribute (Color.BrightGreen, Color.Black),
+            Focus = new Attribute (Color.Black, Color.BrightGreen),
+            Active = new Attribute (Color.BrightGreen, Color.DarkGray)
+        };
+
+        Scheme customScheme = new ()
+        {
+            Normal = normal,
+            Focus = focus,
+            Active = active
+        };
+
+        TreeView<string> tree = new (new DelegateTreeBuilder<string> (_ => [], _ => false))
+        {
+            Width = 20,
+            Height = 2,
+            ColorGetter = item => item == selected ? customScheme : null
+        };
+        tree.Style.ShowBranchLines = false;
+        tree.SetScheme (treeScheme);
+        tree.AddObject (selected);
+        tree.SelectedObject = selected;
+
+        View otherView = new () { Y = Pos.Bottom (tree), Width = 1, Height = 1, CanFocus = true };
+
+        using Runnable top = new ();
+        top.Add (tree, otherView);
+
+        app.Begin (top);
+        tree.SetFocus ();
+        app.LayoutAndDraw ();
+        Assert.Equal (focus, app.Driver.Contents! [0, 1].Attribute);
+
+        otherView.SetFocus ();
+        app.LayoutAndDraw ();
+
+        Assert.False (tree.HasFocus);
+        Assert.Equal (active, app.Driver.Contents! [0, 1].Attribute);
+    }
+
     [Fact]
     public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {
@@ -215,6 +272,483 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         Assert.False (tree.IsExpanded (f));
 
         tree.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void CheckboxMode_Space_Toggles_Checked_State_Not_Expansion ()
+    {
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out Car car2);
+        tree.CheckboxMode = true;
+        tree.SelectedObject = f;
+
+        List<object> checkedObjects = [];
+        tree.CheckedChanged += (_, e) =>
+                               {
+                                   checkedObjects.Add (e.Object!);
+                               };
+
+        tree.NewKeyDownEvent (Key.Space);
+
+        Assert.False (tree.IsExpanded (f));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (f));
+
+        // Propagation: f and all its children should be checked
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (car1));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (car2));
+
+        // Events fire for each node that changed
+        Assert.Contains (f, checkedObjects);
+        Assert.Contains (car1, checkedObjects);
+        Assert.Contains (car2, checkedObjects);
+    }
+
+    // Copilot
+    [Fact]
+    public void CheckboxMode_Draws_Checkbox_Glyphs_And_Indeterminate_Parent ()
+    {
+        IDriver driver = CreateTestDriver ();
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
+        tree.Driver = driver;
+        tree.CheckboxMode = true;
+        tree.Frame = new Rectangle (0, 0, 20, 3);
+        tree.Expand (f);
+
+        tree.SetChecked (car1, CheckState.Checked);
+        tree.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ($"""
+                                               └-{Glyphs.CheckStateNone} Factory
+                                                 ├─{Glyphs.CheckStateChecked} 
+                                                 └─{Glyphs.CheckStateUnChecked} 
+                                               """,
+                                               output,
+                                               driver);
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_MouseClick_OnCheckbox_Toggles_Check ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        root.Children.Add (new TreeNode { Text = "Child1" });
+        tree.AddObject (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Layout (no border): └ + ☐ · R o o t
+        // Pos:                  0 1 2 3 4 5 6 7
+        // Checkbox is at screen position x=2
+
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (2, 0)));
+
+        Assert.False (tree.IsExpanded (root));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void MouseClick_OnExpandSymbol_Expands_Node ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+
+        TreeNode root = new () { Text = "Root" };
+        root.Children.Add (new TreeNode { Text = "Child1" });
+        tree.AddObject (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Layout (no border): └ + R o o t
+        // Pos:                  0 1 2 3 4 5
+        // Expand symbol at position 1
+
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (1, 0)));
+
+        Assert.True (tree.IsExpanded (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_MouseClick_OnExpandSymbol_Expands_Not_Toggles_Check ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        root.Children.Add (new TreeNode { Text = "Child1" });
+        tree.AddObject (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Layout (no border): └ + ☐ · R o o t
+        // Pos:                  0 1 2 3 4 5 6 7
+        // Expand symbol at position 1, checkbox at position 2
+
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (1, 0)));
+
+        Assert.True (tree.IsExpanded (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_TriState_Parent_Reflects_Children ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+
+        // Initially all unchecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        // Check one child → parent becomes indeterminate
+        tree.SetChecked (child1, CheckState.Checked);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        // Check all children → parent becomes checked
+        tree.SetChecked (child2, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        // Uncheck one child → parent becomes indeterminate again
+        tree.SetChecked (child1, CheckState.UnChecked);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+
+        // Uncheck all children → parent becomes unchecked
+        tree.SetChecked (child2, CheckState.UnChecked);
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Toggling_Parent_Propagates_To_Children ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+
+        // Toggle parent ON → all children become checked
+        tree.SetChecked (root, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child2));
+
+        // Toggle parent OFF → all children become unchecked
+        tree.SetChecked (root, CheckState.UnChecked);
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Toggle_Parent_When_All_Children_Checked_Unchecks_All ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Check all children so parent derives as Checked
+        tree.SetChecked (child1, CheckState.Checked);
+        tree.SetChecked (child2, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        // Select root and press Space to toggle it OFF
+        tree.SelectedObject = root;
+        tree.NewKeyDownEvent (Key.Space);
+
+        // Parent and all children should now be unchecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_MouseClick_Uncheck_Parent_When_Children_Checked ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 20, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Check all children so parent derives as Checked
+        tree.SetChecked (child1, CheckState.Checked);
+        tree.SetChecked (child2, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        // Click on root's checkbox glyph (x=2 for expanded root with branch lines)
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (2, 0)));
+
+        // Parent and all children should now be unchecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_MouseClick_Children_Then_Uncheck_Parent ()
+    {
+        // Reproduce exact user scenario: click child1 cb, click child2 cb, then click root cb
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 30, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Layout with ShowBranchLines=true (default), CheckboxMode=true:
+        // GetLinePrefix yields: for each parent 2 elements (line + space), then 1 junction element.
+        // IsHitOnCheckbox = GetLinePrefix().Count() + GetExpandableSymbol().GetColumns()
+        // Root (depth=0): prefix count=1 (junction only), expand=1 col → checkbox at x=2
+        // Children (depth=1): prefix count=3 (parent line+space + junction), expand=1 col → checkbox at x=4
+
+        // Click child1's checkbox at (4, 1)
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (4, 1)));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.None, tree.GetCheckState (root)); // indeterminate
+
+        // Click child2's checkbox at (4, 2)
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (4, 2)));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (child2));
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root)); // all children checked
+
+        // Click root's checkbox at (2, 0) to uncheck everything
+        app.InjectSequence (InputInjectionExtensions.LeftButtonClick (new Point (2, 0)));
+
+        // Parent and all children should now be unchecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child1));
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (child2));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Collapsed_Parent_Shows_Indeterminate_When_One_Child_Checked ()
+    {
+        // When only one child is checked and parent is collapsed, parent should show
+        // indeterminate (None), not Checked or UnChecked.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 30, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Check only child1 - parent should be indeterminate
+        tree.SetChecked (child1, CheckState.Checked);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+
+        // Collapse root - should STILL show indeterminate
+        tree.Collapse (root);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+
+        // Expand again - should still be indeterminate
+        tree.Expand (root);
+        Assert.Equal (CheckState.None, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Collapsed_Parent_Shows_Checked_When_All_Children_Checked ()
+    {
+        // When all children are checked and parent is collapsed, parent should show Checked.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 30, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Check both children
+        tree.SetChecked (child1, CheckState.Checked);
+        tree.SetChecked (child2, CheckState.Checked);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        // Collapse root - should STILL show Checked
+        tree.Collapse (root);
+        Assert.Equal (CheckState.Checked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_Collapsed_Parent_Shows_UnChecked_When_No_Children_Checked ()
+    {
+        // When no children are checked and parent is collapsed, parent should show UnChecked.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        TreeView tree = new () { Width = 30, Height = 5 };
+        tree.CheckboxMode = true;
+
+        TreeNode root = new () { Text = "Root" };
+        TreeNode child1 = new () { Text = "C1" };
+        TreeNode child2 = new () { Text = "C2" };
+        root.Children.Add (child1);
+        root.Children.Add (child2);
+        tree.AddObject (root);
+        tree.Expand (root);
+
+        Runnable top = new ();
+        top.Add (tree);
+        app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // No children checked - parent is UnChecked
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        // Collapse root - should STILL show UnChecked
+        tree.Collapse (root);
+        Assert.Equal (CheckState.UnChecked, tree.GetCheckState (root));
+
+        top.Dispose ();
+        app.Dispose ();
     }
 
     [Fact]
@@ -894,6 +1428,58 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         tree.AddObject (factory1);
 
         return tree;
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_SetChecked_Handles_Cyclic_TreeBuilder ()
+    {
+        // A tree builder that creates a cycle: A -> B -> A
+        object a = "A";
+        object b = "B";
+
+        Dictionary<object, object []> graph = new ()
+        {
+            { a, [b] },
+            { b, [a] }
+        };
+
+        TreeView<object> tree = new (new DelegateTreeBuilder<object> (
+                                         o => graph.TryGetValue (o, out object []? children) ? children : [],
+                                         _ => true));
+        tree.CheckboxMode = true;
+        tree.AddObject (a);
+
+        // Should not stack overflow - cycle protection should prevent infinite recursion
+        Exception? ex = Record.Exception (() => tree.SetChecked (a, CheckState.Checked));
+        Assert.Null (ex);
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void CheckboxMode_GetCheckState_Handles_Cyclic_TreeBuilder ()
+    {
+        // A tree builder that creates a cycle: A -> B -> A
+        object a = "A";
+        object b = "B";
+
+        Dictionary<object, object []> graph = new ()
+        {
+            { a, [b] },
+            { b, [a] }
+        };
+
+        TreeView<object> tree = new (new DelegateTreeBuilder<object> (
+                                         o => graph.TryGetValue (o, out object []? children) ? children : [],
+                                         _ => true));
+        tree.CheckboxMode = true;
+        tree.AddObject (a);
+
+        tree.SetChecked (a, CheckState.Checked);
+
+        // Should not stack overflow when deriving state
+        Exception? ex = Record.Exception (() => tree.GetCheckState (a));
+        Assert.Null (ex);
     }
 
     #endregion

@@ -107,7 +107,7 @@ public class CheckBox : View, IValue<CheckState>
     ///     <para>
     ///         If <see cref="AllowCheckStateNone"/> is <see langword="true"/> and <see cref="CheckState.None"/>, the
     ///         <see cref="CheckBox"/>
-    ///         will display the <c>Glyphs.CheckStateNone</c> character (☒).
+    ///         will display the <c>Glyphs.CheckStateNone</c> character (⬛).
     ///     </para>
     ///     <para>
     ///         If <see cref="CheckState.UnChecked"/>, the <see cref="CheckBox"/>
@@ -215,12 +215,12 @@ public class CheckBox : View, IValue<CheckState>
     public bool? AdvanceCheckState ()
     {
         CheckState nextValue = Value switch
-                               {
-                                   CheckState.None => CheckState.Checked,
-                                   CheckState.Checked => CheckState.UnChecked,
-                                   CheckState.UnChecked => AllowCheckStateNone ? CheckState.None : CheckState.Checked,
-                                   _ => CheckState.UnChecked
-                               };
+        {
+            CheckState.None => CheckState.Checked,
+            CheckState.Checked => CheckState.UnChecked,
+            CheckState.UnChecked => AllowCheckStateNone ? CheckState.None : CheckState.Checked,
+            _ => CheckState.UnChecked
+        };
 
         return ChangeValue (nextValue);
     }

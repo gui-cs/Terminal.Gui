@@ -22,7 +22,7 @@ public interface IColorNameResolver
     /// <param name="color"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    bool TryNameColor (Color color, [NotNullWhen(true)]out string? name);
+    bool TryNameColor (Color color, [NotNullWhen (true)] out string? name);
 
     /// <summary>
     ///     Returns <see langword="true"/> if <paramref name="name"/> is a recognized

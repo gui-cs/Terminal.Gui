@@ -6,7 +6,7 @@ namespace Terminal.Gui.Testing;
 public static class InputInjectionExtensions
 {
     /// <param name="app">The application instance.</param>
-    extension (IApplication app)
+    extension(IApplication app)
     {
         /// <summary>
         ///     Injects a key event (convenience method).

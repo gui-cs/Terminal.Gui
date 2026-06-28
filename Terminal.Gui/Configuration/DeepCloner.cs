@@ -6,8 +6,6 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-#pragma warning disable CS0618 // Obsolete - DeepCloner still uses ConfigurationManager.SerializerContext during transition
-
 namespace Terminal.Gui.Configuration;
 
 /// <summary>
@@ -471,7 +469,7 @@ public static class DeepCloner
     #region AOT Support
 
     private static TScopeT CloneScope<TScopeT> (TScopeT scope, ConcurrentDictionary<object, object> visited)
-        where TScopeT : Scope<TScopeT>, new ()
+        where TScopeT : Scope<TScopeT>, new()
     {
         TScopeT clonedScope = new ();
         visited.TryAdd (scope, clonedScope);

@@ -278,9 +278,30 @@ internal partial class ApplicationImpl
             Rectangle clipRect = Screen with { X = 0, Y = 0 };
             Driver.Clip = new Region (clipRect);
 
-            // Only force a complete redraw if needed (needsLayout or forceRedraw).
-            // Otherwise, just redraw views that need it.
-            View.Draw (views.ToArray ().Cast<View> (), neededLayout || forceRedraw);
+            // Only force a complete redraw when explicitly requested.
+            // Otherwise, redraw only the views that need it.
+            //
+            // NOTE (#5358): passing force=true here calls SetNeedsDraw on the top runnable, which
+            // cascades to all overlapping subviews via the existing SetNeedsDraw recursion. This
+            // is the remaining draw-fan-out source documented by TabsFanOutIntegrationTests. The
+            // proper fix requires tracking adornment thickness changes (in addition to Frame
+            // changes) so the SuperView can be invalidated precisely instead of force-redrawing
+            // the whole tree.
+            View.Draw (views.ToArray ().Cast<View> (), forceRedraw);
+
+            // Release raster graphics (Sixel/Kitty) whose owning view is no longer rendered — hidden,
+            // removed from the hierarchy, or on a runnable that has ended. They are emitted out-of-band
+            // and persist on screen until explicitly deleted, so erasing their cells is not enough. See
+            // https://github.com/tui-cs/Terminal.Gui/issues/5543.
+            IOutputBuffer rasterBuffer = Driver.GetOutputBuffer ();
+            HashSet<string> activeRasterIds = [];
+
+            foreach (View? view in views)
+            {
+                view?.CollectActiveRasterImageIds (activeRasterIds);
+            }
+
+            rasterBuffer.RetainRasterImages (activeRasterIds);
 
             Driver.Clip = new Region (clipRect);
 

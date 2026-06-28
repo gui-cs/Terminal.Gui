@@ -822,6 +822,11 @@ public partial class View // Keyboard APIs
             return false;
         }
 
+        if (!Visible)
+        {
+            return false;
+        }
+
         bool? handled = null;
 
         // Process this View

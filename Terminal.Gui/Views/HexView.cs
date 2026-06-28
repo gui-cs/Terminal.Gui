@@ -557,18 +557,18 @@ public class HexView : View, IDesignable
 
                         //    break;
                         case > 127:
-                        {
-                            byte [] utf8 = GetData (data, offset, 4, out bool _);
-
-                            OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-
-                            while (status == OperationStatus.NeedMoreData)
                             {
-                                status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
-                            }
+                                byte [] utf8 = GetData (data, offset, 4, out bool _);
 
-                            break;
-                        }
+                                OperationStatus status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+
+                                while (status == OperationStatus.NeedMoreData)
+                                {
+                                    status = Rune.DecodeFromUtf8 (utf8, out c, out utf8BytesConsumed);
+                                }
+
+                                break;
+                            }
 
                         default:
                             Rune.DecodeFromUtf8 (new ReadOnlySpan<byte> (ref b), out c, out _);

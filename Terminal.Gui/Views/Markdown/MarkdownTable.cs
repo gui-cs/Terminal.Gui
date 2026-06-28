@@ -104,11 +104,11 @@ public sealed class MarkdownTable : View, IDesignable
             for (var i = 0; i < _data.ColumnCount; i++)
             {
                 seps [i] = _data.ColumnAlignments [i] switch
-                           {
-                               Alignment.Center => ":---:",
-                               Alignment.End => "---:",
-                               _ => "---"
-                           };
+                {
+                    Alignment.Center => ":---:",
+                    Alignment.End => "---:",
+                    _ => "---"
+                };
             }
 
             lines.Add ($"| {string.Join (" | ", seps)} |");
@@ -595,7 +595,7 @@ public sealed class MarkdownTable : View, IDesignable
                     }
 
                     bool hasUrl = !string.IsNullOrWhiteSpace (seg.Url);
-                    bool isAbsoluteUrl = hasUrl && Uri.IsWellFormedUriString (seg.Url, UriKind.Absolute);
+                    bool isAbsoluteUrl = hasUrl && MarkdownAttributeHelper.TryCreateSafeAbsoluteUri (seg.Url, out _);
                     bool isActive = hasUrl && HasFocus && IsActiveLinkAt (rowIndex, col, seg.Url!);
 
                     if (isActive)
@@ -696,7 +696,7 @@ public sealed class MarkdownTable : View, IDesignable
     {
         if (maxWidth <= 0)
         {
-            return [[]];
+            return [ []];
         }
 
         List<List<StyledSegment>> lines = [];
@@ -1076,11 +1076,11 @@ public sealed class MarkdownTable : View, IDesignable
         int usableTextWidth = Math.Min (textWidth, innerWidth);
 
         return alignment switch
-               {
-                   Alignment.Center => 1 + Math.Max ((innerWidth - usableTextWidth) / 2, 0),
-                   Alignment.End => 1 + Math.Max (innerWidth - usableTextWidth, 0),
-                   _ => 1
-               };
+        {
+            Alignment.Center => 1 + Math.Max ((innerWidth - usableTextWidth) / 2, 0),
+            Alignment.End => 1 + Math.Max (innerWidth - usableTextWidth, 0),
+            _ => 1
+        };
     }
 
     private static string TruncateToWidth (string text, int maxWidth)
@@ -1200,7 +1200,7 @@ public sealed class MarkdownTable : View, IDesignable
         Text = """
                | Feature | *Status (centered)* | **Owner** |
                |---------|:-----------------:|-------|
-               | [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! | @tig |
+               | [Markdown](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! | @tig |
                | *Tables*     | ✅ For **sure!** | [tig](https://github.com/tig) |
                | `Code`       | ✅ `printf ("Awesome!");` | ??? |
                """;

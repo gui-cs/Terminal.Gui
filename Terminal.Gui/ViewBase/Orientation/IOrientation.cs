@@ -1,6 +1,7 @@
 
 
 namespace Terminal.Gui.ViewBase;
+
 using System;
 
 /// <summary>

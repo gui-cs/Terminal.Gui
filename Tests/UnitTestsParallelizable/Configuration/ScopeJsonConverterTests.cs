@@ -19,9 +19,9 @@ public class ScopeJsonConverterTests
         string scopeJson = $"{{{configPropertyJson}}}";
 
         // Act
-        SettingsScope? deserialized = JsonSerializer.Deserialize<SettingsScope> (scopeJson, ConfigurationManager.SerializerContext.Options);
+        SettingsScope? deserialized = JsonSerializer.Deserialize<SettingsScope> (scopeJson, TuiSerializerContext.Instance.Options);
 
-        string? json = JsonSerializer.Serialize<SettingsScope> (deserialized!, ConfigurationManager.SerializerContext.Options);
+        string? json = JsonSerializer.Serialize<SettingsScope> (deserialized!, TuiSerializerContext.Instance.Options);
 
         // Strip all whitespace
         json = json.Replace (" ", string.Empty);
@@ -41,7 +41,7 @@ public class ScopeJsonConverterTests
         SettingsScope settingsScope = new () { Schema = null! };
 
         // Act
-        string json = JsonSerializer.Serialize (settingsScope, ConfigurationManager.SerializerContext.SettingsScope);
+        string json = JsonSerializer.Serialize (settingsScope, TuiSerializerContext.Instance.SettingsScope);
         JsonDocument document = JsonDocument.Parse (json);
 
         // Assert

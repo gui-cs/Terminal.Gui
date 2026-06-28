@@ -166,31 +166,31 @@ public class AnsiMouseParser
     private static MouseFlags GetButtonFlags (int button, char terminator)
     {
         return button switch
-               {
-                   0 => terminator == 'M' ? MouseFlags.LeftButtonPressed : MouseFlags.LeftButtonReleased,
-                   1 => terminator == 'M' ? MouseFlags.MiddleButtonPressed : MouseFlags.MiddleButtonReleased,
-                   2 => terminator == 'M' ? MouseFlags.RightButtonPressed : MouseFlags.RightButtonReleased,
-                   _ => MouseFlags.None
-               };
+        {
+            0 => terminator == 'M' ? MouseFlags.LeftButtonPressed : MouseFlags.LeftButtonReleased,
+            1 => terminator == 'M' ? MouseFlags.MiddleButtonPressed : MouseFlags.MiddleButtonReleased,
+            2 => terminator == 'M' ? MouseFlags.RightButtonPressed : MouseFlags.RightButtonReleased,
+            _ => MouseFlags.None
+        };
     }
 
     private static MouseFlags GetWheelFlags (int buttonCode)
     {
         return buttonCode switch
-               {
-                   66 or 68 or 72 or 80 => MouseFlags.WheeledLeft,
-                   67 or 69 or 73 or 81 => MouseFlags.WheeledRight,
-                   _ => GetVerticalWheelFlags (buttonCode)
-               };
+        {
+            66 or 68 or 72 or 80 => MouseFlags.WheeledLeft,
+            67 or 69 or 73 or 81 => MouseFlags.WheeledRight,
+            _ => GetVerticalWheelFlags (buttonCode)
+        };
     }
 
     private static MouseFlags GetVerticalWheelFlags (int buttonCode)
     {
         return (buttonCode & ButtonMask) switch
-               {
-                   0 => MouseFlags.WheeledUp,
-                   1 => MouseFlags.WheeledDown,
-                   _ => MouseFlags.None
-               };
+        {
+            0 => MouseFlags.WheeledUp,
+            1 => MouseFlags.WheeledDown,
+            _ => MouseFlags.None
+        };
     }
 }

@@ -15,7 +15,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Negative values are not supported.
@@ -51,7 +51,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Negative values are not supported.
@@ -88,7 +88,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Negative sizes are not supported.
@@ -208,7 +208,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         If the content size was not explicitly set by <see cref="SetContentSize"/>, and the View has no visible
@@ -289,7 +289,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <list type="bullet">
     ///         <listheader>
@@ -369,7 +369,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         This event follows the Cancellable Work Pattern (CWP). See the
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/cancellable-work-pattern.html">CWP Deep Dive</see>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/cancellable-work-pattern.html">CWP Deep Dive</see>
     ///         for more information.
     ///     </para>
     /// </remarks>
@@ -397,7 +397,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         This event follows the Cancellable Work Pattern (CWP). See the
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/cancellable-work-pattern.html">CWP Deep Dive</see>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/cancellable-work-pattern.html">CWP Deep Dive</see>
     ///         for more information.
     ///     </para>
     /// </remarks>
@@ -476,7 +476,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         Positive values for the location indicate the visible area is offset into (down-and-right) the View's virtual

@@ -288,32 +288,32 @@ internal class MouseInterpreter
         }
 
         return buttonIdx switch
-               {
-                   0 => numberOfClicks switch
-                        {
-                            1 => MouseFlags.LeftButtonClicked,
-                            2 => MouseFlags.LeftButtonDoubleClicked,
-                            _ => MouseFlags.LeftButtonTripleClicked
-                        },
-                   1 => numberOfClicks switch
-                        {
-                            1 => MouseFlags.MiddleButtonClicked,
-                            2 => MouseFlags.MiddleButtonDoubleClicked,
-                            _ => MouseFlags.MiddleButtonTripleClicked
-                        },
-                   2 => numberOfClicks switch
-                        {
-                            1 => MouseFlags.RightButtonClicked,
-                            2 => MouseFlags.RightButtonDoubleClicked,
-                            _ => MouseFlags.RightButtonTripleClicked
-                        },
-                   3 => numberOfClicks switch
-                        {
-                            1 => MouseFlags.Button4Clicked,
-                            2 => MouseFlags.Button4DoubleClicked,
-                            _ => MouseFlags.Button4TripleClicked
-                        },
-                   _ => throw new ArgumentOutOfRangeException (nameof (buttonIdx), @"Unsupported button index")
-               };
+        {
+            0 => numberOfClicks switch
+            {
+                1 => MouseFlags.LeftButtonClicked,
+                2 => MouseFlags.LeftButtonDoubleClicked,
+                _ => MouseFlags.LeftButtonTripleClicked
+            },
+            1 => numberOfClicks switch
+            {
+                1 => MouseFlags.MiddleButtonClicked,
+                2 => MouseFlags.MiddleButtonDoubleClicked,
+                _ => MouseFlags.MiddleButtonTripleClicked
+            },
+            2 => numberOfClicks switch
+            {
+                1 => MouseFlags.RightButtonClicked,
+                2 => MouseFlags.RightButtonDoubleClicked,
+                _ => MouseFlags.RightButtonTripleClicked
+            },
+            3 => numberOfClicks switch
+            {
+                1 => MouseFlags.Button4Clicked,
+                2 => MouseFlags.Button4DoubleClicked,
+                _ => MouseFlags.Button4TripleClicked
+            },
+            _ => throw new ArgumentOutOfRangeException (nameof (buttonIdx), @"Unsupported button index")
+        };
     }
 }

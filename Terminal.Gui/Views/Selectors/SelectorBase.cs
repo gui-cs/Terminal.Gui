@@ -122,17 +122,17 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 break;
 
             default:
-            {
-                if (Styles.HasFlag (SelectorStyles.ShowValue))
                 {
-                    _valueField?.SetFocus ();
+                    if (Styles.HasFlag (SelectorStyles.ShowValue))
+                    {
+                        _valueField?.SetFocus ();
 
-                    return true;
+                        return true;
+                    }
+                    active = SubViews.OfType<CheckBox> ().Count () - 1;
+
+                    break;
                 }
-                active = SubViews.OfType<CheckBox> ().Count () - 1;
-
-                break;
-            }
         }
         SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
 

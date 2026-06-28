@@ -242,6 +242,6 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
 
         // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
         // BUGBUG: This is a partial workaround
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+        // BUGBUG: See https://github.com/tui-cs/Terminal.Gui/issues/4288
         SetSchemes (GetHardCodedSchemes ().ToDictionary ());
 }
