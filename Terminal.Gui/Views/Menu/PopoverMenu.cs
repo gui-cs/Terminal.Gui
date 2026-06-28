@@ -25,7 +25,7 @@ namespace Terminal.Gui.Views;
 ///         menu.MakeVisible (); // or Application.Popover?.Show (menu);
 ///     </code>
 ///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
+///         See <see href="https://tui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
 ///     </para>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">

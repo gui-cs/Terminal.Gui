@@ -77,7 +77,7 @@ public class Adornments : Scenario
 
         Button button = new () { X = Pos.Center (), Y = Pos.Center (), Text = "Press me!" };
 
-        button.Accepting += (_, _) => MessageBox.Query (appWindow.App!, "Hi", $"Am I a {window.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
+        button.Accepted += (_, _) => MessageBox.Query (appWindow.App!, "Hi", $"Am I a {window.GetType ().Name}?", Strings.btnNo, Strings.btnYes);
 
         Editor editor = new ()
         {

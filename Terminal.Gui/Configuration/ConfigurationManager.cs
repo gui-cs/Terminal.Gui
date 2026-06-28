@@ -14,7 +14,7 @@ namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Provides settings and configuration management for Terminal.Gui applications. See the Configuration Deep Dive for
-///     more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/config.html"/>.
+///     more information: <see href="https://tui-cs.github.io/Terminal.Gui/docs/config.html"/>.
 ///     <para>
 ///         Users can set Terminal.Gui settings on a global or per-application basis by providing JSON formatted
 ///         configuration files. The configuration files can be placed in at <c>.tui</c> folder in the user's home
@@ -24,7 +24,7 @@ namespace Terminal.Gui.Configuration;
 ///     </para>
 ///     <para>
 ///         Settings are defined in JSON format, according to this schema:
-///         https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
+///         https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
 ///     </para>
 ///     <para>
 ///         Settings that will apply to all applications (global settings) reside in files named <c>config.json</c>.
@@ -305,7 +305,7 @@ public static class ConfigurationManager
     // TODO: Find a way to make this cache truly read-only at the leaf node level.
     // TODO: Right now, the dictionary is frozen, but the ConfigProperty instances can still be modified
     // TODO: if the PropertyValue is a reference type.
-    // TODO: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+    // TODO: See https://github.com/tui-cs/Terminal.Gui/issues/4288
     /// <summary>
     ///     A cache of all<see cref="ConfigurationPropertyAttribute"/> properties and their hard coded values.
     /// </summary>
@@ -409,7 +409,7 @@ public static class ConfigurationManager
 
         // BUGBUG: ThemeScope is broken and needs to be fixed to not have the hard coded schemes get overwritten.
         // BUGBUG: This a partial workaround.
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
+        // BUGBUG: See https://github.com/tui-cs/Terminal.Gui/issues/4288
         ThemeManager.Themes? [ThemeManager.Theme].Apply ();
     }
 

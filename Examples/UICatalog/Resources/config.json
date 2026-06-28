@@ -1,5 +1,5 @@
 {
-  "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+  "$schema": "https://tui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
   "Themes": [
     {
       "Hot Dog Stand": {

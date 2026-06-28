@@ -595,7 +595,7 @@ public sealed class MarkdownTable : View, IDesignable
                     }
 
                     bool hasUrl = !string.IsNullOrWhiteSpace (seg.Url);
-                    bool isAbsoluteUrl = hasUrl && Uri.IsWellFormedUriString (seg.Url, UriKind.Absolute);
+                    bool isAbsoluteUrl = hasUrl && MarkdownAttributeHelper.TryCreateSafeAbsoluteUri (seg.Url, out _);
                     bool isActive = hasUrl && HasFocus && IsActiveLinkAt (rowIndex, col, seg.Url!);
 
                     if (isActive)
@@ -1200,7 +1200,7 @@ public sealed class MarkdownTable : View, IDesignable
         Text = """
                | Feature | *Status (centered)* | **Owner** |
                |---------|:-----------------:|-------|
-               | [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! | @tig |
+               | [Markdown](https://tui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! | @tig |
                | *Tables*     | ✅ For **sure!** | [tig](https://github.com/tig) |
                | `Code`       | ✅ `printf ("Awesome!");` | ??? |
                """;

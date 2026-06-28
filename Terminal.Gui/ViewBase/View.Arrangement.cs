@@ -8,7 +8,7 @@ public partial class View
     /// <remarks>
     ///     <para>
     ///         See the View Arrangement Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/arrangement.html"/>
     ///     </para>
     /// </remarks>
     /// <example>

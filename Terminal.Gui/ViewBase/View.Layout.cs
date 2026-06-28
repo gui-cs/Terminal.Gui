@@ -27,7 +27,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         <see cref="Frame"/> is typically the output of Terminal.Gui's responsive layout system. To describe layout,
@@ -240,7 +240,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To express responsive relationships such as "center this view", "anchor it to the end", or "place it to
@@ -291,7 +291,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To express responsive relationships such as "center this view", "anchor it to the bottom", or "place it
@@ -341,7 +341,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To express responsive sizing such as filling remaining space, using a percentage of the available height,
@@ -434,7 +434,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To express responsive sizing such as filling remaining space, using a percentage of the available width,
@@ -562,7 +562,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         This method turns responsive <see cref="Pos"/> and <see cref="Dim"/> expressions into an absolute
@@ -615,7 +615,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         To force a responsive layout pass after changing <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or
@@ -788,7 +788,7 @@ public partial class View // Layout APIs
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
-    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///         <see href="https://tui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
     ///         The position and dimensions of the view are indeterminate until the view has been initialized. Therefore, the
@@ -813,6 +813,10 @@ public partial class View // Layout APIs
         contentSize = GetContentSize ();
 
         SubViewLayout?.Invoke (this, new LayoutEventArgs (contentSize));
+
+        // Re-read again — SubViewLayout event handlers may also have called SetContentSize, and the
+        // value captured below is what every SubView is laid out against. See issue #4522 / #4863.
+        contentSize = GetContentSize ();
 
         // The Adornments already have their Frame's set by SetRelativeLayout so we call LayoutSubViews vs. Layout here.
         Margin.View?.LayoutSubViews ();
@@ -906,10 +910,13 @@ public partial class View // Layout APIs
 
     #region NeedsLayout
 
-    // We expose no setter for this to ensure that the ONLY place it's changed is in SetNeedsLayout
-
-    // BUGBUG: The above statement is misleading. There are still cases internally where this property
-    // BUGBUG: is being set directly without calling SetNeedsLayout. We should remove the setter completely.
+    // NeedsLayout is mutated only from within View:
+    //   * Set true by SetNeedsLayout and its helpers MarkSubtreeNeedsLayout / MarkAncestorsNeedLayout.
+    //   * Cleared by LayoutSubViews once the view has been laid out, and by the Margin fast-path in
+    //     View.Drawing.Adornments.
+    // The setter is internal (rather than private) only so layout unit tests can establish a known
+    // baseline; external code must never assign it directly — call SetNeedsLayout instead. Fully
+    // removing the setter is tracked as part of the broader NeedsLayout lifecycle cleanup (issue #4522).
 
     /// <summary>
     ///     Indicates the View's Frame or the layout of the View's subviews (including Adornments) have

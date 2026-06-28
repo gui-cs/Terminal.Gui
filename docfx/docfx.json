@@ -67,14 +67,14 @@
       "pdf": false,
       "_appFaviconPath": "images/icon48.png",
       "_appLogoPath": "images/logo48.png",
-      "_appFooter": "Terminal.Gui - Part of the <a href=https://github.com/gui-cs>gui-cs Organization</a>",
+      "_appFooter": "Terminal.Gui - Part of the <a href=https://github.com/tui-cs>tui-cs Organization</a>",
       "_enableSearch": true,
       "_disableSideFilter": false,
       "_enableNewTab": true,
       "_disableContribution": false,
       "_disableBreadcrumb": false,
       "_gitContribute": {
-        "repo": "https://github.com/gui-cs/Terminal.Gui",
+        "repo": "https://github.com/tui-cs/Terminal.Gui",
         "branch": "develop",
         "apiSpecFolder": "docfx/overrides"
       },

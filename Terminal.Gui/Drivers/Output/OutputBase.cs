@@ -47,6 +47,9 @@ public abstract class OutputBase
         }
     }
 
+    /// <inheritdoc cref="IOutput.UseKittyGraphics"/>
+    public bool UseKittyGraphics { get; set; }
+
     private readonly ConcurrentQueue<SixelToRender> _sixels = [];
 
     /// <inheritdoc cref="IOutput.GetSixels"/>
@@ -74,6 +77,36 @@ public abstract class OutputBase
     private readonly StringBuilder _lastOutputStringBuilder = new ();
     private bool _clearLastOutputPending;
 
+    // Kitty image ids placed on the previous Write, keyed by RasterImageCommand.Id. A single image
+    // can occupy more than one placement when its visible region is fragmented by clipping (e.g. a
+    // SubView punches a hole), and each fragment needs its own image id — sharing one id makes each
+    // a=T overwrite the previous fragment's data. Kitty placements persist until explicitly deleted
+    // (unlike Sixel, which is erased by redrawing cells), so every id placed last frame must be
+    // deleted when the image is resized, re-fragmented, or removed.
+    private readonly Dictionary<string, List<int>> _placedKittyImageIds = [];
+
+    // The visible destination fragments each Kitty image occupied on the previous Write, keyed by
+    // RasterImageCommand.Id. When the geometry is unchanged a repaint can replace the placements in
+    // place (no delete, no flash); only a changed layout needs the prior placements deleted first.
+    private readonly Dictionary<string, List<Rectangle>> _placedKittyGeometry = [];
+
+    // Source-crop mode (RasterImageCommand.SourceRect set): the full image is transmitted once and kept
+    // resident; pan/zoom then only moves the crop via placement updates. Maps RasterImageCommand.Id to the
+    // full-image pixel array currently resident in the terminal (re-transmitted only when it changes), and to
+    // the placement ids displayed last frame (so a shrunk fragment set can delete its now-unused placements).
+    private readonly Dictionary<string, Color [,]> _kittyTransmittedImage = [];
+
+    // The RasterImageCommand.SourceVersion last transmitted per id. A reused buffer (same array instance,
+    // new contents) keeps the same reference but bumps the version, so this catches updates the reference
+    // comparison would miss.
+    private readonly Dictionary<string, int> _kittyTransmittedVersion = [];
+    private readonly Dictionary<string, List<int>> _kittyPlacementIds = [];
+
+    // The image id currently resident+displayed for a source-crop command. New pixels are double-buffered:
+    // transmitted to the OTHER id and placed on top before the old id is deleted, so a sharpen-on-zoom
+    // re-raster never blanks the placement.
+    private readonly Dictionary<string, int> _kittyCurrentImageId = [];
+
     /// <summary>
     ///     Writes dirty cells from the buffer to the console. Iterates rows/cols, skips clean cells,
     ///     batches dirty cells into ANSI sequences, emits OSC 8 hyperlink start/close around URL cells,
@@ -92,11 +125,20 @@ public abstract class OutputBase
         int lastCol = -1;
 
         InvalidateRowsWithUrlsIfStale (buffer, rows, cols);
+        IReadOnlyList<Rectangle> rasterCellRectangles = GetRasterCellRectangles (buffer);
+
+        // Erase Kitty placements for images that were present last frame but are gone now. Kitty
+        // placements persist until explicitly deleted, so removed images would otherwise linger.
+        if (!IsLegacyConsole && UseKittyGraphics)
+        {
+            EmitVanishedKittyDeletes (buffer);
+            ClearKittyRasterBlankCells (buffer);
+        }
 
         // Raster images must be written before dirty cells so later text draws above them.
         if (!IsLegacyConsole)
         {
-            RenderRasterImages (buffer);
+            RenderRasterImages (buffer, renderAfterText: false);
         }
 
         // Process each row
@@ -140,9 +182,18 @@ public abstract class OutputBase
                 // Batch consecutive dirty cells
                 for (; col < cols; col++)
                 {
-                    // Skip clean cells - position cursor and continue
-                    if (!buffer.Contents! [row, col].IsDirty)
+                    // Skip clean cells, plus blank cells owned by raster images. Raster-owned
+                    // blanks must not be emitted because normal text output would erase Sixel
+                    // images and is unnecessary over Kitty's transparent-cleared placement.
+                    bool skipRasterBlank = IsRasterCoveredBlankCell (buffer, row, col, rasterCellRectangles);
+
+                    if (!buffer.Contents! [row, col].IsDirty || skipRasterBlank)
                     {
+                        if (skipRasterBlank)
+                        {
+                            buffer.Contents [row, col].IsDirty = false;
+                        }
+
                         if (outputStringBuilder.Length > 0)
                         {
                             // This clears outputStringBuilder
@@ -199,7 +250,7 @@ public abstract class OutputBase
                     if (col != lastCol)
                     {
                         // Was a wide grapheme so mark clean next cell
-                        // See https://github.com/gui-cs/Terminal.Gui/issues/4466
+                        // See https://github.com/tui-cs/Terminal.Gui/issues/4466
                         buffer.Contents [row, col].IsDirty = false;
                     }
                 }
@@ -254,6 +305,8 @@ public abstract class OutputBase
         {
             return;
         }
+
+        RenderRasterImages (buffer, renderAfterText: true);
 
         // Render queued sixel images
         foreach (SixelToRender s in GetSixels ())
@@ -502,7 +555,8 @@ public abstract class OutputBase
         }
 
         StringBuilder ansiOutput = new ();
-        bool wroteRasterImages = AppendRasterImageAnsi (buffer, ansiOutput);
+        IReadOnlyList<Rectangle> rasterCellRectangles = GetRasterCellRectangles (buffer);
+        bool wroteRasterImages = AppendRasterImageAnsi (buffer, ansiOutput, renderAfterText: false);
 
         if (wroteRasterImages)
         {
@@ -510,56 +564,557 @@ public abstract class OutputBase
         }
 
         Attribute? lastAttr = null;
-        BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
+
+        if (rasterCellRectangles.Count > 0)
+        {
+            BuildAnsiForRegionSkippingRasterCoveredBlanks (buffer,
+                                                           0,
+                                                           buffer.Rows,
+                                                           0,
+                                                           buffer.Cols,
+                                                           ansiOutput,
+                                                           ref lastAttr,
+                                                           rasterCellRectangles);
+        }
+        else
+        {
+            BuildAnsiForRegion (buffer, 0, buffer.Rows, 0, buffer.Cols, ansiOutput, ref lastAttr);
+        }
+
+        AppendRasterImageAnsi (buffer, ansiOutput, renderAfterText: true);
 
         return ansiOutput.ToString ();
     }
 
-    private void RenderRasterImages (IOutputBuffer buffer)
+    private void BuildAnsiForRegionSkippingRasterCoveredBlanks (IOutputBuffer buffer,
+                                                                int startRow,
+                                                                int endRow,
+                                                                int startCol,
+                                                                int endCol,
+                                                                StringBuilder output,
+                                                                ref Attribute? lastAttr,
+                                                                IReadOnlyList<Rectangle> rasterCellRectangles)
+    {
+        var redrawTextStyle = TextStyle.None;
+        string? lastUrl = null;
+
+        for (int row = startRow; row < endRow; row++)
+        {
+            for (int col = startCol; col < endCol; col++)
+            {
+                if (IsRasterCoveredBlankCell (buffer, row, col, rasterCellRectangles))
+                {
+                    if (lastUrl is { })
+                    {
+                        output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                        lastUrl = null;
+                    }
+
+                    continue;
+                }
+
+                output.Append (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+                lastAttr = null;
+                redrawTextStyle = TextStyle.None;
+
+                for (; col < endCol; col++)
+                {
+                    if (IsRasterCoveredBlankCell (buffer, row, col, rasterCellRectangles))
+                    {
+                        col--;
+
+                        break;
+                    }
+
+                    string? cellUrl = buffer.GetCellUrl (col, row);
+
+                    if (cellUrl != lastUrl)
+                    {
+                        if (lastUrl is { })
+                        {
+                            output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                        }
+
+                        if (!string.IsNullOrEmpty (cellUrl))
+                        {
+                            output.Append (EscSeqUtils.OSC_StartHyperlink (cellUrl));
+                        }
+
+                        lastUrl = cellUrl;
+                    }
+
+                    Cell cell = buffer.Contents! [row, col];
+                    int outputWidth = -1;
+                    AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col, ref outputWidth);
+                }
+            }
+
+            if (lastUrl is { })
+            {
+                output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                lastUrl = null;
+            }
+        }
+    }
+
+    private void ClearKittyRasterBlankCells (IOutputBuffer buffer)
+    {
+        if (buffer.Contents is null)
+        {
+            return;
+        }
+
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            bool clearAllCoveredBlanks = command.IsDirty || command.AlwaysRender || command.NeedsTransparentCellClear;
+
+            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            {
+                Rectangle visible = Rectangle.Intersect (visibleCells, new Rectangle (0, 0, buffer.Cols, buffer.Rows));
+
+                for (int row = visible.Y; row < visible.Bottom; row++)
+                {
+                    for (int col = visible.X; col < visible.Right; col++)
+                    {
+                        Cell cell = buffer.Contents [row, col];
+
+                        if (!IsRasterOwnedBlankCell (cell) || (!clearAllCoveredBlanks && !cell.IsDirty))
+                        {
+                            continue;
+                        }
+
+                        if (!SetCursorPositionImpl (col, row))
+                        {
+                            return;
+                        }
+
+                        WriteTransparentBlankCell ();
+                        buffer.Contents [row, col].IsDirty = false;
+                    }
+                }
+            }
+
+            command.NeedsTransparentCellClear = false;
+        }
+    }
+
+    private void WriteTransparentBlankCell ()
+    {
+        StringBuilder output = new ();
+        EscSeqUtils.CSI_AppendResetForegroundColor (output);
+        EscSeqUtils.CSI_AppendResetBackgroundColor (output);
+        output.Append (' ');
+        Write (output);
+    }
+
+    private static IReadOnlyList<Rectangle> GetRasterCellRectangles (IOutputBuffer buffer)
+    {
+        List<Rectangle> rectangles = [];
+        Rectangle screen = new (0, 0, buffer.Cols, buffer.Rows);
+
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            {
+                Rectangle visible = Rectangle.Intersect (visibleCells, screen);
+
+                if (visible.Width > 0 && visible.Height > 0)
+                {
+                    rectangles.Add (visible);
+                }
+            }
+        }
+
+        return rectangles;
+    }
+
+    private static bool IsRasterCoveredBlankCell (IOutputBuffer buffer,
+                                                 int row,
+                                                 int col,
+                                                 IReadOnlyList<Rectangle> rasterCellRectangles)
+    {
+        if (rasterCellRectangles.Count == 0 || buffer.Contents is null || !IsRasterOwnedBlankCell (buffer.Contents [row, col]))
+        {
+            return false;
+        }
+
+        foreach (Rectangle rectangle in rasterCellRectangles)
+        {
+            if (rectangle.Contains (col, row))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsBlankCell (Cell cell) => string.IsNullOrEmpty (cell.Grapheme) || cell.Grapheme == " ";
+
+    // A raster image owns only its transparent (alpha-0) blank cells — those are what let the
+    // terminal-composited image show through. A blank cell carrying an opaque background (e.g. a
+    // View's shadow, or a colored fill) is intended overlay content and must be emitted so it paints
+    // over the image (Sixel) or appears above the z=-1 placement (Kitty). See issue #5502.
+    private static bool IsRasterOwnedBlankCell (Cell cell) =>
+        IsBlankCell (cell) && (cell.Attribute is not { } attribute || attribute.Background.A == 0);
+
+    // Emits Kitty delete sequences for images that were placed on the previous Write but are no
+    // longer in the buffer, dropping their tracking entries. Entries for images still present are
+    // left untouched — their placements persist on screen and are managed by RenderRasterImages.
+    private void EmitVanishedKittyDeletes (IOutputBuffer buffer)
+    {
+        HashSet<string> currentIds = [];
+
+        foreach (RasterImageCommand command in buffer.GetRasterImages ())
+        {
+            if (string.IsNullOrEmpty (command.Id))
+            {
+                continue;
+            }
+
+            currentIds.Add (command.Id);
+        }
+
+        List<string> vanished = [];
+
+        foreach ((string id, List<int> placedImageIds) in _placedKittyImageIds)
+        {
+            if (currentIds.Contains (id))
+            {
+                continue;
+            }
+
+            DeleteKittyPlacements (placedImageIds);
+            vanished.Add (id);
+        }
+
+        foreach (string id in vanished)
+        {
+            _placedKittyImageIds.Remove (id);
+            _placedKittyGeometry.Remove (id);
+        }
+
+        // Source-crop images are resident in the terminal; when one is gone from the buffer, delete the
+        // image (which also drops its placements) and forget it so a future use re-transmits.
+        List<string> vanishedSourceCrop = [];
+
+        foreach ((string id, Color [,] _) in _kittyTransmittedImage)
+        {
+            if (currentIds.Contains (id))
+            {
+                continue;
+            }
+
+            if (_kittyCurrentImageId.TryGetValue (id, out int residentImageId))
+            {
+                Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (residentImageId)));
+            }
+
+            vanishedSourceCrop.Add (id);
+        }
+
+        foreach (string id in vanishedSourceCrop)
+        {
+            _kittyTransmittedImage.Remove (id);
+            _kittyTransmittedVersion.Remove (id);
+            _kittyPlacementIds.Remove (id);
+            _kittyCurrentImageId.Remove (id);
+        }
+    }
+
+    private void DeleteKittyPlacements (List<int> imageIds)
+    {
+        foreach (int imageId in imageIds)
+        {
+            Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (imageId)));
+        }
+    }
+
+    // Derives the Kitty image id for the rectIndex-th visible fragment of a command. Fragment 0 uses
+    // the command's base id (matching ImageView's pre-encoded payload); later fragments get distinct
+    // ids so their data does not overwrite earlier fragments under a shared id.
+    private static int GetKittyImageId (string commandId, int rectIndex) =>
+        rectIndex == 0
+            ? KittyGraphicsEncoder.GetImageId (commandId)
+            : KittyGraphicsEncoder.GetImageId ($"{commandId}#{rectIndex}");
+
+    private void RenderRasterImages (IOutputBuffer buffer, bool renderAfterText)
     {
         foreach (RasterImageCommand command in buffer.GetRasterImages ())
         {
+            if (command.RenderAfterText != renderAfterText)
+            {
+                continue;
+            }
+
             if (!command.IsDirty && !command.AlwaysRender)
             {
                 continue;
             }
 
-            foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+            bool trackKitty = UseKittyGraphics && !string.IsNullOrEmpty (command.Id);
+
+            // Source-crop fast path: transmit the full image once and pan/zoom it with tiny placement
+            // updates (a=p) showing a different crop, instead of re-transmitting the whole image every
+            // frame. This is what keeps panning/zooming a static image flash-free for large images.
+            if (trackKitty && command.SourceRect is { } sourceRect && command.Pixels is { })
+            {
+                RenderKittySourceCrop (command, sourceRect);
+                command.IsDirty = false;
+
+                continue;
+            }
+
+            // The destination fragments this frame. Re-placing each one (a=T with a stable placement
+            // id) replaces it in place, so when the layout is unchanged from last frame the old pixels
+            // stay visible until the new ones arrive — no blank, no flash. Only a changed layout needs
+            // the prior placements deleted first, otherwise a resized/moved/re-fragmented image would
+            // leave stale placements behind. Sixel needs no delete — redrawing the cells overwrites it.
+            List<Rectangle> visibleRects = GetVisibleRasterCellRectangles (command).ToList ();
+
+            bool geometryUnchanged = trackKitty
+                                     && _placedKittyGeometry.TryGetValue (command.Id!, out List<Rectangle>? previousRects)
+                                     && previousRects.SequenceEqual (visibleRects);
+
+            if (trackKitty && !geometryUnchanged && _placedKittyImageIds.TryGetValue (command.Id!, out List<int>? previous))
+            {
+                DeleteKittyPlacements (previous);
+            }
+
+            List<int> placedImageIds = [];
+            var rectIndex = 0;
+
+            foreach (Rectangle visibleCells in visibleRects)
             {
                 if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
                 {
                     continue;
                 }
 
+                int imageId = trackKitty ? GetKittyImageId (command.Id!, rectIndex) : 0;
                 SetCursorPositionImpl (visibleCells.X, visibleCells.Y);
-                Write (new StringBuilder (GetRasterImageSixelData (command, visibleCells, pixels)));
+                Write (new StringBuilder (GetRasterImageData (command, visibleCells, pixels, imageId)));
+
+                if (trackKitty)
+                {
+                    placedImageIds.Add (imageId);
+                }
+
+                rectIndex++;
+            }
+
+            if (trackKitty)
+            {
+                _placedKittyImageIds [command.Id!] = placedImageIds;
+                _placedKittyGeometry [command.Id!] = visibleRects;
             }
 
             command.IsDirty = false;
         }
     }
 
-    private static bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output)
+    // Displays the command's image via Kitty placement crops. The full image is transmitted once (and only
+    // re-transmitted when the pixels themselves change); each visible fragment is then shown with an a=p
+    // placement that crops the corresponding source region. Reusing placement ids replaces them in place, so
+    // a pan/zoom of a static image is a handful of tiny bytes — no per-frame pixel re-transmit, no flash.
+    private void RenderKittySourceCrop (RasterImageCommand command, Rectangle sourceRect)
+    {
+        int idA = KittyGraphicsEncoder.GetImageId (command.Id!);
+        int idB = KittyGraphicsEncoder.GetImageId (command.Id! + ":b");
+
+        // Re-transmit when the pixels change — by reference (a new array) OR by version (a reused buffer with
+        // new contents; the host bumps SourceVersion on every Image set, matching the legacy image-version
+        // cache key). Either signal alone would miss one of those cases.
+        bool hadTransmitted = _kittyTransmittedImage.TryGetValue (command.Id!, out Color [,]? transmitted);
+        _kittyTransmittedVersion.TryGetValue (command.Id!, out int transmittedVersion);
+
+        bool pixelsChanged = !hadTransmitted
+                             || !ReferenceEquals (transmitted, command.Pixels)
+                             || transmittedVersion != command.SourceVersion;
+
+        _kittyCurrentImageId.TryGetValue (command.Id!, out int previousImageId);
+        int imageId = previousImageId == 0 ? idA : previousImageId;
+
+        if (pixelsChanged)
+        {
+            // Double-buffer: transmit the new pixels to the OTHER image id, so the image currently on
+            // screen stays intact while the new one loads; the new placement is then drawn on top below.
+            imageId = previousImageId == idA ? idB : idA;
+            Write (new StringBuilder (new KittyGraphicsEncoder ().EncodeTransmit (command.Pixels!, imageId)));
+            _kittyTransmittedImage [command.Id!] = command.Pixels!;
+            _kittyTransmittedVersion [command.Id!] = command.SourceVersion;
+            _kittyCurrentImageId [command.Id!] = imageId;
+        }
+
+        List<int> placementIds = [];
+        var index = 0;
+
+        foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
+        {
+            Rectangle srcSub = MapFragmentToSource (sourceRect, command.DestinationCells, visibleCells);
+            int placementId = index + 1;
+            SetCursorPositionImpl (visibleCells.X, visibleCells.Y);
+
+            Write (new StringBuilder (KittyGraphicsEncoder.EncodePut (imageId,
+                                                                      placementId,
+                                                                      srcSub.X,
+                                                                      srcSub.Y,
+                                                                      srcSub.Width,
+                                                                      srcSub.Height,
+                                                                      visibleCells.Width,
+                                                                      visibleCells.Height)));
+            placementIds.Add (placementId);
+            index++;
+        }
+
+        // The new image is now placed on top; delete the previous buffer (image + its placements). The old
+        // pixels were visible right up to this point, so the swap never blanks.
+        if (pixelsChanged && previousImageId != 0 && previousImageId != imageId)
+        {
+            Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacements (previousImageId)));
+        }
+
+        // Fewer fragments than last frame (e.g. a clip hole closed): delete the now-unused placements so
+        // they do not linger.
+        if (_kittyPlacementIds.TryGetValue (command.Id!, out List<int>? previousPlacements))
+        {
+            foreach (int pid in previousPlacements)
+            {
+                if (!placementIds.Contains (pid))
+                {
+                    Write (new StringBuilder (KittyGraphicsEncoder.EncodeDeletePlacement (imageId, pid)));
+                }
+            }
+        }
+
+        _kittyPlacementIds [command.Id!] = placementIds;
+    }
+
+    // Maps a visible destination fragment back to the source-image crop it should display, by proportion.
+    // For the common un-clipped case the fragment equals the whole destination, so this returns sourceRect.
+    // Internal for unit testing the rounding/clamp behavior.
+    internal static Rectangle MapFragmentToSource (Rectangle sourceRect, Rectangle destinationCells, Rectangle fragment)
+    {
+        if (destinationCells.Width <= 0 || destinationCells.Height <= 0)
+        {
+            return sourceRect;
+        }
+
+        double relX = (fragment.X - destinationCells.X) / (double)destinationCells.Width;
+        double relY = (fragment.Y - destinationCells.Y) / (double)destinationCells.Height;
+        double relW = fragment.Width / (double)destinationCells.Width;
+        double relH = fragment.Height / (double)destinationCells.Height;
+
+        var x = (int)Math.Round (sourceRect.X + relX * sourceRect.Width);
+        var y = (int)Math.Round (sourceRect.Y + relY * sourceRect.Height);
+        int w = Math.Max (1, (int)Math.Round (relW * sourceRect.Width));
+        int h = Math.Max (1, (int)Math.Round (relH * sourceRect.Height));
+
+        // Rounding can push the far edge past the source (e.g. the last fragment rounds x up while width also
+        // rounds up). Clamp so the emitted Kitty crop coordinates always stay within the resident image.
+        x = Math.Clamp (x, sourceRect.X, Math.Max (sourceRect.X, sourceRect.Right - 1));
+        y = Math.Clamp (y, sourceRect.Y, Math.Max (sourceRect.Y, sourceRect.Bottom - 1));
+        w = Math.Clamp (w, 1, sourceRect.Right - x);
+        h = Math.Clamp (h, 1, sourceRect.Bottom - y);
+
+        return new Rectangle (x, y, w, h);
+    }
+
+    // Extracts the sub-rectangle of a full image (a Kitty source-crop command keeps the whole image in
+    // Pixels). The rect is clamped to the image bounds; a rect that already covers the whole image returns
+    // the source unchanged to avoid an allocation/copy.
+    private static Color [,] CropPixelsToRect (Color [,] source, Rectangle rect)
+    {
+        int sourceWidth = source.GetLength (0);
+        int sourceHeight = source.GetLength (1);
+
+        int x = Math.Clamp (rect.X, 0, Math.Max (0, sourceWidth - 1));
+        int y = Math.Clamp (rect.Y, 0, Math.Max (0, sourceHeight - 1));
+        int width = Math.Clamp (rect.Width, 1, sourceWidth - x);
+        int height = Math.Clamp (rect.Height, 1, sourceHeight - y);
+
+        if (x == 0 && y == 0 && width == sourceWidth && height == sourceHeight)
+        {
+            return source;
+        }
+
+        Color [,] cropped = new Color [width, height];
+
+        for (var cx = 0; cx < width; cx++)
+        {
+            for (var cy = 0; cy < height; cy++)
+            {
+                cropped [cx, cy] = source [x + cx, y + cy];
+            }
+        }
+
+        return cropped;
+    }
+
+    private bool AppendRasterImageAnsi (IOutputBuffer buffer, StringBuilder output, bool renderAfterText)
     {
         bool wroteRasterImages = false;
 
         foreach (RasterImageCommand command in buffer.GetRasterImages ())
         {
+            if (command.RenderAfterText != renderAfterText)
+            {
+                continue;
+            }
+
+            bool useKittyIds = UseKittyGraphics && !string.IsNullOrEmpty (command.Id);
+            var rectIndex = 0;
+
+            // ToAnsi() recreates the current screen as a self-contained string, so it cannot rely on the
+            // resident-image state the live source-crop path keeps. For a source-crop command (Pixels is the
+            // full image) extract the visible crop first, so the export reflects the panned/zoomed region
+            // rather than the whole source scaled into the destination.
+            Color [,] sourcePixels = command.SourceRect is { } sourceRect
+                                         ? CropPixelsToRect (command.Pixels!, sourceRect)
+                                         : command.Pixels!;
+
             foreach (Rectangle visibleCells in GetVisibleRasterCellRectangles (command))
             {
-                if (!TryCropRasterImagePixels (command.Pixels!, command.DestinationCells, visibleCells, out Color [,] pixels))
+                if (!TryCropRasterImagePixels (sourcePixels, command.DestinationCells, visibleCells, out Color [,] pixels))
                 {
-
                     continue;
                 }
 
+                int imageId = useKittyIds ? GetKittyImageId (command.Id!, rectIndex) : 0;
                 output.Append (EscSeqUtils.CSI_SetCursorPosition (visibleCells.Y + 1, visibleCells.X + 1));
-                output.Append (GetRasterImageSixelData (command, visibleCells, pixels));
+                output.Append (GetRasterImageData (command, visibleCells, pixels, imageId));
                 wroteRasterImages = true;
+                rectIndex++;
             }
         }
 
         return wroteRasterImages;
+    }
+
+    private string GetRasterImageData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels, int imageId)
+    {
+        if (UseKittyGraphics)
+        {
+            return GetRasterImageKittyData (command, visibleCells, pixels, imageId);
+        }
+
+        return GetRasterImageSixelData (command, visibleCells, pixels);
+    }
+
+    private static string GetRasterImageKittyData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels, int imageId)
+    {
+        // The pre-encoded payload carries the base image id and covers the whole destination, so it
+        // only applies to fragment 0 rendered un-clipped.
+        if (command.EncodedKitty is { } encodedKitty
+            && visibleCells == command.DestinationCells
+            && imageId == KittyGraphicsEncoder.GetImageId (command.Id!))
+        {
+            return encodedKitty;
+        }
+
+        KittyGraphicsEncoder encoder = new ();
+
+        return encoder.EncodeKitty (pixels, visibleCells.Width, visibleCells.Height, imageId);
     }
 
     private static string GetRasterImageSixelData (RasterImageCommand command, Rectangle visibleCells, Color [,] pixels)

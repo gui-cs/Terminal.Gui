@@ -156,7 +156,7 @@ public sealed class AotAllViewsWindow : Runnable
         yield return Design (new FlagSelector ());
         yield return Design (new GraphView ());
         yield return Design (new HexView ());
-        yield return Design (new Link { Text = "Terminal.Gui on GitHub", Url = "https://github.com/gui-cs/Terminal.Gui" });
+        yield return Design (new Link { Text = "Terminal.Gui on GitHub", Url = "https://github.com/tui-cs/Terminal.Gui" });
         yield return Design (new ListView ());
         yield return Design (new OptionSelector ());
         yield return Design (new ProgressBar ());

@@ -4,7 +4,7 @@ namespace ViewBaseTests.Layout;
 
 /// <summary>
 ///     Tests for the stale content size capture bug in <see cref="View.LayoutSubViews"/>.
-///     See: https://github.com/gui-cs/Terminal.Gui/issues/4522
+///     See: https://github.com/tui-cs/Terminal.Gui/issues/4522
 ///
 ///     The core bug: <c>LayoutSubViews</c> captures <c>contentSize</c> once at the top, then fires
 ///     <c>OnSubViewLayout</c>. If a subclass (e.g. Dialog) calls <c>SetContentSize</c> from that callback,
@@ -52,16 +52,36 @@ public class StaleContentSizeCaptureTests
         }
     }
 
+    /// <summary>
+    ///     A View subclass that calls <see cref="View.SetContentSize"/> from the <c>SubViewLayout</c>
+    ///     event (raised before SubViews are laid out, after <see cref="View.OnSubViewLayout"/>).
+    ///     <see cref="NewContentSize"/> is nullable so the event handler can be armed after
+    ///     <c>EndInit</c> and won't corrupt state during initialization.
+    /// </summary>
+    private class ContentSizeChangingOnSubViewLayoutEventView : View
+    {
+        public Size? NewContentSize { get; set; }
+
+        public ContentSizeChangingOnSubViewLayoutEventView ()
+        {
+            SubViewLayout += (_, _) =>
+            {
+                if (NewContentSize.HasValue) { SetContentSize (NewContentSize.Value); }
+            };
+        }
+    }
+
     #endregion
 
     #region Test 1: Core stale capture
 
     /// <summary>
-    ///     Proves the core bug: <c>LayoutSubViews</c> captures <c>contentSize</c> before
-    ///     <c>OnSubViewLayout</c> fires, so SubViews are laid out with the wrong size.
+    ///     Regression guard: <c>LayoutSubViews</c> re-reads <c>contentSize</c> after
+    ///     <c>OnSubViewLayout</c> fires, so SubViews are laid out with the updated size.
+    ///     Fixed by #4863.
     /// </summary>
     [Fact]
-    public void LayoutSubViews_Uses_Stale_ContentSize_When_OnSubViewLayout_Changes_It ()
+    public void LayoutSubViews_Honors_SetContentSize_From_OnSubViewLayout ()
     {
         // Arrange: SuperView that changes content size in OnSubViewLayout
         ContentSizeChangingOnSubViewLayoutView superView = new ()
@@ -143,14 +163,16 @@ public class StaleContentSizeCaptureTests
 
     #endregion
 
-    #region Test 3: Dialog OnSubViewLayout divergence
+    #region Test 3: Dialog OnSubViewLayout non-divergence
 
     /// <summary>
-    ///     Proves that <c>Dialog.OnSubViewLayout</c> → <c>UpdateSizes</c> → <c>SetContentSize</c>
-    ///     produces a content size that differs from what <c>LayoutSubViews</c> used to lay out SubViews.
+    ///     Regression guard: after the fix, <c>Dialog.OnSubViewLayout</c> → <c>UpdateSizes</c> →
+    ///     <c>SetContentSize</c> does NOT produce a content size that differs from what
+    ///     <c>LayoutSubViews</c> uses to lay out SubViews. The pre-event and post-event sizes
+    ///     must be equal (no divergence). Fixed by #4863.
     /// </summary>
     [Fact]
-    public void Dialog_OnSubViewLayout_SetContentSize_Diverges_From_Captured_Value ()
+    public void Dialog_OnSubViewLayout_SetContentSize_Does_Not_Diverge_From_Layout_Value ()
     {
         // Arrange: Dialog with explicit (non-Auto) Width/Height
         Dialog dialog = new ()
@@ -284,6 +306,63 @@ public class StaleContentSizeCaptureTests
         // On current code, the child was already laid out before SubViewsLaidOut fired.
         Assert.Equal (80, child.Frame.Width);
         Assert.Equal (30, child.Frame.Height);
+    }
+
+    #endregion
+
+    #region Test 5b: SubViewLayout event SetContentSize is honored
+
+    // Claude - Sonnet 4.6
+    /// <summary>
+    ///     Regression test for the <c>SubViewLayout</c> <b>event</b> companion to the
+    ///     <c>OnSubViewLayout</c> virtual fixed by #4863. A handler on the <c>SubViewLayout</c> event
+    ///     that calls <see cref="View.SetContentSize"/> must be honored: <see cref="View.LayoutSubViews"/>
+    ///     re-reads the content size after raising the event, so SubViews are laid out against the
+    ///     updated value rather than the size captured before the event fired. See issue #4522.
+    /// </summary>
+    /// <remarks>
+    ///     The test arms the event handler <b>after</b> <c>EndInit</c> and explicitly resets the
+    ///     content size to a known 20×10 baseline. This ensures the captured <c>contentSize</c> local
+    ///     variable in <c>LayoutSubViews</c> starts at 20×10, so removing the post-event reread would
+    ///     give the child a width of 20 (not 50) — making the test a genuine regression guard for the
+    ///     specific line added in this fix.
+    /// </remarks>
+    [Fact]
+    public void LayoutSubViews_Honors_SetContentSize_From_SubViewLayout_Event ()
+    {
+        // NewContentSize is NOT set here; the event handler does nothing during EndInit,
+        // so it cannot pre-seed the content size to 50×20 before the guarded layout pass.
+        ContentSizeChangingOnSubViewLayoutEventView superView = new ()
+        {
+            Width = 20,
+            Height = 10
+        };
+
+        View child = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        superView.Add (child);
+        superView.BeginInit ();
+        superView.EndInit ();
+
+        // Establish a concrete 20×10 baseline. SetContentSize also calls SetNeedsLayout so
+        // the next Layout() call will run LayoutSubViews and not return early.
+        superView.SetContentSize (new Size (20, 10));
+
+        // Now arm the event: the handler will inject 50×20 during the next SubViewLayout event.
+        superView.NewContentSize = new Size (50, 20);
+
+        superView.Layout ();
+
+        // The child must fill the content size injected by the SubViewLayout event handler (50×20),
+        // not the baseline value captured before the event fired (20×10).
+        Assert.Equal (50, child.Frame.Width);
+        Assert.Equal (20, child.Frame.Height);
+
+        superView.Dispose ();
     }
 
     #endregion

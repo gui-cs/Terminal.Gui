@@ -229,8 +229,9 @@ public partial class Markdown
                 {
                     Attribute linkAttr = GetAttributeForSegment (segment);
                     Attribute reversed = new (linkAttr.Background, linkAttr.Foreground, linkAttr.Style);
+                    bool isSafeAbsoluteLink = MarkdownAttributeHelper.TryCreateSafeAbsoluteUri (segment.Url, out _);
 
-                    if (!string.IsNullOrWhiteSpace (segment.Url) && Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute) && Driver is { })
+                    if (isSafeAbsoluteLink && Driver is { })
                     {
                         Driver.CurrentUrl = segment.Url;
 
@@ -276,7 +277,7 @@ public partial class Markdown
     {
         Attribute attr = GetAttributeForSegment (segment);
 
-        if (!string.IsNullOrWhiteSpace (segment.Url) && Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute) && Driver is { })
+        if (MarkdownAttributeHelper.TryCreateSafeAbsoluteUri (segment.Url, out _) && Driver is { })
         {
             Driver.CurrentUrl = segment.Url;
 

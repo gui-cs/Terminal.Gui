@@ -266,7 +266,7 @@ public class FileDialogTests : TestsAllDrivers
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4950
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4950
     ///     OpenFileDialog only closes after clicking Cancel or OK three times.
     ///     The first mouse-press triggers a layout pass that repositions the button,
     ///     so the subsequent mouse-release misses it.

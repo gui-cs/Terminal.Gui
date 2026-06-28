@@ -55,7 +55,7 @@ public class Navigation : Scenario
         window.Add (testFrame);
 
         Button button = new () { X = 0, Y = 0, Title = $"TopButton _{GetNextHotKey ()}" };
-        button.Accepting += (_, _) => MessageBox.Query (app, "hi", button.Title, Strings.btnOk);
+        button.Accepted += (_, _) => MessageBox.Query (app, "hi", button.Title, Strings.btnOk);
 
         testFrame.Add (button);
 

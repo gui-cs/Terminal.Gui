@@ -451,7 +451,7 @@ public class HexViewTests : TestDriverBase
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4963
     ///     Ctrl-modified keys must not edit hex data even when they look like valid hex digits.
     /// </summary>
     [Fact]
@@ -485,7 +485,7 @@ public class HexViewTests : TestDriverBase
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Regression test for https://github.com/tui-cs/Terminal.Gui/issues/4963
     ///     Alt-modified keys on the right (text) side must not edit data.
     /// </summary>
     [Fact]

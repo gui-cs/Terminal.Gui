@@ -158,25 +158,15 @@ public class DropDownList : TextField
 
                                              return Math.Min (Source?.Count ?? 0, Math.Max (1, available));
                                          })),
-            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar,
+
+            // Use the Menu scheme so the dropped list "floats" with its own background, distinct from the
+            // SuperView's. See https://github.com/gui-cs/Terminal.Gui/issues/5517.
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu)
         };
 
         // Create popover
         _listPopover = new Popover<ListView, string?> (listView) { Anchor = GetAnchor };
-
-        // This ensures the Normal attribute is always that of the host
-        _listPopover.GettingAttributeForRole += (sender, args) =>
-                                                {
-                                                    if (sender is not View || args.Role != VisualRole.Normal)
-                                                    {
-                                                        return;
-                                                    }
-
-                                                    Attribute? res = App?.TopRunnableView?.MostFocused?.GetAttributeForRole (VisualRole.Normal);
-                                                    args.Handled = true;
-
-                                                    args.Result = res;
-                                                };
 
 #if DEBUG
         _listPopover.Id = "dropDownListPopover";

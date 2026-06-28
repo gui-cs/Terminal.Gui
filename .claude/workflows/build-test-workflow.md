@@ -4,8 +4,8 @@
 
 ## Required Tools
 
-- **.NET SDK**: 8.0.0 (see `global.json`)
-- **Runtime**: .NET 8.x (latest GA)
+- **.NET SDK**: 10.0.100 (see `global.json`)
+- **Runtime**: .NET 10.x (latest GA)
 - **Optional**: ReSharper/Rider for code formatting (honor `.editorconfig` and `Terminal.sln.DotSettings`)
 
 ## Build Commands
@@ -47,7 +47,7 @@ dotnet build --configuration Release --no-restore
 **Time:** ~10 min timeout
 
 ```bash
-dotnet test --project Tests/UnitTests --no-build --verbosity normal
+dotnet test --project Tests/UnitTests.NonParallelizable --no-build --verbosity normal
 ```
 
 - Uses `Application.Init` and static state
@@ -75,7 +75,7 @@ dotnet test --project Tests/IntegrationTests --no-build --verbosity normal
 ### Run All Tests
 
 ```bash
-dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
+dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal && dotnet test --project Tests/UnitTests.NonParallelizable --no-build --verbosity normal
 ```
 
 ## Common Build Issues
@@ -94,7 +94,7 @@ dotnet publish ./Tests/NativeAotSmoke/NativeAotSmoke.csproj --configuration Rele
 **For clean builds, always run in this order:**
 
 ```bash
-dotnet restore && dotnet build --no-restore && dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build
+dotnet restore && dotnet build --no-restore && dotnet test --project Tests/UnitTestsParallelizable --no-build && dotnet test --project Tests/UnitTests.NonParallelizable --no-build
 ```
 
 This ensures:

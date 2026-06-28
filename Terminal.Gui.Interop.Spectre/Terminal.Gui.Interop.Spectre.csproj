@@ -18,10 +18,10 @@
     <IsAotCompatible>true</IsAotCompatible>
     <PackageId>Terminal.Gui.Interop.Spectre</PackageId>
     <Description>Bridge package for rendering Spectre.Console IRenderable widgets inside Terminal.Gui applications.</Description>
-    <Authors>gui-cs contributors</Authors>
+    <Authors>tui-cs contributors</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/gui-cs/Terminal.Gui</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/gui-cs/Terminal.Gui</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/tui-cs/Terminal.Gui</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/tui-cs/Terminal.Gui</RepositoryUrl>
     <PackageTags>terminal;gui;console;spectre;interop</PackageTags>
   </PropertyGroup>
 

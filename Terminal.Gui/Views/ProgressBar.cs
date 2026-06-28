@@ -93,6 +93,7 @@ public class ProgressBar : View, IDesignable
     private int _fireEncoderMaxColors;
     private int _fireFrame;
     private readonly string _fireRasterImageId = $"{nameof (ProgressBar)}.{Guid.NewGuid ():N}.Fire";
+    private bool _fireRasterImageActive;
     private float _fraction;
     private bool _isActivity;
     private bool _syncWithTerminal;
@@ -417,13 +418,25 @@ public class ProgressBar : View, IDesignable
     {
         filledCells = Math.Clamp (filledCells, 0, Viewport.Width);
 
-        if (filledCells <= 0 || Viewport.Height <= 0 || Driver?.SixelSupport is not { IsSupported: true } support)
+        if (filledCells <= 0 || Viewport.Height <= 0 || Driver is not { } driver)
         {
             return false;
         }
 
-        int cellWidthPixels = Math.Max (1, support.Resolution.Width);
-        int cellHeightPixels = Math.Max (1, support.Resolution.Height);
+        // The fire is a raster image, so it works under either raster protocol. Prefer Kitty when it
+        // is the active output (e.g. Kitty/Ghostty report no Sixel support), otherwise fall back to
+        // Sixel. Without this the fire silently disappears on Kitty-only terminals.
+        bool kittyActive = driver.KittyGraphicsSupport is { IsSupported: true } && driver.GetOutput ().UseKittyGraphics;
+        SixelSupportResult? sixel = driver.SixelSupport;
+
+        if (!kittyActive && sixel is not { IsSupported: true })
+        {
+            return false;
+        }
+
+        Size resolution = kittyActive ? driver.KittyGraphicsSupport!.Resolution : sixel!.Resolution;
+        int cellWidthPixels = Math.Max (1, resolution.Width);
+        int cellHeightPixels = Math.Max (1, resolution.Height);
         int pixelWidth = Math.Max (1, filledCells * cellWidthPixels);
         int pixelHeight = Math.Max (1, Viewport.Height * cellHeightPixels);
 
@@ -432,10 +445,13 @@ public class ProgressBar : View, IDesignable
             Id = _fireRasterImageId,
             Pixels = CreateFirePixels (pixelWidth, pixelHeight, _fireFrame++),
             DestinationCells = ViewportToScreen (new Rectangle (0, 0, filledCells, Viewport.Height)),
-            Encoder = GetFireEncoder (support)
+
+            // The Sixel encoder is ignored when Kitty output is active; only build it for the Sixel path.
+            Encoder = kittyActive ? null : GetFireEncoder (sixel!)
         };
 
-        Driver.GetOutputBuffer ().AddRasterImage (command);
+        driver.GetOutputBuffer ().AddRasterImage (command);
+        _fireRasterImageActive = true;
 
         return true;
     }
@@ -493,7 +509,27 @@ public class ProgressBar : View, IDesignable
         public List<Color> BuildPalette (int maxColors) => [.. _firePalette.Take (maxColors)];
     }
 
-    private void RemoveFireRasterImage () => Driver?.GetOutputBuffer ().RemoveRasterImage (_fireRasterImageId);
+    private void RemoveFireRasterImage ()
+    {
+        _fireRasterImageActive = false;
+        Driver?.GetOutputBuffer ().RemoveRasterImage (_fireRasterImageId);
+    }
+
+    /// <inheritdoc/>
+    internal override void CollectActiveRasterImageIds (HashSet<string> ids)
+    {
+        if (!Visible)
+        {
+            return;
+        }
+
+        base.CollectActiveRasterImageIds (ids);
+
+        if (_fireRasterImageActive)
+        {
+            ids.Add (_fireRasterImageId);
+        }
+    }
 
     private void UpdateTerminalProgress ()
     {

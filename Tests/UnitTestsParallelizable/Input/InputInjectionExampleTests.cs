@@ -329,7 +329,7 @@ public class InputInjectionExampleTests
 
     #endregion
 
-    #region Tests for https: //github.com/gui-cs/Terminal.Gui/issues/4675
+    #region Tests for https: //github.com/tui-cs/Terminal.Gui/issues/4675
 
     [Fact]
     public void Issue_4675_MakeInjectingDoubleClickEasier_WorksAsExpected ()

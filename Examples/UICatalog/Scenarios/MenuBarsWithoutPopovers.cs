@@ -194,7 +194,7 @@ public class MenuBarsWithoutPopovers : Scenario
                                                     new MenuItem
                                                     {
                                                         Title = "_Online Help...",
-                                                        Action = () => MessageBox.Query (App!, "Online Help", "https://gui-cs.github.io/Terminal.Gui", Strings.btnOk)
+                                                        Action = () => MessageBox.Query (App!, "Online Help", "https://tui-cs.github.io/Terminal.Gui", Strings.btnOk)
                                                     },
                                                     new MenuItem
                                                     {

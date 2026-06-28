@@ -122,11 +122,45 @@ internal static class MarkdownAttributeHelper
         return segments;
     }
 
-    private static Attribute MakeLinkAttribute (Attribute normal, StyledSegment segment)
-    {
-        bool isClickable = !string.IsNullOrWhiteSpace (segment.Url)
-                           && (Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute) || segment.Url!.StartsWith ('#'));
+    private static Attribute MakeLinkAttribute (Attribute normal, StyledSegment segment) =>
+        IsMarkdownLinkTarget (segment.Url) ? normal with { Style = normal.Style | TextStyle.Underline } : normal;
 
-        return isClickable ? normal with { Style = normal.Style | TextStyle.Underline } : normal;
+    internal static bool IsMarkdownLinkTarget (string? url)
+    {
+        if (string.IsNullOrWhiteSpace (url))
+        {
+            return false;
+        }
+
+        if (url.StartsWith ('#'))
+        {
+            return true;
+        }
+
+        if (TryCreateSafeAbsoluteUri (url, out _))
+        {
+            return true;
+        }
+
+        return Uri.TryCreate (url, UriKind.Relative, out _);
+    }
+
+    internal static bool TryCreateSafeAbsoluteUri (string? url, out Uri? absoluteUri)
+    {
+        absoluteUri = null;
+
+        if (!Uri.TryCreate (url, UriKind.Absolute, out Uri? parsed) || parsed is null)
+        {
+            return false;
+        }
+
+        if (!Link.SafeSchemes.Contains (parsed.Scheme))
+        {
+            return false;
+        }
+
+        absoluteUri = parsed;
+
+        return true;
     }
 }

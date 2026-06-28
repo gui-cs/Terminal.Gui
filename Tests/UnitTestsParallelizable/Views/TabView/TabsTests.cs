@@ -43,7 +43,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Add_View_Value_Is_First_Added_SuperView ()
     {
-        var superView = new View { CanFocus = true };
+        View superView = new () { CanFocus = true };
         Tabs tabs = new ();
         superView.Add (tabs);
 
@@ -302,6 +302,75 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         Assert.Same (tab1, ordered [0]);
         Assert.Same (tab2, ordered [1]);
         Assert.Same (tab3, ordered [2]);
+    }
+
+    // ChatGPT - GPT-5
+    [Fact]
+    public void GetSubViews_ReturnsLogicalOrder_AfterFocusedTabChangesDrawOrder ()
+    {
+        Tabs tabs = new ();
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Value = tab2;
+
+        List<View> ordered = tabs.GetSubViews ().ToList ();
+
+        Assert.Equal (3, ordered.Count);
+        Assert.Same (tab1, ordered [0]);
+        Assert.Same (tab2, ordered [1]);
+        Assert.Same (tab3, ordered [2]);
+
+        tabs.Dispose ();
+    }
+
+    // ChatGPT - GPT-5
+    [Fact]
+    public void GetSubViews_IncludesNonTabAdornmentSubViews_AfterLogicalTabs ()
+    {
+        Tabs tabs = new () { BorderStyle = LineStyle.Single };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View borderSubView = new () { Id = "borderSubView", Width = 1, Height = 1 };
+
+        tabs.Add (tab1, tab2);
+        tabs.Border.View!.Add (borderSubView);
+
+        List<View> ordered = tabs.GetSubViews (includeBorder: true).ToList ();
+
+        Assert.Same (tab1, ordered [0]);
+        Assert.Same (tab2, ordered [1]);
+        Assert.Same (borderSubView, ordered [2]);
+
+        tabs.Dispose ();
+    }
+
+    // ChatGPT - GPT-5
+    [Fact]
+    public void InsertTab_InvalidatesLogicalOrderCache ()
+    {
+        Tabs tabs = new ();
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab3);
+        _ = tabs.TabCollection.ToList ();
+
+        tabs.InsertTab (1, tab2);
+
+        List<View> ordered = tabs.TabCollection.ToList ();
+
+        Assert.Equal (0, tabs.IndexOf (tab1));
+        Assert.Equal (1, tabs.IndexOf (tab2));
+        Assert.Equal (2, tabs.IndexOf (tab3));
+        Assert.Same (tab1, ordered [0]);
+        Assert.Same (tab2, ordered [1]);
+        Assert.Same (tab3, ordered [2]);
+
+        tabs.Dispose ();
     }
 
     [Fact]

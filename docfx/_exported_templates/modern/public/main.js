@@ -3,7 +3,7 @@ export default {
     iconLinks: [
       {
         icon: 'github',
-        href: 'https://github.com/gui-cs',
+        href: 'https://github.com/tui-cs',
         title: 'GitHub'
       }
     ]

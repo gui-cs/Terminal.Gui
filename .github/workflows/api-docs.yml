@@ -21,7 +21,7 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
@@ -78,7 +78,10 @@ jobs:
     - name: Install views docs tools
       if: steps.view-docs.outputs.should_generate == 'true'
       run: |
-        go install github.com/gui-cs/tuirec/cmd/tuirec@latest
+        # Pin to @main: tuirec's released tags (≤ v0.9.0) still declare the old
+        # module path github.com/gui-cs/tuirec, so go install ...@latest would
+        # fail the import-path check. main already declares github.com/tui-cs/tuirec.
+        go install github.com/tui-cs/tuirec/cmd/tuirec@main
         Add-Content $env:GITHUB_PATH "$(go env GOPATH)\bin"
         Install-Module powershell-yaml -Scope CurrentUser -Force
 

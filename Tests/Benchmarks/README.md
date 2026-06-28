@@ -8,7 +8,7 @@ Fast, in-process memory measurement using `GC.GetAllocatedBytesForCurrentThread(
 
 ### View Memory (`memory`)
 
-Measures memory allocated when instantiating each concrete `View` subclass. Discovers all types via reflection (same technique as `TestsAllViews`). Tracks per-view footprint for [#4696](https://github.com/gui-cs/Terminal.Gui/issues/4696).
+Measures memory allocated when instantiating each concrete `View` subclass. Discovers all types via reflection (same technique as `TestsAllViews`). Tracks per-view footprint for [#4696](https://github.com/tui-cs/Terminal.Gui/issues/4696).
 
 ```bash
 # Print to console (note the -- separator before the command)
@@ -208,4 +208,4 @@ dotnet run --project Tests/Benchmarks -c Release -- --filter '*Scroll*' '*Config
 ## Resources
 
 - [BenchmarkDotNet Documentation](https://benchmarkdotnet.org/)
-- [Issue #4696 — View memory footprint](https://github.com/gui-cs/Terminal.Gui/issues/4696)
+- [Issue #4696 — View memory footprint](https://github.com/tui-cs/Terminal.Gui/issues/4696)

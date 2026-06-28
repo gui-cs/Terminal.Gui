@@ -36,8 +36,14 @@ public class ImageViewTests
         Assert.Equal ([Command.ScrollUp], imageView.KeyBindings.GetCommands (Key.CursorUp));
         Assert.Equal ([Command.ScrollDown], imageView.KeyBindings.GetCommands (Key.CursorDown));
         Assert.Equal ([Command.Home], imageView.KeyBindings.GetCommands (Key.Home));
-        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (Key.PageUp));
-        Assert.Equal ([Command.ZoomOut], imageView.KeyBindings.GetCommands (Key.PageDown));
+        Assert.Equal ([Command.Home], imageView.KeyBindings.GetCommands (Key.D0));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('+')));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('+').WithShift));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('=')));
+        Assert.Equal ([Command.ZoomIn], imageView.KeyBindings.GetCommands (new Key ('=').WithShift));
+        Assert.Equal ([Command.ZoomOut], imageView.KeyBindings.GetCommands (new Key ('-')));
+        Assert.Equal ([Command.PageUp], imageView.KeyBindings.GetCommands (Key.PageUp));
+        Assert.Equal ([Command.PageDown], imageView.KeyBindings.GetCommands (Key.PageDown));
         Assert.Equal ([Command.ZoomIn], imageView.MouseBindings.GetCommands (MouseFlags.WheeledUp));
         Assert.Equal ([Command.ZoomOut], imageView.MouseBindings.GetCommands (MouseFlags.WheeledDown));
         Assert.Equal ([Command.Center], imageView.MouseBindings.GetCommands (MouseFlags.LeftButtonDoubleClicked));
@@ -652,7 +658,7 @@ public class ImageViewTests
         runnable.Add (imageView);
         app.LayoutAndDraw ();
 
-        Assert.True (imageView.NewKeyDownEvent (Key.PageUp));
+        Assert.True (imageView.NewKeyDownEvent (new Key ('+')));
         Assert.True (imageView.ZoomLevel > 1d);
 
         imageView.ZoomLevel = 2d;
@@ -711,7 +717,7 @@ public class ImageViewTests
         app.LayoutAndDraw ();
         imageView.SetFocus ();
 
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.PageUp));
+        Assert.True (app.Keyboard.RaiseKeyDownEvent (new Key ('+')));
         Assert.True (imageView.ZoomLevel > 1d);
 
         imageView.ZoomLevel = 2d;
@@ -866,6 +872,127 @@ public class ImageViewTests
         Assert.Equal (image [1, 1], command.Pixels! [0, 0]);
 
         runnable.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_PlusKey_ZoomsIn ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewKeyDownEvent (new Key ('+')));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        host.Dispose ();
+    }
+
+    [Fact]
+    public void KeyBindings_ShiftedPlusKey_ZoomsIn ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewKeyDownEvent (new Key ('+').WithShift));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_EqualsKey_ZoomsIn ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewKeyDownEvent (new Key ('=')));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_MinusKey_ZoomsOut ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        imageView.ZoomLevel = 2d;
+        Assert.True (imageView.NewKeyDownEvent (new Key ('-')));
+        Assert.True (imageView.ZoomLevel < 2d);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_ZeroKey_ResetsZoom ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        imageView.ZoomLevel = 2d;
+        Assert.True (imageView.NewKeyDownEvent (Key.D0));
+        Assert.Equal (1d, imageView.ZoomLevel);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_PageUpStillZoomsIn ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (imageView.NewKeyDownEvent (Key.PageUp));
+        Assert.True (imageView.ZoomLevel > 1d);
+
+        host.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void KeyBindings_PageDownStillZoomsOut ()
+    {
+        ImageView imageView = new () { Width = 2, Height = 2, Image = CreateCoordinateImage (4, 4) };
+        View host = new () { Width = 2, Height = 2 };
+        host.Add (imageView);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        imageView.ZoomLevel = 2d;
+        Assert.True (imageView.NewKeyDownEvent (Key.PageDown));
+        Assert.True (imageView.ZoomLevel < 2d);
+
+        host.Dispose ();
     }
 
     #endregion Pan and Zoom
@@ -1459,6 +1586,301 @@ public class ImageViewTests
 
     #endregion FitImageInViewportCells
 
+    #region Resolution Selection Consistency
+
+    // Copilot - Claude Sonnet 4.6
+    // When both Sixel and Kitty are available, ViewportToScreenInPixels must use the Kitty
+    // resolution (Kitty is the preferred protocol). Using the Sixel resolution for sizing
+    // while Kitty does the actual rendering would cause mis-sized images.
+    [Fact]
+    public void ViewportToScreenInPixels_WhenBothSixelAndKittyAvailable_UsesKittyResolution ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+
+        // Sixel: 10 px/cell. Kitty: 20 px/cell — deliberately different so we can tell which wins.
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (20, 20) });
+
+        ImageView imageView = new () { Width = 2, Height = 2, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // With Kitty resolution (20 px/cell) and a 2×2 cell viewport the pixel rect is 40×40.
+        // With Sixel resolution (10 px/cell) it would be 20×20 — wrong when Kitty is preferred.
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        Assert.Equal (40, pixelRect.Width);
+        Assert.Equal (40, pixelRect.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void ViewportToScreenInPixels_WhenKittyActive_IgnoresSixelAvoidBottomScroll ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+
+        ImageView imageView = new ()
+        {
+            Width = 2,
+            Height = 4,
+            SixelEncoder = new SixelEncoder { AvoidBottomScroll = true }
+        };
+
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        Assert.Equal (20, pixelRect.Width);
+        Assert.Equal (40, pixelRect.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void ViewportToScreenInPixels_WhenKittyOutputDisabled_UsesSixelResolutionAndAvoidBottomScroll ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (20, 20) });
+        driver.GetOutput ().UseKittyGraphics = false;
+
+        ImageView imageView = new ()
+        {
+            Width = 2,
+            Height = 4,
+            SixelEncoder = new SixelEncoder { AvoidBottomScroll = true }
+        };
+
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Rectangle pixelRect = imageView.ViewportToScreenInPixels ();
+
+        Assert.Equal (20, pixelRect.Width);
+        Assert.Equal (36, pixelRect.Height);
+        Assert.True (imageView.IsUsingSixel);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Sonnet 4.6
+    // FitImageInViewportCells must use Kitty resolution when both protocols are available,
+    // because Kitty is the preferred protocol.
+    [Fact]
+    public void FitImageInViewportCells_WhenBothSixelAndKittyAvailable_UsesKittyResolution ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 20, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+
+        // Sixel: 8×16 px/cell (cell aspect ratio 2.0). Kitty: 16×8 px/cell (aspect ratio 0.5).
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (8, 16) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (16, 8) });
+
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Kitty cell aspect ratio = 8/16 = 0.5. 80×80 px image →
+        //   adjusted height = 80 / 0.5 = 160 cells → constrained by height → (2, 5).
+        // Sixel cell aspect ratio = 16/8 = 2.0. 80×80 px image →
+        //   adjusted height = 80 / 2.0 = 40 cells → fits as (10, 5).
+        Size result = imageView.FitImageInViewportCells (new Size (80, 80));
+
+        // Must match the Kitty result, not the Sixel result.
+        Assert.Equal (2, result.Width);
+        Assert.Equal (5, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    [Fact]
+    public void FitImageInViewportCells_WhenKittyOutputDisabled_UsesSixelResolution ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 20, Height = 10 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new SixelSupportResult { IsSupported = true, Resolution = new Size (8, 16) });
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (16, 8) });
+        driver.GetOutput ().UseKittyGraphics = false;
+
+        ImageView imageView = new () { Width = 10, Height = 5, SixelEncoder = new SixelEncoder () };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Size result = imageView.FitImageInViewportCells (new Size (80, 80));
+
+        Assert.Equal (10, result.Width);
+        Assert.Equal (5, result.Height);
+
+        runnable.Dispose ();
+    }
+
+    #endregion Resolution Selection Consistency
+
+    #region Raster Cleanup (issue #5543)
+
+    // Claude - Opus 4.8
+    // A raster ImageView removed from its SuperView (without being disposed) must not leave its
+    // out-of-band Sixel/Kitty graphic resident in the output buffer. See issue #5543.
+    [Fact]
+    public void RasterImage_Released_WhenRemovedFromSuperView ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 4, Height = 4, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+
+        runnable.Remove (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        imageView.Dispose ();
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.8
+    // A raster ImageView that becomes invisible must release its resident Sixel/Kitty graphic. See issue #5543.
+    [Fact]
+    public void RasterImage_Released_WhenHidden ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        ImageView imageView = new () { Width = 4, Height = 4, Image = CreateCoordinateImage (4, 4) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+
+        imageView.Visible = false;
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.8
+    // A raster ImageView nested in a container that is removed (e.g. the container revealing the view
+    // beneath it) must release its resident Sixel/Kitty graphic. This generalizes the issue #5543 case
+    // beyond modal Dialogs to any overlapping container.
+    [Fact]
+    public void RasterImage_Released_WhenContainerRemoved ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+
+        Runnable runnable = new () { Width = 10, Height = 10 };
+        app.Begin (runnable);
+
+        View container = new () { Width = 6, Height = 6 };
+        ImageView imageView = new () { Width = 4, Height = 4, Image = CreateCoordinateImage (4, 4) };
+        container.Add (imageView);
+        runnable.Add (container);
+        app.LayoutAndDraw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+
+        runnable.Remove (container);
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        container.Dispose ();
+        runnable.Dispose ();
+    }
+
+    // Claude - Opus 4.8
+    // The issue #5543 scenario: a modal runnable hosting a raster ImageView leaves its Sixel/Kitty graphic
+    // on screen after it closes. When the modal session ends, its raster graphic must be released.
+    [Fact]
+    public void RasterImage_Released_WhenModalRunnableEnds ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetSixelSupport (new () { IsSupported = true, Resolution = new (10, 10), MaxPaletteColors = 256 });
+        app.Driver!.SetScreenSize (10, 10);
+
+        Runnable main = new () { Width = 10, Height = 10 };
+        app.Begin (main);
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        // Run a modal runnable hosting a raster ImageView on top of the main view.
+        Runnable dialog = new () { Width = 6, Height = 6 };
+        ImageView imageView = new () { Width = 4, Height = 4, Image = CreateCoordinateImage (4, 4) };
+        dialog.Add (imageView);
+        SessionToken? dialogToken = app.Begin (dialog);
+        app.LayoutAndDraw ();
+
+        Assert.Single (driver.GetOutputBuffer ().GetRasterImages ());
+
+        // Close the modal — the main view is revealed and the dialog's graphic must not linger.
+        app.End (dialogToken!);
+        app.LayoutAndDraw ();
+
+        Assert.Empty (driver.GetOutputBuffer ().GetRasterImages ());
+
+        dialog.Dispose ();
+        main.Dispose ();
+    }
+
+    #endregion Raster Cleanup (issue #5543)
+
     #region Helper Methods
 
     /// <summary>Creates a solid-color image of the specified dimensions.</summary>
@@ -1497,6 +1919,212 @@ public class ImageViewTests
         Cell [,]? contents = driver.Contents;
         Assert.NotNull (contents);
         Assert.Equal (expected, contents! [row, col].Attribute!.Value.Background);
+    }
+
+    // Claude - Opus 4.8
+    // A Kitty image draws below text (z=-1). When an ImageView grows, the framework can leave a glyph
+    // in a now-interior viewport cell (e.g. the old border column) that resize invalidation never
+    // clears — it would render as a stale line over the image. The raster draw must blank every
+    // viewport cell so no stale glyph survives.
+    [Fact]
+    public void Draw_KittyRaster_ClearsStaleGlyphInViewport ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 20, Height = 20 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 10) });
+
+        ImageView imageView = new () { X = 0, Y = 0, Width = 6, Height = 6, Image = CreateGradientImage (12, 12) };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+
+        // Plant a stale glyph in a cell inside the image's viewport (as resize leaves an old border).
+        Rectangle viewport = imageView.ViewportToScreen ();
+        int staleX = viewport.X + 1;
+        int staleY = viewport.Y + 1;
+        driver.GetOutputBuffer ().Contents! [staleY, staleX].Grapheme = "║";
+
+        // Act — redraw the image.
+        imageView.SetNeedsDraw ();
+        app.LayoutAndDraw ();
+
+        // Assert — the stale glyph was blanked so it cannot render over the z=-1 image.
+        Assert.Equal (" ", driver.GetOutputBuffer ().Contents! [staleY, staleX].Grapheme);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Opus 4.8
+    // Kitty source-crop: the full image is transmitted once (a=t), then panning a zoomed-in image only
+    // moves the crop with a placement update (a=p) — it must NOT re-transmit the pixels (no a=t). Re-sending
+    // the whole image every step is what made a large preview flash on each pan ("whole pane flashes").
+    [Fact]
+    public void Draw_KittyRaster_SourceCrop_PanUpdatesPlacementWithoutRetransmit ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 16, Height = 16 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.GetOutput ().UseKittyGraphics = true;
+
+        // Zoom in so the image fills the viewport and is pannable.
+        ImageView imageView = new () { X = 0, Y = 0, Width = 8, Height = 8, Image = CreateGradientImage (16, 16), ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        string first = driver.GetOutput ().GetLastOutput ();
+
+        Assert.Contains ("a=t,", first); // the full image is transmitted once...
+        Assert.Contains ("a=p,", first); // ...and displayed via a placement.
+
+        // Pan one cell — same image, different crop.
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        app.LayoutAndDraw ();
+        string panFrame = driver.GetOutput ().GetLastOutput ();
+
+        Assert.Contains ("a=p,", panFrame); // the crop moves with a tiny placement update...
+        Assert.DoesNotContain ("a=t,", panFrame); // ...with no pixel re-transmit (the flash fix).
+        Assert.DoesNotContain ("a=d", panFrame); // ...and no delete.
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Opus 4.8
+    // A fresh Image must re-transmit (the placement would otherwise show stale pixels), and it must be
+    // double-buffered: the new pixels go to the OTHER image id and are placed before the old id is deleted,
+    // so a sharpen-on-zoom re-raster never blanks the on-screen image.
+    [Fact]
+    public void Draw_KittyRaster_SourceCrop_DoubleBuffersOnImageChange ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 16, Height = 16 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.GetOutput ().UseKittyGraphics = true;
+
+        ImageView imageView = new () { X = 0, Y = 0, Width = 8, Height = 8, Image = CreateGradientImage (16, 16), ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        driver.GetOutput ().GetLastOutput ();
+
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        app.LayoutAndDraw ();
+        Assert.DoesNotContain ("a=t,", driver.GetOutput ().GetLastOutput ()); // pan: no re-transmit
+
+        // A brand-new image re-transmits to the OTHER buffer and deletes the previous one.
+        imageView.Image = CreateGradientImage (16, 16);
+        app.LayoutAndDraw ();
+        string frame = driver.GetOutput ().GetLastOutput ();
+
+        System.Text.RegularExpressions.Match transmit = System.Text.RegularExpressions.Regex.Match (frame, @"a=t,f=32,i=(\d+)");
+        System.Text.RegularExpressions.Match delete = System.Text.RegularExpressions.Regex.Match (frame, @"a=d,d=i,i=(\d+)");
+
+        Assert.True (transmit.Success, "the new image must be transmitted");
+        Assert.True (delete.Success, "the previous image must be deleted");
+
+        // The deleted id is the OLD image id — different from the just-transmitted one — proving the new
+        // pixels did not overwrite the on-screen image in place (no blank during the swap).
+        Assert.NotEqual (transmit.Groups [1].Value, delete.Groups [1].Value);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Opus 4.8
+    // Re-assigning ImageView.Image — even the SAME Color[,] instance — bumps the image version and must
+    // re-transmit (a=t). Keying "did the pixels change" on the array reference alone misses a buffer a
+    // caller reused for a new render, leaving the terminal showing stale pixels. (Mirrors the legacy path,
+    // which re-encodes on every image-version bump.)
+    [Fact]
+    public void Draw_KittyRaster_SourceCrop_RetransmitsWhenImageReassignedSameInstance ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 16, Height = 16 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.GetOutput ().UseKittyGraphics = true;
+
+        Color [,] image = CreateGradientImage (16, 16);
+        ImageView imageView = new () { X = 0, Y = 0, Width = 8, Height = 8, Image = image, ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        Assert.Contains ("a=t,", driver.GetOutput ().GetLastOutput ()); // first transmit
+
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        app.LayoutAndDraw ();
+        Assert.DoesNotContain ("a=t,", driver.GetOutput ().GetLastOutput ()); // pan: no re-transmit
+
+        // Re-assign the SAME instance: the image version bumps, so the resident image must be refreshed.
+        imageView.Image = image;
+        app.LayoutAndDraw ();
+        Assert.Contains ("a=t,", driver.GetOutput ().GetLastOutput ());
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Opus 4.8
+    // ToAnsi() must recreate the *visible crop* of a panned/zoomed Kitty image, not the whole source. Two
+    // different pan positions of the same image therefore export different raster payloads; encoding
+    // command.Pixels (the full image) and ignoring SourceRect would make the two exports identical.
+    [Fact]
+    public void ToAnsi_KittyRaster_SourceCrop_ReflectsVisibleCrop ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable runnable = new () { Width = 16, Height = 16 };
+        app.Begin (runnable);
+
+        DriverImpl driver = (DriverImpl)app.Driver!;
+        driver.SetKittyGraphicsSupport (new KittyGraphicsSupportResult { IsSupported = true, Resolution = new Size (10, 20) });
+        driver.GetOutput ().UseKittyGraphics = true;
+
+        ImageView imageView = new () { X = 0, Y = 0, Width = 8, Height = 8, Image = CreateGradientImage (16, 16), ZoomLevel = 2d };
+        runnable.Add (imageView);
+        app.LayoutAndDraw ();
+        string ansiLeft = driver.ToAnsi ();
+
+        // Pan to a different crop of the same image.
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        imageView.NewKeyDownEvent (Key.CursorRight);
+        app.LayoutAndDraw ();
+        string ansiPanned = driver.ToAnsi ();
+
+        Assert.NotEqual (ansiLeft, ansiPanned);
+
+        runnable.Dispose ();
+    }
+
+    // Copilot - Claude Opus 4.8
+    // MapFragmentToSource must never return a crop that extends past the source rectangle: rounding can push
+    // the last fragment's x/width (or y/height) beyond the source, which would emit out-of-bounds Kitty crop
+    // coordinates. Here dest 2x2 cells over a 3x3 source rounds the bottom-right 1x1 fragment past the edge.
+    [Fact]
+    public void MapFragmentToSource_ClampsToSourceRect ()
+    {
+        Rectangle mapped = OutputBase.MapFragmentToSource (
+                                                           new Rectangle (0, 0, 3, 3),
+                                                           new Rectangle (0, 0, 2, 2),
+                                                           new Rectangle (1, 1, 1, 1));
+
+        Assert.True (mapped.X >= 0 && mapped.Y >= 0, $"crop origin {mapped.Location} is negative");
+        Assert.True (mapped.Right <= 3, $"crop right {mapped.Right} exceeds source width 3");
+        Assert.True (mapped.Bottom <= 3, $"crop bottom {mapped.Bottom} exceeds source height 3");
+        Assert.True (mapped.Width >= 1 && mapped.Height >= 1, "crop must stay at least 1x1");
     }
 
     /// <summary>Creates a gradient image where pixel color varies by position.</summary>

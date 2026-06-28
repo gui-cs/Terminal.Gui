@@ -319,12 +319,14 @@ public class OutputBufferImpl : IOutputBuffer
             {
                 MarkRasterImageCellsDirty (_rasterImages [index]);
                 MarkRasterImageCellsClean (command);
+                command.NeedsTransparentCellClear = ClearCellsUnderRasterImage (command);
                 _rasterImages [index] = command;
 
                 return;
             }
 
             MarkRasterImageCellsClean (command);
+            command.NeedsTransparentCellClear = ClearCellsUnderRasterImage (command);
             _rasterImages.Add (command);
         }
     }
@@ -351,12 +353,76 @@ public class OutputBufferImpl : IOutputBuffer
     }
 
     /// <inheritdoc/>
+    public void RetainRasterImages (IReadOnlyCollection<string> activeIds)
+    {
+        ArgumentNullException.ThrowIfNull (activeIds);
+
+        lock (_contentsLock)
+        {
+            for (int i = _rasterImages.Count - 1; i >= 0; i--)
+            {
+                if (_rasterImages [i].Id is { } id && activeIds.Contains (id))
+                {
+                    continue;
+                }
+
+                MarkRasterImageCellsDirty (_rasterImages [i]);
+                _rasterImages.RemoveAt (i);
+            }
+        }
+    }
+
+    /// <inheritdoc/>
     public IReadOnlyList<RasterImageCommand> GetRasterImages ()
     {
         lock (_contentsLock)
         {
             return _rasterImages.ToArray ();
         }
+    }
+
+    // A raster image owns the blank cells in its visible destination. Keep those cells clean so
+    // Sixel output is not erased by normal cell rendering; OutputBase decides when protocol-specific
+    // transparent blanks must be emitted for Kitty's below-text placement model.
+    private bool ClearCellsUnderRasterImage (RasterImageCommand command)
+    {
+        if (Contents is null)
+        {
+            return false;
+        }
+
+        Attribute transparent = new (Color.None, Color.None);
+        Region clip = command.Clip ?? new (Screen);
+        var needsTerminalClear = false;
+
+        foreach (Rectangle clipRect in clip.GetRectangles ())
+        {
+            Rectangle visible = Rectangle.Intersect (Rectangle.Intersect (command.DestinationCells, clipRect), Screen);
+
+            if (visible.Width <= 0 || visible.Height <= 0)
+            {
+                continue;
+            }
+
+            for (int row = visible.Y; row < visible.Bottom; row++)
+            {
+                for (int col = visible.X; col < visible.Right; col++)
+                {
+                    string grapheme = Contents [row, col].Grapheme;
+
+                    if (!string.IsNullOrEmpty (grapheme) && grapheme != " ")
+                    {
+                        needsTerminalClear = true;
+                    }
+
+                    Contents [row, col].Grapheme = " ";
+                    Contents [row, col].Attribute = transparent;
+                    Contents [row, col].IsDirty = false;
+                }
+            }
+        }
+
+        return needsTerminalClear;
     }
 
     private void MarkRasterImageCellsClean (RasterImageCommand command)
@@ -499,7 +565,7 @@ public class OutputBufferImpl : IOutputBuffer
             }
 
             // Skip the second column of a wide character
-            // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
+            // See issue: https://github.com/tui-cs/Terminal.Gui/issues/4492
             // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
             // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
             if (Clip.Contains (Col, Row))
@@ -732,7 +798,7 @@ public class OutputBufferImpl : IOutputBuffer
             // The wide glyph will naturally render across both columns.
             // If we set column N+1 to replacement char, we would overwrite
             // any content that was intentionally drawn there (like borders at odd columns).
-            // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
+            // See: https://github.com/tui-cs/Terminal.Gui/issues/4258
         }
     }
 }

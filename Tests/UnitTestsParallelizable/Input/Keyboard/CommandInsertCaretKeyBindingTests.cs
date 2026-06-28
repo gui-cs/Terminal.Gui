@@ -9,7 +9,7 @@ namespace InputTests;
 ///     round-trip through the configuration serializer <b>by readable name</b>
 ///     (not as a bare number), so a consumer's <c>[ConfigurationProperty]</c>
 ///     default key bindings are discoverable and a user can override them in
-///     <c>config.json</c> by name — exactly the gui-cs/Editor scenario that
+///     <c>config.json</c> by name — exactly the tui-cs/Editor scenario that
 ///     forced the <c>(Command)1001/1002</c> magic-int workaround. Mirrors
 ///     <see cref="KeyBindingSchemaTests"/> and uses the same canonical options.
 /// </summary>
@@ -20,7 +20,7 @@ public class CommandInsertCaretKeyBindingTests
     [Fact]
     public void InsertCaretBindings_RoundTrip_ByName ()
     {
-        // Arrange — the real chords gui-cs/Editor binds (DEC-006: VS Code parity).
+        // Arrange — the real chords tui-cs/Editor binds (DEC-006: VS Code parity).
         Dictionary<Command, PlatformKeyBinding> original = new ()
         {
             [Command.InsertCaretAbove] = new PlatformKeyBinding { All = ["Ctrl+Alt+CursorUp"] },
@@ -46,7 +46,7 @@ public class CommandInsertCaretKeyBindingTests
     [Fact]
     public void InsertCaretBindings_Deserialize_FromUserConfigFormat ()
     {
-        // Arrange — what a user (or gui-cs/Editor's shipped default) writes by hand.
+        // Arrange — what a user (or tui-cs/Editor's shipped default) writes by hand.
         var json =
             """
             {
@@ -71,7 +71,7 @@ public class CommandInsertCaretKeyBindingTests
     [Fact]
     public void ViewKeyBindings_WithInsertCaret_RoundTrips ()
     {
-        // The concrete gui-cs/Editor shape: a per-view [ConfigurationProperty]
+        // The concrete tui-cs/Editor shape: a per-view [ConfigurationProperty]
         // Dictionary<string, Dictionary<Command, PlatformKeyBinding>> ("Editor"
         // → its default bindings). This is the path the magic-int cast broke.
         Dictionary<string, Dictionary<Command, PlatformKeyBinding>> original = new ()

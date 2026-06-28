@@ -3,7 +3,7 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     Displays an image represented as a 2D array of <see cref="Color"/> pixels.
 ///     Supports two rendering modes: cell-based (one colored space per pixel, works everywhere)
-///     and sixel-based (when the terminal supports it).
+///     and raster-based (for terminals that support either the Sixel or Kitty graphics protocols).
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -13,15 +13,14 @@ namespace Terminal.Gui.Views;
 ///         has no dependency on any image library.
 ///     </para>
 ///     <para>
-///         When sixel is available (detected via <see cref="IDriver.SixelSupport"/>) and
-///         <see cref="UseSixel"/> is <see langword="true"/>, the view will encode the image as
-///         sixel escape sequences and render it through the driver's output buffer. Sixel data
-///         is only re-sent to the terminal when <see cref="View.NeedsDraw"/> is true,
+///         When <see cref="UseRasterGraphics"/> is <see langword="true"/>, the view renders through
+///         the best raster protocol available to the driver: Kitty graphics first, then Sixel.
+///         Raster data is only re-sent to the terminal when <see cref="View.NeedsDraw"/> is true,
 ///         avoiding redundant rendering of unchanged images.
 ///     </para>
 ///     <para>
-///         When sixel is not available, the view falls back to cell-based rendering where each
-///         terminal cell is colored with the background color of the corresponding pixel.
+///         When no raster protocol is available, the view falls back to cell-based rendering where
+///         each terminal cell is colored with the background color of the corresponding pixel.
 ///     </para>
 /// </remarks>
 public partial class ImageView : View, IDesignable
@@ -49,9 +48,12 @@ public partial class ImageView : View, IDesignable
         [Command.ScrollRight] = Bind.All (Key.CursorRight),
         [Command.ScrollUp] = Bind.All (Key.CursorUp),
         [Command.ScrollDown] = Bind.All (Key.CursorDown),
-        [Command.Home] = Bind.All (Key.Home),
-        [Command.ZoomIn] = Bind.All (Key.PageUp),
-        [Command.ZoomOut] = Bind.All (Key.PageDown)
+        [Command.Home] = Bind.All (Key.Home, Key.D0),
+        [Command.ZoomIn] = Bind.All (new Key ('+'),
+                                      new Key ('+').WithShift,
+                                      new Key ('='),
+                                      new Key ('=').WithShift),
+        [Command.ZoomOut] = Bind.All (new Key ('-'))
     };
 
     /// <summary>
@@ -139,16 +141,33 @@ public partial class ImageView : View, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets whether to prefer sixel rendering when the terminal supports it.
+    ///     Gets or sets whether to prefer raster-graphics rendering (Kitty or Sixel protocol)
+    ///     when the terminal supports it. Default is <see langword="true"/>.
+    /// </summary>
+    /// <remarks>
+    ///     When <see langword="true"/> the view selects the best available protocol:
+    ///     Kitty graphics (if the driver reports <see cref="IDriver.KittyGraphicsSupport"/>),
+    ///     then Sixel (if the driver reports <see cref="IDriver.SixelSupport"/>),
+    ///     then cell-based rendering as a fallback.
+    ///     Set to <see langword="false"/> to always use cell-based rendering.
+    /// </remarks>
+    public bool UseRasterGraphics { get; set; } = true;
+
+    /// <summary>
+    ///     Gets whether to prefer raster rendering when the terminal supports it.
     ///     Default is <see langword="true"/>.
     /// </summary>
     /// <remarks>
-    ///     When <see langword="true"/> and the terminal supports sixel
-    ///     (per <see cref="IDriver.SixelSupport"/>), the image is rendered using sixel
-    ///     escape sequences for full-resolution display. When <see langword="false"/>,
-    ///     cell-based rendering is always used.
+    ///     This obsolete compatibility property delegates to <see cref="UseRasterGraphics"/>.
+    ///     When <see langword="true"/>, Kitty graphics is preferred and Sixel is used as the
+    ///     fallback. When <see langword="false"/>, cell-based rendering is always used.
     /// </remarks>
-    public bool UseSixel { get; set; } = true;
+    [Obsolete ("Use UseRasterGraphics instead. UseSixel will be removed in a future version.")]
+    public bool UseSixel
+    {
+        get => UseRasterGraphics;
+        set => UseRasterGraphics = value;
+    }
 
     /// <summary>
     ///     Gets or sets whether ImageView scales image renders on a background thread.
@@ -241,6 +260,13 @@ public partial class ImageView : View, IDesignable
     /// </summary>
     public double ZoomLevel { get => _zoomLevel; set => SetZoomLevel (value, null); }
 
+    /// <summary>
+    ///     Raised when <see cref="ZoomLevel"/> changes (including a reset to fit). A host that renders its
+    ///     own source image (e.g. rasterizes a document) can subscribe to re-render it at the new zoom for
+    ///     crispness — the view itself only ever scales the pixels it was given.
+    /// </summary>
+    public event EventHandler? ZoomLevelChanged;
+
     private SixelEncoder? _sixelEncoder;
 
     private bool _usesDefaultSixelEncoder;
@@ -274,9 +300,17 @@ public partial class ImageView : View, IDesignable
     }
 
     /// <summary>
+    ///     Gets whether the current rendering mode is using a raster graphics protocol (Kitty or Sixel).
+    /// </summary>
+    public bool IsUsingRasterGraphics => UseRasterGraphics
+                                         && (IsKittyGraphicsActive ()
+                                             || App?.Driver?.SixelSupport is { IsSupported: true });
+
+    /// <summary>
     ///     Gets whether the current rendering mode is using sixel.
     /// </summary>
-    public bool IsUsingSixel => UseSixel && App?.Driver?.SixelSupport is { IsSupported: true };
+    [Obsolete ("Use IsUsingRasterGraphics instead. IsUsingSixel will be removed in a future version.")]
+    public bool IsUsingSixel => UseRasterGraphics && !IsKittyGraphicsActive () && App?.Driver?.SixelSupport is { IsSupported: true };
 
     /// <summary>
     ///     Converts the Viewport to screen coordinates in pixels.
@@ -291,18 +325,41 @@ public partial class ImageView : View, IDesignable
     /// <returns>The screen coordinates of the Viewport in pixels.</returns>
     public Rectangle ViewportToScreenInPixels ()
     {
-        SixelSupportResult support = App?.Driver?.SixelSupport ?? throw new InvalidOperationException (@"No sixel support available.");
+        Size resolution = GetActiveResolution () ?? throw new InvalidOperationException (@"No raster graphics support available.");
 
-        int pixelsPerCellX = support.Resolution.Width;
-        int pixelsPerCellY = support.Resolution.Height;
+        int pixelsPerCellX = resolution.Width;
+        int pixelsPerCellY = resolution.Height;
         Rectangle boundsRect = ViewportToScreen ();
 
-        // Calculate target size in pixels based on viewport and cell resolution
         int targetWidthInPixels = boundsRect.Width * pixelsPerCellX;
-        int targetHeightInPixels = SixelEncoder?.GetHeightInPixels (boundsRect.Height, pixelsPerCellY) ?? boundsRect.Height * pixelsPerCellY;
+        int targetHeightInPixels = IsKittyGraphicsActive ()
+                                       ? boundsRect.Height * pixelsPerCellY
+                                       : SixelEncoder?.GetHeightInPixels (boundsRect.Height, pixelsPerCellY) ?? boundsRect.Height * pixelsPerCellY;
 
         return new Rectangle (boundsRect.X * pixelsPerCellX, boundsRect.Y * pixelsPerCellY, targetWidthInPixels, targetHeightInPixels);
     }
+
+    /// <summary>
+    ///     Returns the resolution (pixels per cell) for the active raster graphics protocol,
+    ///     preferring Kitty over Sixel.  Returns <see langword="null"/> when neither is available.
+    /// </summary>
+    private Size? GetActiveResolution ()
+    {
+        if (IsKittyGraphicsActive () && App?.Driver?.KittyGraphicsSupport is { IsSupported: true } kitty)
+        {
+            return kitty.Resolution;
+        }
+
+        if (App?.Driver?.SixelSupport is { IsSupported: true } sixel)
+        {
+            return sixel.Resolution;
+        }
+
+        return null;
+    }
+
+    private bool IsKittyGraphicsActive () =>
+        App?.Driver is { KittyGraphicsSupport.IsSupported: true } driver && driver.GetOutput ().UseKittyGraphics;
 
     /// <summary>
     ///     Returns the size in cell terms of the given image resized to fit in the viewport.
@@ -324,7 +381,8 @@ public partial class ImageView : View, IDesignable
         }
 
         // Account for the terminal cell aspect ratio
-        double cellAspectRatio = App?.Driver?.SixelSupport is { } support ? (double)support.Resolution.Height / support.Resolution.Width : 2.0;
+        Size? activeResolution = GetActiveResolution ();
+        double cellAspectRatio = activeResolution is { } res ? (double)res.Height / res.Width : 2.0;
         Size imageSize = imageSizeInPixels with { Height = (int)(imageSizeInPixels.Height / cellAspectRatio) };
 
         // Calculate aspect-ratio-preserving size

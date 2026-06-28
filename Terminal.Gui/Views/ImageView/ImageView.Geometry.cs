@@ -91,7 +91,7 @@ public partial class ImageView
 
     private Size GetBaseRenderTargetSize ()
     {
-        if (IsUsingSixel && App?.Driver?.SixelSupport is { })
+        if (IsUsingRasterGraphics && App?.Driver is { })
         {
             return ViewportToScreenInPixels ().Size;
         }
