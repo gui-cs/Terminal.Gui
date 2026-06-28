@@ -66,13 +66,8 @@ public partial class View // Text Property APIs
 
             UpdateTextFormatterText ();
 
-            if (IsTextDrivenFrameUnchanged ())
+            if (TryRedrawWithoutLayout ())
             {
-                // The new Text produces the same Frame (position and size) as before. The content changed, so it must
-                // be reformatted and redrawn, but nothing outside this view can be affected, so the layout pass (and
-                // the ancestor propagation SetNeedsLayout would trigger) is skipped. See issue #5499.
-                TextFormatter.NeedsFormat = true;
-                SetNeedsDraw ();
                 OnTextChanged ();
 
                 return;
@@ -84,8 +79,9 @@ public partial class View // Text Property APIs
     }
 
     /// <summary>
-    ///     Determines whether the new <see cref="Text"/> resolves to the same <see cref="Frame"/> (position and size)
-    ///     the view has now, so a text change can skip <see cref="SetNeedsLayout"/> and only redraw. See issue #5499.
+    ///     If the new <see cref="Text"/> resolves to the same <see cref="Frame"/> (position and size) the view has now,
+    ///     handles the change with a redraw only — skipping <see cref="SetNeedsLayout"/> and the ancestor layout
+    ///     propagation it triggers. See issue #5499.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -101,12 +97,17 @@ public partial class View // Text Property APIs
     ///         lays out subviews while calculating, so resolving it here would have side effects; those views fall back
     ///         to <see cref="SetNeedsLayout"/>.
     ///     </para>
+    ///     <para>
+    ///         On the fast path this mirrors the <see cref="TextFormatter"/> setup <see cref="SetRelativeLayout"/>
+    ///         performs (<see cref="SetTextFormatterSize"/> plus the post-resolve constraint finalization) so wrapped or
+    ///         clipped text stays correctly constrained, then marks the view for reformat and redraw.
+    ///     </para>
     /// </remarks>
     /// <returns>
-    ///     <see langword="true"/> if the optimization applies and the resolved <see cref="Frame"/> is unchanged;
-    ///     otherwise <see langword="false"/>.
+    ///     <see langword="true"/> if the change was handled by redraw only; <see langword="false"/> if a normal layout
+    ///     pass is required.
     /// </returns>
-    private bool IsTextDrivenFrameUnchanged ()
+    private bool TryRedrawWithoutLayout ()
     {
         if (_frame is null)
         {
@@ -122,7 +123,19 @@ public partial class View // Text Property APIs
         // Mirror SetRelativeLayout's preamble so the prediction sees the same TextFormatter state.
         SetTextFormatterSize ();
 
-        return TryComputeRelativeFrame (GetContainerSize (), out Rectangle predicted) && predicted == Frame;
+        if (!TryComputeRelativeFrame (GetContainerSize (), out Rectangle predicted) || predicted != Frame)
+        {
+            return false;
+        }
+
+        // The Frame is unchanged, so nothing outside this view can be affected. Mirror SetRelativeLayout's formatter
+        // finalization (skipped because we bypass it) so wrapped/clipped text stays constrained, then reformat and
+        // redraw without a layout pass.
+        FinalizeTextFormatterConstraints ();
+        TextFormatter.NeedsFormat = true;
+        SetNeedsDraw ();
+
+        return true;
 
         // A dimension is safe to resolve here only when doing so has no side effects beyond this view's own
         // TextFormatter. DimAbsolute is constant; a Text-only DimAuto depends solely on the TextFormatter.

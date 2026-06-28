@@ -94,6 +94,57 @@ public partial class DimAutoTests
     }
 
     [Fact]
+    public void Text_RepeatedSameWidthUpdates_NoFrameDrift_NoAncestorLayout ()
+    {
+        // Clock simulation: a Text-auto label whose text changes every "tick" to the same width must never drift its
+        // Frame and never mark its SuperView for layout. See issue #5499.
+        View view = new () { Width = Auto (DimAutoStyle.Text), Height = Auto (DimAutoStyle.Text), Text = "00:00:00" };
+        View superView = new () { Width = 40, Height = 5 };
+        superView.Add (view);
+        superView.Layout (new Size (40, 5));
+        Rectangle frame0 = view.Frame;
+
+        for (var i = 0; i < 100; i++)
+        {
+            superView.NeedsLayout = false;
+            view.NeedsLayout = false;
+
+            view.Text = $"{i % 24:D2}:{i % 60:D2}:{i % 60:D2}"; // always 8 wide
+
+            Assert.False (view.NeedsLayout);
+            Assert.False (superView.NeedsLayout);
+            Assert.Equal (frame0, view.Frame);
+        }
+    }
+
+    [Fact]
+    public void Text_ReentrantTextChanged_Settles ()
+    {
+        // A TextChanged handler that sets Text again (to another same-width value) on the fast path must settle
+        // without an infinite loop and apply the final value.
+        View view = new () { Width = Auto (DimAutoStyle.Text), Height = Auto (DimAutoStyle.Text), Text = "aaa" };
+        view.Layout ();
+
+        var count = 0;
+        view.TextChanged += (sender, _) =>
+                            {
+                                count++;
+
+                                if (count == 1)
+                                {
+                                    ((View)sender!).Text = "bbb";
+                                }
+                            };
+
+        view.NeedsLayout = false;
+
+        view.Text = "ccc";
+
+        Assert.Equal ("bbb", view.Text);
+        Assert.Equal (new Rectangle (0, 0, 3, 1), view.Frame);
+    }
+
+    [Fact]
     public void Text_AutoStyle_BypassesOptimization ()
     {
         // DimAutoStyle.Auto (Content | Text) also depends on content/subviews, so the optimization must not apply
@@ -124,6 +175,62 @@ public partial class DimAutoTests
 
         Assert.False (view.NeedsLayout);
         Assert.True (view.NeedsDraw);
+    }
+
+    [Fact]
+    public void Text_FixedDimensions_WordWrap_FormatterConstraintsMatchFullLayout ()
+    {
+        // Regression: the same-frame fast path must mirror SetRelativeLayout's formatter finalization. Otherwise
+        // UpdateTextFormatterText clears the constraints and they are never restored, so a null (= int.MaxValue) width
+        // breaks wrapping/clipping for fixed-size text. See issue #5499 review.
+        View view = new () { Width = 5, Height = 2 };
+        view.TextFormatter.WordWrap = true;
+        view.Text = "abc";
+        view.Layout ();
+
+        view.NeedsLayout = false;
+
+        // Different content, same fixed Frame - takes the redraw-only fast path
+        view.Text = "abcdefghi";
+
+        Assert.False (view.NeedsLayout);
+
+        // Contract: the fast path leaves TextFormatter in the same state a full layout pass would.
+        int? fastWidth = view.TextFormatter.ConstrainToWidth;
+        int? fastHeight = view.TextFormatter.ConstrainToHeight;
+        Assert.NotNull (fastWidth);
+        Assert.NotNull (fastHeight);
+
+        view.SetNeedsLayout ();
+        view.Layout ();
+        Assert.Equal (view.TextFormatter.ConstrainToWidth, fastWidth);
+        Assert.Equal (view.TextFormatter.ConstrainToHeight, fastHeight);
+    }
+
+    [Fact]
+    public void Text_OneAxisAuto_WordWrap_FormatterConstraintsMatchFullLayout ()
+    {
+        // One axis Text-auto, the other fixed - same contract: fast-path constraints equal a full layout's.
+        View view = new () { Width = Auto (DimAutoStyle.Text), Height = 2 };
+        view.TextFormatter.WordWrap = true;
+        view.Text = "abc";
+        view.Layout ();
+
+        view.NeedsLayout = false;
+
+        view.Text = "xyz"; // same 3x2 Frame
+
+        Assert.False (view.NeedsLayout);
+
+        int? fastWidth = view.TextFormatter.ConstrainToWidth;
+        int? fastHeight = view.TextFormatter.ConstrainToHeight;
+        Assert.NotNull (fastWidth);
+        Assert.NotNull (fastHeight);
+
+        view.SetNeedsLayout ();
+        view.Layout ();
+        Assert.Equal (view.TextFormatter.ConstrainToWidth, fastWidth);
+        Assert.Equal (view.TextFormatter.ConstrainToHeight, fastHeight);
     }
 
     [Fact]

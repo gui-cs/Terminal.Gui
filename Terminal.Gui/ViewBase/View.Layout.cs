@@ -726,6 +726,23 @@ public partial class View // Layout APIs
             }
         }
 
+        FinalizeTextFormatterConstraints ();
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Finalizes <see cref="TextFormatter"/>'s size constraints after the <see cref="Frame"/> has been resolved.
+    ///     Any constraint left unset by <see cref="SetTextFormatterSize"/> (e.g. for fixed dimensions whose content
+    ///     size was not explicitly set) is filled from the view's content size so wrapped/clipped text formats
+    ///     correctly.
+    /// </summary>
+    /// <remarks>
+    ///     Called by <see cref="SetRelativeLayout"/> and by the <see cref="Text"/> setter's same-frame fast path, which
+    ///     skips <see cref="SetRelativeLayout"/> but must leave <see cref="TextFormatter"/> in the same state.
+    /// </remarks>
+    private void FinalizeTextFormatterConstraints ()
+    {
         if (TextFormatter.ConstrainToWidth is null)
         {
             TextFormatter.ConstrainToWidth = GetContentWidth ();
@@ -735,8 +752,6 @@ public partial class View // Layout APIs
         {
             TextFormatter.ConstrainToHeight = GetContentHeight ();
         }
-
-        return true;
     }
 
     /// <summary>
