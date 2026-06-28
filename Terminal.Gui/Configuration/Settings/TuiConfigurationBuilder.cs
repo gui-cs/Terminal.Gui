@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
@@ -168,7 +167,7 @@ public class TuiConfigurationBuilder
 
     [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
     [UnconditionalSuppressMessage ("AOT", "IL3050", Justification = "Settings POCOs are simple types; no generic instantiation needed at runtime.")]
-    private static void BindSection<T> (IConfiguration config, string sectionName, Action<T> apply) where T : new ()
+    private static void BindSection<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicProperties)] T> (IConfiguration config, string sectionName, Action<T> apply) where T : new ()
     {
         T settings = new ();
         IConfigurationSection section = config.GetSection (sectionName);
@@ -206,10 +205,10 @@ public class TuiConfigurationBuilder
 
     /// <summary>
     ///     Binds flat dotted keys (e.g. <c>Driver.Force16Colors</c>) from the configuration root to the
-    ///     corresponding properties on the settings POCO.
+    ///     corresponding properties on the settings POCO. <typeparamref name="T"/>'s public properties are
+    ///     preserved for trimming via the <see cref="DynamicallyAccessedMembersAttribute"/> on the type parameter.
     /// </summary>
-    [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
-    private static void BindFlatDottedKeys<T> (IConfiguration config, string sectionName, T settings)
+    private static void BindFlatDottedKeys<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicProperties)] T> (IConfiguration config, string sectionName, T settings)
     {
         string prefix = sectionName + ".";
 
@@ -244,8 +243,12 @@ public class TuiConfigurationBuilder
     }
 
     /// <summary>
-    ///     Converts a configuration string value to the target property type, using a fast path for the
-    ///     common scalar types and falling back to a <see cref="TypeConverter"/>.
+    ///     Converts a configuration string value to the target property type. Only the scalar types used by the
+    ///     settings POCOs are supported, so this path is trim/AOT-safe — it deliberately avoids
+    ///     <c>TypeDescriptor.GetConverter</c> (which is <see cref="RequiresUnreferencedCodeAttribute"/> /
+    ///     <see cref="RequiresDynamicCodeAttribute"/> and breaks NativeAOT/trimmed consumers). New non-scalar
+    ///     settings property types must be added here explicitly. Unsupported types return <see langword="null"/>
+    ///     and are skipped by <see cref="BindFlatDottedKeys{T}"/>.
     /// </summary>
     private static object? ConvertValue (string value, Type targetType)
     {
@@ -269,16 +272,14 @@ public class TuiConfigurationBuilder
             return value.Length > 0 ? new Rune (value [0]) : new Rune ('+');
         }
 
+        if (targetType == typeof (Key))
+        {
+            return Key.TryParse (value, out Key key) ? key : null;
+        }
+
         if (targetType.IsEnum)
         {
             return Enum.Parse (targetType, value);
-        }
-
-        TypeConverter converter = TypeDescriptor.GetConverter (targetType);
-
-        if (converter.CanConvertFrom (typeof (string)))
-        {
-            return converter.ConvertFromInvariantString (value);
         }
 
         return null;
