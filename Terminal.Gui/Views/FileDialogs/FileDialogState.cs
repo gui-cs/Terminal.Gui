@@ -108,7 +108,7 @@ internal class FileDialogState
         }
         catch (Exception)
         {
-            // If even the parent cannot be statted, keep the readable children.
+            // If even the parent cannot be stat'ed/read metadata, keep the readable children.
         }
     }
 
