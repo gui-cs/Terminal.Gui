@@ -1,6 +1,7 @@
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace Terminal.Gui.Configuration;
 
@@ -114,8 +115,10 @@ public class TuiConfigurationBuilder
     {
         IConfiguration config = Configuration;
 
+        // ThemeSettings is special: the active theme is a scalar "Theme" key, not a nested section.
+        BindThemeScalar (config);
+
         // SettingsScope POCOs
-        BindSection<ThemeSettings> (config, "Theme", s => ThemeSettings.Defaults = s);
         BindSection<ApplicationSettings> (config, "Application", s => ApplicationSettings.Defaults = s);
         BindSection<DriverSettings> (config, "Driver", s => DriverSettings.Defaults = s);
         BindSection<FileDialogSettings> (config, "FileDialog", s => FileDialogSettings.Defaults = s);
@@ -168,7 +171,116 @@ public class TuiConfigurationBuilder
     private static void BindSection<T> (IConfiguration config, string sectionName, Action<T> apply) where T : new ()
     {
         T settings = new ();
-        config.GetSection (sectionName).Bind (settings);
+        IConfigurationSection section = config.GetSection (sectionName);
+
+        if (section.Exists ())
+        {
+            // Nested object format: { "Driver": { "Force16Colors": true } }
+            section.Bind (settings);
+        }
+        else
+        {
+            // Flat dotted-key format: { "Driver.Force16Colors": true }. The MEC JSON provider stores
+            // these literally (a dot is not a section separator), so map them to properties by hand.
+            BindFlatDottedKeys (config, sectionName, settings);
+        }
+
         apply (settings);
+    }
+
+    /// <summary>
+    ///     Binds the scalar <c>Theme</c> key from configuration to <see cref="ThemeSettings.Defaults"/>.
+    ///     Unlike other settings, the active theme is a scalar value (e.g. <c>"Dark"</c>), not a nested section.
+    /// </summary>
+    private static void BindThemeScalar (IConfiguration config)
+    {
+        string? themeValue = config ["Theme"];
+
+        if (string.IsNullOrEmpty (themeValue))
+        {
+            return;
+        }
+
+        ThemeSettings.Defaults = new () { Theme = themeValue };
+    }
+
+    /// <summary>
+    ///     Binds flat dotted keys (e.g. <c>Driver.Force16Colors</c>) from the configuration root to the
+    ///     corresponding properties on the settings POCO.
+    /// </summary>
+    [UnconditionalSuppressMessage ("Trimming", "IL2026", Justification = "Settings POCOs are simple types preserved by DynamicDependency in ConfigPropertyHostTypes.")]
+    private static void BindFlatDottedKeys<T> (IConfiguration config, string sectionName, T settings)
+    {
+        string prefix = sectionName + ".";
+
+        foreach (PropertyInfo prop in typeof (T).GetProperties (BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (!prop.CanWrite)
+            {
+                continue;
+            }
+
+            string? value = config [prefix + prop.Name];
+
+            if (value is null)
+            {
+                continue;
+            }
+
+            try
+            {
+                object? converted = ConvertValue (value, prop.PropertyType);
+
+                if (converted is not null)
+                {
+                    prop.SetValue (settings, converted);
+                }
+            }
+            catch (Exception)
+            {
+                // Skip properties whose value cannot be converted to the target type.
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Converts a configuration string value to the target property type, using a fast path for the
+    ///     common scalar types and falling back to a <see cref="TypeConverter"/>.
+    /// </summary>
+    private static object? ConvertValue (string value, Type targetType)
+    {
+        if (targetType == typeof (string))
+        {
+            return value;
+        }
+
+        if (targetType == typeof (bool))
+        {
+            return bool.Parse (value);
+        }
+
+        if (targetType == typeof (int))
+        {
+            return int.Parse (value);
+        }
+
+        if (targetType == typeof (Rune))
+        {
+            return value.Length > 0 ? new Rune (value [0]) : new Rune ('+');
+        }
+
+        if (targetType.IsEnum)
+        {
+            return Enum.Parse (targetType, value);
+        }
+
+        TypeConverter converter = TypeDescriptor.GetConverter (targetType);
+
+        if (converter.CanConvertFrom (typeof (string)))
+        {
+            return converter.ConvertFromInvariantString (value);
+        }
+
+        return null;
     }
 }
