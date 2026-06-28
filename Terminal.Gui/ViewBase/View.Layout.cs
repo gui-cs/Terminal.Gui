@@ -814,6 +814,10 @@ public partial class View // Layout APIs
 
         SubViewLayout?.Invoke (this, new LayoutEventArgs (contentSize));
 
+        // Re-read again — SubViewLayout event handlers may also have called SetContentSize, and the
+        // value captured below is what every SubView is laid out against. See issue #4522 / #4863.
+        contentSize = GetContentSize ();
+
         // The Adornments already have their Frame's set by SetRelativeLayout so we call LayoutSubViews vs. Layout here.
         Margin.View?.LayoutSubViews ();
         Border.View?.LayoutSubViews ();
@@ -906,10 +910,13 @@ public partial class View // Layout APIs
 
     #region NeedsLayout
 
-    // We expose no setter for this to ensure that the ONLY place it's changed is in SetNeedsLayout
-
-    // BUGBUG: The above statement is misleading. There are still cases internally where this property
-    // BUGBUG: is being set directly without calling SetNeedsLayout. We should remove the setter completely.
+    // NeedsLayout is mutated only from within View:
+    //   * Set true by SetNeedsLayout and its helpers MarkSubtreeNeedsLayout / MarkAncestorsNeedLayout.
+    //   * Cleared by LayoutSubViews once the view has been laid out, and by the Margin fast-path in
+    //     View.Drawing.Adornments.
+    // The setter is internal (rather than private) only so layout unit tests can establish a known
+    // baseline; external code must never assign it directly — call SetNeedsLayout instead. Fully
+    // removing the setter is tracked as part of the broader NeedsLayout lifecycle cleanup (issue #4522).
 
     /// <summary>
     ///     Indicates the View's Frame or the layout of the View's subviews (including Adornments) have

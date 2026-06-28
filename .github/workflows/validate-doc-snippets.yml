@@ -12,6 +12,7 @@ on:
       - 'ai-v2-primer.md'
       - '.claude/tasks/build-app.md'
       - '.claude/cookbook/common-patterns.md'
+      - 'llms.txt'
       - 'Terminal.Gui/**'
       - 'Scripts/DocSnippetValidator/**'
       - '.github/workflows/validate-doc-snippets.yml'
@@ -20,6 +21,7 @@ on:
       - 'ai-v2-primer.md'
       - '.claude/tasks/build-app.md'
       - '.claude/cookbook/common-patterns.md'
+      - 'llms.txt'
       - 'Terminal.Gui/**'
       - 'Scripts/DocSnippetValidator/**'
       - '.github/workflows/validate-doc-snippets.yml'
@@ -50,7 +52,8 @@ jobs:
             Terminal.Gui/bin/Debug/net10.0/Terminal.Gui.dll \
             ai-v2-primer.md \
             .claude/tasks/build-app.md \
-            .claude/cookbook/common-patterns.md
+            .claude/cookbook/common-patterns.md \
+            llms.txt
 
       # Negative test: the validator must REJECT a snippet using obsolete v1 APIs
       # (CS0618/CS0612), so the v1 rot this workflow prevents cannot slip back in

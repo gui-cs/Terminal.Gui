@@ -46,11 +46,11 @@ public class WindowsAndFrameViews : Scenario
             SchemeName = "Error",
             Text = $"Padding of container is {PADDING}"
         };
-        paddingButton.Accepting += (_, _) => MessageBox.Query (app,
-                                                               "About UI Catalog",
-                                                               "UI Catalog is a comprehensive sample library for Terminal.Gui",
-                                                               Strings.btnOk
-                                                              );
+        paddingButton.Accepted += (_, _) => MessageBox.Query (app,
+                                                              "About UI Catalog",
+                                                              "UI Catalog is a comprehensive sample library for Terminal.Gui",
+                                                              Strings.btnOk
+                                                             );
         win.Add (paddingButton);
 
         win.Add (
@@ -87,8 +87,8 @@ public class WindowsAndFrameViews : Scenario
                 X = Pos.Center (), Y = 0, SchemeName = "Error", Text = "Press me! (Y = 0)",
             };
 
-            pressMeButton.Accepting += (s, _) =>
-                                        MessageBox.ErrorQuery ((s as View)?.App!, loopWin.Title, "Neat?", Strings.btnNo, Strings.btnYes);
+            pressMeButton.Accepted += (s, _) =>
+                                       MessageBox.ErrorQuery ((s as View)?.App!, loopWin.Title, "Neat?", Strings.btnNo, Strings.btnYes);
             loopWin.Add (pressMeButton);
 
             Window subWin = new ()

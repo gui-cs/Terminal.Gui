@@ -289,6 +289,20 @@ internal partial class ApplicationImpl
             // the whole tree.
             View.Draw (views.ToArray ().Cast<View> (), forceRedraw);
 
+            // Release raster graphics (Sixel/Kitty) whose owning view is no longer rendered — hidden,
+            // removed from the hierarchy, or on a runnable that has ended. They are emitted out-of-band
+            // and persist on screen until explicitly deleted, so erasing their cells is not enough. See
+            // https://github.com/tui-cs/Terminal.Gui/issues/5543.
+            IOutputBuffer rasterBuffer = Driver.GetOutputBuffer ();
+            HashSet<string> activeRasterIds = [];
+
+            foreach (View? view in views)
+            {
+                view?.CollectActiveRasterImageIds (activeRasterIds);
+            }
+
+            rasterBuffer.RetainRasterImages (activeRasterIds);
+
             Driver.Clip = new Region (clipRect);
 
             // Cause the driver to flush any pending updates to the terminal

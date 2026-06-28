@@ -1178,6 +1178,71 @@ public class OutputBaseTests
         Assert.True (buffer.DirtyLines [0]);
     }
 
+    // Claude - Opus 4.8
+    [Fact]
+    public void RetainRasterImages_RemovesUnlistedImages_AndInvalidatesTheirCells ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 4);
+        buffer.Clip = new Region (new Rectangle (0, 0, 4, 4));
+
+        RasterImageCommand keep = new ()
+        {
+            Id = "keep",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        };
+
+        RasterImageCommand drop = new ()
+        {
+            Id = "drop",
+            Pixels = CreateSolidImage (2, 2, new Color (0, 255, 0)),
+            DestinationCells = new Rectangle (2, 2, 2, 2)
+        };
+
+        buffer.AddRasterImage (keep);
+        buffer.AddRasterImage (drop);
+        buffer.DirtyLines [2] = false;
+        buffer.DirtyLines [3] = false;
+
+        // Act
+        buffer.RetainRasterImages (["keep"]);
+
+        // Assert
+        RasterImageCommand remaining = Assert.Single (buffer.GetRasterImages ());
+        Assert.Equal ("keep", remaining.Id);
+
+        // The dropped image's cells are invalidated so they get repainted.
+        Assert.True (buffer.Contents! [3, 3].IsDirty);
+        Assert.True (buffer.DirtyLines [3]);
+    }
+
+    // Claude - Opus 4.8
+    [Fact]
+    public void RetainRasterImages_EmptyActiveIds_RemovesAll ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (2, 2);
+        buffer.Clip = new Region (new Rectangle (0, 0, 2, 2));
+
+        buffer.AddRasterImage (new ()
+        {
+            Id = "image",
+            Pixels = CreateSolidImage (2, 2, new Color (255, 0, 0)),
+            DestinationCells = new Rectangle (0, 0, 2, 2)
+        });
+
+        // Act
+        buffer.RetainRasterImages ([]);
+
+        // Assert
+        Assert.Empty (buffer.GetRasterImages ());
+    }
+
     // Copilot - GPT-5.5
     [Fact]
     public void GetRasterImages_ReturnsReadOnlySnapshot ()

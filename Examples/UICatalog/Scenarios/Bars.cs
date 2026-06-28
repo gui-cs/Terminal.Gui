@@ -279,7 +279,7 @@ public class Bars : Scenario
         bar.Add (new Label { HotKeySpecifier = new Rune ('_'), Text = "Fo_cusLabel", CanFocus = true });
 
         Button middleButton = new () { Text = "Or me!" };
-        middleButton.Accepting += (s, _) => (s as View)?.App!.RequestStop ();
+        middleButton.Accepted += (s, _) => (s as View)?.App!.RequestStop ();
 
         bar.Add (middleButton);
 

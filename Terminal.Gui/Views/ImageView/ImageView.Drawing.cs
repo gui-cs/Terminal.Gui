@@ -51,6 +51,22 @@ public partial class ImageView
         InvalidateScaledImage ();
     }
 
+    /// <inheritdoc/>
+    internal override void CollectActiveRasterImageIds (HashSet<string> ids)
+    {
+        if (!Visible)
+        {
+            return;
+        }
+
+        base.CollectActiveRasterImageIds (ids);
+
+        if (IsUsingRasterGraphics && _image is { })
+        {
+            ids.Add (RasterImageId);
+        }
+    }
+
     /// <summary>
     ///     Renders the image using cell-based rendering where each terminal cell
     ///     gets the background color of the corresponding pixel.
